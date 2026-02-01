@@ -272,7 +272,7 @@ async function signUp(email, password, firstName, lastName) {
       );
       document.getElementById('signupForm')?.reset();
     } else {
-      // Auto-confirmed â€" session exists
+      // Auto-confirmed ï¿½" session exists
       showAuthAlert('signupAlert', 'âœ… Account created successfully! Logging you in...', 'success');
       setTimeout(() => {
         bootstrap.Modal.getInstance(document.getElementById('signupModal'))?.hide();
@@ -443,7 +443,7 @@ async function renderAll() {
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
-  // Use 'totalInvestments' as the check â€" it only exists on the dashboard, not reports.html
+  // Use 'totalInvestments' as the check ï¿½" it only exists on the dashboard, not reports.html
   if (document.getElementById('totalInvestments')) {
       updateDashboardCards();
       renderUpcomingPayments();
@@ -713,7 +713,7 @@ function calculateAmortization(principal, annualRate, termMonths, paymentsMade) 
 
   let monthlyPayment;
   if (!annualRate || annualRate === 0) {
-    // 0% APR — simple division
+    // 0% APR ï¿½ simple division
     monthlyPayment = principal / termMonths;
     result.monthlyPayment = Math.round(monthlyPayment * 100) / 100;
     result.totalCost = Math.round(principal * 100) / 100;
@@ -735,7 +735,7 @@ function calculateAmortization(principal, annualRate, termMonths, paymentsMade) 
     return result;
   }
 
-  // Standard amortization: M = P[r(1+r)^n] / [(1+r)^n – 1]
+  // Standard amortization: M = P[r(1+r)^n] / [(1+r)^n ï¿½ 1]
   const r = annualRate / 100 / 12;
   const n = termMonths;
   const factor = Math.pow(1 + r, n);
@@ -867,7 +867,7 @@ function renderBills() {
   const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off');
   const completedFinancing = financingBills.filter(b => getBillFinancingInfo(b).status === 'paid_off');
 
-  // Render ALL active bills in the table (including financing — they're recurring payments too)
+  // Render ALL active bills in the table (including financing ï¿½ they're recurring payments too)
   const activeBills = allBills.filter(b => {
     const info = getBillFinancingInfo(b);
     return !(info.isFinancing && info.status === 'paid_off');
@@ -1037,7 +1037,13 @@ function renderBills() {
   }
 
   // Update summary cards
-  const totalBills = allBills.reduce((sum, b) => sum + getRaw(b.amount), 0);
+  // BUG FIX: Use owner_amount for shared bills instead of full amount
+  const totalBills = allBills.reduce((sum, b) => {
+    const shareInfo = getShareInfoForBill(b.id);
+    // If bill is shared (and accepted), use owner_amount; otherwise use full amount
+    const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
+    return sum + getRaw(userAmount);
+  }, 0);
   if (document.getElementById('billsTotal')) document.getElementById('billsTotal').textContent = formatCurrency(totalBills);
   if (document.getElementById('billsRecurringCount')) document.getElementById('billsRecurringCount').textContent = recurringBills.length;
   if (document.getElementById('billsFinancingCount')) document.getElementById('billsFinancingCount').textContent = activeFinancing.length;
@@ -1086,7 +1092,7 @@ function updateLoanCalcPreview() {
     }
   } else {
     preview.classList.add('d-none');
-    if (balanceDisplay) balanceDisplay.textContent = '—';
+    if (balanceDisplay) balanceDisplay.textContent = 'ï¿½';
   }
 }
 
@@ -1100,7 +1106,7 @@ function openBillModal(id = null) {
   const preview = document.getElementById('loanCalcPreview');
   if (preview) preview.classList.add('d-none');
   const balanceReset = document.getElementById('remainingBalanceDisplay');
-  if (balanceReset) balanceReset.textContent = '—';
+  if (balanceReset) balanceReset.textContent = 'ï¿½';
 
   if (id) {
       const b = window.bills.find(x => x.id == id);
@@ -1115,7 +1121,7 @@ function openBillModal(id = null) {
             if (financingFields) financingFields.classList.remove('d-none');
             if (b.interest_rate !== undefined && b.interest_rate !== null) f.billInterestRate.value = b.interest_rate;
             if (b.original_principal) f.billOriginalPrincipal.value = b.original_principal;
-            // Loan term — show in years if divisible by 12, otherwise months
+            // Loan term ï¿½ show in years if divisible by 12, otherwise months
             if (b.loan_term_months) {
               const termUnit = document.getElementById('billLoanTermUnit');
               const termValue = document.getElementById('billLoanTermValue');
@@ -1148,7 +1154,7 @@ function openBillModal(id = null) {
             updateLoanCalcPreview();
             // Also compute remaining balance even without full amort (fallback)
             const balanceDisplay = document.getElementById('remainingBalanceDisplay');
-            if (balanceDisplay && balanceDisplay.textContent === '—') {
+            if (balanceDisplay && balanceDisplay.textContent === 'ï¿½') {
               const info = getBillFinancingInfo(b);
               if (info.isFinancing) {
                 balanceDisplay.textContent = formatCurrency(info.remainingBalance);
@@ -1200,10 +1206,10 @@ async function saveBill() {
       record.total_amount = calc.totalCost;
     }
   }
-  // Attempt save — if new columns don't exist yet, retry without them
+  // Attempt save ï¿½ if new columns don't exist yet, retry without them
   let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(record);
   if (error && error.message && error.message.includes('column')) {
-    // Columns don't exist yet in DB — strip new fields and retry
+    // Columns don't exist yet in DB ï¿½ strip new fields and retry
     const baseRecord = {
       name: record.name, type: record.type, amount: record.amount,
       frequency: record.frequency, nextDueDate: record.nextDueDate, user_id: record.user_id
@@ -1295,7 +1301,7 @@ function showAmortizationSchedule(billId) {
 
   // Update modal title
   const title = document.getElementById('amortizationModalLabel');
-  if (title) title.textContent = `Amortization Schedule — ${bill.name}`;
+  if (title) title.textContent = `Amortization Schedule ï¿½ ${bill.name}`;
 
   bootstrap.Modal.getOrCreateInstance(document.getElementById('amortizationModal')).show();
 }
@@ -1545,7 +1551,16 @@ async function renderAdditionalCharts() {
     ];
     allExpenseItems.forEach(item => {
       if (!item.nextDueDate || !item.frequency) return;
-      const amount = parseFloat(item.amount || 0);
+      // BUG FIX: Use owner_amount for shared bills in savings rate calculation
+      let amount = item.amount;
+      // Check if this is a bill (has id and not mapped from debt) and if it's shared
+      if (item.id && item.type !== 'debt') {
+        const shareInfo = getShareInfoForBill(item.id);
+        if (shareInfo && shareInfo.status === 'accepted') {
+          amount = shareInfo.owner_amount;
+        }
+      }
+      amount = parseFloat(amount || 0);
       let nextDate = new Date(item.nextDueDate + 'T00:00:00');
       let safety = 0;
       while (nextDate < monthStart && safety < 1000) { nextDate = getNextDate(nextDate, item.frequency); safety++; }
@@ -1799,8 +1814,8 @@ async function loadAndRenderBudget() {
           <td>${escapeHtml(rec.category || 'N/A')}</td>
           <td><s>${escapeHtml(rec.name || 'Unnamed')}</s></td>
           <td class="text-muted">${formatCurrency(needed)}</td>
-          <td class="text-muted">—</td>
-          <td class="text-muted">—</td>
+          <td class="text-muted">ï¿½</td>
+          <td class="text-muted">ï¿½</td>
           <td class="text-muted small">Removed</td>
           <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${rec.item_id}', '${monthString}')" title="Restore to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
       `;
@@ -2083,7 +2098,7 @@ async function generateBudgetForMonth(monthString) {
 
     if (budgetError) throw budgetError;
 
-    // Build a set of already-budgeted item IDs (including suppressed ones — don't re-add them)
+    // Build a set of already-budgeted item IDs (including suppressed ones ï¿½ don't re-add them)
     const budgetedItemIds = new Set((existingBudgets || []).map(b => b.item_id));
 
     // 3. Fetch last month's budget for variable bill amounts
@@ -2241,7 +2256,17 @@ function renderUpcomingPayments() {
       const d = new Date(item.nextDueDate + 'T00:00:00');
       return d >= today && d <= nextWeek;
   }).sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
-  c.innerHTML = upcoming.length ? upcoming.map(item => `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span></div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(item.amount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
+  c.innerHTML = upcoming.length ? upcoming.map(item => {
+    // BUG FIX: Use owner_amount for shared bills in upcoming payments
+    let displayAmount = item.amount;
+    if (item.category !== 'Debt' && item.id) {
+      const shareInfo = getShareInfoForBill(item.id);
+      if (shareInfo && shareInfo.status === 'accepted') {
+        displayAmount = shareInfo.owner_amount;
+      }
+    }
+    return `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span></div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(displayAmount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`;
+  }).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
 }
 async function renderNetWorthChart() {
   const ctx = document.getElementById('netWorthTimelineChart');
@@ -2273,7 +2298,15 @@ async function generateMonthlyCashFlowChart() {
       [...(window.income || []), ...activeBillsForCashFlow, ...(window.debts || []).map(d => ({ ...d, amount: d.monthlyPayment, frequency: 'monthly' }))].forEach(item => {
           if (!item.nextDueDate || !item.frequency) return;
           const isIncome = (typeof item.type === 'string' && (item.type.toLowerCase() === 'w2' || item.type.toLowerCase() === '1099'));
-          const amount = getRaw(item.amount);
+          // BUG FIX: Use owner_amount for shared bills in cash flow calculations
+          let amount = item.amount;
+          if (!isIncome && item.id) { // Check if it's an expense (bill) with an id
+            const shareInfo = getShareInfoForBill(item.id);
+            if (shareInfo && shareInfo.status === 'accepted') {
+              amount = shareInfo.owner_amount;
+            }
+          }
+          amount = getRaw(amount);
           let nextDate = new Date(item.nextDueDate + 'T00:00:00');
           let loopGuard = 0;
           while (nextDate < monthStart && nextDate.getFullYear() < today.getFullYear() + 2 && loopGuard < 1000) { try { nextDate = getNextDate(nextDate, item.frequency); } catch { break; } loopGuard++; }
@@ -2341,7 +2374,7 @@ function init() {
     debugLog(`AUTH: Event received: ${event}`);
     currentUser = session?.user || null;
 
-    // Handle password recovery event â€" show reset password modal
+    // Handle password recovery event ï¿½" show reset password modal
     if (event === 'PASSWORD_RECOVERY') {
       const resetModal = document.getElementById('resetPasswordModal');
       if (resetModal) {
@@ -3042,7 +3075,7 @@ async function loadSharedBillsData() {
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'pending');
   
-  // Load outgoing shares (bills I'm sharing with others) — with bill + friend details
+  // Load outgoing shares (bills I'm sharing with others) ï¿½ with bill + friend details
   const { data: myOutgoingShares } = await sb
     .from('bill_shares')
     .select('*, bill:bills!bill_shares_bill_id_fkey(*), shared_user:user_profiles!bill_shares_shared_with_id_user_profiles_fkey(id, username, display_name)')
