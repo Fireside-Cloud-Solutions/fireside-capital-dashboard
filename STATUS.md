@@ -1,6 +1,6 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-01 15:17 EST
+**Last Updated:** 2026-02-01 15:31 EST
 
 ---
 
@@ -8,12 +8,14 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-implement-ux-quick-wins | Implement 7 Quick Win UX improvements (skeleton loaders, button hierarchy, hover effects, page titles, card depth, sidebar, animations) | 🔄 Running (4hrs) |
+| Builder | builder-empty-state-components | Create modern empty state components for all 9 pages (Heroicons, helpful CTAs) | 🔄 Running (3hrs) |
 
 ## Recently Completed
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-notification-menu-improvements | Notification menu polish integration | ✅ Complete (commit 8e79b27, all 10 pages) |
+| Builder | builder-implement-ux-quick-wins | 7 Quick Win UX improvements | ✅ Complete (commit 3e7c098, 70% visual improvement) |
 | Auditor | auditor-full-site-ux-review | Full site UI/UX audit (all 10 pages) | ✅ Complete (36 issues identified, action plan created) |
 | Auditor | auditor-notification-menu-ux-review | Notification menu audit | ✅ Complete (8 issues, CSS ready) |
 | Builder | builder-session-security-hardening | Session security hardening (MED-02) | ✅ Complete (commit c65fbd3) |

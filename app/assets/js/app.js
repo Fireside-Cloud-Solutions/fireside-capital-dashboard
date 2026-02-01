@@ -661,6 +661,17 @@ async function renderAll() {
   renderReportsSummary();
 }
 function renderReportsSummary() {
+    // Check if there's any data to report on
+    const hasAnyData = (window.assets && window.assets.length > 0) ||
+                        (window.investments && window.investments.length > 0) ||
+                        (window.debts && window.debts.length > 0) ||
+                        (window.bills && window.bills.length > 0) ||
+                        (window.income && window.income.length > 0);
+    
+    if (typeof toggleEmptyState === 'function') {
+      toggleEmptyState('dataContainer', 'reports', hasAnyData);
+    }
+    
     const totalInv = (window.investments || []).reduce((s, i) => s + getRaw(i.value), 0);
     const totalDebt = (window.debts || []).reduce((s, d) => s + getRaw(d.amount), 0);
     const totalAssetEquity = (window.assets || []).reduce((s, a) => s + Math.max(0, getRaw(a.value) - getRaw(a.loan)), 0);
@@ -676,7 +687,15 @@ function renderReportsSummary() {
 function renderAssets() {
   const tbody = document.getElementById('assetTableBody');
   if (!tbody) return;
-  tbody.innerHTML = (window.assets || []).map(a => `
+  
+  const assets = window.assets || [];
+  
+  // Toggle empty state
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'assets', assets);
+  }
+  
+  tbody.innerHTML = assets.map(a => `
       <tr>
           <td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.type)}</td><td>${formatCurrency(a.value)}</td>
           <td>${formatCurrency(a.loan)}</td><td>${formatCurrency(Math.max(getRaw(a.value) - getRaw(a.loan), 0))}</td>
@@ -778,7 +797,15 @@ async function deleteAssetConfirmed() {
 function renderInvestments() {
   const tbody = document.getElementById('investmentTableBody');
   if (!tbody) return;
-  tbody.innerHTML = (window.investments || []).map(inv => `
+  
+  const investments = window.investments || [];
+  
+  // Toggle empty state
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'investments', investments);
+  }
+  
+  tbody.innerHTML = investments.map(inv => `
       <tr>
           <td>${escapeHtml(inv.name)}</td><td>${escapeHtml(inv.type)}</td><td>${formatCurrency(inv.startingBalance)}</td>
           <td>${formatCurrency(inv.monthlyContribution)}</td><td>${escapeHtml(inv.annualReturn ? inv.annualReturn + '%' : '-')}</td>
@@ -874,7 +901,15 @@ async function deleteInvestmentConfirmed(id) {
 function renderDebts() {
   const tbody = document.getElementById('debtTableBody');
   if (!tbody) return;
-  tbody.innerHTML = (window.debts || []).map(d => `
+  
+  const debts = window.debts || [];
+  
+  // Toggle empty state
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'debts', debts);
+  }
+  
+  tbody.innerHTML = debts.map(d => `
       <tr>
           <td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.type)}</td><td>${formatCurrency(d.amount)}</td><td>${escapeHtml(d.interestRate)}%</td>
           <td>${escapeHtml(d.term || '-')} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
@@ -1139,6 +1174,11 @@ function renderBills() {
   if (!tbody) return;
 
   const allBills = window.bills || [];
+  
+  // Toggle empty state for bills page
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'bills', allBills);
+  }
   const isFinancingType = (b) => {
     const type = (b.type || '').toLowerCase();
     return type === 'financing' || getBillFinancingInfo(b).isFinancing;
@@ -1705,7 +1745,15 @@ async function deleteBillConfirmed() {
 function renderIncome() {
   const tbody = document.getElementById('incomeTableBody');
   if (!tbody) return;
-  tbody.innerHTML = (window.income || []).map(i => `
+  
+  const income = window.income || [];
+  
+  // Toggle empty state
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'income', income);
+  }
+  
+  tbody.innerHTML = income.map(i => `
       <tr>
           <td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.type)}</td><td>${formatCurrency(i.amount)}</td>
           <td>${escapeHtml(i.frequency)}</td><td>${i.nextDueDate ? escapeHtml(formatDate(i.nextDueDate)) : '-'}</td>
@@ -2175,6 +2223,12 @@ async function loadAndRenderBudget() {
 
   const tbody = document.getElementById('budgetAssignmentTable');
   tbody.textContent = '';
+  
+  // Check if there's any budget data to display
+  const hasBudgetData = (window.bills && window.bills.length > 0) || (window.debts && window.debts.length > 0) || (window.income && window.income.length > 0);
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'budget', hasBudgetData);
+  }
 
   // Fetch shared bills for budget display (same logic as generateBudgetForMonth)
   let sharedBillsForDisplay = [];
@@ -2771,6 +2825,18 @@ function initializeBudgetPage() {
 
 async function updateDashboardCards() {
   if (!currentUser) return;
+  
+  // Check if user has any data at all
+  const hasAnyData = (window.assets && window.assets.length > 0) ||
+                      (window.investments && window.investments.length > 0) ||
+                      (window.debts && window.debts.length > 0) ||
+                      (window.bills && window.bills.length > 0) ||
+                      (window.income && window.income.length > 0);
+  
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'dashboard', hasAnyData);
+  }
+  
   const totalInv = (window.investments || []).reduce((s, i) => s + getRaw(i.value), 0);
   const totalDebt = (window.debts || []).reduce((s, d) => s + getRaw(d.amount), 0);
   const totalAssetEquity = (window.assets || []).reduce((s, a) => s + Math.max(0, getRaw(a.value) - getRaw(a.loan)), 0);
@@ -3559,6 +3625,9 @@ async function loadFriendsPage() {
     }));
     
     if (friends.length > 0) {
+      if (typeof hideEmptyState === 'function') {
+        hideEmptyState('myFriendsContainer');
+      }
       friendsContainer.innerHTML = friends.map(f => `
         <div class="col-xl-4 col-md-6 col-12">
           <div class="card">
@@ -3581,13 +3650,18 @@ async function loadFriendsPage() {
         </div>
       `).join('');
     } else {
-      const col = document.createElement('div');
-      col.className = 'col-12';
-      const message = document.createElement('p');
-      message.className = 'text-muted fst-italic';
-      message.textContent = 'No friends yet. Search for people to connect with!';
-      col.appendChild(message);
-      friendsContainer.replaceChildren(col);
+      if (typeof showEmptyState === 'function') {
+        friendsContainer.innerHTML = '';
+        showEmptyState('myFriendsContainer', 'friends');
+      } else {
+        const col = document.createElement('div');
+        col.className = 'col-12';
+        const message = document.createElement('p');
+        message.className = 'text-muted fst-italic';
+        message.textContent = 'No friends yet. Search for people to connect with!';
+        col.appendChild(message);
+        friendsContainer.replaceChildren(col);
+      }
     }
   }
   
