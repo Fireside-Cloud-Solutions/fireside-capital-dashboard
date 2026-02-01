@@ -2927,6 +2927,16 @@ async function confirmShareBill() {
     case 'fixed':
       owner_fixed = parseFloat(document.getElementById('shareOwnerFixed').value) || 0;
       shared_fixed = parseFloat(document.getElementById('shareSharedFixed').value) || 0;
+      if (owner_fixed > bill.amount || shared_fixed > bill.amount) {
+        const warn = document.getElementById('fixedAmountError');
+        if (warn) { warn.textContent = 'Amount exceeds the bill total.'; warn.classList.remove('d-none'); }
+        return;
+      }
+      if (Math.abs((owner_fixed + shared_fixed) - bill.amount) > 0.01) {
+        const warn = document.getElementById('fixedAmountError');
+        if (warn) { warn.textContent = 'Amounts must add up to the bill total.'; warn.classList.remove('d-none'); }
+        return;
+      }
       owner_amount = owner_fixed;
       shared_amount = shared_fixed;
       break;
@@ -2991,12 +3001,37 @@ function initShareBillUI() {
     document.getElementById('percentageSplitFields').classList.toggle('d-none', e.target.value !== 'percentage');
     document.getElementById('fixedSplitFields').classList.toggle('d-none', e.target.value !== 'fixed');
     document.getElementById('percentageError')?.classList.add('d-none');
+    document.getElementById('fixedAmountError')?.classList.add('d-none');
     updateSharePreview();
   });
   
-  // Live preview updates
-  ['shareOwnerPercent', 'shareSharedPercent', 'shareOwnerFixed', 'shareSharedFixed'].forEach(id => {
+  // Live preview updates for percentage fields
+  ['shareOwnerPercent', 'shareSharedPercent'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', updateSharePreview);
+  });
+  
+  // Fixed amount auto-fill: editing one field calculates the other as remainder
+  document.getElementById('shareOwnerFixed')?.addEventListener('input', (e) => {
+    const billAmount = getRaw(document.getElementById('shareBillAmount').value);
+    const ownerVal = parseFloat(e.target.value) || 0;
+    const capped = Math.min(Math.max(ownerVal, 0), billAmount);
+    const remainder = Math.round((billAmount - capped) * 100) / 100;
+    document.getElementById('shareSharedFixed').value = remainder >= 0 ? remainder : 0;
+    // Show warning if entered value exceeds bill total
+    const warn = document.getElementById('fixedAmountError');
+    if (warn) warn.classList.toggle('d-none', ownerVal <= billAmount);
+    updateSharePreview();
+  });
+  document.getElementById('shareSharedFixed')?.addEventListener('input', (e) => {
+    const billAmount = getRaw(document.getElementById('shareBillAmount').value);
+    const sharedVal = parseFloat(e.target.value) || 0;
+    const capped = Math.min(Math.max(sharedVal, 0), billAmount);
+    const remainder = Math.round((billAmount - capped) * 100) / 100;
+    document.getElementById('shareOwnerFixed').value = remainder >= 0 ? remainder : 0;
+    // Show warning if entered value exceeds bill total
+    const warn = document.getElementById('fixedAmountError');
+    if (warn) warn.classList.toggle('d-none', sharedVal <= billAmount);
+    updateSharePreview();
   });
   
   // Percentage sync
