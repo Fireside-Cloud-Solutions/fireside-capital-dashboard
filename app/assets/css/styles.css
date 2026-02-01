@@ -1,19 +1,25 @@
 /* =================================================================
-   Fireside Capital Dashboard — Refined Hierarchy Design
+   Fireside Capital Dashboard — Logo-Native Brand System
    Built on Bootstrap 5 · Brand tokens from design-tokens.css
-   Dark-first design system · v3.0 UX/UI Redesign
+   Dark-first design system · v2.1 UX/UI Refinement (PROPOSAL)
    
-   Design Philosophy:
-   - Black primary actions (trust, stability)
-   - Orange accent used sparingly (brand moments only)
-   - Red outline for destructive actions
+   Design Philosophy (Tri-Color Hierarchy):
+   - Flame Orange (#f44e24): PRIMARY actions - 1 per page max
+   - Sky Blue (#01a4ef): SECONDARY actions - 2 per page max
+   - Neutral Gray: TERTIARY actions - unlimited
+   - Lime Green (#81b900): SUCCESS states
+   - Red outline: DESTRUCTIVE actions
+   
+   Layout Improvements:
    - 8px spacing grid consistently applied
-   - 44px minimum touch targets
+   - 44px minimum touch targets (WCAG 2.5.5)
    - 16px minimum body text (prevents iOS zoom)
    - Generous breathing room on all viewports
+   - Buttons stack vertically on mobile (<576px)
    
-   Redesign Date: January 15, 2025
+   Refinement Date: January 15, 2025
    Designer: Designer Agent
+   Status: AWAITING APPROVAL
    ================================================================= */
 
 @import url('./design-tokens.css');
@@ -625,42 +631,73 @@ strong {
   min-height: 44px; /* Touch target minimum */
 }
 
-/* Primary — Black background, white text */
+/* Primary — Flame Orange (HIGH IMPACT - use 1 per page max) */
 .btn-primary {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-text-on-brand);
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
   background-color: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: var(--color-text-on-brand);
+  box-shadow: var(--shadow-glow-sm);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
   background-color: var(--color-primary-active);
   border-color: var(--color-primary-active);
-  color: #ffffff;
+  color: var(--color-text-on-brand);
   transform: translateY(0);
 }
 
-/* Outline Primary — Gray outline, subtle hover */
-.btn-outline-primary {
+/* Secondary — Sky Blue (MEDIUM IMPACT - supportive actions) */
+.btn-secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: #ffffff;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(var(--color-secondary-rgb), 0.3);
+  transform: translateY(-1px);
+}
+
+/* Outline Secondary — Neutral Gray (LOW IMPACT - utility actions) */
+.btn-outline-secondary {
   color: var(--color-text-primary);
-  border-color: var(--color-border-strong);
+  border-color: var(--color-tertiary);
+  background-color: transparent;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-tertiary-hover);
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Outline Primary — Orange outline (alternative primary style) */
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
   background-color: transparent;
 }
 
 .btn-outline-primary:hover,
 .btn-outline-primary:focus {
-  background-color: var(--color-bg-3);
+  background-color: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: var(--color-text-on-brand);
+  box-shadow: var(--shadow-glow-sm);
 }
 
 /* Secondary — Neutral surface */
@@ -691,7 +728,7 @@ strong {
   box-shadow: 0 0 12px rgba(var(--color-danger-rgb), 0.3);
 }
 
-/* Success */
+/* Success — Lime Green (positive confirmations) */
 .btn-success {
   background-color: var(--color-success);
   border-color: var(--color-success);
@@ -702,6 +739,7 @@ strong {
   background-color: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
   color: var(--color-text-on-brand);
+  box-shadow: 0 0 10px rgba(var(--color-success-rgb), 0.3);
 }
 
 /* Warning / Accent */

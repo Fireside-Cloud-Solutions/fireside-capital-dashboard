@@ -8,35 +8,34 @@
 
 :root {
   /* -----------------------------------------------------------------
-     COLORS — Brand (Refined Hierarchy)
+     COLORS — Brand (Fireside Logo-Native)
      ----------------------------------------------------------------- */
-  /* Primary — Black (Primary actions, trust, stability) */
-  --color-primary: #1a1a1a;
-  --color-primary-hover: #2a2a2a;
-  --color-primary-active: #0f0f0f;
-  --color-primary-rgb: 26, 26, 26;
-  --color-primary-light: rgba(26, 26, 26, 0.15);
+  /* Primary — Flame Orange (Logo "3" chevron - HIGH IMPACT CTAs) */
+  --color-primary: #f44e24;
+  --color-primary-hover: #d94420;
+  --color-primary-active: #c03b1a;
+  --color-primary-rgb: 244, 78, 36;
+  --color-primary-light: rgba(244, 78, 36, 0.15);
 
-  /* Brand Accent — Flame Orange (Logo Red-Orange, used sparingly) */
-  --color-brand-accent: #f44e24;
-  --color-brand-accent-hover: #d94420;
-  --color-brand-accent-active: #c03b1a;
-  --color-brand-accent-rgb: 244, 78, 36;
-  --color-brand-accent-light: rgba(244, 78, 36, 0.15);
-
-  /* Secondary — Sky Blue (Logo Blue) */
+  /* Secondary — Sky Blue (Logo "E" - MEDIUM IMPACT actions) */
   --color-secondary: #01a4ef;
   --color-secondary-hover: #0190d4;
   --color-secondary-active: #017db8;
   --color-secondary-rgb: 1, 164, 239;
   --color-secondary-light: rgba(1, 164, 239, 0.15);
 
-  /* Tertiary / Accent — Lime (Logo Green) */
+  /* Success/Accent — Lime Green (Logo "365" - SUCCESS states) */
   --color-accent: #81b900;
   --color-accent-hover: #72a300;
   --color-accent-active: #648e00;
   --color-accent-rgb: 129, 185, 0;
   --color-accent-light: rgba(129, 185, 0, 0.15);
+
+  /* Tertiary — Neutral Gray (LOW IMPACT utility actions) */
+  --color-tertiary: #4a4a4a;
+  --color-tertiary-hover: #5a5a5a;
+  --color-tertiary-rgb: 74, 74, 74;
+  --color-tertiary-light: rgba(74, 74, 74, 0.15);
 
   /* -----------------------------------------------------------------
      COLORS — Backgrounds (Neutral Charcoal)
@@ -70,14 +69,17 @@
   /* -----------------------------------------------------------------
      COLORS — Semantic
      ----------------------------------------------------------------- */
-  --color-success: #28a745;
-  --color-success-rgb: 40, 167, 69;
-  --color-success-bg: rgba(40, 167, 69, 0.12);
+  /* Success — Use logo Lime Green */
+  --color-success: #81b900;
+  --color-success-rgb: 129, 185, 0;
+  --color-success-bg: rgba(129, 185, 0, 0.12);
 
+  /* Warning — Amber (non-logo, for caution states) */
   --color-warning: #ffc107;
   --color-warning-rgb: 255, 193, 7;
   --color-warning-bg: rgba(255, 193, 7, 0.12);
 
+  /* Danger — Red (non-logo, for destructive actions) */
   --color-danger: #dc3545;
   --color-danger-rgb: 220, 53, 69;
   --color-danger-bg: rgba(220, 53, 69, 0.12);
@@ -87,6 +89,7 @@
   --color-error-rgb: 220, 53, 69;
   --color-error-bg: rgba(220, 53, 69, 0.12);
 
+  /* Info — Use logo Sky Blue */
   --color-info: #01a4ef;
   --color-info-rgb: 1, 164, 239;
   --color-info-bg: rgba(1, 164, 239, 0.12);

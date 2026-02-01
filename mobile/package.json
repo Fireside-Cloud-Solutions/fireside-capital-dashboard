@@ -1,7 +1,7 @@
 {
   "name": "fireside-capital-mobile",
   "version": "1.0.0",
-  "main": "expo/AppEntry.js",
+  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -29,7 +29,11 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "metro": "^0.80.0",
+    "metro-config": "^0.80.0",
+    "metro-resolver": "^0.80.0",
+    "@expo/metro-config": "~0.18.0"
   },
   "private": true
 }
