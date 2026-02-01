@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
 const { searchBillEmails } = require('../../integrations/gmail/gmail-client');
 const { parseBillEmails } = require('../../integrations/gmail/bill-parser');
@@ -8,6 +9,38 @@ const { parseBillEmails } = require('../../integrations/gmail/bill-parser');
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: ['https://nice-cliff-05b13880f.2.azurestaticapps.net', 'http://localhost:3000'] }));
+
+// ===== RATE LIMITING =====
+
+// General API rate limiter - 20 requests per 10 seconds
+const generalLimiter = rateLimit({
+  windowMs: 10 * 1000, // 10 seconds
+  max: 20,
+  message: { error: 'Too many requests. Please wait and try again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Strict limiter for sensitive operations - 5 requests per minute
+const strictLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5,
+  message: { error: 'Too many requests. Please wait before trying again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Email scan limiter - 2 requests per minute
+const emailLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 2,
+  message: { error: 'Too many email scan requests. Please wait 1 minute between scans.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply general rate limiting to all routes
+app.use(generalLimiter);
 
 const plaidClient = new PlaidApi(
   new Configuration({
@@ -21,7 +54,7 @@ const plaidClient = new PlaidApi(
   })
 );
 
-app.post('/exchange_public_token', async (req, res) => {
+app.post('/exchange_public_token', strictLimiter, async (req, res) => {
   try {
     const response = await plaidClient.itemPublicTokenExchange({
       public_token: req.body.public_token,
@@ -36,7 +69,7 @@ app.post('/exchange_public_token', async (req, res) => {
   }
 });
 
-app.post('/create_link_token', async (req, res) => {
+app.post('/create_link_token', strictLimiter, async (req, res) => {
   try {
     const response = await plaidClient.linkTokenCreate({
       user: {

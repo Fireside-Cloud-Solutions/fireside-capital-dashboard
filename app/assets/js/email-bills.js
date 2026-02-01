@@ -22,6 +22,14 @@ const CONFIDENCE_THRESHOLDS = {
  * Calls the backend scanner and stores results in pending_bills table.
  */
 async function scanEmailForBills() {
+  // Rate limiting
+  if (window.rateLimiters && !window.rateLimiters.email.allow('scanEmailBills')) {
+    const remainingMs = window.rateLimiters.email.getRemainingTime('scanEmailBills');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    showToast(`Too many scan requests. Please wait ${remainingSeconds} seconds.`, 'warning');
+    return;
+  }
+
   const scanBtn = document.getElementById('scanEmailBillsBtn');
   if (!scanBtn) return;
 

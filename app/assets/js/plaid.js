@@ -60,6 +60,14 @@ function exchangePublicToken(publicToken) {
 
 // Open Plaid Link
 function openPlaidLink() {
+  // Rate limiting
+  if (window.rateLimiters && !window.rateLimiters.plaid.allow('openPlaidLink')) {
+    const remainingMs = window.rateLimiters.plaid.getRemainingTime('openPlaidLink');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many Plaid connection attempts. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   if (plaidLinkHandler) {
     plaidLinkHandler.open();
   } else {

@@ -184,6 +184,14 @@ async function safeCreateChart(ctx, config, chartName) {
 
 // ===== CSV EXPORT (SUG-02) =====
 function exportFinancialDataCSV() {
+  // Rate limiting
+  if (!rateLimiters.report.allow('csvExport')) {
+    const remainingMs = rateLimiters.report.getRemainingTime('csvExport');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many export requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   const lines = [];
   const esc = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
 
@@ -442,6 +450,11 @@ async function logout() {
   // Clear all session data
   clearCache();
   
+  // Clear CSRF token on logout
+  if (typeof CSRF !== 'undefined') {
+    CSRF.clearToken();
+  }
+  
   // Sign out from Supabase (revokes tokens server-side)
   await sb.auth.signOut();
   
@@ -657,6 +670,14 @@ function confirmDeleteAsset(id, name) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteAssetModal')).show();
 }
 async function deleteAssetConfirmed() {
+  // Rate limiting
+  if (!rateLimiters.delete.allow('deleteAsset')) {
+    const remainingMs = rateLimiters.delete.getRemainingTime('deleteAsset');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many delete requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -740,6 +761,14 @@ function confirmDeleteInvestment(id, name) {
   }
 }
 async function deleteInvestmentConfirmed(id) {
+  // Rate limiting
+  if (!rateLimiters.delete.allow('deleteInvestment')) {
+    const remainingMs = rateLimiters.delete.getRemainingTime('deleteInvestment');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many delete requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -787,6 +816,14 @@ function openDebtModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveDebt() {
+  // Rate limiting
+  if (!rateLimiters.save.allow('saveDebt')) {
+    const remainingMs = rateLimiters.save.getRemainingTime('saveDebt');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -817,6 +854,14 @@ function confirmDeleteDebt(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteDebtModal')).show();
 }
 async function deleteDebtConfirmed() {
+  // Rate limiting
+  if (!rateLimiters.delete.allow('deleteDebt')) {
+    const remainingMs = rateLimiters.delete.getRemainingTime('deleteDebt');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many delete requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -1337,6 +1382,14 @@ function openBillModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveBill() {
+  // Rate limiting
+  if (!rateLimiters.save.allow('saveBill')) {
+    const remainingMs = rateLimiters.save.getRemainingTime('saveBill');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -1482,6 +1535,14 @@ function confirmDeleteBill(id, name) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
 }
 async function deleteBillConfirmed() {
+  // Rate limiting
+  if (!rateLimiters.delete.allow('deleteBill')) {
+    const remainingMs = rateLimiters.delete.getRemainingTime('deleteBill');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many delete requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -1529,6 +1590,24 @@ function openIncomeModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveIncome() {
+  // Rate limiting
+  if (!rateLimiters.save.allow('saveIncome')) {
+    const remainingMs = rateLimiters.save.getRemainingTime('saveIncome');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const f = document.getElementById('incomeForm');
   const record = {
       name: f.incomeName.value, type: f.incomeType.value, amount: getRaw(f.incomeAmount.value),
@@ -1549,6 +1628,24 @@ function confirmDeleteIncome(id, name) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteIncomeModal')).show();
 }
 async function deleteIncomeConfirmed() {
+  // Rate limiting
+  if (!rateLimiters.delete.allow('deleteIncome')) {
+    const remainingMs = rateLimiters.delete.getRemainingTime('deleteIncome');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many delete requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const { error } = await sb.from('income').delete().eq('id', deleteIncomeId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteIncomeModal')).hide();
@@ -1614,6 +1711,24 @@ async function renderEmergencyFundChart() {
 
 // This new function saves your settings to Supabase
 async function saveSettings() {
+  // Rate limiting
+  if (!rateLimiters.save.allow('saveSettings')) {
+    const remainingMs = rateLimiters.save.getRemainingTime('saveSettings');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   if (!currentUser) return;
   const goal = getRaw(document.getElementById('emergencyFundGoal').value);
 
@@ -2111,6 +2226,16 @@ async function loadAndRenderBudget() {
   });
 }
 async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   if (!currentUser || !itemId || !itemType) return;
 
   const monthString = `${currentBudgetMonth.getFullYear()}-${(currentBudgetMonth.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -2142,6 +2267,16 @@ async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
 
 // This function saves a manually-added budget item to Supabase
 async function saveBudgetItem() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   if (!currentUser) return;
   const monthString = `${currentBudgetMonth.getFullYear()}-${(currentBudgetMonth.getMonth() + 1).toString().padStart(2, '0')}`;
   
@@ -2183,6 +2318,16 @@ async function saveBudgetItem() {
 // Bill/debt items are suppressed so "Generate Budget" won't re-add them.
 // Custom items are fully deleted since they have no external source.
 async function deleteBudgetItem(itemId, monthString) {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   if (!currentUser || !itemId) return;
   if (!confirm('Remove this item from the budget for this month?')) return;
 
@@ -2625,6 +2770,12 @@ function initializeAssetForm() {
 function init() {
   debugLog("INIT: Page loaded, starting initialization.");
 
+  // Initialize session security manager
+  sessionSecurity = new SessionSecurityManager(sb, (reason) => {
+    console.log('[Security] Force logout triggered:', reason);
+    // The manager has already handled the logout
+  });
+
   // Auth state change listener
   sb.auth.onAuthStateChange((event, session) => {
     debugLog(`AUTH: Event received: ${event}`);
@@ -2648,6 +2799,11 @@ function init() {
     if (currentUser) {
       document.getElementById('username').textContent = currentUser.user_metadata?.first_name || currentUser.email;
 
+      // Notify security manager of successful login (but only if it's an actual SIGNED_IN event)
+      if (event === 'SIGNED_IN' && sessionSecurity) {
+        sessionSecurity.onLogin();
+      }
+
       // Ensure user profile exists for social features
       ensureUserProfile();
 
@@ -2661,6 +2817,11 @@ function init() {
       });
 
     } else {
+      // User logged out - notify security manager
+      if (event === 'SIGNED_OUT' && sessionSecurity) {
+        sessionSecurity.onLogout();
+      }
+      
       // Clean up realtime subscriptions
       if (notificationChannel) {
         sb.removeChannel(notificationChannel);
@@ -3162,6 +3323,16 @@ async function sendFriendRequest(addresseeId) {
 }
 
 async function acceptFriendRequest(connectionId) {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   await sb.from('connections')
     .update({ status: 'accepted', updated_at: new Date().toISOString() })
     .eq('id', connectionId)
@@ -3568,6 +3739,16 @@ function updateSharePreview() {
 }
 
 async function confirmShareBill() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const billId = document.getElementById('shareBillId').value;
   const friendId = document.getElementById('shareFriendSelect').value;
   const splitType = document.getElementById('shareSplitType').value;
@@ -3646,6 +3827,16 @@ async function confirmShareBill() {
 }
 
 async function acceptBillShare(shareId) {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   await sb.from('bill_shares').update({
     status: 'accepted',
     accepted_at: new Date().toISOString(),
@@ -3655,6 +3846,16 @@ async function acceptBillShare(shareId) {
 }
 
 async function declineBillShare(shareId) {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   await sb.from('bill_shares').update({
     status: 'declined',
     updated_at: new Date().toISOString()
@@ -3758,3 +3959,5 @@ window.markAllNotificationsRead = markAllNotificationsRead;
 window.handleNotificationClick = handleNotificationClick;
 window.showAmortizationSchedule = showAmortizationSchedule;
 window.deleteBudgetItem = deleteBudgetItem;
+// Session security
+window.sessionSecurity = sessionSecurity;
