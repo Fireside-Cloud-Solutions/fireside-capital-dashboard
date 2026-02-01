@@ -2081,13 +2081,44 @@ async function generateBudgetForMonth(monthString) {
   }
 
   try {
-    // 1. Fetch all active recurring bills
-    const { data: activeBills, error: billsError } = await sb
+    // 1. Fetch all active recurring bills (owned + shared)
+    // 1a. Fetch bills user owns
+    const { data: ownedBills, error: billsError } = await sb
       .from('bills')
       .select('*')
       .eq('user_id', currentUser.id);
 
     if (billsError) throw billsError;
+
+    // 1b. Fetch accepted bill shares
+    const { data: sharedBills, error: sharesError } = await sb
+      .from('bill_shares')
+      .select(`
+        *,
+        bill:bills!bill_shares_bill_id_fkey(*)
+      `)
+      .eq('shared_with_id', currentUser.id)
+      .eq('status', 'accepted');
+
+    if (sharesError) throw sharesError;
+
+    // 1c. Merge owned bills and shared bills
+    const activeBills = [
+      ...(ownedBills || []),
+      ...(sharedBills || []).map(share => ({
+        ...share.bill,
+        amount: share.shared_amount || (share.bill.amount * 0.5), // Use shared_amount or 50% fallback
+        id: share.bill.id,
+        isShared: true,
+        shareId: share.id,
+        // Preserve original fields from bill
+        name: share.bill.name,
+        type: share.bill.type,
+        frequency: share.bill.frequency,
+        status: share.bill.status,
+        is_variable: share.bill.is_variable
+      }))
+    ];
 
     // 2. Fetch existing budget entries for this month
     const { data: existingBudgets, error: budgetError } = await sb
