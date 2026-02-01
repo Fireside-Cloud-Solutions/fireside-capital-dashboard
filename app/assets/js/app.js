@@ -172,11 +172,10 @@ function getNextDate(currentDate, frequency) {
   return nextDate;
 }
 function getThemeColors() {
-  const isDark = document.body.getAttribute('data-theme') !== 'light';
   return {
-      fill: isDark ? 'rgba(244, 78, 36, 0.15)' : 'rgba(244, 78, 36, 0.1)',
-      text: isDark ? '#f0f0f0' : '#0f0f0f',
-      grid: isDark ? 'rgba(240, 240, 240, 0.08)' : 'rgba(15, 15, 15, 0.1)'
+      fill: 'rgba(244, 78, 36, 0.15)',
+      text: '#f0f0f0',
+      grid: 'rgba(240, 240, 240, 0.08)'
   };
 }
 function normalizeToMonthly(amount, frequency) {
@@ -3111,40 +3110,7 @@ async function generateMonthlyCashFlowChart() {
 }
 
 // ===== INITIALIZATION =====
-function setupThemeToggle() {
-  const themeSwitch = document.getElementById('themeSwitch');
-  if (!themeSwitch) return; // Exit if the toggle isn't on this page
-
-  const themeLabel = document.querySelector('label[for="themeSwitch"]');
-
-  // This function applies the selected theme to the page (BUG-05: Fixed flicker)
-  const applyTheme = (isDark) => {
-      document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      themeSwitch.checked = isDark;
-      if (themeLabel) {
-          // Use requestAnimationFrame to prevent flicker on page load
-          requestAnimationFrame(() => {
-              // FIX: Label now shows CURRENT mode, not mode you'll switch TO
-              themeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
-          });
-      }
-  };
-
-  // Listen for when the user clicks the toggle
-  themeSwitch.addEventListener('change', () => {
-      const isDark = themeSwitch.checked;
-      // Save the user's preference in their browser
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      applyTheme(isDark);
-      // Re-render all components so the charts can adopt the new colors
-      if (typeof renderAll === 'function') {
-          renderAll();
-      }
-  });
-
-  // On page load, apply the theme that was saved in localStorage
-  applyTheme(localStorage.getItem('theme') !== 'light');
-}
+// Theme toggle removed — dark mode only
 function initializeAssetForm() {
   const assetTypeDropdown = document.getElementById("assetType");
   if (!assetTypeDropdown) return;
@@ -3328,7 +3294,7 @@ if (document.getElementById('budgetAssignmentTable')) {
 
 
    // 3. Setup remaining UI components.
-   setupThemeToggle();
+   // setupThemeToggle() removed — dark mode only
    setupSidebarToggle();
    initializeAssetForm();
    initializeBudgetPage();
