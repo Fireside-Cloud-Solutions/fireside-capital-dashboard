@@ -926,14 +926,22 @@ function toggleFinancingFields() {
   }
 }
 
+function getLoanTermMonths() {
+  const val = parseInt(document.getElementById('billLoanTermValue').value) || 0;
+  const unit = document.getElementById('billLoanTermUnit').value;
+  return unit === 'years' ? val * 12 : val;
+}
+
 function updateLoanCalcPreview() {
   const principal = parseFloat(document.getElementById('billOriginalPrincipal').value) || 0;
   const rate = parseFloat(document.getElementById('billInterestRate').value) || 0;
-  const term = parseInt(document.getElementById('billLoanTermMonths').value) || 0;
+  const term = getLoanTermMonths();
+  const paymentsMade = parseInt(document.getElementById('billPaymentsMade').value) || 0;
   const preview = document.getElementById('loanCalcPreview');
+  const balanceDisplay = document.getElementById('remainingBalanceDisplay');
   if (!preview) return;
   if (principal > 0 && term > 0) {
-    const calc = calculateAmortization(principal, rate, term, 0);
+    const calc = calculateAmortization(principal, rate, term, paymentsMade);
     document.getElementById('calcMonthlyPayment').textContent = formatCurrency(calc.monthlyPayment);
     document.getElementById('calcTotalInterest').textContent = formatCurrency(calc.totalInterest);
     preview.classList.remove('d-none');
@@ -942,8 +950,13 @@ function updateLoanCalcPreview() {
     if (!totalField.value) {
       totalField.placeholder = formatCurrency(calc.totalCost) + ' (auto)';
     }
+    // Update remaining balance display
+    if (balanceDisplay) {
+      balanceDisplay.textContent = formatCurrency(calc.remainingBalance);
+    }
   } else {
     preview.classList.add('d-none');
+    if (balanceDisplay) balanceDisplay.textContent = '—';
   }
 }
 
@@ -956,27 +969,61 @@ function openBillModal(id = null) {
   if (financingFields) financingFields.classList.add('d-none');
   const preview = document.getElementById('loanCalcPreview');
   if (preview) preview.classList.add('d-none');
+  const balanceReset = document.getElementById('remainingBalanceDisplay');
+  if (balanceReset) balanceReset.textContent = '—';
 
   if (id) {
       const b = window.bills.find(x => x.id == id);
       if (b) {
           f.billName.value = b.name; f.billType.value = b.type; f.billAmount.value = b.amount;
           f.billFrequency.value = b.frequency; f.billNextDueDate.value = b.nextDueDate;
-          // Populate financing fields if available
-          if (isFinancingBillType(b.type)) {
+          // Show financing fields if type matches OR bill has existing financing data
+          const hasFinancingData = b.total_amount || b.original_principal || b.payments_made > 0;
+          const metaKey = Object.keys(FINANCING_META).find(k => k.toLowerCase() === (b.name || '').toLowerCase());
+          const meta = metaKey ? FINANCING_META[metaKey] : null;
+          if (isFinancingBillType(b.type) || hasFinancingData || metaKey) {
             if (financingFields) financingFields.classList.remove('d-none');
             if (b.interest_rate !== undefined && b.interest_rate !== null) f.billInterestRate.value = b.interest_rate;
             if (b.original_principal) f.billOriginalPrincipal.value = b.original_principal;
-            if (b.loan_term_months) f.billLoanTermMonths.value = b.loan_term_months;
+            // Loan term — show in years if divisible by 12, otherwise months
+            if (b.loan_term_months) {
+              const termUnit = document.getElementById('billLoanTermUnit');
+              const termValue = document.getElementById('billLoanTermValue');
+              if (b.loan_term_months % 12 === 0 && b.loan_term_months >= 12) {
+                termValue.value = b.loan_term_months / 12;
+                termUnit.value = 'years';
+              } else {
+                termValue.value = b.loan_term_months;
+                termUnit.value = 'months';
+              }
+            }
             if (b.start_date) f.billStartDate.value = b.start_date;
             if (b.payments_made) f.billPaymentsMade.value = b.payments_made;
             if (b.total_amount) f.billTotalFinanced.value = b.total_amount;
             // Also check FINANCING_META fallback for payments_made/total_amount
-            const metaKey = Object.keys(FINANCING_META).find(k => k.toLowerCase() === (b.name || '').toLowerCase());
-            const meta = metaKey ? FINANCING_META[metaKey] : null;
             if (meta && !b.payments_made) f.billPaymentsMade.value = meta.payments_made || '';
             if (meta && !b.total_amount) f.billTotalFinanced.value = meta.total_amount || '';
+            // If we have meta but no loan term from DB, derive from meta
+            if (meta && !b.loan_term_months && meta.total_payments) {
+              const termUnit = document.getElementById('billLoanTermUnit');
+              const termValue = document.getElementById('billLoanTermValue');
+              if (meta.total_payments % 12 === 0 && meta.total_payments >= 12) {
+                termValue.value = meta.total_payments / 12;
+                termUnit.value = 'years';
+              } else {
+                termValue.value = meta.total_payments;
+                termUnit.value = 'months';
+              }
+            }
             updateLoanCalcPreview();
+            // Also compute remaining balance even without full amort (fallback)
+            const balanceDisplay = document.getElementById('remainingBalanceDisplay');
+            if (balanceDisplay && balanceDisplay.textContent === '—') {
+              const info = getBillFinancingInfo(b);
+              if (info.isFinancing) {
+                balanceDisplay.textContent = formatCurrency(info.remainingBalance);
+              }
+            }
           }
       }
   }
@@ -985,10 +1032,12 @@ function openBillModal(id = null) {
   typeSelect.removeEventListener('change', toggleFinancingFields);
   typeSelect.addEventListener('change', toggleFinancingFields);
   // Loan calc preview listeners
-  ['billOriginalPrincipal', 'billInterestRate', 'billLoanTermMonths'].forEach(fid => {
+  ['billOriginalPrincipal', 'billInterestRate', 'billLoanTermValue', 'billPaymentsMade'].forEach(fid => {
     const el = document.getElementById(fid);
     if (el) { el.removeEventListener('input', updateLoanCalcPreview); el.addEventListener('input', updateLoanCalcPreview); }
   });
+  const termUnitEl = document.getElementById('billLoanTermUnit');
+  if (termUnitEl) { termUnitEl.removeEventListener('change', updateLoanCalcPreview); termUnitEl.addEventListener('change', updateLoanCalcPreview); }
 
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
@@ -998,25 +1047,26 @@ async function saveBill() {
       name: f.billName.value, type: f.billType.value, amount: getRaw(f.billAmount.value),
       frequency: f.billFrequency.value, nextDueDate: f.billNextDueDate.value || null, user_id: currentUser.id
   };
-  // Add financing fields if type is financing/auto/housing
-  if (isFinancingBillType(f.billType.value)) {
+  // Add financing fields if financing section is visible (type match, existing data, or FINANCING_META)
+  const financingVisible = !document.getElementById('financingFields').classList.contains('d-none');
+  if (financingVisible) {
     const interestRate = f.billInterestRate.value;
     const originalPrincipal = f.billOriginalPrincipal.value;
-    const loanTermMonths = f.billLoanTermMonths.value;
+    const loanTermMonths = getLoanTermMonths();
     const startDate = f.billStartDate.value;
     const paymentsMade = f.billPaymentsMade.value;
     const totalFinanced = f.billTotalFinanced.value;
     // Only include fields that have values (graceful if columns don't exist yet)
     if (interestRate !== '') record.interest_rate = parseFloat(interestRate);
     if (originalPrincipal !== '') record.original_principal = parseFloat(originalPrincipal);
-    if (loanTermMonths !== '') record.loan_term_months = parseInt(loanTermMonths);
+    if (loanTermMonths > 0) record.loan_term_months = loanTermMonths;
     if (startDate) record.start_date = startDate;
     if (paymentsMade !== '') record.payments_made = parseInt(paymentsMade);
     if (totalFinanced !== '') {
       record.total_amount = parseFloat(totalFinanced);
-    } else if (originalPrincipal && loanTermMonths) {
+    } else if (originalPrincipal && loanTermMonths > 0) {
       // Auto-calculate total_amount from amortization
-      const calc = calculateAmortization(parseFloat(originalPrincipal), parseFloat(interestRate) || 0, parseInt(loanTermMonths), 0);
+      const calc = calculateAmortization(parseFloat(originalPrincipal), parseFloat(interestRate) || 0, loanTermMonths, 0);
       record.total_amount = calc.totalCost;
     }
   }
