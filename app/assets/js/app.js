@@ -426,7 +426,7 @@ async function saveAsset() {
   } else if (type === 'vehicle') {
       record.value = getRaw(f.vehicleValue.value); record.loan = getRaw(f.vehicleLoanBalance.value); record.nextDueDate = f.vehicleNextDueDate.value || null;
   }
-  const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId) : await sb.from('assets').insert(record);
+  const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId).eq('user_id', currentUser.id) : await sb.from('assets').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -438,7 +438,7 @@ function confirmDeleteAsset(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteAssetModal')).show();
 }
 async function deleteAssetConfirmed() {
-  const { error } = await sb.from('assets').delete().eq('id', deleteAssetId);
+  const { error } = await sb.from('assets').delete().eq('id', deleteAssetId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteAssetModal')).hide();
   await fetchAllDataFromSupabase();
@@ -483,7 +483,7 @@ async function saveInvestment() {
       annualReturn: getRaw(f.annualReturn.value), nextContributionDate: f.nextContributionDate.value || null,
       user_id: currentUser.id
   };
-  const { error } = editInvestmentId ? await sb.from('investments').update(record).eq('id', editInvestmentId) : await sb.from('investments').insert(record);
+  const { error } = editInvestmentId ? await sb.from('investments').update(record).eq('id', editInvestmentId).eq('user_id', currentUser.id) : await sb.from('investments').insert(record);
 
   editInvestmentId = null;
   if (error) return alert(error.message);
@@ -498,7 +498,7 @@ function confirmDeleteInvestment(id) {
   }
 }
 async function deleteInvestmentConfirmed(id) {
-  const { error } = await sb.from('investments').delete().eq('id', id);
+  const { error } = await sb.from('investments').delete().eq('id', id).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   await fetchAllDataFromSupabase();
   renderAll();
@@ -540,7 +540,7 @@ async function saveDebt() {
       term: getRaw(f.debtTerm.value), monthlyPayment: getRaw(f.debtMonthly.value),
       nextDueDate: f.debtNextPaymentDate.value || null, user_id: currentUser.id
   };
-  const { error } = editDebtId ? await sb.from('debts').update(record).eq('id', editDebtId) : await sb.from('debts').insert(record);
+  const { error } = editDebtId ? await sb.from('debts').update(record).eq('id', editDebtId).eq('user_id', currentUser.id) : await sb.from('debts').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -552,7 +552,7 @@ function confirmDeleteDebt(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteDebtModal')).show();
 }
 async function deleteDebtConfirmed() {
-  const { error } = await sb.from('debts').delete().eq('id', deleteDebtId);
+  const { error } = await sb.from('debts').delete().eq('id', deleteDebtId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteDebtModal')).hide();
   await fetchAllDataFromSupabase();
@@ -1071,7 +1071,7 @@ async function saveBill() {
     }
   }
   // Attempt save — if new columns don't exist yet, retry without them
-  let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId) : await sb.from('bills').insert(record);
+  let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(record);
   if (error && error.message && error.message.includes('column')) {
     // Columns don't exist yet in DB — strip new fields and retry
     const baseRecord = {
@@ -1080,7 +1080,7 @@ async function saveBill() {
     };
     if (record.total_amount) baseRecord.total_amount = record.total_amount;
     if (record.payments_made !== undefined) baseRecord.payments_made = record.payments_made;
-    const retry = editBillId ? await sb.from('bills').update(baseRecord).eq('id', editBillId) : await sb.from('bills').insert(baseRecord);
+    const retry = editBillId ? await sb.from('bills').update(baseRecord).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(baseRecord);
     error = retry.error;
   }
   if (error) return alert(error.message);
@@ -1174,7 +1174,7 @@ function confirmDeleteBill(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
 }
 async function deleteBillConfirmed() {
-  const { error } = await sb.from('bills').delete().eq('id', deleteBillId);
+  const { error } = await sb.from('bills').delete().eq('id', deleteBillId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteBillModal')).hide();
   await fetchAllDataFromSupabase();
@@ -1214,7 +1214,7 @@ async function saveIncome() {
       name: f.incomeName.value, type: f.incomeType.value, amount: getRaw(f.incomeAmount.value),
       frequency: f.incomeFrequency.value, nextDueDate: f.incomeNextDueDate.value || null, user_id: currentUser.id
   };
-  const { error } = editIncomeId ? await sb.from('income').update(record).eq('id', editIncomeId) : await sb.from('income').insert(record);
+  const { error } = editIncomeId ? await sb.from('income').update(record).eq('id', editIncomeId).eq('user_id', currentUser.id) : await sb.from('income').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -1226,7 +1226,7 @@ function confirmDeleteIncome(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteIncomeModal')).show();
 }
 async function deleteIncomeConfirmed() {
-  const { error } = await sb.from('income').delete().eq('id', deleteIncomeId);
+  const { error } = await sb.from('income').delete().eq('id', deleteIncomeId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteIncomeModal')).hide();
   await fetchAllDataFromSupabase();
@@ -2231,3 +2231,5 @@ window.openIncomeModal = openIncomeModal;
 window.confirmDeleteIncome = confirmDeleteIncome;
 window.deleteIncomeConfirmed = deleteIncomeConfirmed;
 window.generateBudgetForMonth = generateBudgetForMonth;
+window.showAmortizationSchedule = showAmortizationSchedule;
+window.deleteBudgetItem = deleteBudgetItem;
