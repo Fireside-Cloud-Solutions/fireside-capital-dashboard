@@ -175,8 +175,9 @@ strong {
 }
 
 .card:hover {
-  box-shadow: var(--shadow-elevated);
-  border-color: var(--color-border-default);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.15);
+  transform: translateY(-2px);
 }
 
 .card h5 {
@@ -205,8 +206,8 @@ strong {
 }
 
 .dashboard-card:hover {
-  box-shadow: var(--shadow-elevated);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.12);
+  transform: translateY(-3px);
 }
 
 .dashboard-card::before {
