@@ -567,8 +567,8 @@ function getCategoryBadgeClass(type) {
     case 'utilities':     return 'bg-info text-dark';    // teal/cyan
     case 'auto':          return 'bg-warning text-dark'; // orange
     case 'financing':     return 'bg-purple';            // purple (custom)
-    case 'health':        return 'bg-success';           // green
     case 'subscriptions': return 'bg-indigo';            // indigo/violet (custom)
+    case 'health':        return 'bg-success';           // green (reserved)
     default:              return 'bg-secondary';         // fallback grey
   }
 }
