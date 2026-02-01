@@ -624,8 +624,8 @@ async function renderAll() {
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
-  // Use 'totalInvestments' as the check �" it only exists on the dashboard, not reports.html
-  if (document.getElementById('totalInvestments')) {
+  // Use 'netWorthValue' as the check — it only exists on the dashboard, not reports.html
+  if (document.getElementById('netWorthValue')) {
       updateDashboardCards();
       renderUpcomingPayments();
       
@@ -2837,17 +2837,101 @@ async function updateDashboardCards() {
     toggleEmptyState('dataContainer', 'dashboard', hasAnyData);
   }
   
-  const totalInv = (window.investments || []).reduce((s, i) => s + getRaw(i.value), 0);
-  const totalDebt = (window.debts || []).reduce((s, d) => s + getRaw(d.amount), 0);
-  const totalAssetEquity = (window.assets || []).reduce((s, a) => s + Math.max(0, getRaw(a.value) - getRaw(a.loan)), 0);
-  const netWorth = totalInv + totalAssetEquity - totalDebt;
-  [['totalInvestments', totalInv], ['totalDebts', totalDebt], ['totalAssets', totalAssetEquity], ['netWorth', netWorth]].forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = formatCurrency(val);
-  });
-  const today = new Date().toISOString().split('T')[0];
-  const { error } = await sb.from('snapshots').upsert({ date: today, netWorth, user_id: currentUser.id }, { onConflict: 'date,user_id' });
-  if (error) console.error("Error saving snapshot:", error);
+  try {
+    // Calculate totals
+    const assets = window.assets || [];
+    const investments = window.investments || [];
+    const debts = window.debts || [];
+    const bills = window.bills || [];
+    const income = window.income || [];
+    
+    const totalAssets = assets.reduce((sum, a) => sum + (getRaw(a.value) || 0), 0);
+    const totalInvestments = investments.reduce((sum, i) => sum + (getRaw(i.value) || 0), 0);
+    const totalDebts = debts.reduce((sum, d) => sum + (getRaw(d.amount) || 0), 0);
+    const netWorth = (totalAssets + totalInvestments) - totalDebts;
+
+    // Calculate monthly bills total (accounting for frequency and shared bills)
+    const monthlyBills = bills.reduce((sum, bill) => {
+      // Skip paid-off financing bills
+      const info = getBillFinancingInfo(bill);
+      if (info.isFinancing && info.status === 'paid_off') {
+        return sum;
+      }
+      
+      // Use owner's share if bill is shared
+      const shareInfo = getShareInfoForBill(bill.id);
+      const userAmount = (shareInfo && shareInfo.status === 'accepted') 
+        ? shareInfo.owner_amount 
+        : bill.amount;
+      
+      const amount = getRaw(userAmount) || 0;
+      let monthlyAmount = amount;
+      
+      switch((bill.frequency || '').toLowerCase()) {
+        case 'daily': monthlyAmount = amount * 30; break;
+        case 'weekly': monthlyAmount = amount * 52 / 12; break;
+        case 'bi-weekly': monthlyAmount = amount * 26 / 12; break;
+        case 'biweekly': monthlyAmount = amount * 26 / 12; break;
+        case 'twice monthly': monthlyAmount = amount * 2; break;
+        case 'semi-monthly': monthlyAmount = amount * 2; break;
+        case 'monthly': monthlyAmount = amount; break;
+        case 'quarterly': monthlyAmount = amount / 3; break;
+        case 'semi-annually': monthlyAmount = amount / 6; break;
+        case 'annually': monthlyAmount = amount / 12; break;
+        case 'annual': monthlyAmount = amount / 12; break;
+        default: monthlyAmount = amount; break;
+      }
+      
+      return sum + monthlyAmount;
+    }, 0);
+
+    // Calculate monthly income
+    const monthlyIncome = income.reduce((sum, inc) => {
+      const amount = getRaw(inc.amount) || 0;
+      const normalized = normalizeToMonthly(amount, inc.frequency);
+      return sum + normalized;
+    }, 0);
+
+    // Update stat card values
+    const el = (id) => document.getElementById(id);
+    
+    if (el('netWorthValue')) el('netWorthValue').textContent = formatCurrency(netWorth);
+    if (el('totalAssetsValue')) el('totalAssetsValue').textContent = formatCurrency(totalAssets);
+    if (el('monthlyBillsValue')) el('monthlyBillsValue').textContent = formatCurrency(monthlyBills);
+    if (el('totalDebtsValue')) el('totalDebtsValue').textContent = formatCurrency(totalDebts);
+    if (el('totalInvestmentsValue')) el('totalInvestmentsValue').textContent = formatCurrency(totalInvestments);
+    if (el('monthlyIncomeValue')) el('monthlyIncomeValue').textContent = formatCurrency(monthlyIncome);
+
+    // Update counts
+    if (el('assetCount')) el('assetCount').textContent = `${assets.length} asset${assets.length !== 1 ? 's' : ''}`;
+    if (el('billCount')) {
+      const activeBills = bills.filter(b => {
+        const info = getBillFinancingInfo(b);
+        return !(info.isFinancing && info.status === 'paid_off');
+      });
+      el('billCount').textContent = `${activeBills.length} bill${activeBills.length !== 1 ? 's' : ''}`;
+    }
+    if (el('debtCount')) el('debtCount').textContent = `${debts.length} debt${debts.length !== 1 ? 's' : ''}`;
+    if (el('investmentCount')) el('investmentCount').textContent = `${investments.length} investment${investments.length !== 1 ? 's' : ''}`;
+    if (el('incomeCount')) el('incomeCount').textContent = `${income.length} source${income.length !== 1 ? 's' : ''}`;
+
+    // TODO: Calculate and display trend (requires snapshots comparison)
+    // For now, just show a neutral indicator
+    if (el('netWorthTrend')) {
+      el('netWorthTrend').innerHTML = '<span class="trend-indicator">—</span>';
+    }
+
+    // Save snapshot
+    const today = new Date().toISOString().split('T')[0];
+    const { error } = await sb.from('snapshots').upsert(
+      { date: today, netWorth, user_id: currentUser.id }, 
+      { onConflict: 'date,user_id' }
+    );
+    if (error) console.error("Error saving snapshot:", error);
+
+  } catch (error) {
+    console.error('Error updating dashboard cards:', error);
+  }
 }
 function renderUpcomingPayments() {
   const c = document.getElementById('upcomingPaymentsList');
