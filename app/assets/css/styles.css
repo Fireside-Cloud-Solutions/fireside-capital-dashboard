@@ -853,6 +853,21 @@ strong {
   color: var(--color-info) !important;
 }
 
+.badge.bg-primary {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #3b82f6 !important;
+}
+
+.badge.bg-purple {
+  background-color: rgba(139, 92, 246, 0.12) !important;
+  color: #8b5cf6 !important;
+}
+
+.badge.bg-indigo {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+  color: #6366f1 !important;
+}
+
 .text-secondary-emphasis {
   color: var(--color-primary) !important;
 }

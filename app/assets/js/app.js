@@ -560,6 +560,19 @@ async function deleteDebtConfirmed() {
 }
 
 // --- BILLS ---
+// Category badge color mapping for bill types
+function getCategoryBadgeClass(type) {
+  switch ((type || '').toLowerCase()) {
+    case 'housing':       return 'bg-primary';           // blue
+    case 'utilities':     return 'bg-info text-dark';    // teal/cyan
+    case 'auto':          return 'bg-warning text-dark'; // orange
+    case 'financing':     return 'bg-purple';            // purple (custom)
+    case 'health':        return 'bg-success';           // green
+    case 'subscriptions': return 'bg-indigo';            // indigo/violet (custom)
+    default:              return 'bg-secondary';         // fallback grey
+  }
+}
+
 // Financing metadata for payoff tracking (used until DB schema has these columns)
 const FINANCING_META = {
   'Golf Clubs':    { total_amount: 2501.04, payments_made: 12, total_payments: 12, status: 'paid_off', end_date: '2025-12-01' },
@@ -637,7 +650,7 @@ function renderBills() {
   // Render recurring bills table
   tbody.innerHTML = recurringBills.map(b => `
       <tr>
-          <td>${escapeHtml(b.name)}</td><td><span class="badge bg-info">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}</td>
+          <td>${escapeHtml(b.name)}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}</td>
           <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? formatDate(b.nextDueDate) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
@@ -662,7 +675,7 @@ function renderBills() {
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div>
                     <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">${escapeHtml(b.name)}</h5>
-                    <span class="badge bg-warning">${escapeHtml(b.type)}</span>
+                    <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>
                   </div>
                   <div class="text-end">
                     <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
@@ -1478,7 +1491,7 @@ function renderUpcomingPayments() {
       const d = new Date(item.nextDueDate + 'T00:00:00');
       return d >= today && d <= nextWeek;
   }).sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
-  c.innerHTML = upcoming.length ? upcoming.map(item => `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill ms-2">${escapeHtml(item.category || 'Bill')}</span></div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(item.amount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
+  c.innerHTML = upcoming.length ? upcoming.map(item => `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span></div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(item.amount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
 }
 function renderNetWorthChart() {
   const ctx = document.getElementById('netWorthTimelineChart');
