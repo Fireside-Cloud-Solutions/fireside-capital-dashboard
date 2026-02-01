@@ -3185,7 +3185,8 @@ function init() {
     }
 
     if (currentUser) {
-      document.getElementById('username').textContent = currentUser.user_metadata?.first_name || currentUser.email;
+      const firstName = currentUser.user_metadata?.first_name?.trim() || currentUser.email;
+      document.getElementById('username').textContent = firstName;
 
       // Notify security manager of successful login (but only if it's an actual SIGNED_IN event)
       if (event === 'SIGNED_IN' && sessionSecurity) {
