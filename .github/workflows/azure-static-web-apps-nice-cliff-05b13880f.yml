@@ -28,8 +28,8 @@ jobs:
           action: "upload"
           app_location: "app"           # HTML lives in app/ subdirectory
           api_location: ""              # No API
-          output_location: "."          # Deploy app/ content as-is
-          app_build_command: ""         # No build step needed
+          output_location: ""           # No build output — deploy source as-is
+          skip_app_build: true          # No build step — static HTML/JS/CSS only
           
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

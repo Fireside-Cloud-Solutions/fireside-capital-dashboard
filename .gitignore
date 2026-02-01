@@ -11,6 +11,12 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Sensitive memory files
+memory/credentials.md
+
+# Temp scripts
+check-deploy.ps1
+
 # IDE
 .vscode/
 .idea/
