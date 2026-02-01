@@ -8,9 +8,19 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-accessibility-wcag | WCAG AA compliance (aria-labels, focus indicators, keyboard nav) | 🔄 Running |
-| Builder | builder-shared-bill-deletion-warning | Add confirmation dialog for shared bill deletion | 🔄 Running |
-| Builder | builder-rate-limiting | Implement rate limiting (10 connections/hr, 20 bills/min) | 🔄 Running |
+| Builder | builder-fix-dashboard-light-mode | **CRITICAL:** Fix white-on-white dashboard in light mode | 🔄 Running (15min) |
+| Builder | builder-fix-supabase-406-errors | **CRITICAL:** Fix Supabase 406 API errors on settings | 🔄 Running (15min) |
+
+## Recently Completed
+
+| Agent | Label | Task | Result |
+|-------|-------|------|--------|
+| Auditor | auditor-comprehensive-live-site-qa | Full live site QA audit | ✅ Complete - Found 2 CRITICAL issues |
+| Builder | builder-accessibility-wcag | WCAG AA compliance | ✅ Complete (commit 3b4e4b8) |
+| Builder | builder-shared-bill-deletion-warning | Shared bill deletion warning | ✅ Complete (commit 9637f3f) |
+| Builder | builder-rate-limiting | Rate limiting implementation | ✅ Complete (commit 3c6fc3f, needs DB schema) |
+| Connector | connector-fix-github-secrets | GitHub push protection fix | ✅ Complete (commit 2cdc170) |
+| Builder | builder-integrate-security-scripts | Security script integration | ✅ Complete (commit b1acdbc) |
 
 ## Completed Sub-Agents (Today - Feb 1)
 
@@ -87,8 +97,10 @@
 
 | Bug | Severity | Status |
 |-----|----------|--------|
-| GitHub push protection blocking Gmail code | BLOCKER | Needs founder to allow secrets |
-| Shared bill deletion no warning | MEDIUM | Open — MED-03 |
+| **Notifications dropdown broken** | CRITICAL | Audit in progress |
+| **Light mode unreadable/untested** | CRITICAL | Audit in progress |
+| **Insufficient QA process** | CRITICAL | New comprehensive audit running |
+| Shared bill deletion no warning | MEDIUM | ✅ FIXED (commit 9637f3f) |
 
 ---
 

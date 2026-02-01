@@ -544,7 +544,7 @@ async function fetchAllDataFromSupabase(forceRefresh = false) {
         sb.from('bills').select('*').eq('user_id', currentUser.id),
         sb.from('income').select('*').eq('user_id', currentUser.id),
         sb.from('snapshots').select('*').eq('user_id', currentUser.id),
-        sb.from('settings').select('*').eq('user_id', currentUser.id).single() // Fetch settings
+        sb.from('settings').select('*').eq('user_id', currentUser.id).maybeSingle() // Fetch settings (may not exist yet)
     ]);
 
       // Check if any of the requests failed
@@ -555,6 +555,11 @@ async function fetchAllDataFromSupabase(forceRefresh = false) {
           }
       }
 
+      // Handle settings error or missing data with defaults
+      if (settingsRes.error) {
+          console.warn('Settings fetch error (using defaults):', settingsRes.error);
+      }
+
       // THE FIX: Assign data to the global window object
       window.assets = assetsRes.data || [];
       window.investments = investmentsRes.data || [];
@@ -562,7 +567,7 @@ async function fetchAllDataFromSupabase(forceRefresh = false) {
       window.bills = billsRes.data || [];
       window.income = incomeRes.data || [];
       window.snapshots = snapshotsRes.data || [];
-      window.settings = settingsRes.data || {};
+      window.settings = settingsRes.data || { emergency_fund_goal: 3 }; // Default to 3 months if no settings exist
 
       // Performance: Cache the fetched data
       setCachedData(cacheKey, {

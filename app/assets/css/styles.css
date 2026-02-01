@@ -1763,6 +1763,70 @@ body[data-theme='light'] .sidebar-overlay.show {
 }
 
 /* =================================================================
+   LIGHT MODE — Dashboard Readability Fixes
+   Critical overrides for stat values and display text
+   ================================================================= */
+
+body[data-theme='light'] .display-4,
+body[data-theme='light'] .stat-value {
+  color: #212529 !important;
+}
+
+body[data-theme='light'] .summary-card h4,
+body[data-theme='light'] .summary-value {
+  color: #212529 !important;
+}
+
+body[data-theme='light'] .stat-box .stat-value {
+  color: #212529 !important;
+}
+
+body[data-theme='light'] .card-title {
+  color: #212529 !important;
+}
+
+body[data-theme='light'] canvas {
+  background-color: transparent !important;
+}
+
+/* Ensure all heading levels are dark in light mode */
+body[data-theme='light'] h1,
+body[data-theme='light'] h2,
+body[data-theme='light'] h3,
+body[data-theme='light'] h4,
+body[data-theme='light'] h5,
+body[data-theme='light'] h6 {
+  color: #212529 !important;
+}
+
+/* Dashboard card text values */
+body[data-theme='light'] .dashboard-card p,
+body[data-theme='light'] .dashboard-card h5 {
+  color: #212529 !important;
+}
+
+body[data-theme='light'] .dashboard-card h5 {
+  color: #6c757d !important;
+}
+
+/* Text muted should be visible but secondary */
+body[data-theme='light'] .text-muted,
+body[data-theme='light'] small.text-muted {
+  color: #6c757d !important;
+}
+
+/* Strong text should be prominent */
+body[data-theme='light'] strong {
+  color: #212529 !important;
+}
+
+/* Ensure card bodies have proper text color */
+body[data-theme='light'] .card-body,
+body[data-theme='light'] .card-body p {
+  color: #212529 !important;
+}
+
+/* =================================================================
    DARK MODE EXPLICIT — Matches base (for data-theme='dark')
    ================================================================= */
 

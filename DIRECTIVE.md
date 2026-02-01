@@ -8,7 +8,14 @@
 
 ## THE MISSION
 
-Build a **world-class personal finance web application** called **Fireside Capital**. This is the first piece of a personal assistant platform. Start with personal finance, then expand capabilities over time.
+Build a **world-class personal assistant platform**, starting with **Fireside Capital** (personal finance). The website and mobile app remain "Fireside Capital" until told otherwise. The platform will evolve through these phases:
+
+1. **Personal Finance** (NOW) — Fireside Capital web app + mobile app
+2. **Email Intelligence** (NEXT) — Gmail/Outlook: parse bills, sort inbox, draft replies, block spam
+3. **Calendar & Meetings** — Manage calendars, schedule meetings, handle conflicts
+4. **Unified Personal Assistant** — All capabilities under one roof
+
+The product backlog lives in `BACKLOG.md`. Work off of it. A PM sub-agent manages user stories, sprints, and tracking.
 
 ## THE VISION
 
