@@ -1093,13 +1093,138 @@ strong {
     font-size: var(--text-caption);
   }
 
+  /* Enhanced touch targets — Minimum 44px for mobile */
   .btn {
+    min-height: 44px;
+    padding: var(--space-2-5) var(--space-4);
+    font-size: var(--text-body-sm);
+  }
+
+  .btn-sm {
+    min-height: 40px;
     padding: var(--space-2) var(--space-3);
-    font-size: var(--text-caption);
+  }
+
+  /* Sidebar links — Easier tapping */
+  .sidebar a {
+    padding: var(--space-3-5) var(--space-5);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Stack button groups vertically on very small screens */
+  .btn-group-vertical {
+    flex-direction: column;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions .btn {
+    width: 100%;
+  }
+
+  /* Form inputs — Touch-friendly sizing */
+  .form-control,
+  .form-select {
+    min-height: 44px;
+    font-size: 16px; /* Prevents iOS zoom */
+    padding: var(--space-2-5) var(--space-3);
+  }
+
+  .input-group-text {
+    min-height: 44px;
+  }
+
+  /* Stack input groups vertically */
+  .input-group {
+    flex-wrap: wrap;
+  }
+
+  .input-group > .form-control,
+  .input-group > .form-select,
+  .input-group > .btn {
+    width: 100% !important;
   }
 
   .summary-card h4,
   .summary-card .summary-value {
+    font-size: var(--text-h5);
+  }
+
+  /* Modals — Full width on mobile */
+  .modal-dialog {
+    margin: var(--space-2);
+  }
+
+  .modal-xl,
+  .modal-lg {
+    max-width: calc(100vw - 2rem);
+  }
+
+  .modal-body {
+    padding: var(--space-4);
+  }
+
+  /* Notification dropdown — Full width on mobile */
+  .dropdown-menu {
+    max-width: calc(100vw - 2rem) !important;
+  }
+
+  #notificationDropdown .dropdown-menu {
+    width: calc(100vw - 2rem) !important;
+  }
+
+  /* Table action buttons — Stack vertically if needed */
+  .table .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .table .btn-group .btn {
+    width: 100%;
+  }
+
+  /* Chart containers — Ensure responsiveness */
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .chart-wrapper,
+  .chart-card .chart-wrapper {
+    max-height: 300px !important;
+    min-height: 250px !important;
+  }
+
+  /* Increase base font size on mobile to prevent iOS zoom */
+  html {
+    font-size: 16px;
+  }
+}
+
+/* =================================================================
+   RESPONSIVE — Extra small mobile (360px and below)
+   ================================================================= */
+
+@media (max-width: 359.98px) {
+  /* Further optimize for very small devices */
+  .sidebar {
+    width: 100%;
+  }
+
+  .main-content {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  h1, h2 {
+    font-size: var(--text-h3);
+  }
+
+  h3, h4 {
     font-size: var(--text-h5);
   }
 }
