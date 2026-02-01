@@ -3110,7 +3110,7 @@ async function generateMonthlyCashFlowChart() {
 }
 
 // ===== INITIALIZATION =====
-// Theme toggle removed — dark mode only
+// Theme toggle removed ï¿½ dark mode only
 function initializeAssetForm() {
   const assetTypeDropdown = document.getElementById("assetType");
   if (!assetTypeDropdown) return;
@@ -3294,8 +3294,9 @@ if (document.getElementById('budgetAssignmentTable')) {
 
 
    // 3. Setup remaining UI components.
-   // setupThemeToggle() removed — dark mode only
+   // setupThemeToggle() removed ï¿½ dark mode only
    setupSidebarToggle();
+   setupNotificationScrollLock();
    initializeAssetForm();
    initializeBudgetPage();
    initShareBillUI();
@@ -3353,6 +3354,29 @@ function setupSidebarToggle() {
         closeSidebar();
       }
     });
+  });
+}
+
+// ===== MOBILE: LOCK BODY SCROLL WHEN NOTIFICATION DROPDOWN IS OPEN =====
+function setupNotificationScrollLock() {
+  const dropdownEl = document.getElementById('notificationDropdown');
+  if (!dropdownEl || window.innerWidth > 991) return;
+
+  dropdownEl.addEventListener('shown.bs.dropdown', () => {
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${window.scrollY}px`;
+    document.body.dataset.scrollY = window.scrollY;
+  });
+
+  dropdownEl.addEventListener('hidden.bs.dropdown', () => {
+    const scrollY = document.body.dataset.scrollY || '0';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.top = '';
+    window.scrollTo(0, parseInt(scrollY));
   });
 }
 
