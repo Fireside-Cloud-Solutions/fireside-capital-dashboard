@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />`n  <link rel="stylesheet" href="assets/css/polish.css" />
 </head>
 <body data-theme="dark">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
     <i class="bi bi-list"></i>
   </button>
@@ -51,11 +52,11 @@
       </div>
     </div>
 
-    <main class="main-content flex-grow-1">
+    <main class="main-content flex-grow-1" id="main-content">
       <div class="page-header">
         <div class="page-header-actions">
           <h2>Income</h2>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomeModal">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomeModal" aria-label="Add new income source">
             <i class="bi bi-plus-circle"></i> Add Income
           </button>
         </div>
@@ -78,7 +79,7 @@
                 <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
                   <li class="dropdown-header d-flex justify-content-between align-items-center">
                     <strong>Notifications</strong>
-                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()">Mark all read</button>
+                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
                   </li>
                   <li><hr class="dropdown-divider"></li>
                   <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>

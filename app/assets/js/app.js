@@ -1843,7 +1843,7 @@ async function loadAndRenderBudget() {
           <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${assigned.toFixed(2)}" data-item-id="${item.id}" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
           <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${Math.min(fundingPercent, 100)}%">${Math.round(fundingPercent)}%</div></div></td>
-          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${item.id}', '${monthString}')" title="Remove from budget"><i class="bi bi-trash"></i></button></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${item.id}', '${monthString}')" aria-label="Remove ${escapeHtml(item.name)} from budget"><i class="bi bi-trash"></i></button></td>
       `;
       tbody.appendChild(row);
   });
@@ -1868,7 +1868,7 @@ async function loadAndRenderBudget() {
           <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${assigned.toFixed(2)}" data-item-id="${rec.item_id}" data-item-type="custom" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
           <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${Math.min(fundingPercent, 100)}%">${Math.round(fundingPercent)}%</div></div></td>
-          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${rec.item_id}', '${monthString}')" title="Remove from budget"><i class="bi bi-trash"></i></button></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${rec.item_id}', '${monthString}')" aria-label="Remove ${escapeHtml(rec.item_name)} from budget"><i class="bi bi-trash"></i></button></td>
       `;
       tbody.appendChild(row);
   });
@@ -1891,7 +1891,7 @@ async function loadAndRenderBudget() {
           <td class="text-muted">�</td>
           <td class="text-muted">�</td>
           <td class="text-muted small">Removed</td>
-          <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${rec.item_id}', '${monthString}')" title="Restore to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
+          <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${rec.item_id}', '${monthString}')" aria-label="Restore ${escapeHtml(rec.item_name)} to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
       `;
       tbody.appendChild(row);
     });

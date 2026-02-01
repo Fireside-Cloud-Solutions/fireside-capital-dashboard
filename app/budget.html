@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="assets/css/styles.css" />`n  <link rel="stylesheet" href="assets/css/polish.css" />
 </head>
 <body data-theme="dark">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
       <i class="bi bi-list"></i>
     </button>
@@ -51,20 +52,20 @@
             </div>
         </div>
 
-        <main class="main-content flex-grow-1">
+        <main class="main-content flex-grow-1" id="main-content">
             <div class="page-header">
                 <div class="page-header-actions flex-wrap">
                   <h2>Budget</h2>
                   <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-outline-primary btn-sm" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
+                    <button class="btn btn-outline-primary btn-sm" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button>
                     <h4 id="currentMonth" class="mb-0" style="white-space: nowrap;">Loading...</h4>
-                    <button class="btn btn-outline-primary btn-sm" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
+                    <button class="btn btn-outline-primary btn-sm" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
                   </div>
-                  <button class="btn btn-success btn-sm" id="generateBudgetBtn">
+                  <button class="btn btn-success btn-sm" id="generateBudgetBtn" aria-label="Generate budget automatically">
                       <i class="bi bi-magic"></i> Generate Budget
                   </button>
                   <span id="generateBudgetStatus"></span>
-                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal">
+                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal" aria-label="Add budget item">
                       <i class="bi bi-plus-circle"></i> Add Item
                   </button>
                 </div>
@@ -87,7 +88,7 @@
                         <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
                           <li class="dropdown-header d-flex justify-content-between align-items-center">
                             <strong>Notifications</strong>
-                            <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()">Mark all read</button>
+                            <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
                           </li>
                           <li><hr class="dropdown-divider"></li>
                           <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>
