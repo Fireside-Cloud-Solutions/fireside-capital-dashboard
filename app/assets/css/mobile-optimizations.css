@@ -403,33 +403,41 @@
 
 /* =================================================================
    MOBILE TOP BAR — Bell + Welcome in same row as hamburger
-   Fix: Move notification/welcome to fixed header row on mobile
-   Fix: Center icons properly, make them bigger
+   Targets #loggedInState directly so it works on ALL pages
+   (dashboard, assets, bills, etc. have different HTML structures)
    ================================================================= */
 
 @media (max-width: 991.98px) {
-  /* Move notification/welcome bar to fixed position at top-right */
-  .main-content > .d-flex:first-child {
-    position: fixed;
-    top: 12px;
-    right: 16px;
-    left: auto;
-    z-index: calc(var(--z-sticky) + 10);
-    margin-bottom: 0 !important;
-  }
-
-  /* Bigger, properly centered hamburger toggle */
+  /* ---- Hamburger toggle ---- */
+  /* Stay above sidebar (z-modal=400) so it's clickable to close */
   .sidebar-toggle {
+    z-index: 500 !important;
     width: 48px;
     height: 48px;
   }
 
-  .sidebar-toggle .bi-list {
+  /* Center the hamburger/close icon properly */
+  .sidebar-toggle i {
     font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    line-height: 1;
+  }
+
+  /* ---- Bell + Welcome: fixed top-right on ALL pages ---- */
+  #loggedInState {
+    position: fixed !important;
+    top: 12px;
+    right: 16px;
+    z-index: 500;
+    margin: 0 !important;
   }
 
   /* Fix icon centering in buttons on mobile */
-  /* The mobile .btn padding override breaks .btn-icon centering */
+  /* Mobile .btn padding override was breaking .btn-icon centering */
   .btn.btn-icon {
     padding: 0 !important;
     display: inline-flex !important;
@@ -449,17 +457,44 @@
 }
 
 /* =================================================================
-   NOTIFICATION DROPDOWN — Mobile full width
+   NOTIFICATION DROPDOWN — Full-width mobile overlay
+   No scrollbar, proper text wrapping, clean mobile UX
    ================================================================= */
 
-@media (max-width: 575.98px) {
+@media (max-width: 991.98px) {
   #notificationDropdown .dropdown-menu {
     position: fixed !important;
-    top: 64px !important;
-    right: 1rem !important;
-    left: 1rem !important;
-    width: calc(100vw - 2rem) !important;
-    max-width: 100vw !important;
+    top: 68px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100vh - 84px) !important;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Hide scrollbar but keep scroll functionality */
+  #notificationDropdown .dropdown-menu {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #notificationDropdown .dropdown-menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Let notification text wrap naturally — no truncation */
+  #notificationDropdown .dropdown-menu * {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Keep header row on one line */
+  #notificationDropdown .dropdown-header {
+    white-space: nowrap !important;
   }
 }
 
