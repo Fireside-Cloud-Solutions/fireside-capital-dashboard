@@ -743,8 +743,12 @@ function renderBills() {
   const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off');
   const completedFinancing = financingBills.filter(b => getBillFinancingInfo(b).status === 'paid_off');
 
-  // Render recurring bills table
-  tbody.innerHTML = recurringBills.map(b => `
+  // Render ALL active bills in the table (including financing — they're recurring payments too)
+  const activeBills = allBills.filter(b => {
+    const info = getBillFinancingInfo(b);
+    return !(info.isFinancing && info.status === 'paid_off');
+  });
+  tbody.innerHTML = activeBills.map(b => `
       <tr>
           <td>${escapeHtml(b.name)}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}</td>
           <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? formatDate(b.nextDueDate) : '-'}</td>
