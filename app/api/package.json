@@ -1,0 +1,10 @@
+{
+  "name": "fireside-capital-api",
+  "version": "1.0.0",
+  "description": "Azure Functions API for Fireside Capital",
+  "main": "index.js",
+  "dependencies": {
+    "googleapis": "^171.0.0",
+    "dotenv": "^16.5.0"
+  }
+}
