@@ -1,4 +1,4 @@
-﻿// ===== DEBUG UTILITY =====
+// ===== DEBUG UTILITY =====
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
 
@@ -2590,7 +2590,7 @@ async function loadFriendsPage() {
   // Load pending requests (incoming)
   const { data: pendingIncoming } = await sb
     .from('connections')
-    .select('id, created_at, requester_id, requester:user_profiles!connections_requester_id_fkey(id, username, display_name, avatar_url)')
+    .select('id, created_at, requester_id, requester:user_profiles!connections_requester_id_user_profiles_fkey(id, username, display_name, avatar_url)')
     .eq('addressee_id', currentUser.id)
     .eq('status', 'pending');
   
@@ -2628,7 +2628,7 @@ async function loadFriendsPage() {
   // Load my friends (accepted)
   const { data: myConnections } = await sb
     .from('connections')
-    .select('id, status, created_at, requester_id, addressee_id, requester:user_profiles!connections_requester_id_fkey(id, username, display_name, avatar_url), addressee:user_profiles!connections_addressee_id_fkey(id, username, display_name, avatar_url)')
+    .select('id, status, created_at, requester_id, addressee_id, requester:user_profiles!connections_requester_id_user_profiles_fkey(id, username, display_name, avatar_url), addressee:user_profiles!connections_addressee_id_user_profiles_fkey(id, username, display_name, avatar_url)')
     .eq('status', 'accepted')
     .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
   
@@ -2670,7 +2670,7 @@ async function loadFriendsPage() {
   // Load outgoing requests
   const { data: outgoing } = await sb
     .from('connections')
-    .select('id, created_at, addressee:user_profiles!connections_addressee_id_fkey(id, username, display_name, avatar_url)')
+    .select('id, created_at, addressee:user_profiles!connections_addressee_id_user_profiles_fkey(id, username, display_name, avatar_url)')
     .eq('requester_id', currentUser.id)
     .eq('status', 'pending');
   
@@ -2716,14 +2716,14 @@ async function loadSharedBillsData() {
   // Load shares I own (to show indicators)
   const { data: myShares } = await sb
     .from('bill_shares')
-    .select('*, shared_user:user_profiles!bill_shares_shared_with_id_fkey(id, username, display_name)')
+    .select('*, shared_user:user_profiles!bill_shares_shared_with_id_user_profiles_fkey(id, username, display_name)')
     .eq('owner_id', currentUser.id);
   billSharesCache = myShares || [];
   
   // Load shares shared with me (accepted)
   const { data: sharedWithMe } = await sb
     .from('bill_shares')
-    .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_fkey(id, username, display_name)')
+    .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_user_profiles_fkey(id, username, display_name)')
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'accepted');
   sharedWithMeCache = sharedWithMe || [];
@@ -2731,7 +2731,7 @@ async function loadSharedBillsData() {
   // Load pending shares (awaiting my acceptance)
   const { data: pendingShares } = await sb
     .from('bill_shares')
-    .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_fkey(id, username, display_name)')
+    .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_user_profiles_fkey(id, username, display_name)')
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'pending');
   
@@ -2844,7 +2844,7 @@ async function openShareBillModal(billId) {
   
   const { data: connections } = await sb
     .from('connections')
-    .select('id, requester_id, addressee_id, requester:user_profiles!connections_requester_id_fkey(id, username, display_name), addressee:user_profiles!connections_addressee_id_fkey(id, username, display_name)')
+    .select('id, requester_id, addressee_id, requester:user_profiles!connections_requester_id_user_profiles_fkey(id, username, display_name), addressee:user_profiles!connections_addressee_id_user_profiles_fkey(id, username, display_name)')
     .eq('status', 'accepted')
     .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
   
