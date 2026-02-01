@@ -133,6 +133,24 @@ function getThemeColors() {
       grid: isDark ? 'rgba(240, 240, 240, 0.08)' : 'rgba(15, 15, 15, 0.1)'
   };
 }
+function normalizeToMonthly(amount, frequency) {
+  const rawAmount = getRaw(amount);
+  const freq = (frequency || '').toLowerCase();
+  switch (freq) {
+    case 'daily': return rawAmount * 30; // Approximate
+    case 'weekly': return rawAmount * 52 / 12;
+    case 'bi-weekly': return rawAmount * 26 / 12;
+    case 'twice monthly': return rawAmount * 2;
+    case 'semi-monthly': return rawAmount * 2;
+    case 'monthly': return rawAmount;
+    case 'quarterly': return rawAmount / 3;
+    case 'annually': return rawAmount / 12;
+    case 'annual': return rawAmount / 12;
+    default:
+      console.warn(`Unknown frequency: ${frequency}, defaulting to monthly`);
+      return rawAmount;
+  }
+}
 function dedupeSnapshotsByDate(snaps) {
   const uniqueSnaps = {};
   (snaps || []).forEach(snap => { uniqueSnaps[snap.date] = snap; });
@@ -218,6 +236,10 @@ function exportFinancialDataCSV() {
 const supabaseUrl = 'https://qqtiofdqplwycnwplmen.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxdGlvZmRxcGx3eWNud3BsbWVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MDY5NDIsImV4cCI6MjA4NTQ4Mjk0Mn0.Vjg7hQDPWJwmbkQccw5CXH_Npi2YJgJbt-OAEnF_P5g';
 const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// ===== SESSION SECURITY =====
+let sessionSecurity = null;
+// Initialize after DOM loads (will be set up in init())
 
 // ===== STATE & GLOBAL VARIABLES =====
 let currentUser = null;
@@ -319,11 +341,33 @@ async function login(email, password) {
   setButtonLoading('loginSubmitBtn', true);
 
   try {
+    // Check if account is locked due to too many attempts
+    if (sessionSecurity && sessionSecurity.isAccountLocked()) {
+      showAuthAlert('loginAlert', `Too many failed login attempts. Please wait ${sessionSecurity.getLockoutMinutes()} minutes before trying again.`, 'danger');
+      setButtonLoading('loginSubmitBtn', false);
+      return;
+    }
+
     const { error } = await sb.auth.signInWithPassword({ email, password });
 
     if (error) {
+      // Record failed login attempt
+      if (sessionSecurity) {
+        const lockStatus = sessionSecurity.recordLoginAttempt(false, email);
+        if (lockStatus.locked) {
+          showAuthAlert('loginAlert', lockStatus.message, 'danger');
+          setButtonLoading('loginSubmitBtn', false);
+          return;
+        }
+      }
       showAuthAlert('loginAlert', getFriendlyAuthError(error), 'danger');
       return;
+    }
+
+    // Record successful login
+    if (sessionSecurity) {
+      sessionSecurity.recordLoginAttempt(true, email);
+      sessionSecurity.onLogin();
     }
 
     showAuthAlert('loginAlert', '✅ Login successful!', 'success');
@@ -333,7 +377,8 @@ async function login(email, password) {
     }, 500);
   } catch (err) {
     showAuthAlert('loginAlert', 'An unexpected error occurred. Please try again.', 'danger');
-    console.error('Login error:', err);
+    // Don't log the full error object which might contain tokens
+    console.error('[Auth] Login error occurred');
   } finally {
     setButtonLoading('loginSubmitBtn', false);
   }
@@ -389,7 +434,22 @@ async function updatePassword(newPassword) {
   }
 }
 
-async function logout() { await sb.auth.signOut(); }
+async function logout() {
+  if (sessionSecurity) {
+    sessionSecurity.onLogout();
+  }
+  
+  // Clear all session data
+  clearCache();
+  
+  // Sign out from Supabase (revokes tokens server-side)
+  await sb.auth.signOut();
+  
+  // Redirect to home page
+  if (window.location.pathname !== '/index.html' && window.location.pathname !== '/') {
+    window.location.href = 'index.html';
+  }
+}
 
 // ===== CORE DATA & RENDER FUNCTIONS =====
 // --- THE DEBUGGING FUNCTION ---
@@ -557,6 +617,24 @@ function openAssetModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveAsset() {
+  // Rate limiting
+  if (!rateLimiters.save.allow('saveAsset')) {
+    const remainingMs = rateLimiters.save.getRemainingTime('saveAsset');
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
+    return;
+  }
+
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const f = document.getElementById('assetForm');
   const type = f.assetType.value;
   const record = { name: f.assetName.value, type, user_id: currentUser.id };
@@ -579,6 +657,16 @@ function confirmDeleteAsset(id, name) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteAssetModal')).show();
 }
 async function deleteAssetConfirmed() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const { error } = await sb.from('assets').delete().eq('id', deleteAssetId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteAssetModal')).hide();
@@ -618,6 +706,16 @@ function openInvestmentModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveInvestment() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const f = document.getElementById('investmentForm');
   const record = {
       name: f.investmentName.value, type: f.investmentType.value, value: getRaw(f.investmentValue.value),
@@ -642,6 +740,16 @@ function confirmDeleteInvestment(id, name) {
   }
 }
 async function deleteInvestmentConfirmed(id) {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const { error } = await sb.from('investments').delete().eq('id', id).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   clearCache(); // Performance: Clear cache on data mutation
@@ -679,6 +787,16 @@ function openDebtModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveDebt() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const f = document.getElementById('debtForm');
   const record = {
       name: f.debtName.value, type: f.debtType.value, amount: getRaw(f.debtAmount.value), interestRate: getRaw(f.debtInterest.value),
@@ -699,6 +817,16 @@ function confirmDeleteDebt(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteDebtModal')).show();
 }
 async function deleteDebtConfirmed() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const { error } = await sb.from('debts').delete().eq('id', deleteDebtId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteDebtModal')).hide();
@@ -1065,12 +1193,15 @@ function renderBills() {
   }
 
   // Update summary cards
-  // BUG FIX: Use owner_amount for shared bills instead of full amount
-  const totalBills = allBills.reduce((sum, b) => {
+  // BUG FIX: Use owner_amount for shared bills AND normalize all bills to monthly amounts
+  // Only count active bills (exclude paid-off financing)
+  const totalBills = activeBills.reduce((sum, b) => {
     const shareInfo = getShareInfoForBill(b.id);
     // If bill is shared (and accepted), use owner_amount; otherwise use full amount
     const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
-    return sum + getRaw(userAmount);
+    // Normalize to monthly amount based on frequency
+    const monthlyAmount = normalizeToMonthly(userAmount, b.frequency);
+    return sum + monthlyAmount;
   }, 0);
   if (document.getElementById('billsTotal')) document.getElementById('billsTotal').textContent = formatCurrency(totalBills);
   if (document.getElementById('billsRecurringCount')) document.getElementById('billsRecurringCount').textContent = recurringBills.length;
@@ -1206,6 +1337,16 @@ function openBillModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveBill() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const f = document.getElementById('billForm');
   const record = {
       name: f.billName.value, type: f.billType.value, amount: getRaw(f.billAmount.value),
@@ -1341,6 +1482,16 @@ function confirmDeleteBill(id, name) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
 }
 async function deleteBillConfirmed() {
+  // CSRF Protection
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.requireValidToken();
+    }
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
+
   const { error } = await sb.from('bills').delete().eq('id', deleteBillId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteBillModal')).hide();
