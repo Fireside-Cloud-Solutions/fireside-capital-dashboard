@@ -1727,8 +1727,36 @@ async function loadAndRenderBudget() {
   const tbody = document.getElementById('budgetAssignmentTable');
   tbody.innerHTML = '';
 
+  // Fetch shared bills for budget display (same logic as generateBudgetForMonth)
+  let sharedBillsForDisplay = [];
+  if (currentUser) {
+    const { data: sharedBills, error: sharesError } = await sb
+      .from('bill_shares')
+      .select(`
+        *,
+        bill:bills!bill_shares_bill_id_fkey(*)
+      `)
+      .eq('shared_with_id', currentUser.id)
+      .eq('status', 'accepted');
+    
+    if (!sharesError && sharedBills) {
+      sharedBillsForDisplay = sharedBills.map(share => ({
+        ...share.bill,
+        amount: share.shared_amount || (share.bill.amount * 0.5),
+        id: share.bill.id,
+        isShared: true,
+        shareId: share.id,
+        name: share.bill.name,
+        type: share.bill.type,
+        frequency: share.bill.frequency,
+        status: share.bill.status,
+        is_variable: share.bill.is_variable
+      }));
+    }
+  }
+
   // Filter out paid-off financing items from the budget display
-  const budgetItems = [...(window.bills || []), ...(window.debts || [])].filter(item => {
+  const budgetItems = [...(window.bills || []), ...sharedBillsForDisplay, ...(window.debts || [])].filter(item => {
       if (!item) return false;
       // Skip paid-off or cancelled bills (check DB status field if it exists)
       const dbStatus = (item.status || '').toLowerCase();
