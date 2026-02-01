@@ -2734,3 +2734,20 @@ body[data-theme='light'] .stat-meta {
     padding: var(--space-4);
   }
 }
+
+/* =================================================================
+   CRITICAL FIX: Welcome button must not wrap (Build 2026-02-01-17:00)
+   ================================================================= */
+#userDropdown,
+button#userDropdown,
+.user-dropdown-toggle,
+[data-bs-toggle="dropdown"].btn:has(#username) {
+  white-space: nowrap !important;
+  min-width: auto !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+#username {
+  white-space: nowrap !important;
+}

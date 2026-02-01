@@ -62,10 +62,13 @@
 }
 
 /* ===== NOTIFICATION DROPDOWN ===== */
+/* Make notifications dropdown MUCH wider - NO more truncation */
 #notificationList,
-#notificationDropdown .dropdown-menu {
-  width: max(480px, 40vw);  /* 40% of viewport width, minimum 480px */
-  max-width: 600px;          /* Cap at 600px */
+#notificationDropdown .dropdown-menu,
+.notification-dropdown-menu {
+  width: 550px !important;  /* Much wider */
+  max-width: 90vw !important;
+  min-width: 400px !important;
   padding: 0;
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
@@ -171,26 +174,31 @@
 }
 
 /* Notification content */
+/* Ensure notification text can wrap properly */
 .notification-item strong,
-.notification-item .notification-title {
+.notification-item .notification-title,
+.notification-title {
   display: block;
   color: var(--color-text-primary);
   font-size: 14px;
   margin-bottom: 4px;
-  white-space: normal;    /* Allow wrapping */
-  word-wrap: break-word;  /* Break long words */
-  overflow-wrap: break-word;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  max-width: 100% !important;
 }
 
 .notification-item p,
-.notification-item .notification-body {
+.notification-item .notification-body,
+.notification-body {
   color: var(--color-text-secondary);
   font-size: 13px;
   margin: 0;
   line-height: 1.4;
-  white-space: normal;    /* Allow wrapping */
-  word-wrap: break-word;  /* Break long words */
-  overflow-wrap: break-word;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  max-width: 100% !important;
 }
 
 .notification-item small {
@@ -321,17 +329,22 @@
 @media (max-width: 768px) {
   /* Responsive dropdown width for tablets and mobile */
   #notificationList,
-  #notificationDropdown .dropdown-menu {
-    width: 95vw !important;  /* On mobile, use most of screen */
+  #notificationDropdown .dropdown-menu,
+  .notification-dropdown-menu {
+    width: 95vw !important;
     max-width: 95vw !important;
+    min-width: 300px !important;
   }
 }
 
 @media (max-width: 575.98px) {
   /* Responsive dropdown width */
-  #notificationDropdown .dropdown-menu {
-    width: calc(100vw - 32px) !important;
-    max-width: calc(100vw - 32px) !important;
+  #notificationList,
+  #notificationDropdown .dropdown-menu,
+  .notification-dropdown-menu {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    min-width: 300px !important;
     right: 16px;
     left: auto;
   }
