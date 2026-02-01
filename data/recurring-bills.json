@@ -1,0 +1,168 @@
+{
+  "extracted_from": "app/Supabase/Budget_Forecast_Template_With_Formulas.xlsx - Bills tab",
+  "user_id": "8b6aca68-6072-457d-8053-7e81e41bfef3",
+  "notes": "Amounts are approximate averages from spreadsheet history. Negative amounts in sheet = outflow (bills). Some vary monthly.",
+  "recurring_bills": [
+    {
+      "name": "Mortgage",
+      "amount": 1069.00,
+      "frequency": "monthly",
+      "type": "housing",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": false,
+      "notes": "Primary mortgage"
+    },
+    {
+      "name": "BMW Payment",
+      "amount": 1534.00,
+      "frequency": "monthly",
+      "type": "auto",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": true,
+      "notes": "Main BMW loan"
+    },
+    {
+      "name": "BMW 430i",
+      "amount": 411.00,
+      "frequency": "monthly",
+      "type": "auto",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": true,
+      "notes": "Second vehicle - manual payment to Britt sometimes"
+    },
+    {
+      "name": "Chevy Tahoe",
+      "amount": 636.88,
+      "frequency": "monthly",
+      "type": "auto",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": true,
+      "notes": "Newer vehicle entry"
+    },
+    {
+      "name": "HOA Fees",
+      "amount": 170.00,
+      "frequency": "monthly",
+      "type": "housing",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": false,
+      "notes": "Monthly HOA"
+    },
+    {
+      "name": "Cell Phone",
+      "amount": 200.51,
+      "frequency": "monthly",
+      "type": "utilities",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": false,
+      "notes": "T-Mobile or similar"
+    },
+    {
+      "name": "Internet",
+      "amount": 89.99,
+      "frequency": "monthly",
+      "type": "utilities",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": false,
+      "notes": "Reimbursed by Brittany's work"
+    },
+    {
+      "name": "Electric",
+      "amount": 87.44,
+      "frequency": "monthly",
+      "type": "utilities",
+      "auto_draft": true,
+      "is_variable": true,
+      "notes": "West Penn Power - latest amount from Gmail: $87.44 due Feb 9. Varies widely $106-478"
+    },
+    {
+      "name": "Water",
+      "amount": 101.03,
+      "frequency": "monthly",
+      "type": "utilities",
+      "auto_draft": false,
+      "is_variable": true,
+      "notes": "American Water - latest from Gmail: $101.03 due Feb 2. Posts to Robinhood CC"
+    },
+    {
+      "name": "Sewage",
+      "amount": 117.00,
+      "frequency": "monthly",
+      "type": "utilities",
+      "auto_draft": true,
+      "is_variable": true,
+      "notes": "Variable $103-185. User stopped receiving emails for this"
+    },
+    {
+      "name": "Peoples Gas",
+      "amount": 133.64,
+      "frequency": "monthly",
+      "type": "utilities",
+      "auto_draft": true,
+      "is_variable": true,
+      "notes": "Variable $71-157. User never received emails for this"
+    },
+    {
+      "name": "Big Green Egg",
+      "amount": 324.52,
+      "frequency": "monthly",
+      "type": "financing",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": true,
+      "notes": "Still paying - user wants to see payoff progress"
+    },
+    {
+      "name": "XGIMI",
+      "amount": 136.36,
+      "frequency": "monthly",
+      "type": "financing",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": true,
+      "notes": "Getting close to paid off per user"
+    },
+    {
+      "name": "Golf Clubs",
+      "amount": 208.42,
+      "frequency": "monthly",
+      "type": "financing",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": true,
+      "status": "PAID_OFF",
+      "notes": "Already paid off - should show as completed"
+    },
+    {
+      "name": "GLP-1",
+      "amount": 349.00,
+      "frequency": "monthly",
+      "type": "health",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": false,
+      "notes": "Monthly medication"
+    },
+    {
+      "name": "USC Rec",
+      "amount": 52.00,
+      "frequency": "monthly",
+      "type": "subscriptions",
+      "auto_draft": true,
+      "is_variable": false,
+      "is_finite": false,
+      "notes": "Posts to Robinhood CC"
+    }
+  ],
+  "already_in_supabase": [
+    {"name": "American Water", "amount": 101.03, "due": "2026-02-02"},
+    {"name": "West Penn Power", "amount": 87.44, "due": "2026-02-09"}
+  ]
+}

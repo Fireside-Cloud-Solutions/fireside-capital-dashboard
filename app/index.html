@@ -16,8 +16,14 @@
 </head>
 
 <body data-theme="dark">
+  <!-- Mobile sidebar toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <div class="d-flex">
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div>
         <div class="sidebar-brand">
           <h4>
@@ -48,7 +54,7 @@
       </div>
     </div>
 
-    <main class="main-content flex-grow-1 px-4 py-4">
+    <main class="main-content flex-grow-1">
       <div class="d-flex justify-content-end align-items-center mb-4">
         <div id="loggedOutState">
           <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
@@ -73,94 +79,106 @@
       </div>
     
       <div id="dataContainer">
-    
-        <div class="row g-4">
-          <div class="d-flex flex-wrap gap-4 mb-4">
+
+        <!-- Row 1: Stat Cards -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-xl-3 col-md-6 col-12">
             <div class="dashboard-card card-investments">
               <h5>Investments</h5>
               <p id="totalInvestments">$0.00</p>
             </div>
+          </div>
+          <div class="col-xl-3 col-md-6 col-12">
             <div class="dashboard-card card-debts">
               <h5>Debts</h5>
               <p id="totalDebts">$0.00</p>
             </div>
+          </div>
+          <div class="col-xl-3 col-md-6 col-12">
             <div class="dashboard-card card-assets">
               <h5>Assets</h5>
               <p id="totalAssets">$0.00</p>
             </div>
+          </div>
+          <div class="col-xl-3 col-md-6 col-12">
             <div class="dashboard-card card-networth">
               <h5>Net Worth</h5>
               <p id="netWorth">$0.00</p>
             </div>
           </div>
         </div>
-    
-        <div class="d-flex flex-wrap gap-3 mb-4">
-          <div class="card p-4 shadow-sm" style="flex: 1 1 20%;">
-            <h5 class="mb-3">Upcoming Transactions</h5>
-            <div id="upcomingPaymentsList"></div>
-          </div>
-          <div class="card p-4 shadow-sm" style="flex: 2 1 50%;">
-            <h5 class="mb-3">Net Worth Over Time</h5>
-            <div class="chart-wrapper" style="height: 300px;">
-              <canvas id="netWorthTimelineChart"></canvas>
+
+        <!-- Row 2: Upcoming + Net Worth Timeline + Cash Flow -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-xl-3 col-lg-4 col-12">
+            <div class="chart-card">
+              <h5>Upcoming Transactions</h5>
+              <div id="upcomingPaymentsList" style="overflow-y: auto; max-height: 300px;"></div>
             </div>
           </div>
-          <div class="card p-4 shadow-sm" style="flex: 1 1 25%;">
-            <h5 class="mb-3">Monthly Cash Flow</h5>
-            <div class="chart-wrapper" style="height: 300px;">
-              <canvas id="cashFlowChart"></canvas>
+          <div class="col-xl-5 col-lg-8 col-12">
+            <div class="chart-card">
+              <h5>Net Worth Over Time</h5>
+              <div class="chart-wrapper" style="height: 300px;">
+                <canvas id="netWorthTimelineChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4 col-lg-6 col-12">
+            <div class="chart-card">
+              <h5>Monthly Cash Flow</h5>
+              <div class="chart-wrapper" style="height: 300px;">
+                <canvas id="cashFlowChart"></canvas>
+              </div>
             </div>
           </div>
         </div>
-    
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-4 mb-4">
-            <div class="col">
-              <div class="card p-4 shadow-sm h-100">
-                <h5 class="mb-3">Monthly Net Worth Change</h5>
-                <div class="chart-wrapper" style="height: 250px;">
-                  <canvas id="netWorthDeltaChart"></canvas>
-                </div>
-              </div>
-            </div>
-          
-            <div class="col">
-              <div class="card p-4 shadow-sm h-100">
-                <h5 class="mb-3">Top Spending Categories</h5>
-                <div class="chart-wrapper" style="height: 250px;">
-                  <canvas id="spendingCategoriesChart"></canvas>
-                </div>
-              </div>
-            </div>
-          
-            <div class="col">
-              <div class="card p-4 shadow-sm h-100">
-                <h5 class="mb-3">Emergency Fund Progress</h5>
-                <div class="chart-wrapper d-flex align-items-center justify-content-center" id="emergencyFundChartWrapper" style="height: 250px;">
-                </div>
-              </div>
-            </div>
-          
-            <div class="col">
-              <div class="card p-4 shadow-sm h-100">
-                <h5 class="mb-3">Savings Rate Over Time</h5>
-                <div class="chart-wrapper" style="height: 250px;">
-                  <canvas id="savingsRateChart"></canvas>
-                </div>
-              </div>
-            </div>
-          
-            <div class="col">
-              <div class="card p-4 shadow-sm h-100">
-                <h5 class="mb-3">Investment Growth Over Time</h5>
-                <div class="chart-wrapper" style="height: 250px;">
-                  <canvas id="investmentGrowthChart"></canvas>
-                </div>
+
+        <!-- Row 3: Analytics Charts -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-xl-4 col-lg-6 col-12">
+            <div class="chart-card">
+              <h5>Monthly Net Worth Change</h5>
+              <div class="chart-wrapper" style="height: 260px;">
+                <canvas id="netWorthDeltaChart"></canvas>
               </div>
             </div>
           </div>
-    
-      </div> </main>
+          <div class="col-xl-4 col-lg-6 col-12">
+            <div class="chart-card">
+              <h5>Top Spending Categories</h5>
+              <div class="chart-wrapper" style="height: 260px;">
+                <canvas id="spendingCategoriesChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4 col-lg-6 col-12">
+            <div class="chart-card">
+              <h5>Emergency Fund Progress</h5>
+              <div class="chart-wrapper d-flex align-items-center justify-content-center" id="emergencyFundChartWrapper" style="height: 260px;">
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-12">
+            <div class="chart-card">
+              <h5>Savings Rate Over Time</h5>
+              <div class="chart-wrapper" style="height: 260px;">
+                <canvas id="savingsRateChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-12">
+            <div class="chart-card">
+              <h5>Investment Growth Over Time</h5>
+              <div class="chart-wrapper" style="height: 260px;">
+                <canvas id="investmentGrowthChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -313,8 +331,6 @@
     </div>
   </div>
 
-
-  <!-- Password Reset Modal (shown when user clicks email reset link) -->
   <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
       <div class="modal-content">

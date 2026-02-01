@@ -722,7 +722,7 @@ async function saveSettings() {
   if (!currentUser) return;
   const goal = getRaw(document.getElementById('emergencyFundGoal').value);
 
-  const { error } = await supabase
+  const { error } = await sb
       .from('settings')
       .upsert({ user_id: currentUser.id, emergency_fund_goal: goal });
 
@@ -1059,7 +1059,7 @@ async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
     assigned_amount: assignedAmount
   };
 
-  const { error } = await supabase
+  const { error } = await sb
     .from('budgets')
     .upsert(record, { onConflict: 'user_id,month,item_id' });
 
@@ -1367,10 +1367,53 @@ if (document.getElementById('budgetAssignmentTable')) {
 
    // 3. Setup remaining UI components.
    setupThemeToggle();
+   setupSidebarToggle();
    initializeAssetForm();
    initializeBudgetPage();
    //renderAdditionalCharts();
 }
+
+// ===== MOBILE SIDEBAR TOGGLE =====
+function setupSidebarToggle() {
+  const toggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!toggle || !sidebar) return;
+
+  const openSidebar = () => {
+    sidebar.classList.add('show');
+    if (overlay) overlay.classList.add('show');
+    toggle.innerHTML = '<i class="bi bi-x-lg"></i>';
+  };
+
+  const closeSidebar = () => {
+    sidebar.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+    toggle.innerHTML = '<i class="bi bi-list"></i>';
+  };
+
+  toggle.addEventListener('click', () => {
+    if (sidebar.classList.contains('show')) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  });
+
+  if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+  }
+
+  // Close sidebar when a nav link is clicked (mobile)
+  sidebar.querySelectorAll('a[href]').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 991) {
+        closeSidebar();
+      }
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', init);
 
 // ===== GLOBAL EXPORTS =====

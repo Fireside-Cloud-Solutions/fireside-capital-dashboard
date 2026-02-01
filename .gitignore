@@ -20,3 +20,7 @@ check-deploy.ps1
 # IDE
 .vscode/
 .idea/
+
+# Agent config files (contain credentials/internal routing)
+AGENTS.md
+TOOLS.md

@@ -13,8 +13,13 @@
     <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body data-theme="dark">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="d-flex">
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div>
                 <div class="sidebar-brand">
                   <h4>
@@ -45,21 +50,19 @@
             </div>
         </div>
 
-        <main class="main-content flex-grow-1 px-4 py-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-
-                <div class="d-flex align-items-center">
-                  <h2 class="mb-0">Budget</h2>
-                  <div class="d-flex align-items-center ms-4">
-                    <button class="btn btn-outline-primary btn-sm me-2" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
-                    <h4 id="currentMonth" class="mb-0">Loading...</h4>
-                    <button class="btn btn-outline-primary btn-sm ms-2" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
-                    <button class="btn btn-primary btn-sm ms-4" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal">
-                        <i class="bi bi-plus-circle"></i> Add Item
-                      </button>
+        <main class="main-content flex-grow-1">
+            <div class="page-header">
+                <div class="page-header-actions flex-wrap">
+                  <h2>Budget</h2>
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-primary btn-sm" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
+                    <h4 id="currentMonth" class="mb-0" style="white-space: nowrap;">Loading...</h4>
+                    <button class="btn btn-outline-primary btn-sm" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
                   </div>
+                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal">
+                      <i class="bi bi-plus-circle"></i> Add Item
+                  </button>
                 </div>
-              
                 <div>
                   <div id="loggedOutState">
                     <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
@@ -82,42 +85,41 @@
                     </div>
                   </div>
                 </div>
-              
-              </div>
+            </div>
 
             <div id="dataContainer" style="visibility: hidden;">
             <!-- Summary Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card p-3 shadow-sm text-center">
-                        <h6 class="text-muted mb-1">Expected Income</h6>
+            <div class="row g-3 g-xl-4 mb-4">
+                <div class="col-xl-3 col-md-6 col-12">
+                    <div class="summary-card">
+                        <h6>Expected Income</h6>
                         <h4 id="expectedIncome">$0.00</h4>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card p-3 shadow-sm text-center">
-                        <h6 class="text-muted mb-1">Assigned</h6>
+                <div class="col-xl-3 col-md-6 col-12">
+                    <div class="summary-card">
+                        <h6>Assigned</h6>
                         <h4 id="assignedAmount">$0.00</h4>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card p-3 shadow-sm text-center">
-                        <h6 class="text-muted mb-1">Spent</h6>
+                <div class="col-xl-3 col-md-6 col-12">
+                    <div class="summary-card">
+                        <h6>Spent</h6>
                         <h4 id="activityAmount">$0.00</h4>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card p-3 shadow-sm text-center text-success">
-                        <h6 class="text-muted mb-1">Remaining to Budget</h6>
-                        <h4 id="remainingToBudget">$0.00</h4>
+                <div class="col-xl-3 col-md-6 col-12">
+                    <div class="summary-card">
+                        <h6>Remaining to Budget</h6>
+                        <h4 id="remainingToBudget" class="text-success">$0.00</h4>
                     </div>
                 </div>
             </div>
 
             <!-- Budget Assignment Table -->
-            <div class="card p-4 shadow-sm mb-4">
+            <div class="table-card">
                 <div class="table-responsive">
-                    <table class="table align-middle">
+                    <table class="table align-middle mb-0">
                         <thead>
                             <tr>
                               <th style="width: 15%;">Category</th>
@@ -248,8 +250,7 @@
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/plaid.js"></script>
-  
-  <!-- Password Reset Modal (shown when user clicks email reset link) -->
+
   <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
       <div class="modal-content">

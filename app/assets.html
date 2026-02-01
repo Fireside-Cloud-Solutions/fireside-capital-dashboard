@@ -13,8 +13,14 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body data-theme="dark">
+  <!-- Mobile sidebar toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <div class="d-flex">
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div>
         <div class="sidebar-brand">
           <h4>
@@ -45,16 +51,14 @@
       </div>
     </div>
 
-    <main class="main-content flex-grow-1 px-4 py-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div class="d-flex align-items-center">
-          <h2 class="mb-0">Assets</h2>
-          <button class="btn btn-primary ms-3" onclick="openAssetModal()">
-            <i class="bi bi-plus-circle me-1"></i> Add Asset
+    <main class="main-content flex-grow-1">
+      <div class="page-header">
+        <div class="page-header-actions">
+          <h2>Assets</h2>
+          <button class="btn btn-primary" onclick="openAssetModal()">
+            <i class="bi bi-plus-circle"></i> Add Asset
           </button>
         </div>
-      
         <div>
           <div id="loggedOutState">
             <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
@@ -77,13 +81,12 @@
             </div>
           </div>
         </div>
-      
       </div>
 
       <div id="dataContainer" style="visibility: hidden;">
-        <div class="card p-4 shadow-sm">
+        <div class="table-card">
           <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table align-middle mb-0">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -96,7 +99,7 @@
                 </tr>
               </thead>
               <tbody id="assetTableBody">
-                </tbody>
+              </tbody>
             </table>
           </div>
         </div>
@@ -128,7 +131,6 @@
                   <option value="other">Other</option>
                 </select>
               </div>
-
               <div class="col-12 asset-fields real-estate-fields d-none">
                 <div class="row g-3">
                   <div class="col-md-4">
@@ -145,7 +147,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="col-12 asset-fields vehicle-fields d-none">
                  <div class="row g-3">
                     <div class="col-md-4">
@@ -271,7 +272,7 @@
   <script src="assets/js/app.js"></script>
   <script src="assets/js/plaid.js"></script>
 
-  <!-- Password Reset Modal (shown when user clicks email reset link) -->
+  <!-- Password Reset Modal -->
   <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
       <div class="modal-content">
