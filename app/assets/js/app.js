@@ -703,11 +703,11 @@ function renderInvestments() {
   tbody.innerHTML = (window.investments || []).map(inv => `
       <tr>
           <td>${escapeHtml(inv.name)}</td><td>${escapeHtml(inv.type)}</td><td>${formatCurrency(inv.startingBalance)}</td>
-          <td>${formatCurrency(inv.monthlyContribution)}</td><td>${inv.annualReturn ? inv.annualReturn + '%' : '-'}</td>
-          <td>${inv.nextContributionDate ? formatDate(inv.nextContributionDate) : '-'}</td><td>${formatCurrency(inv.value)}</td>
+          <td>${formatCurrency(inv.monthlyContribution)}</td><td>${escapeHtml(inv.annualReturn ? inv.annualReturn + '%' : '-')}</td>
+          <td>${inv.nextContributionDate ? escapeHtml(formatDate(inv.nextContributionDate)) : '-'}</td><td>${formatCurrency(inv.value)}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openInvestmentModal('${inv.id}')" aria-label="Edit ${escapeHtml(inv.name)}"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${inv.id}', '${escapeHtml(inv.name)}')" aria-label="Delete ${escapeHtml(inv.name)}"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openInvestmentModal('${escapeAttribute(inv.id)}')" aria-label="Edit ${escapeAttribute(inv.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${escapeAttribute(inv.id)}', '${escapeAttribute(inv.name)}')" aria-label="Delete ${escapeAttribute(inv.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -793,11 +793,11 @@ function renderDebts() {
   tbody.innerHTML = (window.debts || []).map(d => `
       <tr>
           <td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.type)}</td><td>${formatCurrency(d.amount)}</td><td>${escapeHtml(d.interestRate)}%</td>
-          <td>${d.term || '-'} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
-          <td>${d.nextDueDate ? formatDate(d.nextDueDate) : '-'}</td>
+          <td>${escapeHtml(d.term || '-')} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
+          <td>${d.nextDueDate ? escapeHtml(formatDate(d.nextDueDate)) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openDebtModal('${d.id}')" aria-label="Edit ${escapeHtml(d.name)}"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${d.id}', '${escapeHtml(d.name)}')" aria-label="Delete ${escapeHtml(d.name)}"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openDebtModal('${escapeAttribute(d.id)}')" aria-label="Edit ${escapeAttribute(d.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${escapeAttribute(d.id)}', '${escapeAttribute(d.name)}')" aria-label="Delete ${escapeAttribute(d.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -1075,15 +1075,15 @@ function renderBills() {
   });
   tbody.innerHTML = activeBills.map(b => {
       const shareInfo = getShareInfoForBill(b.id);
-      const sharedBadge = shareInfo ? `<span class="badge bg-info ms-1" title="Shared with ${escapeHtml(shareInfo.shared_user?.display_name || 'someone')}"><i class="bi bi-link-45deg me-1"></i>${shareInfo.status === 'accepted' ? 'Shared' : 'Pending'}</span>` : '';
+      const sharedBadge = shareInfo ? `<span class="badge bg-info ms-1" title="Shared with ${escapeAttribute(shareInfo.shared_user?.display_name || 'someone')}"><i class="bi bi-link-45deg me-1"></i>${escapeHtml(shareInfo.status === 'accepted' ? 'Shared' : 'Pending')}</span>` : '';
       return `
       <tr>
           <td>${escapeHtml(b.name)} ${sharedBadge}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}${shareInfo && shareInfo.status === 'accepted' ? `<small class="d-block" style="color: var(--color-text-tertiary);">Your share: ${formatCurrency(shareInfo.owner_amount)}</small>` : ''}</td>
-          <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? formatDate(b.nextDueDate) : '-'}</td>
+          <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? escapeHtml(formatDate(b.nextDueDate)) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" aria-label="Share ${escapeHtml(b.name)}"><i class="bi bi-share"></i></button>
-              <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')" aria-label="Edit ${escapeHtml(b.name)}"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')" aria-label="Delete ${escapeHtml(b.name)}"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`;
   }).join('');
@@ -1096,11 +1096,11 @@ function renderBills() {
           const info = getBillFinancingInfo(b);
           const progressColor = info.percentPaid >= 75 ? 'var(--color-success)' : 'var(--color-primary)';
           const payoffStr = info.estimatedPayoffDate
-            ? info.estimatedPayoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            ? escapeHtml(info.estimatedPayoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }))
             : 'N/A';
           // APR badge
           const aprBadge = info.interestRate !== null && info.interestRate !== undefined
-            ? `<span class="badge ${info.interestRate === 0 ? 'bg-success' : 'bg-warning text-dark'} ms-1" style="font-size: 0.7rem;">${info.interestRate}% APR</span>`
+            ? `<span class="badge ${info.interestRate === 0 ? 'bg-success' : 'bg-warning text-dark'} ms-1" style="font-size: 0.7rem;">${escapeHtml(info.interestRate)}% APR</span>`
             : '';
           // Principal vs Interest breakdown (only when loan details exist)
           const hasBreakdown = info.hasLoanDetails && info.interestPaidToDate !== null;
@@ -1111,12 +1111,12 @@ function renderBills() {
                   </div>
                   <div class="progress" style="height: 8px; border-radius: var(--radius-full);">
                     <div class="progress-bar" role="progressbar"
-                         style="width: ${info.amountPaid > 0 ? (info.principalPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0}%; background-color: var(--color-primary);"
-                         title="Principal: ${formatCurrency(info.principalPaidToDate)}">
+                         style="width: ${escapeAttribute(String(info.amountPaid > 0 ? (info.principalPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0))}%; background-color: var(--color-primary);"
+                         title="Principal: ${escapeAttribute(formatCurrency(info.principalPaidToDate))}">
                     </div>
                     <div class="progress-bar" role="progressbar"
-                         style="width: ${info.amountPaid > 0 ? (info.interestPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0}%; background-color: var(--color-secondary);"
-                         title="Interest: ${formatCurrency(info.interestPaidToDate)}">
+                         style="width: ${escapeAttribute(String(info.amountPaid > 0 ? (info.interestPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0))}%; background-color: var(--color-secondary);"
+                         title="Interest: ${escapeAttribute(formatCurrency(info.interestPaidToDate))}">
                     </div>
                   </div>
                   <div class="d-flex justify-content-between mt-1">
@@ -1132,7 +1132,7 @@ function renderBills() {
                   </div>` : '';
           // View Schedule button (only when loan details exist)
           const scheduleBtn = info.hasLoanDetails
-            ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showAmortizationSchedule('${b.id}')"><i class="bi bi-table me-1"></i>View Schedule</button>`
+            ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showAmortizationSchedule('${escapeAttribute(b.id)}')"><i class="bi bi-table me-1"></i>View Schedule</button>`
             : '';
           return `
           <div class="col-xl-4 col-md-6 col-12">
@@ -1144,20 +1144,20 @@ function renderBills() {
                     <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
                   </div>
                   <div class="text-end">
-                    <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" aria-label="Share ${escapeHtml(b.name)}"><i class="bi bi-share"></i></button>
-                    <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')" aria-label="Edit ${escapeHtml(b.name)}"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')" aria-label="Delete ${escapeHtml(b.name)}"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
                   </div>
                 </div>
                 <div class="mb-3">
                   <div class="d-flex justify-content-between mb-1">
                     <small style="color: var(--color-text-secondary);">Progress</small>
-                    <small style="color: var(--color-text-secondary);">${Math.round(info.percentPaid)}%</small>
+                    <small style="color: var(--color-text-secondary);">${escapeHtml(Math.round(info.percentPaid))}%</small>
                   </div>
                   <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
                     <div class="progress-bar" role="progressbar"
-                         style="width: ${info.percentPaid}%; background-color: ${progressColor};"
-                         aria-valuenow="${info.percentPaid}" aria-valuemin="0" aria-valuemax="100">
+                         style="width: ${escapeAttribute(String(info.percentPaid))}%; background-color: ${escapeAttribute(progressColor)};"
+                         aria-valuenow="${escapeAttribute(String(info.percentPaid))}" aria-valuemin="0" aria-valuemax="100">
                     </div>
                   </div>
                 </div>${breakdownHtml}
@@ -1176,7 +1176,7 @@ function renderBills() {
                   </div>${totalInterestHtml}
                 </div>
                 <div class="mt-2 text-center">
-                  <small style="color: var(--color-text-tertiary);">${info.paymentsMade} of ${info.totalPayments} payments made</small>
+                  <small style="color: var(--color-text-tertiary);">${escapeHtml(info.paymentsMade)} of ${escapeHtml(info.totalPayments)} payments made</small>
                   ${scheduleBtn}
                 </div>
               </div>
@@ -1206,8 +1206,8 @@ function renderBills() {
                   <span class="badge bg-success">Paid Off</span>
                 </div>
                 <div class="text-end">
-                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')" aria-label="Edit ${escapeHtml(b.name)}"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')" aria-label="Delete ${escapeHtml(b.name)}"><i class="bi bi-trash"></i></button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
                 </div>
               </div>
               <div class="mb-3">
@@ -1225,7 +1225,7 @@ function renderBills() {
                 </div>
                 <div class="col-6">
                   <small class="d-block" style="color: var(--color-text-tertiary);">Completed</small>
-                  <strong style="color: var(--color-success);">${info.paymentsMade} payments</strong>
+                  <strong style="color: var(--color-success);">${escapeHtml(info.paymentsMade)} payments</strong>
                 </div>
               </div>
             </div>
@@ -1511,8 +1511,8 @@ function showAmortizationSchedule(billId) {
       } else if (isPast) {
         rowStyle = 'opacity: 0.6;';
       }
-      return `<tr class="${rowClass}" style="${rowStyle}">
-        <td>${isCurrent ? '<i class="bi bi-arrow-right-circle-fill me-1" style="color: var(--color-primary);"></i>' : ''}${row.payment}</td>
+      return `<tr class="${escapeAttribute(rowClass)}" style="${escapeAttribute(rowStyle)}">
+        <td>${isCurrent ? '<i class="bi bi-arrow-right-circle-fill me-1" style="color: var(--color-primary);"></i>' : ''}${escapeHtml(row.payment)}</td>
         <td>${formatCurrency(row.paymentAmount)}</td>
         <td>${formatCurrency(row.principal)}</td>
         <td>${formatCurrency(row.interest)}</td>
@@ -1569,10 +1569,10 @@ function renderIncome() {
   tbody.innerHTML = (window.income || []).map(i => `
       <tr>
           <td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.type)}</td><td>${formatCurrency(i.amount)}</td>
-          <td>${escapeHtml(i.frequency)}</td><td>${i.nextDueDate ? formatDate(i.nextDueDate) : '-'}</td>
+          <td>${escapeHtml(i.frequency)}</td><td>${i.nextDueDate ? escapeHtml(formatDate(i.nextDueDate)) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openIncomeModal('${i.id}')" aria-label="Edit ${escapeHtml(i.name)}"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${i.id}', '${escapeHtml(i.name)}')" aria-label="Delete ${escapeHtml(i.name)}"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openIncomeModal('${escapeAttribute(i.id)}')" aria-label="Edit ${escapeAttribute(i.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${escapeAttribute(i.id)}', '${escapeAttribute(i.name)}')" aria-label="Delete ${escapeAttribute(i.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -2106,10 +2106,10 @@ async function loadAndRenderBudget() {
       const row = document.createElement('tr');
       row.innerHTML = `
           <td>${escapeHtml(toTitleCase(item.type) || 'N/A')}</td><td>${escapeHtml(item.name || 'Unnamed')}</td><td>${formatCurrency(needed)}</td>
-          <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${assigned.toFixed(2)}" data-item-id="${item.id}" step="0.01"></div></td>
+          <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${escapeAttribute(assigned.toFixed(2))}" data-item-id="${escapeAttribute(item.id)}" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
-          <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${Math.min(fundingPercent, 100)}%">${Math.round(fundingPercent)}%</div></div></td>
-          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${item.id}', '${monthString}')" aria-label="Remove ${escapeHtml(item.name)} from budget"><i class="bi bi-trash"></i></button></td>
+          <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${escapeAttribute(String(Math.min(fundingPercent, 100)))}%">${escapeHtml(Math.round(fundingPercent))}%</div></div></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${escapeAttribute(item.id)}', '${escapeAttribute(monthString)}')" aria-label="Remove ${escapeAttribute(item.name)} from budget"><i class="bi bi-trash"></i></button></td>
       `;
       tbody.appendChild(row);
   });
@@ -2131,10 +2131,10 @@ async function loadAndRenderBudget() {
       const row = document.createElement('tr');
       row.innerHTML = `
           <td>${escapeHtml(toTitleCase(rec.category) || 'Custom')}</td><td>${escapeHtml(rec.name || 'Unnamed')}</td><td>${formatCurrency(needed)}</td>
-          <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${assigned.toFixed(2)}" data-item-id="${rec.item_id}" data-item-type="custom" step="0.01"></div></td>
+          <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${escapeAttribute(assigned.toFixed(2))}" data-item-id="${escapeAttribute(rec.item_id)}" data-item-type="custom" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
-          <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${Math.min(fundingPercent, 100)}%">${Math.round(fundingPercent)}%</div></div></td>
-          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${rec.item_id}', '${monthString}')" aria-label="Remove ${escapeHtml(rec.item_name)} from budget"><i class="bi bi-trash"></i></button></td>
+          <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${escapeAttribute(String(Math.min(fundingPercent, 100)))}%">${escapeHtml(Math.round(fundingPercent))}%</div></div></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${escapeAttribute(rec.item_id)}', '${escapeAttribute(monthString)}')" aria-label="Remove ${escapeAttribute(rec.item_name)} from budget"><i class="bi bi-trash"></i></button></td>
       `;
       tbody.appendChild(row);
   });
@@ -2157,7 +2157,7 @@ async function loadAndRenderBudget() {
           <td class="text-muted">�</td>
           <td class="text-muted">�</td>
           <td class="text-muted small">Removed</td>
-          <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${rec.item_id}', '${monthString}')" aria-label="Restore ${escapeHtml(rec.item_name)} to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
+          <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${escapeAttribute(rec.item_id)}', '${escapeAttribute(monthString)}')" aria-label="Restore ${escapeAttribute(rec.item_name)} to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
       `;
       tbody.appendChild(row);
     });
@@ -3281,14 +3281,14 @@ async function searchFriends(query) {
       <div class="card-body p-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-3">
           <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--color-bg-3); border: 1px solid var(--color-border-subtle);">
-            ${p.avatar_url ? `<img src="${escapeHtml(p.avatar_url)}" class="rounded-circle" width="40" height="40">` : `<i class="bi bi-person" style="font-size: 1.2rem;"></i>`}
+            ${p.avatar_url ? `<img src="${escapeAttribute(p.avatar_url)}" class="rounded-circle" width="40" height="40">` : `<i class="bi bi-person" style="font-size: 1.2rem;"></i>`}
           </div>
           <div>
             <strong style="color: var(--color-text-primary);">${escapeHtml(p.display_name || 'Unknown')}</strong>
             ${p.username ? `<div style="font-size: 0.8rem; color: var(--color-text-tertiary);">@${escapeHtml(p.username)}</div>` : ''}
           </div>
         </div>
-        <button class="btn btn-sm btn-primary" onclick="sendFriendRequest('${p.id}')">
+        <button class="btn btn-sm btn-primary" onclick="sendFriendRequest('${escapeAttribute(p.id)}')">
           <i class="bi bi-person-plus me-1"></i>Add Friend
         </button>
       </div>
@@ -3394,8 +3394,8 @@ async function loadFriendsPage() {
                 </div>
               </div>
               <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-success" onclick="acceptFriendRequest('${req.id}')" aria-label="Accept friend request from ${escapeHtml(req.friend_email)}"><i class="bi bi-check-lg"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="declineFriendRequest('${req.id}')" aria-label="Decline friend request from ${escapeHtml(req.friend_email)}"><i class="bi bi-x-lg"></i></button>
+                <button class="btn btn-sm btn-success" onclick="acceptFriendRequest('${escapeAttribute(req.id)}')" aria-label="Accept friend request from ${escapeAttribute(req.friend_email || req.requester?.display_name || 'Unknown')}"><i class="bi bi-check-lg"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="declineFriendRequest('${escapeAttribute(req.id)}')" aria-label="Decline friend request from ${escapeAttribute(req.friend_email || req.requester?.display_name || 'Unknown')}"><i class="bi bi-x-lg"></i></button>
               </div>
             </div>
           </div>
@@ -3436,7 +3436,7 @@ async function loadFriendsPage() {
                   <small style="color: var(--color-text-tertiary);">Friends since ${formatDate(f.since?.split('T')[0])}</small>
                 </div>
               </div>
-              <button class="btn btn-sm btn-outline-danger" onclick="removeFriend('${f.connectionId}', '${escapeHtml(f.friend?.display_name || 'this friend')}')">
+              <button class="btn btn-sm btn-outline-danger" onclick="removeFriend('${escapeAttribute(f.connectionId)}', '${escapeAttribute(f.friend?.display_name || 'this friend')}')">
                 <i class="bi bi-person-dash"></i>
               </button>
             </div>
@@ -3480,7 +3480,7 @@ async function loadFriendsPage() {
                   <small style="color: var(--color-text-tertiary);">Sent ${formatDate(req.created_at?.split('T')[0])}</small>
                 </div>
               </div>
-              <button class="btn btn-sm btn-outline-secondary" onclick="cancelFriendRequest('${req.id}')">
+              <button class="btn btn-sm btn-outline-secondary" onclick="cancelFriendRequest('${escapeAttribute(req.id)}')">
                 <i class="bi bi-x-lg me-1"></i>Cancel
               </button>
             </div>
@@ -3545,7 +3545,7 @@ function renderSharedWithMe(shares) {
   
   section.classList.remove('d-none');
   tbody.innerHTML = shares.map(share => {
-    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${share.shared_percent}%` : formatCurrency(share.shared_fixed);
+    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${escapeHtml(share.shared_percent)}%` : formatCurrency(share.shared_fixed);
     return `
       <tr>
         <td>${escapeHtml(share.bill?.name || 'Unknown')}</td>
@@ -3555,7 +3555,7 @@ function renderSharedWithMe(shares) {
         </td>
         <td><strong style="color: var(--color-primary);">${formatCurrency(share.shared_amount)}</strong></td>
         <td style="color: var(--color-text-tertiary);">${formatCurrency(share.bill?.amount)}</td>
-        <td><span class="badge bg-info">${splitLabel}</span></td>
+        <td><span class="badge bg-info">${escapeHtml(splitLabel)}</span></td>
         <td><span class="badge bg-success">Active</span></td>
         <td>
           <span class="badge bg-secondary-subtle"><i class="bi bi-link-45deg me-1"></i>Shared</span>
@@ -3577,7 +3577,7 @@ function renderPendingShares(shares) {
   
   section.classList.remove('d-none');
   container.innerHTML = shares.map(share => {
-    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${share.owner_percent}/${share.shared_percent}` : 'Fixed';
+    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${escapeHtml(share.owner_percent)}/${escapeHtml(share.shared_percent)}` : 'Fixed';
     return `
       <div class="col-xl-4 col-md-6 col-12">
         <div class="card">
@@ -3599,13 +3599,13 @@ function renderPendingShares(shares) {
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span style="color: var(--color-text-tertiary);">Split:</span>
-              <span class="badge bg-info">${splitLabel}</span>
+              <span class="badge bg-info">${escapeHtml(splitLabel)}</span>
             </div>
             <div class="d-flex gap-2">
-              <button class="btn btn-success btn-sm flex-grow-1" onclick="acceptBillShare('${share.id}')">
+              <button class="btn btn-success btn-sm flex-grow-1" onclick="acceptBillShare('${escapeAttribute(share.id)}')">
                 <i class="bi bi-check-lg me-1"></i>Accept
               </button>
-              <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="declineBillShare('${share.id}')">
+              <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="declineBillShare('${escapeAttribute(share.id)}')">
                 <i class="bi bi-x-lg me-1"></i>Decline
               </button>
             </div>
@@ -3628,7 +3628,7 @@ function renderMySharedBills(shares) {
 
   section.classList.remove('d-none');
   tbody.innerHTML = shares.map(share => {
-    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${share.shared_percent}%` : formatCurrency(share.shared_fixed);
+    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${escapeHtml(share.shared_percent)}%` : formatCurrency(share.shared_fixed);
     const statusColor = share.status === 'accepted' ? 'success' : share.status === 'pending' ? 'warning' : 'danger';
     const statusLabel = share.status === 'accepted' ? 'Active' : share.status === 'pending' ? 'Pending' : 'Declined';
     return `
@@ -3640,10 +3640,10 @@ function renderMySharedBills(shares) {
         </td>
         <td><strong style="color: var(--color-primary);">${formatCurrency(share.shared_amount)}</strong></td>
         <td style="color: var(--color-text-secondary);">${formatCurrency(share.owner_amount)}</td>
-        <td><span class="badge bg-info">${splitLabel}</span></td>
-        <td><span class="badge bg-${statusColor}">${statusLabel}</span></td>
+        <td><span class="badge bg-info">${escapeHtml(splitLabel)}</span></td>
+        <td><span class="badge bg-${escapeAttribute(statusColor)}">${escapeHtml(statusLabel)}</span></td>
         <td>
-          <button class="btn btn-outline-danger btn-sm" onclick="revokeShareBill('${share.id}')" title="Revoke share">
+          <button class="btn btn-outline-danger btn-sm" onclick="revokeShareBill('${escapeAttribute(share.id)}')" title="Revoke share">
             <i class="bi bi-x-circle me-1"></i>Revoke
           </button>
         </td>
