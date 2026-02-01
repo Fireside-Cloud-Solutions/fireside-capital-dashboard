@@ -2527,13 +2527,26 @@ main {
   }
 }
 
-/* Light mode adjustments */
+/* Empty state light mode fixes (CRITICAL: Issue #2) */
+body[data-theme='light'] .empty-state {
+  background: #F5F5F5; /* Light background instead of dark */
+  color: #0f0f0f; /* Dark text for contrast */
+}
+
 body[data-theme='light'] .empty-state-icon {
-  background: linear-gradient(135deg, rgba(1, 164, 239, 0.1) 0%, rgba(244, 78, 36, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(1, 164, 239, 0.1) 0%, rgba(1, 164, 239, 0.2) 100%);
 }
 
 body[data-theme='light'] .empty-state-icon svg.icon {
   color: var(--color-secondary);
+}
+
+body[data-theme='light'] .empty-state-title {
+  color: #0f0f0f; /* Dark title text */
+}
+
+body[data-theme='light'] .empty-state-text {
+  color: #555555; /* Secondary dark text */
 }
 
 /* Mobile responsive empty states */

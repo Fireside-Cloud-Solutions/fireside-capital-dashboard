@@ -3124,7 +3124,8 @@ function setupThemeToggle() {
       if (themeLabel) {
           // Use requestAnimationFrame to prevent flicker on page load
           requestAnimationFrame(() => {
-              themeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+              // FIX: Label now shows CURRENT mode, not mode you'll switch TO
+              themeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
           });
       }
   };
