@@ -1203,7 +1203,7 @@ function renderIncome() {
           <td>${escapeHtml(i.frequency)}</td><td>${i.nextDueDate ? formatDate(i.nextDueDate) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openIncomeModal('${i.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${i.id}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${i.id}', '${escapeHtml(i.name)}')"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
