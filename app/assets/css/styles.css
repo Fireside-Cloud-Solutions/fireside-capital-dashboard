@@ -1,7 +1,19 @@
 /* =================================================================
-   Fireside Capital Dashboard — Logo-Native Brand (Direction D)
+   Fireside Capital Dashboard — Refined Hierarchy Design
    Built on Bootstrap 5 · Brand tokens from design-tokens.css
-   Dark-first design system · v2.0 UI/UX Overhaul
+   Dark-first design system · v3.0 UX/UI Redesign
+   
+   Design Philosophy:
+   - Black primary actions (trust, stability)
+   - Orange accent used sparingly (brand moments only)
+   - Red outline for destructive actions
+   - 8px spacing grid consistently applied
+   - 44px minimum touch targets
+   - 16px minimum body text (prevents iOS zoom)
+   - Generous breathing room on all viewports
+   
+   Redesign Date: January 15, 2025
+   Designer: Designer Agent
    ================================================================= */
 
 @import url('./design-tokens.css');
@@ -43,14 +55,14 @@ html {
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
   color: var(--color-text-primary);
-  line-height: var(--leading-heading);
+  line-height: 1.5;
 }
 
 h1 { font-size: var(--text-h1); letter-spacing: var(--tracking-tight); }
-h2 { font-size: var(--text-h2); letter-spacing: var(--tracking-snug); }
-h3 { font-size: var(--text-h3); }
+h2 { font-size: 2.25rem; letter-spacing: var(--tracking-snug); } /* Increased from 2rem */
+h3 { font-size: 1.75rem; } /* Increased from 1.5rem */
 h4 { font-size: var(--text-h4); }
 
 h5, h6 {
@@ -92,18 +104,19 @@ strong {
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-6);
+  align-items: flex-start;
+  margin-bottom: var(--space-8);
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-4);
   max-width: 100%;
   overflow: visible;
 }
 
 .page-header h2 {
   margin: 0;
-  font-size: var(--text-h2);
+  font-size: 2.25rem;
   word-break: break-word;
+  line-height: 1.5;
 }
 
 .page-header-actions {
@@ -112,6 +125,19 @@ strong {
   gap: var(--space-3);
   flex-wrap: wrap;
   max-width: 100%;
+}
+
+/* Mobile page header stacking */
+@media (max-width: 575.98px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .page-header h2 {
+    font-size: 1.75rem;
+  }
 }
 
 /* =================================================================
@@ -178,22 +204,22 @@ strong {
 .sidebar a:hover {
   color: var(--color-text-primary);
   background-color: var(--color-bg-3);
-  border-left-color: var(--color-primary);
+  border-left-color: var(--color-border-strong);
 }
 
 .sidebar a:hover i {
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .sidebar a.active {
-  color: var(--color-primary);
-  background-color: rgba(var(--color-primary-rgb), 0.1);
-  border-left-color: var(--color-primary);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-3);
+  border-left-color: var(--color-brand-accent);
   font-weight: var(--weight-semibold);
 }
 
 .sidebar a.active i {
-  color: var(--color-primary);
+  color: var(--color-brand-accent);
 }
 
 /* Mobile sidebar toggle */
@@ -260,8 +286,8 @@ strong {
 }
 
 .card:hover {
-  border-color: rgba(var(--color-primary-rgb), 0.3);
-  box-shadow: var(--shadow-elevated);
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-md);
 }
 
 .card h5 {
@@ -273,7 +299,14 @@ strong {
 }
 
 .card-body-padded {
-  padding: var(--space-5);
+  padding: var(--space-6);
+}
+
+/* Mobile card padding */
+@media (max-width: 575.98px) {
+  .card-body-padded {
+    padding: var(--space-4);
+  }
 }
 
 /* =================================================================
@@ -284,7 +317,7 @@ strong {
   background: var(--color-bg-2);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: var(--space-5);
+  padding: var(--space-6);
   position: relative;
   border: 1px solid var(--color-border-subtle);
   transition: box-shadow var(--duration-slow) var(--ease-default),
@@ -294,9 +327,16 @@ strong {
 }
 
 .dashboard-card:hover {
-  box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.12);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  border-color: rgba(var(--color-primary-rgb), 0.3);
+  border-color: var(--color-border-default);
+}
+
+/* Mobile dashboard card padding */
+@media (max-width: 575.98px) {
+  .dashboard-card {
+    padding: var(--space-4);
+  }
 }
 
 .dashboard-card::before {
@@ -348,7 +388,7 @@ strong {
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-subtle);
   box-shadow: var(--shadow-sm);
-  padding: var(--space-5);
+  padding: var(--space-6);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -357,8 +397,15 @@ strong {
 }
 
 .chart-card:hover {
-  border-color: rgba(var(--color-primary-rgb), 0.3);
-  box-shadow: var(--shadow-elevated);
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-md);
+}
+
+/* Mobile chart card padding */
+@media (max-width: 575.98px) {
+  .chart-card {
+    padding: var(--space-4);
+  }
 }
 
 .chart-card h5 {
@@ -412,7 +459,7 @@ strong {
 
 .stat-box {
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  padding: var(--space-6);
   text-align: center;
   background-color: var(--color-bg-3);
   border: 1px solid var(--color-border-subtle);
@@ -420,7 +467,14 @@ strong {
 }
 
 .stat-box:hover {
-  border-color: rgba(var(--color-primary-rgb), 0.3);
+  border-color: var(--color-border-default);
+}
+
+/* Mobile stat box padding */
+@media (max-width: 575.98px) {
+  .stat-box {
+    padding: var(--space-4);
+  }
 }
 
 .stat-box h6 {
@@ -485,14 +539,14 @@ strong {
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   border-bottom: 2px solid var(--color-border-default);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   white-space: nowrap;
 }
 
 .table td {
   color: var(--color-text-primary);
   border-color: var(--color-border-subtle);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   vertical-align: middle;
   font-size: var(--text-body-sm);
 }
@@ -564,48 +618,49 @@ strong {
   border-radius: var(--radius-md);
   transition: all var(--duration-normal) var(--ease-default);
   font-size: var(--text-body-sm);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2-5) var(--space-4);
   display: inline-flex;
   align-items: center;
   gap: var(--space-1-5);
+  min-height: 44px; /* Touch target minimum */
 }
 
-/* Primary — Flame Orange with dark text */
+/* Primary — Black background, white text */
 .btn-primary {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-text-on-brand);
+  color: #ffffff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
   background-color: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  color: var(--color-text-on-brand);
-  box-shadow: var(--shadow-glow-sm);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
   background-color: var(--color-primary-active);
   border-color: var(--color-primary-active);
-  color: var(--color-text-on-brand);
+  color: #ffffff;
   transform: translateY(0);
 }
 
-/* Outline Primary — Ghost style */
+/* Outline Primary — Gray outline, subtle hover */
 .btn-outline-primary {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
   background-color: transparent;
 }
 
 .btn-outline-primary:hover,
 .btn-outline-primary:focus {
-  background-color: var(--color-primary);
+  background-color: var(--color-bg-3);
   border-color: var(--color-primary);
-  color: var(--color-text-on-brand);
-  box-shadow: var(--shadow-glow-sm);
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Secondary — Neutral surface */
@@ -622,18 +677,18 @@ strong {
   color: var(--color-primary);
 }
 
-/* Danger */
+/* Danger — Red outline only (destructive actions) */
 .btn-danger {
-  background-color: var(--color-error);
-  border-color: var(--color-error);
-  color: #fff;
+  background-color: transparent;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .btn-danger:hover {
-  background-color: #c62828;
-  border-color: #c62828;
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
   color: #fff;
-  box-shadow: 0 0 12px rgba(var(--color-error-rgb), 0.3);
+  box-shadow: 0 0 12px rgba(var(--color-danger-rgb), 0.3);
 }
 
 /* Success */
@@ -665,11 +720,12 @@ strong {
 /* Btn icon-only variant */
 .btn-icon {
   padding: var(--space-2);
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius-md);
 }
 
 /* Close button — visible on dark */
@@ -995,14 +1051,21 @@ strong {
   background-color: var(--color-bg-2);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  padding: var(--space-6);
   text-align: center;
   transition: all var(--duration-normal) var(--ease-default);
 }
 
 .summary-card:hover {
-  border-color: rgba(var(--color-primary-rgb), 0.3);
-  box-shadow: var(--shadow-elevated);
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-md);
+}
+
+/* Mobile summary card padding */
+@media (max-width: 575.98px) {
+  .summary-card {
+    padding: var(--space-4);
+  }
 }
 
 .summary-card h6 {
@@ -1097,8 +1160,8 @@ strong {
 
 @media (max-width: 575.98px) {
   .main-content {
-    padding: var(--space-4) var(--space-3);
-    padding-top: calc(var(--space-4) + 56px);
+    padding: var(--space-5) var(--space-4);
+    padding-top: calc(var(--space-5) + 56px);
   }
 
   .dashboard-card p {
@@ -1117,8 +1180,8 @@ strong {
 
   .table th,
   .table td {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-caption);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-body-sm);
     white-space: nowrap; /* Prevent text wrapping that breaks layout */
   }
 
@@ -1126,12 +1189,35 @@ strong {
   .btn {
     min-height: 44px;
     padding: var(--space-2-5) var(--space-4);
-    font-size: var(--text-body-sm);
+    font-size: 16px; /* Prevent iOS zoom */
   }
 
   .btn-sm {
-    min-height: 40px;
-    padding: var(--space-2) var(--space-3);
+    min-height: 44px; /* Still meet touch target minimum */
+    padding: var(--space-2-5) var(--space-3);
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+
+  /* Force button groups to stack vertically on mobile */
+  .page-header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .page-header-actions .btn,
+  .page-header-actions .btn-group {
+    width: 100%;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+    border-radius: var(--radius-md) !important; /* Override btn-group rounding */
+    margin-bottom: var(--space-2);
   }
 
   /* Sidebar links — Easier tapping */
@@ -1159,12 +1245,18 @@ strong {
   .form-control,
   .form-select {
     min-height: 44px;
-    font-size: 16px; /* Prevents iOS zoom */
-    padding: var(--space-2-5) var(--space-3);
+    font-size: 16px !important; /* Prevents iOS zoom */
+    padding: var(--space-3) var(--space-4);
   }
 
   .input-group-text {
     min-height: 44px;
+    font-size: 16px;
+  }
+
+  /* Prevent iOS zoom on all inputs */
+  input, select, textarea {
+    font-size: 16px !important;
   }
 
   /* Stack input groups vertically */

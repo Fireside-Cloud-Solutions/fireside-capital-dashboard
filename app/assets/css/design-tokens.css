@@ -8,14 +8,21 @@
 
 :root {
   /* -----------------------------------------------------------------
-     COLORS — Brand
+     COLORS — Brand (Refined Hierarchy)
      ----------------------------------------------------------------- */
-  /* Primary — Flame Orange (Logo Red-Orange) */
-  --color-primary: #f44e24;
-  --color-primary-hover: #d94420;
-  --color-primary-active: #c03b1a;
-  --color-primary-rgb: 244, 78, 36;
-  --color-primary-light: rgba(244, 78, 36, 0.15);
+  /* Primary — Black (Primary actions, trust, stability) */
+  --color-primary: #1a1a1a;
+  --color-primary-hover: #2a2a2a;
+  --color-primary-active: #0f0f0f;
+  --color-primary-rgb: 26, 26, 26;
+  --color-primary-light: rgba(26, 26, 26, 0.15);
+
+  /* Brand Accent — Flame Orange (Logo Red-Orange, used sparingly) */
+  --color-brand-accent: #f44e24;
+  --color-brand-accent-hover: #d94420;
+  --color-brand-accent-active: #c03b1a;
+  --color-brand-accent-rgb: 244, 78, 36;
+  --color-brand-accent-light: rgba(244, 78, 36, 0.15);
 
   /* Secondary — Sky Blue (Logo Blue) */
   --color-secondary: #01a4ef;
@@ -63,17 +70,22 @@
   /* -----------------------------------------------------------------
      COLORS — Semantic
      ----------------------------------------------------------------- */
-  --color-success: #81b900;
-  --color-success-rgb: 129, 185, 0;
-  --color-success-bg: rgba(129, 185, 0, 0.12);
+  --color-success: #28a745;
+  --color-success-rgb: 40, 167, 69;
+  --color-success-bg: rgba(40, 167, 69, 0.12);
 
-  --color-warning: #f0a500;
-  --color-warning-rgb: 240, 165, 0;
-  --color-warning-bg: rgba(240, 165, 0, 0.12);
+  --color-warning: #ffc107;
+  --color-warning-rgb: 255, 193, 7;
+  --color-warning-bg: rgba(255, 193, 7, 0.12);
 
-  --color-error: #e53935;
-  --color-error-rgb: 229, 57, 53;
-  --color-error-bg: rgba(229, 57, 53, 0.12);
+  --color-danger: #dc3545;
+  --color-danger-rgb: 220, 53, 69;
+  --color-danger-bg: rgba(220, 53, 69, 0.12);
+
+  /* Error (legacy alias for danger) */
+  --color-error: #dc3545;
+  --color-error-rgb: 220, 53, 69;
+  --color-error-bg: rgba(220, 53, 69, 0.12);
 
   --color-info: #01a4ef;
   --color-info-rgb: 1, 164, 239;
