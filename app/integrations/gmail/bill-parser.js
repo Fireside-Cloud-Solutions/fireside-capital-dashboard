@@ -20,8 +20,10 @@
  * Each pattern captures the numeric portion.
  */
 const AMOUNT_PATTERNS = [
-  // "Amount Due: $1,234.56" or "Total Due: $85.50"
-  /(?:amount\s*due|total\s*due|balance\s*due|total\s*amount|payment\s*due|minimum\s*due|new\s*balance|current\s*balance|total\s*charges|amount\s*owed)\s*[:\-–]?\s*\$?([\d,]+\.?\d{0,2})/gi,
+  // "Amount Due: $1,234.56" or "Total Due: $85.50" or "amount due is $85.50"
+  /(?:amount\s*due|total\s*due|balance\s*due|total\s*amount|payment\s*due|minimum\s*due|new\s*balance|current\s*balance|total\s*charges|amount\s*owed)\s*(?:is|was|of)?\s*[:\-–]?\s*\$?([\d,]+\.\d{2})/gi,
+  // "Amount Due: $1,234" (no cents)
+  /(?:amount\s*due|total\s*due|balance\s*due|total\s*amount|payment\s*due)\s*(?:is|was|of)?\s*[:\-–]?\s*\$?([\d,]+)(?!\.\d)/gi,
   // "$1,234.56 due" or "$85.50 is due"
   /\$\s*([\d,]+\.\d{2})\s*(?:is\s+)?(?:due|owed|payable)/gi,
   // "Pay $85.50" or "pay $1,234.56"
@@ -49,7 +51,7 @@ function extractAmount(text) {
       const amount = parseFloat(raw);
       if (amount > 0 && amount < 100000) {
         // Higher confidence for specific patterns (first few), lower for generic
-        const confidence = i < 4 ? 0.9 - i * 0.05 : 0.5;
+        const confidence = i < 5 ? 0.9 - i * 0.05 : 0.5;
         matches.push({ amount, confidence });
       }
     }
