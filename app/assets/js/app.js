@@ -391,7 +391,7 @@ function renderAssets() {
           <td>${a.nextDueDate ? formatDate(a.nextDueDate) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openAssetModal('${a.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAsset('${a.id}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAsset('${a.id}', '${escapeHtml(a.name)}')"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -404,8 +404,8 @@ function openAssetModal(id = null) {
       document.getElementById('addAssetModalLabel').textContent = "Edit Asset";
       const asset = window.assets.find(x => x.id == id); // FIX: Changed === to ==
       if (asset) { // Add a check to ensure the asset was found
-          f.assetName.value = asset.name;
-          f.assetType.value = asset.type;
+          f.assetName.value = escapeHtml(asset.name || '');
+          f.assetType.value = escapeHtml(asset.type || '');
           if (asset.type === 'realEstate') {
               document.querySelector('.real-estate-fields').classList.remove('d-none');
               f.propertyValue.value = asset.value; f.loanAmount.value = asset.loan; f.realEstateNextDueDate.value = asset.nextDueDate;
@@ -432,9 +432,10 @@ async function saveAsset() {
   await fetchAllDataFromSupabase();
   renderAll();
 }
-function confirmDeleteAsset(id) {
+function confirmDeleteAsset(id, name) {
   deleteAssetId = id;
-  document.getElementById('deleteAssetName').textContent = `"${window.assets.find(a=>a.id===id).name}"`;
+  // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
+  document.getElementById('deleteAssetName').textContent = `"${name}"`;
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteAssetModal')).show();
 }
 async function deleteAssetConfirmed() {
@@ -456,7 +457,7 @@ function renderInvestments() {
           <td>${inv.nextContributionDate ? formatDate(inv.nextContributionDate) : '-'}</td><td>${formatCurrency(inv.value)}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openInvestmentModal('${inv.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${inv.id}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${inv.id}', '${escapeHtml(inv.name)}')"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -467,7 +468,7 @@ function openInvestmentModal(id = null) {
   if (id) {
       const inv = window.investments.find(i => i.id == id); // FIX: Changed === to ==
       if(inv) {
-          f.investmentName.value = inv.name; f.investmentType.value = inv.type; f.investmentValue.value = inv.value;
+          f.investmentName.value = escapeHtml(inv.name || ''); f.investmentType.value = escapeHtml(inv.type || ''); f.investmentValue.value = inv.value;
           f.startingBalance.value = inv.startingBalance || '';
           f.monthlyContribution.value = inv.monthlyContribution; f.annualReturn.value = inv.annualReturn;
           f.nextContributionDate.value = inv.nextContributionDate;
@@ -492,8 +493,9 @@ async function saveInvestment() {
   await fetchAllDataFromSupabase();
   renderAll();
 }
-function confirmDeleteInvestment(id) {
-  if (confirm(`Are you sure you want to delete "${window.investments.find(i=>i.id===id).name}"?`)) {
+function confirmDeleteInvestment(id, name) {
+  // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
+  if (confirm(`Are you sure you want to delete "${name}"?`)) {
       deleteInvestmentConfirmed(id);
   }
 }
@@ -515,7 +517,7 @@ function renderDebts() {
           <td>${d.nextDueDate ? formatDate(d.nextDueDate) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openDebtModal('${d.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${d.id}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${d.id}', '${escapeHtml(d.name)}')"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -526,7 +528,7 @@ function openDebtModal(id = null) {
   if (id) {
       const d = window.debts.find(x => x.id == id); // FIX: Changed === to ==
       if(d) {
-          f.debtName.value = d.name; f.debtType.value = d.type; f.debtAmount.value = d.amount;
+          f.debtName.value = escapeHtml(d.name || ''); f.debtType.value = escapeHtml(d.type || ''); f.debtAmount.value = d.amount;
           f.debtInterest.value = d.interestRate; f.debtTerm.value = d.term; f.debtMonthly.value = d.monthlyPayment;
           f.debtNextPaymentDate.value = d.nextDueDate;
       }
@@ -666,6 +668,9 @@ function getBillFinancingInfo(bill) {
       : (bill.total_amount > 0 && bill.amount > 0 ? Math.ceil(bill.total_amount / bill.amount) : 0);
     const amountPaid = paymentsMade * bill.amount;
     const remainingBalance = amortData ? amortData.remainingBalance : Math.max(0, bill.total_amount - amountPaid);
+    // BUG-02 FIX: payments_made = number of COMPLETED payments
+    // Progress bar shows: (completed / total) * 100
+    // Current payment in amortization schedule = payments_made + 1 (next payment to make)
     const percentPaid = totalPayments > 0 ? Math.min(100, (paymentsMade / totalPayments) * 100) : 0;
     const remainingPayments = Math.max(0, totalPayments - paymentsMade);
     const payoffDate = new Date();
@@ -758,7 +763,7 @@ function renderBills() {
           <td>
               <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" title="Share bill"><i class="bi bi-share"></i></button>
               <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`;
   }).join('');
@@ -821,7 +826,7 @@ function renderBills() {
                   <div class="text-end">
                     <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" title="Share bill"><i class="bi bi-share"></i></button>
                     <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')"><i class="bi bi-trash"></i></button>
                   </div>
                 </div>
                 <div class="mb-3">
@@ -882,7 +887,7 @@ function renderBills() {
                 </div>
                 <div class="text-end">
                   <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')"><i class="bi bi-trash"></i></button>
                 </div>
               </div>
               <div class="mb-3">
@@ -981,7 +986,7 @@ function openBillModal(id = null) {
   if (id) {
       const b = window.bills.find(x => x.id == id);
       if (b) {
-          f.billName.value = b.name; f.billType.value = b.type; f.billAmount.value = b.amount;
+          f.billName.value = escapeHtml(b.name || ''); f.billType.value = escapeHtml(b.type || ''); f.billAmount.value = b.amount;
           f.billFrequency.value = b.frequency; f.billNextDueDate.value = b.nextDueDate;
           // Show financing fields if type matches OR bill has existing financing data
           const hasFinancingData = b.total_amount || b.original_principal || b.payments_made > 0;
@@ -1174,9 +1179,10 @@ function showAmortizationSchedule(billId) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('amortizationModal')).show();
 }
 
-function confirmDeleteBill(id) {
+function confirmDeleteBill(id, name) {
   deleteBillId = id;
-  document.getElementById('deleteBillName').textContent = `"${window.bills.find(b=>b.id===id).name}"`;
+  // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
+  document.getElementById('deleteBillName').textContent = `"${name}"`;
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
 }
 async function deleteBillConfirmed() {
@@ -1208,7 +1214,7 @@ function openIncomeModal(id = null) {
   if (id) {
       const i = window.income.find(x => x.id == id); // FIX: Changed === to ==
       if (i) {
-          f.incomeName.value = i.name; f.incomeType.value = i.type; f.incomeAmount.value = i.amount;
+          f.incomeName.value = escapeHtml(i.name || ''); f.incomeType.value = escapeHtml(i.type || ''); f.incomeAmount.value = i.amount;
           f.incomeFrequency.value = i.frequency; f.incomeNextDueDate.value = i.nextDueDate;
       }
   }
@@ -1226,9 +1232,10 @@ async function saveIncome() {
   await fetchAllDataFromSupabase();
   renderAll();
 }
-function confirmDeleteIncome(id) {
+function confirmDeleteIncome(id, name) {
   deleteIncomeId = id;
-  document.getElementById('deleteIncomeName').textContent = `"${window.income.find(i=>i.id===id).name}"`;
+  // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
+  document.getElementById('deleteIncomeName').textContent = `"${name}"`;
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteIncomeModal')).show();
 }
 async function deleteIncomeConfirmed() {
@@ -1417,7 +1424,9 @@ async function renderAdditionalCharts() {
       while (nextDate <= monthEnd && safety < 100) { monthExpenses += amount; nextDate = getNextDate(nextDate, item.frequency); safety++; }
     });
 
-    return monthIncome > 0 ? Math.round(((monthIncome - monthExpenses) / monthIncome) * 100) : 0;
+    // BUG-03 FIX: Add explicit NaN/Infinity check to prevent chart errors
+    const rate = monthIncome > 0 ? ((monthIncome - monthExpenses) / monthIncome) * 100 : 0;
+    return isNaN(rate) || !isFinite(rate) ? 0 : Math.round(rate);
   });
 
   if (savingsRateChartInst) savingsRateChartInst.destroy();
@@ -1507,16 +1516,16 @@ async function loadAndRenderBudget() {
 
   // --- NEW FIX #1: Wait for data before rendering ---
   // This robustly checks if the data from Supabase has arrived.
-  // It will wait up to 3 seconds before showing an error.
+  // It will wait up to 10 seconds before showing an error.
   const startTime = Date.now();
-  while ((!window.bills || !window.debts) && Date.now() - startTime < 3000) {
+  while ((!window.bills || !window.debts) && Date.now() - startTime < 10000) {
       // Wait 50 milliseconds and check again
       await new Promise(resolve => setTimeout(resolve, 50));
   }
 
   // If data is still not available after waiting, show a clear error message.
   if (!window.bills || !window.debts) {
-      console.error("Budget page timeout: Data is not available after 3 seconds.");
+      console.error("Budget page timeout: Data is not available after 10 seconds.");
       document.getElementById('budgetAssignmentTable').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Could not load bill and debt data. Please try refreshing the page.</td></tr>`;
       return;
   }
@@ -3037,7 +3046,7 @@ async function openShareBillModal(billId) {
   if (!bill) return;
   
   document.getElementById('shareBillId').value = bill.id;
-  document.getElementById('shareBillName').value = bill.name;
+  document.getElementById('shareBillName').value = escapeHtml(bill.name || '');
   document.getElementById('shareBillAmount').value = formatCurrency(bill.amount);
   
   // Reset fields
