@@ -1,0 +1,598 @@
+/* ========================================
+   Notification Menu — Modern UX Polish
+   Fireside Capital Dashboard
+   
+   This file enhances the notification system with:
+   - Improved spacing and typography
+   - Smooth animations
+   - Better mobile responsiveness
+   - Unread indicators
+   - Modern hover states
+   - Accessibility improvements
+   
+   Implementation: Add to index.html after styles.css
+   <link rel="stylesheet" href="assets/css/notification-polish.css" />
+   ======================================== */
+
+/* ===== NOTIFICATION BELL ===== */
+#notificationBell {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+#notificationBell:hover {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+#notificationBell:hover i {
+  color: var(--color-primary);
+}
+
+/* Badge styling — Always visible with count */
+#notificationBadge {
+  display: block !important;
+  min-width: 20px;
+  height: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 20px;
+  background-color: var(--color-error) !important;
+  border: 2px solid var(--color-bg-1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide badge when empty or explicitly hidden */
+#notificationBadge:empty,
+#notificationBadge.d-none {
+  display: none !important;
+}
+
+/* Bell ring animation for new notifications */
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(10deg); }
+}
+
+#notificationBell.has-unread i {
+  animation: bellRing 0.5s ease-in-out;
+}
+
+/* ===== NOTIFICATION DROPDOWN ===== */
+#notificationList {
+  padding: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--color-border-subtle);
+  animation: dropdownFadeIn 0.2s ease-out;
+  transform-origin: top right;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown header */
+.dropdown-header {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background-color: var(--color-bg-2);
+}
+
+.dropdown-header strong {
+  font-size: 16px;
+  color: var(--color-text-primary);
+}
+
+.dropdown-header button {
+  font-size: 13px;
+  color: var(--color-primary);
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+  min-height: 36px;
+}
+
+.dropdown-header button:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* ===== NOTIFICATION ITEMS ===== */
+.notification-item {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+  display: flex !important;
+  align-items-start;
+  gap: 12px;
+}
+
+.notification-item:hover {
+  background-color: var(--color-bg-3) !important;
+}
+
+.notification-item:last-child {
+  border-bottom: none !important;
+}
+
+/* Unread indicator — Blue dot */
+.notification-item.unread {
+  font-weight: 600;
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.notification-item.unread::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+/* Notification icon (when using icon-based layout) */
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-bg-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon i {
+  font-size: 1.25rem;
+}
+
+/* Notification content */
+.notification-item strong {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.notification-item p {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notification-item small {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+}
+
+/* Dismiss button — Show on hover */
+.notification-item .btn-dismiss {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 4px;
+  color: var(--color-text-tertiary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.notification-item:hover .btn-dismiss {
+  opacity: 1;
+}
+
+.notification-item .btn-dismiss:hover {
+  color: var(--color-text-primary);
+}
+
+/* ===== EMPTY STATE ===== */
+#noNotifications {
+  padding: 48px 32px !important;
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+#noNotifications i {
+  font-size: 3rem;
+  opacity: 0.3;
+  display: block;
+  margin-bottom: 12px;
+}
+
+#noNotifications p {
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+#noNotifications small {
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+}
+
+/* ===== NOTIFICATION ACTIONS (for actionable notifications) ===== */
+.notification-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.notification-actions .btn {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 13px;
+  min-height: 36px;
+}
+
+/* ===== CATEGORY BADGES ===== */
+.notification-category {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notification-category.bill {
+  background-color: rgba(244, 78, 36, 0.1);
+  color: #f44e24;
+}
+
+.notification-category.budget {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.notification-category.investment {
+  background-color: rgba(129, 185, 0, 0.1);
+  color: #81b900;
+}
+
+.notification-category.system {
+  background-color: rgba(1, 164, 239, 0.1);
+  color: #01a4ef;
+}
+
+/* ===== DROPDOWN FOOTER (for "View All" link) ===== */
+.dropdown-footer {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: 0 !important;
+}
+
+.dropdown-footer a {
+  display: block;
+  padding: 12px 20px;
+  text-align: center;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+  text-decoration: none;
+}
+
+.dropdown-footer a:hover {
+  background-color: var(--color-bg-3);
+  color: var(--color-primary-hover);
+}
+
+.dropdown-footer a i {
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-footer a:hover i {
+  transform: translateX(4px);
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 575.98px) {
+  /* Responsive dropdown width */
+  #notificationDropdown .dropdown-menu {
+    width: calc(100vw - 32px) !important;
+    max-width: 400px;
+    right: 16px;
+    left: auto;
+  }
+  
+  /* Adjust notification item spacing */
+  .notification-item {
+    padding: 12px 16px !important;
+    gap: 10px;
+  }
+  
+  .notification-item strong {
+    font-size: 15px;
+  }
+  
+  .notification-item p {
+    font-size: 14px;
+  }
+  
+  .notification-item small {
+    font-size: 12px;
+  }
+  
+  /* Header adjustments */
+  .dropdown-header {
+    padding: 12px 16px !important;
+  }
+  
+  /* Ensure "Mark all read" button is touch-friendly */
+  .dropdown-header button {
+    min-height: 44px;
+    padding: 8px 16px;
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+  
+  /* Empty state adjustments */
+  #noNotifications {
+    padding: 32px 24px !important;
+  }
+  
+  #noNotifications i {
+    font-size: 2.5rem;
+  }
+  
+  /* Smaller notification icons */
+  .notification-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .notification-icon i {
+    font-size: 1.1rem;
+  }
+  
+  /* Adjust action buttons for mobile */
+  .notification-actions {
+    flex-direction: column;
+  }
+  
+  .notification-actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* Extra small screens (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  #notificationDropdown .dropdown-menu {
+    width: calc(100vw - 16px) !important;
+    right: 8px;
+  }
+  
+  .notification-item {
+    padding: 10px 12px !important;
+  }
+  
+  .dropdown-header {
+    padding: 10px 12px !important;
+  }
+}
+
+/* ===== LIGHT MODE OVERRIDES ===== */
+body[data-theme='light'] #notificationList {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+body[data-theme='light'] .dropdown-header {
+  background-color: #f5f5f5;
+  border-bottom-color: #e0e0e0;
+}
+
+body[data-theme='light'] .dropdown-header strong {
+  color: #212529;
+}
+
+body[data-theme='light'] .dropdown-header button {
+  color: #01a4ef;
+}
+
+body[data-theme='light'] .dropdown-header button:hover {
+  color: #0190d4;
+}
+
+body[data-theme='light'] .notification-item {
+  border-bottom-color: #e8e8e8;
+}
+
+body[data-theme='light'] .notification-item:hover {
+  background-color: #f5f5f5 !important;
+}
+
+body[data-theme='light'] .notification-item.unread {
+  background-color: rgba(1, 164, 239, 0.05);
+}
+
+body[data-theme='light'] .notification-icon {
+  background-color: #f0f0f0;
+}
+
+body[data-theme='light'] .notification-item strong {
+  color: #212529;
+}
+
+body[data-theme='light'] .notification-item p {
+  color: #6c757d;
+}
+
+body[data-theme='light'] .notification-item small {
+  color: #999999;
+}
+
+body[data-theme='light'] #noNotifications {
+  color: #999999;
+}
+
+body[data-theme='light'] #noNotifications p {
+  color: #6c757d;
+}
+
+body[data-theme='light'] .dropdown-footer {
+  border-top-color: #e0e0e0;
+}
+
+body[data-theme='light'] .dropdown-footer a {
+  color: #01a4ef;
+}
+
+body[data-theme='light'] .dropdown-footer a:hover {
+  background-color: #f5f5f5;
+  color: #0190d4;
+}
+
+/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+
+/* Focus indicators for keyboard navigation */
+#notificationBell:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.notification-item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.dropdown-header button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== LOADING STATE ===== */
+.notification-loading {
+  padding: 32px;
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.notification-loading .spinner-border {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3px;
+}
+
+/* ===== TOAST NOTIFICATIONS (real-time popup) ===== */
+.notification-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  min-width: 320px;
+  max-width: 400px;
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.notification-toast .toast-header {
+  background: var(--color-bg-3);
+  border-color: var(--color-border-subtle);
+  padding: 12px 16px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.notification-toast .toast-body {
+  padding: 12px 16px;
+  color: var(--color-text-secondary);
+}
+
+.notification-toast .btn-close {
+  font-size: 12px;
+}
+
+/* Light mode toast */
+body[data-theme='light'] .notification-toast {
+  background: #ffffff;
+  border-color: #e0e0e0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+body[data-theme='light'] .notification-toast .toast-header {
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+}
+
+body[data-theme='light'] .notification-toast .toast-body {
+  color: #6c757d;
+}
+
+/* ===== SMOOTH SCROLLING IN DROPDOWN ===== */
+#notificationList {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) transparent;
+}
+
+#notificationList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#notificationList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#notificationList::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: var(--radius-full);
+}
+
+#notificationList::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* Light mode scrollbar */
+body[data-theme='light'] #notificationList {
+  scrollbar-color: #cccccc transparent;
+}
+
+body[data-theme='light'] #notificationList::-webkit-scrollbar-thumb {
+  background: #cccccc;
+}
+
+body[data-theme='light'] #notificationList::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+/* ===== END OF NOTIFICATION POLISH ===== */

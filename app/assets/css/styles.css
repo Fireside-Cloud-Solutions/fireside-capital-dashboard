@@ -71,6 +71,14 @@ h2 { font-size: 2.25rem; letter-spacing: var(--tracking-snug); } /* Increased fr
 h3 { font-size: 1.75rem; } /* Increased from 1.5rem */
 h4 { font-size: var(--text-h4); }
 
+/* QUICK WIN #4: Increase Page Title Size */
+main h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: var(--space-6);
+  letter-spacing: -0.02em;
+}
+
 h5, h6 {
   font-family: var(--font-body);
   font-weight: var(--weight-semibold);
@@ -280,20 +288,20 @@ strong {
    CARDS
    ================================================================= */
 
+/* QUICK WIN #5: Add Card Depth */
 .card {
   background: var(--color-bg-2);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
+  padding: var(--space-6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
   border: 1px solid var(--color-border-subtle);
-  box-shadow: var(--shadow-sm);
   color: var(--color-text-primary);
-  transition: box-shadow var(--duration-slow) var(--ease-default),
-              border-color var(--duration-slow) var(--ease-default),
-              transform var(--duration-normal) var(--ease-default);
 }
 
 .card:hover {
-  border-color: var(--color-border-default);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
 }
 
 .card h5 {
@@ -631,20 +639,23 @@ strong {
   min-height: 44px; /* Touch target minimum */
 }
 
-/* Primary — Flame Orange (HIGH IMPACT - use 1 per page max) */
+/* QUICK WIN #2: Improve Button Hierarchy */
+/* PRIMARY: Orange filled (high impact actions) */
 .btn-primary {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-text-on-brand);
+  background: var(--color-primary);
+  color: var(--color-button-text);
+  border: none;
+  box-shadow: 0 2px 8px rgba(244, 78, 36, 0.3);
+  transition: all 0.2s ease;
+  border-radius: 10px; /* Modern rounded corners */
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-  color: var(--color-text-on-brand);
-  box-shadow: var(--shadow-glow-sm);
-  transform: translateY(-1px);
+  background: var(--color-primary-hover);
+  color: var(--color-button-text);
+  box-shadow: 0 4px 12px rgba(244, 78, 36, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-primary:active {
@@ -654,35 +665,38 @@ strong {
   transform: translateY(0);
 }
 
-/* Secondary — Sky Blue (MEDIUM IMPACT - supportive actions) */
+/* SECONDARY: Blue outline (medium impact) */
 .btn-secondary {
-  background-color: var(--color-secondary);
-  border-color: var(--color-secondary);
-  color: #ffffff;
+  background: transparent;
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover,
 .btn-secondary:focus {
-  background-color: var(--color-secondary-hover);
+  background: rgba(1, 164, 239, 0.1);
   border-color: var(--color-secondary-hover);
-  color: #ffffff;
-  box-shadow: 0 0 10px rgba(var(--color-secondary-rgb), 0.3);
-  transform: translateY(-1px);
+  color: var(--color-secondary);
+  transform: translateY(-2px);
 }
 
-/* Outline Secondary — Neutral Gray (LOW IMPACT - utility actions) */
+/* TERTIARY: Gray outline (low impact) */
 .btn-outline-secondary {
-  color: var(--color-text-primary);
-  border-color: var(--color-tertiary);
-  background-color: transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-border-default);
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .btn-outline-secondary:hover,
 .btn-outline-secondary:focus {
-  background-color: var(--color-bg-3);
-  border-color: var(--color-tertiary-hover);
+  background: var(--color-bg-3);
+  border-color: var(--color-border-strong);
   color: var(--color-text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Outline Primary — Orange outline (alternative primary style) */
@@ -1547,10 +1561,13 @@ body[data-theme='light'] .sidebar a:hover {
   border-left-color: rgba(255, 255, 255, 0.3);
 }
 
+/* QUICK WIN #6: Improve Sidebar Contrast in Light Mode */
 body[data-theme='light'] .sidebar a.active {
+  background: rgba(255, 255, 255, 0.3);
   color: white;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-left-color: #f44e24;
+  font-weight: 600;
+  border-left: 4px solid white;
+  padding-left: calc(var(--space-4) - 4px);
 }
 
 body[data-theme='light'] .sidebar a i {
@@ -2002,10 +2019,10 @@ body[data-theme='dark'] .table-card {
 }
 
 /* =================================================================
-   ANIMATION — Subtle entrance
+   ANIMATION — Card entrance (staggered)
    ================================================================= */
 
-@keyframes fadeInUp {
+@keyframes fadeInUpCard {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -2020,7 +2037,7 @@ body[data-theme='dark'] .table-card {
 .chart-card,
 .summary-card,
 .table-card {
-  animation: fadeInUp var(--duration-entrance) var(--ease-out) both;
+  animation: fadeInUpCard var(--duration-entrance) var(--ease-out) both;
 }
 
 .dashboard-card:nth-child(1) { animation-delay: 0ms; }
@@ -2161,4 +2178,54 @@ body[data-theme='dark'] .pending-bill-card.selected {
 /* Button gap spacing */
 .d-flex.gap-2 {
   gap: var(--space-2);
+}
+
+/* =================================================================
+   QUICK WIN #1: Fix Loading States — Skeleton Loader
+   ================================================================= */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-2) 25%,
+    var(--color-bg-3) 50%,
+    var(--color-bg-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeleton-text {
+  height: 20px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.skeleton-text:last-child {
+  width: 60%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =================================================================
+   QUICK WIN #7: Add Page Load Animation
+   ================================================================= */
+
+main {
+  animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
