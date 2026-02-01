@@ -50,6 +50,72 @@ function dedupeSnapshotsByDate(snaps) {
   return Object.values(uniqueSnaps).sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
+// ===== CHART ERROR BOUNDARY (SUG-05) =====
+function safeCreateChart(ctx, config, chartName) {
+  try {
+    if (!ctx) {
+      console.warn(`Chart canvas not found for: ${chartName || 'unknown chart'}`);
+      return null;
+    }
+    return new Chart(ctx, config);
+  } catch (err) {
+    console.error(`Failed to render ${chartName || 'chart'}:`, err);
+    const el = (typeof ctx === 'string') ? document.getElementById(ctx) : ctx;
+    if (el && el.parentElement) {
+      el.parentElement.innerHTML = '<p class="text-muted text-center mt-3">Chart could not be loaded.</p>';
+    }
+    return null;
+  }
+}
+
+// ===== CSV EXPORT (SUG-02) =====
+function exportFinancialDataCSV() {
+  const lines = [];
+  const esc = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+  // Bills
+  lines.push('BILLS');
+  lines.push('Name,Type,Amount,Frequency,Next Due Date');
+  (window.bills || []).forEach(b => {
+    lines.push([esc(b.name), esc(b.type), getRaw(b.amount), esc(b.frequency), esc(b.nextDueDate)].join(','));
+  });
+  lines.push('');
+
+  // Debts
+  lines.push('DEBTS');
+  lines.push('Name,Type,Balance,Interest Rate %,Term (months),Monthly Payment,Next Due Date');
+  (window.debts || []).forEach(d => {
+    lines.push([esc(d.name), esc(d.type), getRaw(d.amount), d.interestRate || 0, d.term || '', getRaw(d.monthlyPayment), esc(d.nextDueDate)].join(','));
+  });
+  lines.push('');
+
+  // Income
+  lines.push('INCOME');
+  lines.push('Name,Type,Amount,Frequency,Next Due Date');
+  (window.income || []).forEach(i => {
+    lines.push([esc(i.name), esc(i.type), getRaw(i.amount), esc(i.frequency), esc(i.nextDueDate)].join(','));
+  });
+  lines.push('');
+
+  // Investments
+  lines.push('INVESTMENTS');
+  lines.push('Name,Type,Value,Starting Balance,Monthly Contribution,Annual Return %');
+  (window.investments || []).forEach(inv => {
+    lines.push([esc(inv.name), esc(inv.type), getRaw(inv.value), getRaw(inv.startingBalance), getRaw(inv.monthlyContribution), inv.annualReturn || 0].join(','));
+  });
+
+  const csvContent = lines.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `fireside-capital-export-${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 
 
 // ===== SUPABASE CLIENT =====
@@ -69,18 +135,162 @@ let netWorthDeltaChartInst, spendingCategoriesChartInst, savingsRateChartInst, i
 let currentBudgetMonth = new Date();
 let budgetAssignments = {};
 
+// ===== AUTH UI HELPERS =====
+function showAuthAlert(elementId, message, type = 'danger') {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.className = `alert alert-${type}`;
+  el.textContent = message;
+  el.classList.remove('d-none');
+}
+
+function hideAuthAlert(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.classList.add('d-none');
+  el.textContent = '';
+}
+
+function setButtonLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn.disabled = true;
+    btn._originalText = btn.textContent;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Please wait...';
+  } else {
+    btn.disabled = false;
+    btn.textContent = btn._originalText || btn.textContent;
+  }
+}
+
+function getFriendlyAuthError(error) {
+  const msg = (error.message || '').toLowerCase();
+  if (msg.includes('email not confirmed')) return 'Your email is not confirmed. Please check your inbox (and spam folder) for the confirmation link.';
+  if (msg.includes('invalid login credentials')) return 'Invalid email or password. Please try again.';
+  if (msg.includes('user not found')) return 'No account found with that email address.';
+  if (msg.includes('email rate limit exceeded')) return 'Too many attempts. Please wait a few minutes and try again.';
+  if (msg.includes('user already registered')) return 'An account with this email already exists. Try logging in instead.';
+  if (msg.includes('password') && msg.includes('at least')) return error.message;
+  if (msg.includes('signup is disabled')) return 'Sign up is currently disabled. Please contact the administrator.';
+  return error.message;
+}
+
 // ===== AUTHENTICATION =====
 async function signUp(email, password, firstName, lastName) {
-  const { error } = await supabase.auth.signUp({ email, password, options: { data: { first_name: firstName, last_name: lastName } } });
-  if (error) { alert(error.message); return; }
-  alert('Sign up successful! Please check your email to confirm.');
-  bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
+  hideAuthAlert('signupAlert');
+  setButtonLoading('signupSubmitBtn', true);
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { first_name: firstName, last_name: lastName } }
+    });
+
+    if (error) {
+      showAuthAlert('signupAlert', getFriendlyAuthError(error), 'danger');
+      return;
+    }
+
+    // Check if email confirmation is needed
+    if (data?.user?.identities?.length === 0) {
+      showAuthAlert('signupAlert', 'An account with this email already exists. Try logging in instead.', 'warning');
+    } else if (data?.user && !data?.session) {
+      // User created but no session = email confirmation required
+      showAuthAlert('signupAlert',
+        '✅ Account created! Please check your email (including spam folder) and click the confirmation link before logging in.',
+        'success'
+      );
+      document.getElementById('signupForm')?.reset();
+    } else {
+      // Auto-confirmed — session exists
+      showAuthAlert('signupAlert', '✅ Account created successfully! Logging you in...', 'success');
+      setTimeout(() => {
+        bootstrap.Modal.getInstance(document.getElementById('signupModal'))?.hide();
+      }, 1000);
+    }
+  } catch (err) {
+    showAuthAlert('signupAlert', 'An unexpected error occurred. Please try again.', 'danger');
+    console.error('Signup error:', err);
+  } finally {
+    setButtonLoading('signupSubmitBtn', false);
+  }
 }
 
 async function login(email, password) {
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) { alert(error.message); }
-  else { bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide(); }
+  hideAuthAlert('loginAlert');
+  setButtonLoading('loginSubmitBtn', true);
+
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showAuthAlert('loginAlert', getFriendlyAuthError(error), 'danger');
+      return;
+    }
+
+    showAuthAlert('loginAlert', '✅ Login successful!', 'success');
+    setTimeout(() => {
+      bootstrap.Modal.getInstance(document.getElementById('loginModal'))?.hide();
+      hideAuthAlert('loginAlert');
+    }, 500);
+  } catch (err) {
+    showAuthAlert('loginAlert', 'An unexpected error occurred. Please try again.', 'danger');
+    console.error('Login error:', err);
+  } finally {
+    setButtonLoading('loginSubmitBtn', false);
+  }
+}
+
+async function forgotPassword(email) {
+  hideAuthAlert('forgotAlert');
+
+  if (!email) {
+    showAuthAlert('forgotAlert', 'Please enter your email address.', 'warning');
+    return;
+  }
+
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+
+    if (error) {
+      showAuthAlert('forgotAlert', getFriendlyAuthError(error), 'danger');
+      return;
+    }
+
+    showAuthAlert('forgotAlert', '✅ Password reset link sent! Check your email (including spam folder).', 'success');
+  } catch (err) {
+    showAuthAlert('forgotAlert', 'An unexpected error occurred. Please try again.', 'danger');
+    console.error('Forgot password error:', err);
+  }
+}
+
+async function updatePassword(newPassword) {
+  hideAuthAlert('resetPasswordAlert');
+  setButtonLoading('resetPasswordBtn', true);
+
+  try {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      showAuthAlert('resetPasswordAlert', getFriendlyAuthError(error), 'danger');
+      return;
+    }
+
+    showAuthAlert('resetPasswordAlert', '✅ Password updated successfully! Redirecting...', 'success');
+    setTimeout(() => {
+      bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal'))?.hide();
+      window.location.hash = '';
+    }, 1500);
+  } catch (err) {
+    showAuthAlert('resetPasswordAlert', 'An unexpected error occurred. Please try again.', 'danger');
+    console.error('Password update error:', err);
+  } finally {
+    setButtonLoading('resetPasswordBtn', false);
+  }
 }
 
 async function logout() { await supabase.auth.signOut(); }
@@ -475,7 +685,7 @@ function renderEmergencyFundChart() {
       wrapper.appendChild(canvas);
       const theme = getThemeColors();
 
-      emergencyFundChart = new Chart(canvas, {
+      emergencyFundChart = safeCreateChart(canvas, {
           type: 'bar',
           data: {
               labels: ['Goal', 'Current'],
@@ -495,7 +705,7 @@ function renderEmergencyFundChart() {
                   y: { ticks: { color: theme.text }, grid: { display: false } }
               }
           }
-      });
+      }, 'Emergency Fund');
   } else {
       // If no goal is set, render your custom message
       wrapper.innerHTML = `
@@ -533,13 +743,13 @@ async function saveSettings() {
 async function renderAdditionalCharts() {
   if (!currentUser) return;
 
-  // Fetch all necessary data
+  // Fetch all necessary data (expanded selects for per-month calculations)
   const [snapshotsRes, billsRes, debtsRes, incomeRes, investmentsRes, assetsRes] = await Promise.all([
     supabase.from('snapshots').select('date, netWorth').eq('user_id', currentUser.id),
-    supabase.from('bills').select('type, amount').eq('user_id', currentUser.id),
-    supabase.from('debts').select('type, monthlyPayment').eq('user_id', currentUser.id),
-    supabase.from('income').select('amount, frequency').eq('user_id', currentUser.id),
-    supabase.from('investments').select('value').eq('user_id', currentUser.id),
+    supabase.from('bills').select('type, amount, frequency, nextDueDate').eq('user_id', currentUser.id),
+    supabase.from('debts').select('type, monthlyPayment, nextDueDate').eq('user_id', currentUser.id),
+    supabase.from('income').select('amount, frequency, nextDueDate').eq('user_id', currentUser.id),
+    supabase.from('investments').select('value, annualReturn, monthlyContribution').eq('user_id', currentUser.id),
     supabase.from('assets').select('name, value').eq('user_id', currentUser.id)
   ]);
 
@@ -561,7 +771,7 @@ async function renderAdditionalCharts() {
   const netData = sortedNetWorth.map(([, val], i, arr) => i === 0 ? 0 : val - arr[i - 1][1]);
 
   if (netWorthDeltaChartInst) netWorthDeltaChartInst.destroy();
-  netWorthDeltaChartInst = new Chart(document.getElementById('netWorthDeltaChart'), {
+  netWorthDeltaChartInst = safeCreateChart(document.getElementById('netWorthDeltaChart'), {
     type: 'bar',
     data: {
       labels: netLabels,
@@ -572,7 +782,7 @@ async function renderAdditionalCharts() {
       }]
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { ticks: { color: '#ccc' }, grid: { display: false } } } }
-  });
+  }, 'Net Worth Delta');
 
   // --- Spending Categories ---
   const categorySums = {};
@@ -583,7 +793,7 @@ async function renderAdditionalCharts() {
   const spendValues = Object.values(categorySums);
 
   if (spendingCategoriesChartInst) spendingCategoriesChartInst.destroy();
-  spendingCategoriesChartInst = new Chart(document.getElementById('spendingCategoriesChart'), {
+  spendingCategoriesChartInst = safeCreateChart(document.getElementById('spendingCategoriesChart'), {
     type: 'doughnut',
     data: {
       labels: spendLabels,
@@ -593,18 +803,49 @@ async function renderAdditionalCharts() {
       }]
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccc' } } } }
-  });
+  }, 'Spending Categories');
 
-  // --- Savings Rate Over Time ---
+  // --- Savings Rate Over Time (WARN-07 FIX: per-month calculation) ---
   const savingsLabels = netLabels;
-  const savingsData = netLabels.map(() => {
-    const totalIncome = income.reduce((sum, i) => sum + parseFloat(i.amount || 0), 0);
-    const totalExpenses = spendValues.reduce((sum, amt) => sum + amt, 0);
-    return totalIncome > 0 ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 100) : 0;
+  const savingsData = savingsLabels.map(label => {
+    const monthDate = new Date(label);
+    if (isNaN(monthDate.getTime())) return 0;
+    const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+    const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
+    // Calculate income that falls in this specific month
+    let monthIncome = 0;
+    (income || []).forEach(item => {
+      if (!item.nextDueDate || !item.frequency) return;
+      const amount = parseFloat(item.amount || 0);
+      let nextDate = new Date(item.nextDueDate + 'T00:00:00');
+      let safety = 0;
+      while (nextDate < monthStart && safety < 1000) { nextDate = getNextDate(nextDate, item.frequency); safety++; }
+      safety = 0;
+      while (nextDate <= monthEnd && safety < 100) { monthIncome += amount; nextDate = getNextDate(nextDate, item.frequency); safety++; }
+    });
+
+    // Calculate expenses (bills + debt payments) that fall in this specific month
+    let monthExpenses = 0;
+    const allExpenseItems = [
+      ...(bills || []),
+      ...(debts || []).map(d => ({ ...d, amount: d.monthlyPayment, frequency: 'monthly', nextDueDate: d.nextDueDate }))
+    ];
+    allExpenseItems.forEach(item => {
+      if (!item.nextDueDate || !item.frequency) return;
+      const amount = parseFloat(item.amount || 0);
+      let nextDate = new Date(item.nextDueDate + 'T00:00:00');
+      let safety = 0;
+      while (nextDate < monthStart && safety < 1000) { nextDate = getNextDate(nextDate, item.frequency); safety++; }
+      safety = 0;
+      while (nextDate <= monthEnd && safety < 100) { monthExpenses += amount; nextDate = getNextDate(nextDate, item.frequency); safety++; }
+    });
+
+    return monthIncome > 0 ? Math.round(((monthIncome - monthExpenses) / monthIncome) * 100) : 0;
   });
 
   if (savingsRateChartInst) savingsRateChartInst.destroy();
-  savingsRateChartInst = new Chart(document.getElementById('savingsRateChart'), {
+  savingsRateChartInst = safeCreateChart(document.getElementById('savingsRateChart'), {
     type: 'line',
     data: {
       labels: savingsLabels,
@@ -626,20 +867,38 @@ async function renderAdditionalCharts() {
         x: { ticks: { color: '#ccc' }, grid: { display: false } }
       }
     }
-  });
+  }, 'Savings Rate');
 
-  // --- Investment Growth ---
-  const investLabels = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
-  const startValue = investments.length ? parseFloat(investments[0].value || 0) : 10000;
-  const investData = investLabels.map((_, i) => Math.round(startValue * Math.pow(1.03, i)));
+  // --- Investment Growth (WARN-08 FIX: dynamic months & actual user data) ---
+  const now = new Date();
+  const investLabels = [];
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    investLabels.push(d.toLocaleString('default', { month: 'short' }));
+  }
+
+  const totalCurrentInvestments = investments.reduce((sum, inv) => sum + parseFloat(inv.value || 0), 0);
+  // Weighted-average annual return based on portfolio value allocation
+  const weightedReturn = totalCurrentInvestments > 0
+    ? investments.reduce((sum, inv) => sum + (parseFloat(inv.value || 0) * parseFloat(inv.annualReturn || 0)), 0) / totalCurrentInvestments
+    : 0;
+  const monthlyReturn = weightedReturn / 100 / 12;
+  const totalMonthlyContribution = investments.reduce((sum, inv) => sum + parseFloat(inv.monthlyContribution || 0), 0);
+
+  // Project forward from current total using actual returns & contributions
+  const investData = [totalCurrentInvestments];
+  for (let i = 1; i < 5; i++) {
+    const prev = investData[i - 1];
+    investData.push(Math.round(prev * (1 + monthlyReturn) + totalMonthlyContribution));
+  }
 
   if (investmentGrowthChartInst) investmentGrowthChartInst.destroy();
-  investmentGrowthChartInst = new Chart(document.getElementById('investmentGrowthChart'), {
+  investmentGrowthChartInst = safeCreateChart(document.getElementById('investmentGrowthChart'), {
     type: 'line',
     data: {
       labels: investLabels,
       datasets: [{
-        label: 'Investment Value ($)',
+        label: 'Projected Value ($)',
         data: investData,
         fill: true,
         borderColor: '#4e73df',
@@ -656,7 +915,7 @@ async function renderAdditionalCharts() {
         x: { ticks: { color: '#ccc' }, grid: { display: false } }
       }
     }
-  });
+  }, 'Investment Growth');
 }
 
 
@@ -896,7 +1155,7 @@ function renderNetWorthChart() {
   if (netWorthChart) netWorthChart.destroy();
   const snaps = dedupeSnapshotsByDate(window.snapshots || []);
   const theme = getThemeColors();
-  netWorthChart = new Chart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#4e73df', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } });
+  netWorthChart = safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#4e73df', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
 }
 function generateMonthlyCashFlowChart() {
   const ctx = document.getElementById('cashFlowChart');
@@ -914,15 +1173,18 @@ function generateMonthlyCashFlowChart() {
           const isIncome = (typeof item.type === 'string' && (item.type.toLowerCase() === 'w2' || item.type.toLowerCase() === '1099'));
           const amount = getRaw(item.amount);
           let nextDate = new Date(item.nextDueDate + 'T00:00:00');
-          while (nextDate < monthStart && nextDate.getFullYear() < today.getFullYear() + 2) { try { nextDate = getNextDate(nextDate, item.frequency); } catch { break; } }
-          while (nextDate <= monthEnd) {
+          let loopGuard = 0;
+          while (nextDate < monthStart && nextDate.getFullYear() < today.getFullYear() + 2 && loopGuard < 1000) { try { nextDate = getNextDate(nextDate, item.frequency); } catch { break; } loopGuard++; }
+          loopGuard = 0;
+          while (nextDate <= monthEnd && loopGuard < 100) {
               if (isIncome) monthlyIncome += amount; else monthlyExpenses += amount;
               try { nextDate = getNextDate(nextDate, item.frequency); } catch { break; }
+              loopGuard++;
           }
       });
       incomeTotals.push(monthlyIncome); expenseTotals.push(monthlyExpenses);
   }
-  cashFlowChart = new Chart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#1cc88a' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#e74a3b' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } });
+  cashFlowChart = safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#1cc88a' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#e74a3b' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
 }
 
 // ===== INITIALIZATION =====
@@ -974,6 +1236,14 @@ function init() {
     debugLog(`AUTH: Event received: ${event}`);
     currentUser = session?.user || null;
   
+    // Handle password recovery event — show reset password modal
+    if (event === 'PASSWORD_RECOVERY') {
+      const resetModal = document.getElementById('resetPasswordModal');
+      if (resetModal) {
+        bootstrap.Modal.getOrCreateInstance(resetModal).show();
+      }
+    }
+
     // Update UI based on auth state
     document.getElementById('loggedInState')?.classList.toggle('d-none', !currentUser);
     document.getElementById('loggedOutState')?.classList.toggle('d-none', !!currentUser);
@@ -986,7 +1256,7 @@ function init() {
   
       fetchAllDataFromSupabase().then(() => {
         renderAll();
-        renderAdditionalCharts(); // ✅ Moved inside fetch callback
+        renderAdditionalCharts();
       });
   
     } else {
@@ -1001,8 +1271,68 @@ function init() {
           logout();
       }
   });
-  document.getElementById('loginForm')?.addEventListener('submit', (e) => { e.preventDefault(); login(e.target.loginEmail.value, e.target.loginPassword.value); });
-  document.getElementById('signupForm')?.addEventListener('submit', (e) => { e.preventDefault(); signUp(e.target.signupEmail.value, e.target.signupPassword.value, e.target.signupFirstName.value, e.target.signupLastName.value); });
+
+  // Login form
+  document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    login(e.target.loginEmail.value, e.target.loginPassword.value);
+  });
+
+  // Signup form
+  document.getElementById('signupForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    signUp(e.target.signupEmail.value, e.target.signupPassword.value, e.target.signupFirstName.value, e.target.signupLastName.value);
+  });
+
+  // Forgot password flow
+  document.getElementById('forgotPasswordLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('loginForm')?.classList.add('d-none');
+    document.getElementById('forgotPasswordForm')?.classList.remove('d-none');
+    // Pre-fill email from login form
+    const loginEmail = document.getElementById('loginEmail')?.value;
+    if (loginEmail) document.getElementById('forgotEmail').value = loginEmail;
+  });
+
+  document.getElementById('backToLoginLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('loginForm')?.classList.remove('d-none');
+    document.getElementById('forgotPasswordForm')?.classList.add('d-none');
+    hideAuthAlert('forgotAlert');
+  });
+
+  document.getElementById('forgotPasswordBtn')?.addEventListener('click', () => {
+    forgotPassword(document.getElementById('forgotEmail')?.value);
+  });
+
+  // Reset password form (from email link)
+  document.getElementById('resetPasswordForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('newPassword')?.value;
+    const pw2 = document.getElementById('confirmNewPassword')?.value;
+    if (pw !== pw2) {
+      showAuthAlert('resetPasswordAlert', 'Passwords do not match.', 'warning');
+      return;
+    }
+    if (pw.length < 6) {
+      showAuthAlert('resetPasswordAlert', 'Password must be at least 6 characters.', 'warning');
+      return;
+    }
+    updatePassword(pw);
+  });
+
+  // Reset forgot password form when login modal is re-opened
+  document.getElementById('loginModal')?.addEventListener('show.bs.modal', () => {
+    document.getElementById('loginForm')?.classList.remove('d-none');
+    document.getElementById('forgotPasswordForm')?.classList.add('d-none');
+    hideAuthAlert('loginAlert');
+    hideAuthAlert('forgotAlert');
+  });
+
+  // Clear signup alerts when modal is re-opened
+  document.getElementById('signupModal')?.addEventListener('show.bs.modal', () => {
+    hideAuthAlert('signupAlert');
+  });
   // CORRECTED: Listen for clicks on the SAVE buttons in each modal
   document.getElementById('saveAssetBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveAsset(); });
   document.getElementById('saveInvestmentBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveInvestment(); });
@@ -1011,6 +1341,13 @@ function init() {
   document.getElementById('saveIncomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveIncome(); });
   document.getElementById('saveBudgetItemBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBudgetItem(); });
   document.getElementById('saveSettingsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveSettings(); });
+
+  // SUG-02: Wire up Export button on Reports page
+  const exportBtn = document.querySelector('button .bi-download')?.closest('button');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', (e) => { e.preventDefault(); exportFinancialDataCSV(); });
+  }
+
   debugLog("INIT: Initialization complete.");
 
   // If we are on the dashboard, render the dashboard components

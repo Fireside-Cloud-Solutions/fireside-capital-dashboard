@@ -112,16 +112,31 @@
         </div>
         <div class="modal-body">
           <form id="loginForm">
+            <div id="loginAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
               <label for="loginEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="loginEmail" required>
+              <input type="email" class="form-control" name="loginEmail" id="loginEmail" required>
             </div>
             <div class="mb-3">
               <label for="loginPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="loginPassword" required>
+              <input type="password" class="form-control" name="loginPassword" id="loginPassword" required>
             </div>
-            <button type="submit" class="btn btn-primary">Login</button>
+            <div class="d-flex justify-content-between align-items-center">
+              <button type="submit" class="btn btn-primary" id="loginSubmitBtn">Login</button>
+              <a href="#" id="forgotPasswordLink" class="text-decoration-none small">Forgot Password?</a>
+            </div>
           </form>
+          <div id="forgotPasswordForm" class="d-none mt-3">
+            <hr>
+            <p class="fw-semibold mb-2">Reset Password</p>
+            <div id="forgotAlert" class="alert d-none" role="alert"></div>
+            <div class="mb-3">
+              <label for="forgotEmail" class="form-label">Enter your email address</label>
+              <input type="email" class="form-control" id="forgotEmail">
+            </div>
+            <button type="button" id="forgotPasswordBtn" class="btn btn-outline-primary btn-sm">Send Reset Link</button>
+            <a href="#" id="backToLoginLink" class="ms-2 small text-decoration-none">Back to Login</a>
+          </div>
         </div>
       </div>
     </div>
@@ -137,23 +152,24 @@
         </div>
         <div class="modal-body">
           <form id="signupForm">
+            <div id="signupAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
               <label for="signupFirstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="signupFirstName" required>
+              <input type="text" class="form-control" name="signupFirstName" id="signupFirstName" required>
             </div>
             <div class="mb-3">
               <label for="signupLastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="signupLastName" required>
+              <input type="text" class="form-control" name="signupLastName" id="signupLastName" required>
             </div>
             <div class="mb-3">
               <label for="signupEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="signupEmail" required>
+              <input type="email" class="form-control" name="signupEmail" id="signupEmail" required>
             </div>
             <div class="mb-3">
-              <label for="signupPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="signupPassword" required>
+              <label for="signupPassword" class="form-label">Password (min 6 characters)</label>
+              <input type="password" class="form-control" name="signupPassword" id="signupPassword" minlength="6" required>
             </div>
-            <button type="submit" class="btn btn-primary">Sign Up</button>
+            <button type="submit" class="btn btn-primary" id="signupSubmitBtn">Sign Up</button>
           </form>
         </div>
       </div>
@@ -166,5 +182,30 @@
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/plaid.js"></script>
+
+  <!-- Password Reset Modal (shown when user clicks email reset link) -->
+  <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resetPasswordModalLabel">Set New Password</h5>
+        </div>
+        <div class="modal-body">
+          <form id="resetPasswordForm">
+            <div id="resetPasswordAlert" class="alert d-none" role="alert"></div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
+              <input type="password" class="form-control" id="newPassword" minlength="6" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="resetPasswordBtn">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
