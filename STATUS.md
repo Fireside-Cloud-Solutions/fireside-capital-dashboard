@@ -1,6 +1,6 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-01 15:42 EST
+**Last Updated:** 2026-02-01 23:59 EST
 
 ---
 
@@ -8,12 +8,15 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-dashboard-stats-cards | Create modern stats cards for Dashboard (Net Worth, Assets, Bills, Debts with icons, trends, hover effects) | 🔄 Running (4hrs) |
+| Auditor | auditor-full-site-audit-feb1 | Full site audit (all 10 pages, UX/functionality/security/accessibility) | 🔄 Running |
+| Builder | builder-dashboard-stats-enhancement | Dashboard stats cards enhancement (icons, trends, hover effects) | 🔄 Running |
+| Builder | builder-ux-polish-pass | UX polish pass (spacing, transitions, visual hierarchy) | 🔄 Running |
 
 ## Recently Completed
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-dashboard-stats-cards | Dashboard stats cards (6 cards with icons, calculations) | ✅ Complete (commit aaed88e) |
 | Builder | builder-empty-state-components | Modern empty state components (9 pages) | ✅ Complete (commit 77d73d4, Heroicons + CTAs) |
 | Builder | builder-notification-menu-improvements | Notification menu polish integration | ✅ Complete (commit 8e79b27, all 10 pages) |
 | Builder | builder-implement-ux-quick-wins | 7 Quick Win UX improvements | ✅ Complete (commit 3e7c098, 70% visual improvement) |

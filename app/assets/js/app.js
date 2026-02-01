@@ -2823,6 +2823,102 @@ function initializeBudgetPage() {
 }
 
 
+// Calculate and display month-over-month trends
+async function calculateAndDisplayTrends(currentValues) {
+  const snapshots = window.snapshots || [];
+  
+  // Get snapshots from the last 60 days
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now);
+  thirtyDaysAgo.setDate(now.getDate() - 30);
+  const sixtyDaysAgo = new Date(now);
+  sixtyDaysAgo.setDate(now.getDate() - 60);
+  
+  // Find snapshots from last month (30-60 days ago)
+  const lastMonthSnapshots = snapshots.filter(s => {
+    const snapDate = new Date(s.date + 'T00:00:00');
+    return snapDate >= sixtyDaysAgo && snapDate < thirtyDaysAgo;
+  });
+  
+  // Get the most recent snapshot from last month
+  const lastMonthSnapshot = lastMonthSnapshots.length > 0 
+    ? lastMonthSnapshots.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+    : null;
+  
+  // Helper function to create trend HTML
+  function getTrendHTML(currentValue, lastMonthValue, isInverse = false) {
+    if (!lastMonthValue || lastMonthValue === 0) {
+      return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+    }
+    
+    const change = currentValue - lastMonthValue;
+    const percentChange = (change / lastMonthValue) * 100;
+    
+    // Determine if this is good or bad
+    // isInverse = true means decrease is good (e.g., for debts)
+    const isGood = isInverse ? change < 0 : change > 0;
+    const color = isGood ? 'var(--color-success)' : '#dc2626';
+    const arrow = change > 0 ? '↑' : '↓';
+    const sign = change > 0 ? '+' : '';
+    
+    return `
+      <span class="trend-indicator" style="color: ${color};">
+        <span style="font-size: 1.2em;">${arrow}</span>
+        <span>${sign}${Math.abs(percentChange).toFixed(1)}%</span>
+      </span>
+    `;
+  }
+  
+  // Update each stat card with trend
+  const el = (id) => document.getElementById(id);
+  
+  if (lastMonthSnapshot) {
+    // Net Worth trend
+    if (el('netWorthTrend')) {
+      el('netWorthTrend').innerHTML = getTrendHTML(
+        currentValues.netWorth,
+        getRaw(lastMonthSnapshot.net_worth),
+        false
+      );
+    }
+    
+    // Assets trend (if exists)
+    const assetsTrendEl = el('assetsTrend');
+    if (assetsTrendEl) {
+      assetsTrendEl.innerHTML = getTrendHTML(
+        currentValues.totalAssets,
+        getRaw(lastMonthSnapshot.total_assets),
+        false
+      );
+    }
+    
+    // Investments trend (if exists)
+    const investmentsTrendEl = el('investmentsTrend');
+    if (investmentsTrendEl) {
+      investmentsTrendEl.innerHTML = getTrendHTML(
+        currentValues.totalInvestments,
+        getRaw(lastMonthSnapshot.total_investments),
+        false
+      );
+    }
+    
+    // Debts trend (decrease is good)
+    const debtsTrendEl = el('debtsTrend');
+    if (debtsTrendEl) {
+      debtsTrendEl.innerHTML = getTrendHTML(
+        currentValues.totalDebts,
+        getRaw(lastMonthSnapshot.total_debts),
+        true
+      );
+    }
+  } else {
+    // No historical data - show neutral indicator
+    if (el('netWorthTrend')) {
+      el('netWorthTrend').innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">No data yet</span>';
+    }
+  }
+}
+
 async function updateDashboardCards() {
   if (!currentUser) return;
   
@@ -2915,11 +3011,15 @@ async function updateDashboardCards() {
     if (el('investmentCount')) el('investmentCount').textContent = `${investments.length} investment${investments.length !== 1 ? 's' : ''}`;
     if (el('incomeCount')) el('incomeCount').textContent = `${income.length} source${income.length !== 1 ? 's' : ''}`;
 
-    // TODO: Calculate and display trend (requires snapshots comparison)
-    // For now, just show a neutral indicator
-    if (el('netWorthTrend')) {
-      el('netWorthTrend').innerHTML = '<span class="trend-indicator">—</span>';
-    }
+    // Calculate month-over-month trends from snapshots
+    await calculateAndDisplayTrends({
+      netWorth,
+      totalAssets,
+      totalInvestments,
+      totalDebts,
+      monthlyBills,
+      monthlyIncome
+    });
 
     // Save snapshot
     const today = new Date().toISOString().split('T')[0];
