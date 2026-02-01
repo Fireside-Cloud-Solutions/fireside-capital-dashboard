@@ -1158,11 +1158,7 @@ strong {
   margin: 4px 0;
 }
 
-/* Fix Welcome dropdown wrapping */
-#userDropdown {
-  white-space: nowrap;
-  min-width: 200px;
-}
+/* Fix Welcome dropdown wrapping — see CRITICAL FIX block below */
 
 /* =================================================================
    BADGES (UX Polish: Consistent styling)
@@ -2736,30 +2732,35 @@ body[data-theme='light'] .stat-meta {
 }
 
 /* =================================================================
-   CRITICAL FIX: Welcome dropdown alignment (Build 2026-02-01-17:12)
+   CRITICAL FIX: Welcome dropdown alignment (Build 2026-02-01-17:21)
    ================================================================= */
 #userDropdown {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0 !important;
   white-space: nowrap !important;
   min-width: auto !important;
+  max-width: none !important;
+  width: auto !important;
   padding: 0.375rem 1rem !important;
-  font-size: inherit !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
 }
 
-/* Username span: same size/weight as surrounding text */
-#username {
+/* Username span: must inherit from button, no size changes */
+#userDropdown #username {
   font-size: inherit !important;
   font-weight: inherit !important;
   vertical-align: baseline !important;
+  display: inline !important;
   white-space: nowrap !important;
 }
 
-/* Force caret AFTER all text content (not between Welcome and name) */
+/* Caret: Bootstrap adds ::after as the dropdown arrow.
+   Ensure it stays inline after the text, not wrapping. */
 #userDropdown.dropdown-toggle::after {
-  order: 999 !important;
-  margin-left: 0.4em !important;
+  display: inline-block !important;
   vertical-align: middle !important;
+  margin-left: 0.35em !important;
 }
