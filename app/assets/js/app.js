@@ -39,9 +39,9 @@ function getNextDate(currentDate, frequency) {
 function getThemeColors() {
   const isDark = document.body.getAttribute('data-theme') !== 'light';
   return {
-      fill: isDark ? 'rgba(212, 148, 58, 0.15)' : 'rgba(212, 148, 58, 0.1)',
-      text: isDark ? '#F2EBE3' : '#1C1A18',
-      grid: isDark ? 'rgba(242, 235, 227, 0.08)' : 'rgba(28, 26, 24, 0.1)'
+      fill: isDark ? 'rgba(244, 78, 36, 0.15)' : 'rgba(244, 78, 36, 0.1)',
+      text: isDark ? '#f0f0f0' : '#0f0f0f',
+      grid: isDark ? 'rgba(240, 240, 240, 0.08)' : 'rgba(15, 15, 15, 0.1)'
   };
 }
 function dedupeSnapshotsByDate(snaps) {
@@ -691,7 +691,7 @@ function renderEmergencyFundChart() {
               labels: ['Goal', 'Current'],
               datasets: [{
                   data: [emergencyGoal, emergencyCurrent],
-                  backgroundColor: ['#F0B848', '#5CB85C'],
+                  backgroundColor: ['#f0a500', '#81b900'],
                   barThickness: 50
               }]
           },
@@ -778,10 +778,10 @@ async function renderAdditionalCharts() {
       datasets: [{
         label: 'Change ($)',
         data: netData,
-        backgroundColor: ctx => ctx.raw < 0 ? '#E85B54' : '#5CB85C'
+        backgroundColor: ctx => ctx.raw < 0 ? '#e53935' : '#81b900'
       }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#B5ADA4' }, grid: { color: 'rgba(242,235,227,0.08)' } }, x: { ticks: { color: '#B5ADA4' }, grid: { display: false } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(240,240,240,0.08)' } }, x: { ticks: { color: '#b0b0b0' }, grid: { display: false } } } }
   }, 'Net Worth Delta');
 
   // --- Spending Categories ---
@@ -799,10 +799,10 @@ async function renderAdditionalCharts() {
       labels: spendLabels,
       datasets: [{
         data: spendValues,
-        backgroundColor: ['#D4943A', '#C07848', '#F0B848', '#E85B54', '#918880']
+        backgroundColor: ['#f44e24', '#01a4ef', '#81b900', '#e53935', '#999999']
       }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#B5ADA4' } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#b0b0b0' } } } }
   }, 'Spending Categories');
 
   // --- Savings Rate Over Time (WARN-07 FIX: per-month calculation) ---
@@ -853,18 +853,18 @@ async function renderAdditionalCharts() {
         label: 'Savings Rate %',
         data: savingsData,
         fill: true,
-        borderColor: '#5CB85C',
-        backgroundColor: 'rgba(92, 184, 92, 0.15)',
+        borderColor: '#81b900',
+        backgroundColor: 'rgba(129, 185, 0, 0.15)',
         tension: 0.4
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#B5ADA4' } } },
+      plugins: { legend: { labels: { color: '#b0b0b0' } } },
       scales: {
-        y: { ticks: { color: '#B5ADA4' }, grid: { color: 'rgba(242,235,227,0.08)' } },
-        x: { ticks: { color: '#B5ADA4' }, grid: { display: false } }
+        y: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(240,240,240,0.08)' } },
+        x: { ticks: { color: '#b0b0b0' }, grid: { display: false } }
       }
     }
   }, 'Savings Rate');
@@ -901,18 +901,18 @@ async function renderAdditionalCharts() {
         label: 'Projected Value ($)',
         data: investData,
         fill: true,
-        borderColor: '#D4943A',
-        backgroundColor: 'rgba(212, 148, 58, 0.15)',
+        borderColor: '#f44e24',
+        backgroundColor: 'rgba(244, 78, 36, 0.15)',
         tension: 0.3
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#B5ADA4' } } },
+      plugins: { legend: { labels: { color: '#b0b0b0' } } },
       scales: {
-        y: { ticks: { color: '#B5ADA4' }, grid: { color: 'rgba(242,235,227,0.08)' } },
-        x: { ticks: { color: '#B5ADA4' }, grid: { display: false } }
+        y: { ticks: { color: '#b0b0b0' }, grid: { color: 'rgba(240,240,240,0.08)' } },
+        x: { ticks: { color: '#b0b0b0' }, grid: { display: false } }
       }
     }
   }, 'Investment Growth');
@@ -1155,7 +1155,7 @@ function renderNetWorthChart() {
   if (netWorthChart) netWorthChart.destroy();
   const snaps = dedupeSnapshotsByDate(window.snapshots || []);
   const theme = getThemeColors();
-  netWorthChart = safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#D4943A', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
+  netWorthChart = safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#f44e24', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
 }
 function generateMonthlyCashFlowChart() {
   const ctx = document.getElementById('cashFlowChart');
@@ -1184,7 +1184,7 @@ function generateMonthlyCashFlowChart() {
       });
       incomeTotals.push(monthlyIncome); expenseTotals.push(monthlyExpenses);
   }
-  cashFlowChart = safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#5CB85C' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#E85B54' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
+  cashFlowChart = safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#81b900' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#e53935' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
 }
 
 // ===== INITIALIZATION =====

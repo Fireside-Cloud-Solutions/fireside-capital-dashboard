@@ -48,5 +48,6 @@ Invoke-RestMethod -Uri "https://qqtiofdqplwycnwplmen.supabase.co/rest/v1/bills?s
 
 ## Web Dashboard
 - **App source:** `app/` directory
+- **Live URL:** https://nice-cliff-05b13880f.2.azurestaticapps.net
 - **Azure Static Web App:** CI/CD via GitHub Actions
 - **Repo:** Fireside-Cloud-Solutions/fireside-capital-dashboard
