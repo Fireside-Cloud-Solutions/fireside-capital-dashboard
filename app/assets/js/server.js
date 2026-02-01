@@ -5,7 +5,7 @@ const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: ['https://nice-cliff-05b13880f.azurestaticapps.net', 'http://localhost:3000'] }));
+app.use(cors({ origin: ['https://nice-cliff-05b13880f.2.azurestaticapps.net', 'http://localhost:3000'] }));
 
 const plaidClient = new PlaidApi(
   new Configuration({
