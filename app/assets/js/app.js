@@ -121,7 +121,7 @@ function exportFinancialDataCSV() {
 // ===== SUPABASE CLIENT =====
 const supabaseUrl = 'https://qqtiofdqplwycnwplmen.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxdGlvZmRxcGx3eWNud3BsbWVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MDY5NDIsImV4cCI6MjA4NTQ4Mjk0Mn0.Vjg7hQDPWJwmbkQccw5CXH_Npi2YJgJbt-OAEnF_P5g';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ===== STATE & GLOBAL VARIABLES =====
 let currentUser = null;
@@ -182,7 +182,7 @@ async function signUp(email, password, firstName, lastName) {
   setButtonLoading('signupSubmitBtn', true);
 
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await sb.auth.signUp({
       email,
       password,
       options: { data: { first_name: firstName, last_name: lastName } }
@@ -223,7 +223,7 @@ async function login(email, password) {
   setButtonLoading('loginSubmitBtn', true);
 
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await sb.auth.signInWithPassword({ email, password });
 
     if (error) {
       showAuthAlert('loginAlert', getFriendlyAuthError(error), 'danger');
@@ -252,7 +252,7 @@ async function forgotPassword(email) {
   }
 
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin + window.location.pathname
     });
 
@@ -273,7 +273,7 @@ async function updatePassword(newPassword) {
   setButtonLoading('resetPasswordBtn', true);
 
   try {
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    const { error } = await sb.auth.updateUser({ password: newPassword });
 
     if (error) {
       showAuthAlert('resetPasswordAlert', getFriendlyAuthError(error), 'danger');
@@ -293,7 +293,7 @@ async function updatePassword(newPassword) {
   }
 }
 
-async function logout() { await supabase.auth.signOut(); }
+async function logout() { await sb.auth.signOut(); }
 
 // ===== CORE DATA & RENDER FUNCTIONS =====
 // --- THE DEBUGGING FUNCTION ---
@@ -303,13 +303,13 @@ async function fetchAllDataFromSupabase() {
   try {
       // Fetch all data streams at the same time
       const [assetsRes, investmentsRes, debtsRes, billsRes, incomeRes, snapshotsRes, settingsRes] = await Promise.all([
-        supabase.from('assets').select('*').eq('user_id', currentUser.id),
-        supabase.from('investments').select('*').eq('user_id', currentUser.id),
-        supabase.from('debts').select('*').eq('user_id', currentUser.id),
-        supabase.from('bills').select('*').eq('user_id', currentUser.id),
-        supabase.from('income').select('*').eq('user_id', currentUser.id),
-        supabase.from('snapshots').select('*').eq('user_id', currentUser.id),
-        supabase.from('settings').select('*').eq('user_id', currentUser.id).single() // Fetch settings
+        sb.from('assets').select('*').eq('user_id', currentUser.id),
+        sb.from('investments').select('*').eq('user_id', currentUser.id),
+        sb.from('debts').select('*').eq('user_id', currentUser.id),
+        sb.from('bills').select('*').eq('user_id', currentUser.id),
+        sb.from('income').select('*').eq('user_id', currentUser.id),
+        sb.from('snapshots').select('*').eq('user_id', currentUser.id),
+        sb.from('settings').select('*').eq('user_id', currentUser.id).single() // Fetch settings
     ]);
 
       // Check if any of the requests failed
@@ -426,7 +426,7 @@ async function saveAsset() {
   } else if (type === 'vehicle') {
       record.value = getRaw(f.vehicleValue.value); record.loan = getRaw(f.vehicleLoanBalance.value); record.nextDueDate = f.vehicleNextDueDate.value || null;
   }
-  const { error } = editAssetId ? await supabase.from('assets').update(record).eq('id', editAssetId) : await supabase.from('assets').insert(record);
+  const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId) : await sb.from('assets').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -438,7 +438,7 @@ function confirmDeleteAsset(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteAssetModal')).show();
 }
 async function deleteAssetConfirmed() {
-  const { error } = await supabase.from('assets').delete().eq('id', deleteAssetId);
+  const { error } = await sb.from('assets').delete().eq('id', deleteAssetId);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteAssetModal')).hide();
   await fetchAllDataFromSupabase();
@@ -483,7 +483,7 @@ async function saveInvestment() {
       annualReturn: getRaw(f.annualReturn.value), nextContributionDate: f.nextContributionDate.value || null,
       user_id: currentUser.id
   };
-  const { error } = editInvestmentId ? await supabase.from('investments').update(record).eq('id', editInvestmentId) : await supabase.from('investments').insert(record);
+  const { error } = editInvestmentId ? await sb.from('investments').update(record).eq('id', editInvestmentId) : await sb.from('investments').insert(record);
 
   editInvestmentId = null;
   if (error) return alert(error.message);
@@ -498,7 +498,7 @@ function confirmDeleteInvestment(id) {
   }
 }
 async function deleteInvestmentConfirmed(id) {
-  const { error } = await supabase.from('investments').delete().eq('id', id);
+  const { error } = await sb.from('investments').delete().eq('id', id);
   if (error) return alert(error.message);
   await fetchAllDataFromSupabase();
   renderAll();
@@ -540,7 +540,7 @@ async function saveDebt() {
       term: getRaw(f.debtTerm.value), monthlyPayment: getRaw(f.debtMonthly.value),
       nextDueDate: f.debtNextPaymentDate.value || null, user_id: currentUser.id
   };
-  const { error } = editDebtId ? await supabase.from('debts').update(record).eq('id', editDebtId) : await supabase.from('debts').insert(record);
+  const { error } = editDebtId ? await sb.from('debts').update(record).eq('id', editDebtId) : await sb.from('debts').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -552,7 +552,7 @@ function confirmDeleteDebt(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteDebtModal')).show();
 }
 async function deleteDebtConfirmed() {
-  const { error } = await supabase.from('debts').delete().eq('id', deleteDebtId);
+  const { error } = await sb.from('debts').delete().eq('id', deleteDebtId);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteDebtModal')).hide();
   await fetchAllDataFromSupabase();
@@ -592,7 +592,7 @@ async function saveBill() {
       name: f.billName.value, type: f.billType.value, amount: getRaw(f.billAmount.value),
       frequency: f.billFrequency.value, nextDueDate: f.billNextDueDate.value || null, user_id: currentUser.id
   };
-  const { error } = editBillId ? await supabase.from('bills').update(record).eq('id', editBillId) : await supabase.from('bills').insert(record);
+  const { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId) : await sb.from('bills').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -604,7 +604,7 @@ function confirmDeleteBill(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
 }
 async function deleteBillConfirmed() {
-  const { error } = await supabase.from('bills').delete().eq('id', deleteBillId);
+  const { error } = await sb.from('bills').delete().eq('id', deleteBillId);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteBillModal')).hide();
   await fetchAllDataFromSupabase();
@@ -644,7 +644,7 @@ async function saveIncome() {
       name: f.incomeName.value, type: f.incomeType.value, amount: getRaw(f.incomeAmount.value),
       frequency: f.incomeFrequency.value, nextDueDate: f.incomeNextDueDate.value || null, user_id: currentUser.id
   };
-  const { error } = editIncomeId ? await supabase.from('income').update(record).eq('id', editIncomeId) : await supabase.from('income').insert(record);
+  const { error } = editIncomeId ? await sb.from('income').update(record).eq('id', editIncomeId) : await sb.from('income').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
@@ -656,7 +656,7 @@ function confirmDeleteIncome(id) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteIncomeModal')).show();
 }
 async function deleteIncomeConfirmed() {
-  const { error } = await supabase.from('income').delete().eq('id', deleteIncomeId);
+  const { error } = await sb.from('income').delete().eq('id', deleteIncomeId);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteIncomeModal')).hide();
   await fetchAllDataFromSupabase();
@@ -745,12 +745,12 @@ async function renderAdditionalCharts() {
 
   // Fetch all necessary data (expanded selects for per-month calculations)
   const [snapshotsRes, billsRes, debtsRes, incomeRes, investmentsRes, assetsRes] = await Promise.all([
-    supabase.from('snapshots').select('date, netWorth').eq('user_id', currentUser.id),
-    supabase.from('bills').select('type, amount, frequency, nextDueDate').eq('user_id', currentUser.id),
-    supabase.from('debts').select('type, monthlyPayment, nextDueDate').eq('user_id', currentUser.id),
-    supabase.from('income').select('amount, frequency, nextDueDate').eq('user_id', currentUser.id),
-    supabase.from('investments').select('value, annualReturn, monthlyContribution').eq('user_id', currentUser.id),
-    supabase.from('assets').select('name, value').eq('user_id', currentUser.id)
+    sb.from('snapshots').select('date, netWorth').eq('user_id', currentUser.id),
+    sb.from('bills').select('type, amount, frequency, nextDueDate').eq('user_id', currentUser.id),
+    sb.from('debts').select('type, monthlyPayment, nextDueDate').eq('user_id', currentUser.id),
+    sb.from('income').select('amount, frequency, nextDueDate').eq('user_id', currentUser.id),
+    sb.from('investments').select('value, annualReturn, monthlyContribution').eq('user_id', currentUser.id),
+    sb.from('assets').select('name, value').eq('user_id', currentUser.id)
   ]);
 
   const snapshots = snapshotsRes.data || [];
@@ -953,7 +953,7 @@ async function loadAndRenderBudget() {
 
   let budgetAssignments = {};
   if (currentUser) {
-      const { data: assignments, error } = await supabase.from('budgets').select('*').eq('user_id', currentUser.id).eq('month', monthString);
+      const { data: assignments, error } = await sb.from('budgets').select('*').eq('user_id', currentUser.id).eq('month', monthString);
       if (error) {
           console.error("Could not fetch saved budget assignments:", error.message);
       } else {
@@ -1087,7 +1087,7 @@ async function saveBudgetItem() {
     assigned_amount: getRaw(document.getElementById('budgetItemNeeded').value)
   };
 
-  const { error } = await supabase.from('budgets').insert(record);
+  const { error } = await sb.from('budgets').insert(record);
 
   if (error) {
     alert("Error saving item: " + error.message);
@@ -1133,7 +1133,7 @@ async function updateDashboardCards() {
       if (el) el.textContent = formatCurrency(val);
   });
   const today = new Date().toISOString().split('T')[0];
-  const { error } = await supabase.from('snapshots').upsert({ date: today, netWorth, user_id: currentUser.id }, { onConflict: 'date,user_id' });
+  const { error } = await sb.from('snapshots').upsert({ date: today, netWorth, user_id: currentUser.id }, { onConflict: 'date,user_id' });
   if (error) console.error("Error saving snapshot:", error);
 }
 function renderUpcomingPayments() {
@@ -1232,7 +1232,7 @@ function init() {
   debugLog("INIT: Page loaded, starting initialization.");
 
   // Auth state change listener
-  supabase.auth.onAuthStateChange((event, session) => {
+  sb.auth.onAuthStateChange((event, session) => {
     debugLog(`AUTH: Event received: ${event}`);
     currentUser = session?.user || null;
   
