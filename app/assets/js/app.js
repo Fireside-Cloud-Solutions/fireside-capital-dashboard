@@ -1535,9 +1535,18 @@ async function loadAndRenderBudget() {
           console.error("Could not fetch saved budget assignments:", error.message);
       } else {
           allBudgetRecords = assignments || [];
-          allBudgetRecords.forEach(a => { budgetAssignments[a.item_id] = a.assigned_amount; });
+          allBudgetRecords.forEach(a => {
+            if (!a.suppressed) {
+              budgetAssignments[a.item_id] = a.assigned_amount;
+            }
+          });
       }
   }
+
+  // Build a set of suppressed item IDs from budget records
+  const suppressedItemIds = new Set(
+    allBudgetRecords.filter(a => a.suppressed).map(a => a.item_id)
+  );
 
   const totalIncome = (window.income || []).reduce((sum, i) => sum + getRaw(i.amount), 0);
   const totalAssigned = Object.values(budgetAssignments).reduce((sum, amount) => sum + getRaw(amount), 0);
@@ -1546,6 +1555,21 @@ async function loadAndRenderBudget() {
   if(document.getElementById('expectedIncome')) document.getElementById('expectedIncome').textContent = formatCurrency(totalIncome);
   if(document.getElementById('assignedAmount')) document.getElementById('assignedAmount').textContent = formatCurrency(totalAssigned);
   if(document.getElementById('remainingToBudget')) document.getElementById('remainingToBudget').textContent = formatCurrency(remainingToBudget);
+
+  // MED-04: Income warning banner
+  const tableCard = document.querySelector('.table-card');
+  let incomeWarning = document.getElementById('incomeWarningBanner');
+  if (totalIncome === 0) {
+    if (!incomeWarning && tableCard) {
+      incomeWarning = document.createElement('div');
+      incomeWarning.id = 'incomeWarningBanner';
+      incomeWarning.className = 'alert alert-warning mb-3';
+      incomeWarning.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>⚠️ No income sources found for this month. <a href="income.html" class="alert-link">Add income on the Income page</a> to track your budget accurately.';
+      tableCard.parentNode.insertBefore(incomeWarning, tableCard);
+    }
+  } else if (incomeWarning) {
+    incomeWarning.remove();
+  }
 
   const tbody = document.getElementById('budgetAssignmentTable');
   tbody.innerHTML = '';
@@ -1570,6 +1594,10 @@ async function loadAndRenderBudget() {
           debugLog("Skipping an invalid budget item without an ID:", item);
           return;
       }
+
+      // MED-01: Skip suppressed items from normal rendering (shown separately below)
+      if (suppressedItemIds.has(item.id)) return;
+
       const itemId = item.id;
       const needed = item.amount || item.monthlyPayment || 0;
       const assigned = budgetAssignments[itemId] || 0;
@@ -1594,7 +1622,7 @@ async function loadAndRenderBudget() {
   });
 
   // Render standalone budget items (manually added, not tied to a bill/debt)
-  const standaloneItems = allBudgetRecords.filter(rec => rec.item_id && !billDebtIds.has(rec.item_id) && rec.item_type === 'custom');
+  const standaloneItems = allBudgetRecords.filter(rec => rec.item_id && !billDebtIds.has(rec.item_id) && rec.item_type === 'custom' && !rec.suppressed);
   standaloneItems.forEach(rec => {
       const needed = getRaw(rec.needed_amount) || 0;
       const assigned = getRaw(rec.assigned_amount) || 0;
@@ -1617,6 +1645,41 @@ async function loadAndRenderBudget() {
       `;
       tbody.appendChild(row);
   });
+
+  // MED-01: Render suppressed items (greyed out with restore button)
+  const suppressedRecords = allBudgetRecords.filter(rec => rec.suppressed);
+  if (suppressedRecords.length > 0) {
+    const dividerRow = document.createElement('tr');
+    dividerRow.innerHTML = `<td colspan="7" class="text-muted text-center small py-2" style="opacity: 0.6;"><i class="bi bi-eye-slash me-1"></i>Removed items (click restore to re-add)</td>`;
+    tbody.appendChild(dividerRow);
+
+    suppressedRecords.forEach(rec => {
+      const needed = getRaw(rec.needed_amount) || 0;
+      const row = document.createElement('tr');
+      row.style.opacity = '0.45';
+      row.innerHTML = `
+          <td>${escapeHtml(rec.category || 'N/A')}</td>
+          <td><s>${escapeHtml(rec.name || 'Unnamed')}</s></td>
+          <td class="text-muted">${formatCurrency(needed)}</td>
+          <td class="text-muted">—</td>
+          <td class="text-muted">—</td>
+          <td class="text-muted small">Removed</td>
+          <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${rec.item_id}', '${monthString}')" title="Restore to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // MED-03: Empty state when no budget items exist
+  if (tbody.children.length === 0) {
+    const emptyRow = document.createElement('tr');
+    emptyRow.innerHTML = `<td colspan="7" class="text-center text-muted py-4">
+      <i class="bi bi-journal-text" style="font-size: 1.5rem;"></i><br>
+      No budget items yet.<br>
+      <small>Add bills on the <a href="bills.html">Bills page</a> or click <strong>Generate Budget</strong> to get started.</small>
+    </td>`;
+    tbody.appendChild(emptyRow);
+  }
 
   // --- NEW FIX #2: The corrected event listener ---
   document.querySelectorAll('.assigned-input').forEach(input => {
@@ -1733,25 +1796,110 @@ async function saveBudgetItem() {
   }
 }
 
-// Delete a budget item for a specific month
+// Delete (suppress) a budget item for a specific month
+// Bill/debt items are suppressed so "Generate Budget" won't re-add them.
+// Custom items are fully deleted since they have no external source.
 async function deleteBudgetItem(itemId, monthString) {
   if (!currentUser || !itemId) return;
   if (!confirm('Remove this item from the budget for this month?')) return;
 
+  // Check if there's a budget record for this item (bill/debt items may not have one yet)
+  const { data: existing } = await sb
+    .from('budgets')
+    .select('id, item_type')
+    .eq('user_id', currentUser.id)
+    .eq('month', monthString)
+    .eq('item_id', itemId)
+    .maybeSingle();
+
+  if (existing && existing.item_type === 'custom') {
+    // Custom items: fully delete
+    const { error } = await sb
+      .from('budgets')
+      .delete()
+      .eq('user_id', currentUser.id)
+      .eq('month', monthString)
+      .eq('item_id', itemId);
+
+    if (error) {
+      console.error("Error deleting budget item:", error);
+      alert("Could not delete the budget item: " + error.message);
+      return;
+    }
+  } else if (existing) {
+    // Bill/debt items: suppress so generate won't re-add
+    const { error } = await sb
+      .from('budgets')
+      .update({ suppressed: true, assigned_amount: 0 })
+      .eq('user_id', currentUser.id)
+      .eq('month', monthString)
+      .eq('item_id', itemId);
+
+    if (error) {
+      console.error("Error suppressing budget item:", error);
+      alert("Could not remove the budget item: " + error.message);
+      return;
+    }
+  } else {
+    // No budget record exists yet (bill/debt rendered from source data).
+    // Create a suppressed record so generate won't add it.
+    const isBill = (window.bills || []).some(b => b.id === itemId);
+    const sourceItem = isBill
+      ? (window.bills || []).find(b => b.id === itemId)
+      : (window.debts || []).find(d => d.id === itemId);
+
+    const { error } = await sb
+      .from('budgets')
+      .insert({
+        user_id: currentUser.id,
+        month: monthString,
+        item_id: itemId,
+        item_type: isBill ? 'bill' : 'debt',
+        assigned_amount: 0,
+        needed_amount: getRaw(sourceItem?.amount || sourceItem?.monthlyPayment || 0),
+        name: sourceItem?.name || 'Unknown',
+        category: sourceItem?.type || 'N/A',
+        suppressed: true
+      });
+
+    if (error) {
+      console.error("Error creating suppressed budget item:", error);
+      alert("Could not remove the budget item: " + error.message);
+      return;
+    }
+  }
+
+  // Refresh the budget view
+  await fetchAllDataFromSupabase();
+  loadAndRenderBudget();
+}
+
+// Restore a suppressed budget item
+async function restoreBudgetItem(itemId, monthString) {
+  if (!currentUser || !itemId) return;
+
+  // Find the record to get the needed amount for restoring assigned_amount
+  const { data: record } = await sb
+    .from('budgets')
+    .select('needed_amount')
+    .eq('user_id', currentUser.id)
+    .eq('month', monthString)
+    .eq('item_id', itemId)
+    .maybeSingle();
+
   const { error } = await sb
     .from('budgets')
-    .delete()
+    .update({ suppressed: false, assigned_amount: getRaw(record?.needed_amount || 0) })
     .eq('user_id', currentUser.id)
     .eq('month', monthString)
     .eq('item_id', itemId);
 
   if (error) {
-    console.error("Error deleting budget item:", error);
-    alert("Could not delete the budget item: " + error.message);
+    console.error("Error restoring budget item:", error);
+    alert("Could not restore the budget item: " + error.message);
     return;
   }
 
-  // Refresh the budget view
   await fetchAllDataFromSupabase();
   loadAndRenderBudget();
 }
@@ -1787,7 +1935,7 @@ async function generateBudgetForMonth(monthString) {
 
     if (budgetError) throw budgetError;
 
-    // Build a set of already-budgeted item IDs
+    // Build a set of already-budgeted item IDs (including suppressed ones — don't re-add them)
     const budgetedItemIds = new Set((existingBudgets || []).map(b => b.item_id));
 
     // 3. Fetch last month's budget for variable bill amounts
