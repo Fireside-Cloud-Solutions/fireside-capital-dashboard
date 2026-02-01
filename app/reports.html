@@ -1,16 +1,24 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fireside Capital - Reports</title>
+  <!-- Performance: DNS prefetch and preconnect for CDN resources -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.plaid.com">
+  <link rel="dns-prefetch" href="https://qqtiofdqplwycnwplmen.supabase.co">
+  
+  <!-- Fonts: Optimized to load only needed weights -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  
+  <!-- Critical CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/design-tokens.css" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />`n  <link rel="stylesheet" href="assets/css/polish.css" />
 </head>
 <body data-theme="dark">
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
@@ -209,9 +217,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js is lazy loaded by app.js when needed -->
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/polish-utilities.js"></script>`n  <script src="assets/js/app.js"></script>
+  <script src="assets/js/app-polish-enhancements.js"></script>
   <script src="assets/js/plaid.js"></script>
 
   <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">

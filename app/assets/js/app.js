@@ -2,6 +2,70 @@
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
 
+// ===== PERFORMANCE: LAZY LOAD CHART.JS =====
+let chartJsLoaded = false;
+let chartJsLoading = false;
+const chartLoadCallbacks = [];
+
+function loadChartJs() {
+  return new Promise((resolve, reject) => {
+    if (chartJsLoaded) {
+      resolve();
+      return;
+    }
+    
+    chartLoadCallbacks.push(resolve);
+    
+    if (chartJsLoading) {
+      return; // Already loading, just wait for callback
+    }
+    
+    chartJsLoading = true;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = () => {
+      chartJsLoaded = true;
+      chartJsLoading = false;
+      chartLoadCallbacks.forEach(cb => cb());
+      chartLoadCallbacks.length = 0;
+    };
+    script.onerror = () => {
+      chartJsLoading = false;
+      console.error('Failed to load Chart.js');
+      reject(new Error('Failed to load Chart.js'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// ===== PERFORMANCE: DATA CACHING =====
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const dataCache = {};
+
+function getCachedData(key) {
+  const cached = dataCache[key];
+  if (!cached) return null;
+  
+  const now = Date.now();
+  if (now - cached.timestamp > CACHE_DURATION) {
+    delete dataCache[key];
+    return null;
+  }
+  
+  return cached.data;
+}
+
+function setCachedData(key, data) {
+  dataCache[key] = {
+    data: data,
+    timestamp: Date.now()
+  };
+}
+
+function clearCache() {
+  Object.keys(dataCache).forEach(key => delete dataCache[key]);
+}
+
 // ===== XSS PROTECTION =====
 function escapeHtml(str) {
     if (str == null) return '';
@@ -51,12 +115,16 @@ function dedupeSnapshotsByDate(snaps) {
 }
 
 // ===== CHART ERROR BOUNDARY (SUG-05) =====
-function safeCreateChart(ctx, config, chartName) {
+async function safeCreateChart(ctx, config, chartName) {
   try {
     if (!ctx) {
       console.warn(`Chart canvas not found for: ${chartName || 'unknown chart'}`);
       return null;
     }
+    
+    // Lazy load Chart.js if not already loaded
+    await loadChartJs();
+    
     return new Chart(ctx, config);
   } catch (err) {
     console.error(`Failed to render ${chartName || 'chart'}:`, err);
@@ -199,13 +267,13 @@ async function signUp(email, password, firstName, lastName) {
     } else if (data?.user && !data?.session) {
       // User created but no session = email confirmation required
       showAuthAlert('signupAlert',
-        'âœ… Account created! Please check your email (including spam folder) and click the confirmation link before logging in.',
+        '✅ Account created! Please check your email (including spam folder) and click the confirmation link before logging in.',
         'success'
       );
       document.getElementById('signupForm')?.reset();
     } else {
-      // Auto-confirmed â€" session exists
-      showAuthAlert('signupAlert', 'âœ… Account created successfully! Logging you in...', 'success');
+      // Auto-confirmed �" session exists
+      showAuthAlert('signupAlert', '✅ Account created successfully! Logging you in...', 'success');
       setTimeout(() => {
         bootstrap.Modal.getInstance(document.getElementById('signupModal'))?.hide();
       }, 1000);
@@ -230,7 +298,7 @@ async function login(email, password) {
       return;
     }
 
-    showAuthAlert('loginAlert', 'âœ… Login successful!', 'success');
+    showAuthAlert('loginAlert', '✅ Login successful!', 'success');
     setTimeout(() => {
       bootstrap.Modal.getInstance(document.getElementById('loginModal'))?.hide();
       hideAuthAlert('loginAlert');
@@ -261,7 +329,7 @@ async function forgotPassword(email) {
       return;
     }
 
-    showAuthAlert('forgotAlert', 'âœ… Password reset link sent! Check your email (including spam folder).', 'success');
+    showAuthAlert('forgotAlert', '✅ Password reset link sent! Check your email (including spam folder).', 'success');
   } catch (err) {
     showAuthAlert('forgotAlert', 'An unexpected error occurred. Please try again.', 'danger');
     console.error('Forgot password error:', err);
@@ -280,7 +348,7 @@ async function updatePassword(newPassword) {
       return;
     }
 
-    showAuthAlert('resetPasswordAlert', 'âœ… Password updated successfully! Redirecting...', 'success');
+    showAuthAlert('resetPasswordAlert', '✅ Password updated successfully! Redirecting...', 'success');
     setTimeout(() => {
       bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal'))?.hide();
       window.location.hash = '';
@@ -297,8 +365,26 @@ async function logout() { await sb.auth.signOut(); }
 
 // ===== CORE DATA & RENDER FUNCTIONS =====
 // --- THE DEBUGGING FUNCTION ---
-async function fetchAllDataFromSupabase() {
+async function fetchAllDataFromSupabase(forceRefresh = false) {
   if (!currentUser) return; // Exit if no user is logged in
+
+  const cacheKey = `data_${currentUser.id}`;
+  
+  // Performance: Check cache first (unless force refresh)
+  if (!forceRefresh) {
+    const cached = getCachedData(cacheKey);
+    if (cached) {
+      debugLog("FETCH: Using cached data");
+      window.assets = cached.assets || [];
+      window.investments = cached.investments || [];
+      window.debts = cached.debts || [];
+      window.bills = cached.bills || [];
+      window.income = cached.income || [];
+      window.snapshots = cached.snapshots || [];
+      window.settings = cached.settings || {};
+      return;
+    }
+  }
 
   try {
       // Fetch all data streams at the same time
@@ -329,6 +415,17 @@ async function fetchAllDataFromSupabase() {
       window.snapshots = snapshotsRes.data || [];
       window.settings = settingsRes.data || {};
 
+      // Performance: Cache the fetched data
+      setCachedData(cacheKey, {
+        assets: window.assets,
+        investments: window.investments,
+        debts: window.debts,
+        bills: window.bills,
+        income: window.income,
+        snapshots: window.snapshots,
+        settings: window.settings
+      });
+
       debugLog("FETCH: Data fetch successful for all tables.");
   } catch (error) {
       console.error("Error during data fetch:", error);
@@ -337,7 +434,7 @@ async function fetchAllDataFromSupabase() {
 }
 
 
-function renderAll() {
+async function renderAll() {
   // Render all the tables for the sub-pages
   renderAssets();
   renderInvestments();
@@ -346,18 +443,32 @@ function renderAll() {
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
-  // Use 'totalInvestments' as the check â€" it only exists on the dashboard, not reports.html
+  // Use 'totalInvestments' as the check �" it only exists on the dashboard, not reports.html
   if (document.getElementById('totalInvestments')) {
       updateDashboardCards();
       renderUpcomingPayments();
-      renderNetWorthChart();
-      generateMonthlyCashFlowChart();
-      renderEmergencyFundChart();
+      
+      // Performance: Load critical chart first (Net Worth is most important)
+      await renderNetWorthChart();
+      
+      // Defer non-critical charts using requestIdleCallback for better perceived performance
+      if (window.requestIdleCallback) {
+        requestIdleCallback(() => {
+          generateMonthlyCashFlowChart();
+          renderEmergencyFundChart();
+        }, { timeout: 2000 });
+      } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+          generateMonthlyCashFlowChart();
+          renderEmergencyFundChart();
+        }, 100);
+      }
   }
 
   // If we are on the reports page, render the net worth chart (without writing snapshots)
   if (document.getElementById('reportNetWorth') && document.getElementById('netWorthTimelineChart')) {
-      renderNetWorthChart();
+      await renderNetWorthChart();
   }
 
   // Pre-populate settings inputs
@@ -429,7 +540,8 @@ async function saveAsset() {
   const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId).eq('user_id', currentUser.id) : await sb.from('assets').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 function confirmDeleteAsset(id, name) {
@@ -442,7 +554,8 @@ async function deleteAssetConfirmed() {
   const { error } = await sb.from('assets').delete().eq('id', deleteAssetId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteAssetModal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 
@@ -490,7 +603,8 @@ async function saveInvestment() {
   if (error) return alert(error.message);
 
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 function confirmDeleteInvestment(id, name) {
@@ -502,7 +616,8 @@ function confirmDeleteInvestment(id, name) {
 async function deleteInvestmentConfirmed(id) {
   const { error } = await sb.from('investments').delete().eq('id', id).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 
@@ -545,7 +660,9 @@ async function saveDebt() {
   const { error } = editDebtId ? await sb.from('debts').update(record).eq('id', editDebtId).eq('user_id', currentUser.id) : await sb.from('debts').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 function confirmDeleteDebt(id) {
@@ -557,7 +674,9 @@ async function deleteDebtConfirmed() {
   const { error } = await sb.from('debts').delete().eq('id', deleteDebtId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteDebtModal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 
@@ -594,7 +713,7 @@ function calculateAmortization(principal, annualRate, termMonths, paymentsMade) 
 
   let monthlyPayment;
   if (!annualRate || annualRate === 0) {
-    // 0% APR — simple division
+    // 0% APR � simple division
     monthlyPayment = principal / termMonths;
     result.monthlyPayment = Math.round(monthlyPayment * 100) / 100;
     result.totalCost = Math.round(principal * 100) / 100;
@@ -616,7 +735,7 @@ function calculateAmortization(principal, annualRate, termMonths, paymentsMade) 
     return result;
   }
 
-  // Standard amortization: M = P[r(1+r)^n] / [(1+r)^n – 1]
+  // Standard amortization: M = P[r(1+r)^n] / [(1+r)^n � 1]
   const r = annualRate / 100 / 12;
   const n = termMonths;
   const factor = Math.pow(1 + r, n);
@@ -748,7 +867,7 @@ function renderBills() {
   const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off');
   const completedFinancing = financingBills.filter(b => getBillFinancingInfo(b).status === 'paid_off');
 
-  // Render ALL active bills in the table (including financing — they're recurring payments too)
+  // Render ALL active bills in the table (including financing � they're recurring payments too)
   const activeBills = allBills.filter(b => {
     const info = getBillFinancingInfo(b);
     return !(info.isFinancing && info.status === 'paid_off');
@@ -881,7 +1000,7 @@ function renderBills() {
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                   <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">
-                    ✅ ${escapeHtml(b.name)}
+                    ? ${escapeHtml(b.name)}
                   </h5>
                   <span class="badge bg-success">Paid Off</span>
                 </div>
@@ -967,7 +1086,7 @@ function updateLoanCalcPreview() {
     }
   } else {
     preview.classList.add('d-none');
-    if (balanceDisplay) balanceDisplay.textContent = '—';
+    if (balanceDisplay) balanceDisplay.textContent = '�';
   }
 }
 
@@ -981,7 +1100,7 @@ function openBillModal(id = null) {
   const preview = document.getElementById('loanCalcPreview');
   if (preview) preview.classList.add('d-none');
   const balanceReset = document.getElementById('remainingBalanceDisplay');
-  if (balanceReset) balanceReset.textContent = '—';
+  if (balanceReset) balanceReset.textContent = '�';
 
   if (id) {
       const b = window.bills.find(x => x.id == id);
@@ -996,7 +1115,7 @@ function openBillModal(id = null) {
             if (financingFields) financingFields.classList.remove('d-none');
             if (b.interest_rate !== undefined && b.interest_rate !== null) f.billInterestRate.value = b.interest_rate;
             if (b.original_principal) f.billOriginalPrincipal.value = b.original_principal;
-            // Loan term — show in years if divisible by 12, otherwise months
+            // Loan term � show in years if divisible by 12, otherwise months
             if (b.loan_term_months) {
               const termUnit = document.getElementById('billLoanTermUnit');
               const termValue = document.getElementById('billLoanTermValue');
@@ -1029,7 +1148,7 @@ function openBillModal(id = null) {
             updateLoanCalcPreview();
             // Also compute remaining balance even without full amort (fallback)
             const balanceDisplay = document.getElementById('remainingBalanceDisplay');
-            if (balanceDisplay && balanceDisplay.textContent === '—') {
+            if (balanceDisplay && balanceDisplay.textContent === '�') {
               const info = getBillFinancingInfo(b);
               if (info.isFinancing) {
                 balanceDisplay.textContent = formatCurrency(info.remainingBalance);
@@ -1081,10 +1200,10 @@ async function saveBill() {
       record.total_amount = calc.totalCost;
     }
   }
-  // Attempt save — if new columns don't exist yet, retry without them
+  // Attempt save � if new columns don't exist yet, retry without them
   let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(record);
   if (error && error.message && error.message.includes('column')) {
-    // Columns don't exist yet in DB — strip new fields and retry
+    // Columns don't exist yet in DB � strip new fields and retry
     const baseRecord = {
       name: record.name, type: record.type, amount: record.amount,
       frequency: record.frequency, nextDueDate: record.nextDueDate, user_id: record.user_id
@@ -1096,7 +1215,9 @@ async function saveBill() {
   }
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 function showAmortizationSchedule(billId) {
@@ -1174,7 +1295,7 @@ function showAmortizationSchedule(billId) {
 
   // Update modal title
   const title = document.getElementById('amortizationModalLabel');
-  if (title) title.textContent = `Amortization Schedule — ${bill.name}`;
+  if (title) title.textContent = `Amortization Schedule � ${bill.name}`;
 
   bootstrap.Modal.getOrCreateInstance(document.getElementById('amortizationModal')).show();
 }
@@ -1189,7 +1310,9 @@ async function deleteBillConfirmed() {
   const { error } = await sb.from('bills').delete().eq('id', deleteBillId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteBillModal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 
@@ -1229,7 +1352,9 @@ async function saveIncome() {
   const { error } = editIncomeId ? await sb.from('income').update(record).eq('id', editIncomeId).eq('user_id', currentUser.id) : await sb.from('income').insert(record);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 function confirmDeleteIncome(id, name) {
@@ -1242,7 +1367,9 @@ async function deleteIncomeConfirmed() {
   const { error } = await sb.from('income').delete().eq('id', deleteIncomeId).eq('user_id', currentUser.id);
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(document.getElementById('confirmDeleteIncomeModal')).hide();
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 
@@ -1250,7 +1377,7 @@ async function deleteIncomeConfirmed() {
 // ===== DASHBOARD & CHARTING =====
 
 // This new function renders the Emergency Fund chart OR the custom message
-function renderEmergencyFundChart() {
+async function renderEmergencyFundChart() {
   const wrapper = document.getElementById('emergencyFundChartWrapper');
   if (!wrapper) return;
 
@@ -1268,7 +1395,7 @@ function renderEmergencyFundChart() {
       wrapper.appendChild(canvas);
       const theme = getThemeColors();
 
-      emergencyFundChart = safeCreateChart(canvas, {
+      emergencyFundChart = await safeCreateChart(canvas, {
           type: 'bar',
           data: {
               labels: ['Goal', 'Current'],
@@ -1318,7 +1445,9 @@ async function saveSettings() {
       statusEl.textContent = "Settings saved!";
       statusEl.className = "ms-3 text-success";
       // Re-fetch settings data to update the app state
-      await fetchAllDataFromSupabase();
+      clearCache(); // Performance: Clear cache on data mutation
+
+      await fetchAllDataFromSupabase(true);
   }
   setTimeout(() => { statusEl.textContent = ''; }, 3000);
 }
@@ -1573,7 +1702,7 @@ async function loadAndRenderBudget() {
       incomeWarning = document.createElement('div');
       incomeWarning.id = 'incomeWarningBanner';
       incomeWarning.className = 'alert alert-warning mb-3';
-      incomeWarning.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>⚠️ No income sources found for this month. <a href="income.html" class="alert-link">Add income on the Income page</a> to track your budget accurately.';
+      incomeWarning.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>?? No income sources found for this month. <a href="income.html" class="alert-link">Add income on the Income page</a> to track your budget accurately.';
       tableCard.parentNode.insertBefore(incomeWarning, tableCard);
     }
   } else if (incomeWarning) {
@@ -1670,8 +1799,8 @@ async function loadAndRenderBudget() {
           <td>${escapeHtml(rec.category || 'N/A')}</td>
           <td><s>${escapeHtml(rec.name || 'Unnamed')}</s></td>
           <td class="text-muted">${formatCurrency(needed)}</td>
-          <td class="text-muted">—</td>
-          <td class="text-muted">—</td>
+          <td class="text-muted">�</td>
+          <td class="text-muted">�</td>
           <td class="text-muted small">Removed</td>
           <td><button class="btn btn-sm btn-outline-success" onclick="restoreBudgetItem('${rec.item_id}', '${monthString}')" title="Restore to budget"><i class="bi bi-arrow-counterclockwise"></i></button></td>
       `;
@@ -1764,7 +1893,10 @@ async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
     return;
   }
 
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+
+  await fetchAllDataFromSupabase(true);
   renderAll();
 }
 
@@ -1799,7 +1931,9 @@ async function saveBudgetItem() {
 
     // THE FIX: Use the same successful pattern as your other save functions
     // 1. Fetch all data again to get the new item.
-    await fetchAllDataFromSupabase();
+    clearCache(); // Performance: Clear cache on data mutation
+
+    await fetchAllDataFromSupabase(true);
     // 2. Re-render the entire UI with the fresh data.
     renderAll();
   }
@@ -1879,7 +2013,9 @@ async function deleteBudgetItem(itemId, monthString) {
   }
 
   // Refresh the budget view
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+  await fetchAllDataFromSupabase(true);
   loadAndRenderBudget();
 }
 
@@ -1909,7 +2045,10 @@ async function restoreBudgetItem(itemId, monthString) {
     return;
   }
 
-  await fetchAllDataFromSupabase();
+  clearCache(); // Performance: Clear cache on data mutation
+
+
+  await fetchAllDataFromSupabase(true);
   loadAndRenderBudget();
 }
 
@@ -1944,7 +2083,7 @@ async function generateBudgetForMonth(monthString) {
 
     if (budgetError) throw budgetError;
 
-    // Build a set of already-budgeted item IDs (including suppressed ones — don't re-add them)
+    // Build a set of already-budgeted item IDs (including suppressed ones � don't re-add them)
     const budgetedItemIds = new Set((existingBudgets || []).map(b => b.item_id));
 
     // 3. Fetch last month's budget for variable bill amounts
@@ -2034,13 +2173,15 @@ async function generateBudgetForMonth(monthString) {
     if (insertError) throw insertError;
 
     if (statusEl) {
-      statusEl.textContent = `✅ Generated ${newEntries.length} budget entries!`;
+      statusEl.textContent = `? Generated ${newEntries.length} budget entries!`;
       statusEl.className = 'ms-2 text-success small';
     }
     setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
 
     // 6. Refresh the budget view
-    await fetchAllDataFromSupabase();
+    clearCache(); // Performance: Clear cache on data mutation
+
+    await fetchAllDataFromSupabase(true);
     loadAndRenderBudget();
 
   } catch (error) {
@@ -2102,15 +2243,15 @@ function renderUpcomingPayments() {
   }).sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
   c.innerHTML = upcoming.length ? upcoming.map(item => `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span></div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(item.amount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
 }
-function renderNetWorthChart() {
+async function renderNetWorthChart() {
   const ctx = document.getElementById('netWorthTimelineChart');
   if (!ctx) return;
   if (netWorthChart) netWorthChart.destroy();
   const snaps = dedupeSnapshotsByDate(window.snapshots || []);
   const theme = getThemeColors();
-  netWorthChart = safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#f44e24', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
+  netWorthChart = await safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#f44e24', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
 }
-function generateMonthlyCashFlowChart() {
+async function generateMonthlyCashFlowChart() {
   const ctx = document.getElementById('cashFlowChart');
   if (!ctx) return;
   if (cashFlowChart) cashFlowChart.destroy();
@@ -2145,7 +2286,7 @@ function generateMonthlyCashFlowChart() {
       });
       incomeTotals.push(monthlyIncome); expenseTotals.push(monthlyExpenses);
   }
-  cashFlowChart = safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#81b900' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#e53935' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
+  cashFlowChart = await safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#81b900' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#e53935' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
 }
 
 // ===== INITIALIZATION =====
@@ -2155,12 +2296,15 @@ function setupThemeToggle() {
 
   const themeLabel = document.querySelector('label[for="themeSwitch"]');
 
-  // This function applies the selected theme to the page
+  // This function applies the selected theme to the page (BUG-05: Fixed flicker)
   const applyTheme = (isDark) => {
       document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
       themeSwitch.checked = isDark;
       if (themeLabel) {
-          themeLabel.textContent = isDark ? 'â˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
+          // Use requestAnimationFrame to prevent flicker on page load
+          requestAnimationFrame(() => {
+              themeLabel.textContent = isDark ? '?? Light Mode' : '?? Dark Mode';
+          });
       }
   };
 
@@ -2197,7 +2341,7 @@ function init() {
     debugLog(`AUTH: Event received: ${event}`);
     currentUser = session?.user || null;
 
-    // Handle password recovery event â€" show reset password modal
+    // Handle password recovery event �" show reset password modal
     if (event === 'PASSWORD_RECOVERY') {
       const resetModal = document.getElementById('resetPasswordModal');
       if (resetModal) {
@@ -2898,7 +3042,7 @@ async function loadSharedBillsData() {
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'pending');
   
-  // Load outgoing shares (bills I'm sharing with others) — with bill + friend details
+  // Load outgoing shares (bills I'm sharing with others) � with bill + friend details
   const { data: myOutgoingShares } = await sb
     .from('bill_shares')
     .select('*, bill:bills!bill_shares_bill_id_fkey(*), shared_user:user_profiles!bill_shares_shared_with_id_user_profiles_fkey(id, username, display_name)')
