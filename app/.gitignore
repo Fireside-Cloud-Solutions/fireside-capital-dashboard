@@ -1,3 +1,6 @@
 .env
 node_modules/
 *.log
+# Gmail OAuth token (contains sensitive credentials)
+.gmail-token.json
+integrations/gmail/.gmail-token.json
