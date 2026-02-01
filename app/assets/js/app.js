@@ -678,14 +678,6 @@ function openAssetModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveAsset() {
-  // Rate limiting
-  if (!rateLimiters.save.allow('saveAsset')) {
-    const remainingMs = rateLimiters.save.getRemainingTime('saveAsset');
-    const remainingSeconds = Math.ceil(remainingMs / 1000);
-    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
-    return;
-  }
-
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -696,20 +688,26 @@ async function saveAsset() {
     return;
   }
 
-  const f = document.getElementById('assetForm');
-  const type = f.assetType.value;
-  const record = { name: f.assetName.value, type, user_id: currentUser.id };
-  if (type === 'realEstate') {
-      record.value = getRaw(f.propertyValue.value); record.loan = getRaw(f.loanAmount.value); record.nextDueDate = f.realEstateNextDueDate.value || null;
-  } else if (type === 'vehicle') {
-      record.value = getRaw(f.vehicleValue.value); record.loan = getRaw(f.vehicleLoanBalance.value); record.nextDueDate = f.vehicleNextDueDate.value || null;
-  }
-  const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId).eq('user_id', currentUser.id) : await sb.from('assets').insert(record);
-  if (error) return alert(error.message);
-  bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  clearCache(); // Performance: Clear cache on data mutation
-  await fetchAllDataFromSupabase(true);
-  renderAll();
+  // Hybrid rate limiting (client + database)
+  const operation = editAssetId ? 'update_item' : 'add_asset';
+  const allowed = await withHybridRateLimit('save', operation, async () => {
+    const f = document.getElementById('assetForm');
+    const type = f.assetType.value;
+    const record = { name: f.assetName.value, type, user_id: currentUser.id };
+    if (type === 'realEstate') {
+        record.value = getRaw(f.propertyValue.value); record.loan = getRaw(f.loanAmount.value); record.nextDueDate = f.realEstateNextDueDate.value || null;
+    } else if (type === 'vehicle') {
+        record.value = getRaw(f.vehicleValue.value); record.loan = getRaw(f.vehicleLoanBalance.value); record.nextDueDate = f.vehicleNextDueDate.value || null;
+    }
+    const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId).eq('user_id', currentUser.id) : await sb.from('assets').insert(record);
+    if (error) return alert(error.message);
+    bootstrap.Modal.getInstance(f.closest('.modal')).hide();
+    clearCache(); // Performance: Clear cache on data mutation
+    await fetchAllDataFromSupabase(true);
+    renderAll();
+  });
+  
+  if (allowed === null) return; // Rate limited
 }
 function confirmDeleteAsset(id, name) {
   deleteAssetId = id;
@@ -785,22 +783,28 @@ async function saveInvestment() {
     return;
   }
 
-  const f = document.getElementById('investmentForm');
-  const record = {
-      name: f.investmentName.value, type: f.investmentType.value, value: getRaw(f.investmentValue.value),
-      startingBalance: getRaw(f.startingBalance.value), monthlyContribution: getRaw(f.monthlyContribution.value),
-      annualReturn: getRaw(f.annualReturn.value), nextContributionDate: f.nextContributionDate.value || null,
-      user_id: currentUser.id
-  };
-  const { error } = editInvestmentId ? await sb.from('investments').update(record).eq('id', editInvestmentId).eq('user_id', currentUser.id) : await sb.from('investments').insert(record);
+  // Hybrid rate limiting (client + database)
+  const operation = editInvestmentId ? 'update_item' : 'add_investment';
+  const allowed = await withHybridRateLimit('save', operation, async () => {
+    const f = document.getElementById('investmentForm');
+    const record = {
+        name: f.investmentName.value, type: f.investmentType.value, value: getRaw(f.investmentValue.value),
+        startingBalance: getRaw(f.startingBalance.value), monthlyContribution: getRaw(f.monthlyContribution.value),
+        annualReturn: getRaw(f.annualReturn.value), nextContributionDate: f.nextContributionDate.value || null,
+        user_id: currentUser.id
+    };
+    const { error } = editInvestmentId ? await sb.from('investments').update(record).eq('id', editInvestmentId).eq('user_id', currentUser.id) : await sb.from('investments').insert(record);
 
-  editInvestmentId = null;
-  if (error) return alert(error.message);
+    editInvestmentId = null;
+    if (error) return alert(error.message);
 
-  bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  clearCache(); // Performance: Clear cache on data mutation
-  await fetchAllDataFromSupabase(true);
-  renderAll();
+    bootstrap.Modal.getInstance(f.closest('.modal')).hide();
+    clearCache(); // Performance: Clear cache on data mutation
+    await fetchAllDataFromSupabase(true);
+    renderAll();
+  });
+  
+  if (allowed === null) return; // Rate limited
 }
 function confirmDeleteInvestment(id, name) {
   // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
@@ -864,14 +868,6 @@ function openDebtModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveDebt() {
-  // Rate limiting
-  if (!rateLimiters.save.allow('saveDebt')) {
-    const remainingMs = rateLimiters.save.getRemainingTime('saveDebt');
-    const remainingSeconds = Math.ceil(remainingMs / 1000);
-    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
-    return;
-  }
-
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -882,19 +878,25 @@ async function saveDebt() {
     return;
   }
 
-  const f = document.getElementById('debtForm');
-  const record = {
-      name: f.debtName.value, type: f.debtType.value, amount: getRaw(f.debtAmount.value), interestRate: getRaw(f.debtInterest.value),
-      term: getRaw(f.debtTerm.value), monthlyPayment: getRaw(f.debtMonthly.value),
-      nextDueDate: f.debtNextPaymentDate.value || null, user_id: currentUser.id
-  };
-  const { error } = editDebtId ? await sb.from('debts').update(record).eq('id', editDebtId).eq('user_id', currentUser.id) : await sb.from('debts').insert(record);
-  if (error) return alert(error.message);
-  bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  clearCache(); // Performance: Clear cache on data mutation
+  // Hybrid rate limiting (client + database)
+  const operation = editDebtId ? 'update_item' : 'add_debt';
+  const allowed = await withHybridRateLimit('save', operation, async () => {
+    const f = document.getElementById('debtForm');
+    const record = {
+        name: f.debtName.value, type: f.debtType.value, amount: getRaw(f.debtAmount.value), interestRate: getRaw(f.debtInterest.value),
+        term: getRaw(f.debtTerm.value), monthlyPayment: getRaw(f.debtMonthly.value),
+        nextDueDate: f.debtNextPaymentDate.value || null, user_id: currentUser.id
+    };
+    const { error } = editDebtId ? await sb.from('debts').update(record).eq('id', editDebtId).eq('user_id', currentUser.id) : await sb.from('debts').insert(record);
+    if (error) return alert(error.message);
+    bootstrap.Modal.getInstance(f.closest('.modal')).hide();
+    clearCache(); // Performance: Clear cache on data mutation
 
-  await fetchAllDataFromSupabase(true);
-  renderAll();
+    await fetchAllDataFromSupabase(true);
+    renderAll();
+  });
+  
+  if (allowed === null) return; // Rate limited
 }
 function confirmDeleteDebt(id) {
   deleteDebtId = id;
@@ -1456,14 +1458,6 @@ function openBillModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveBill() {
-  // Rate limiting
-  if (!rateLimiters.save.allow('saveBill')) {
-    const remainingMs = rateLimiters.save.getRemainingTime('saveBill');
-    const remainingSeconds = Math.ceil(remainingMs / 1000);
-    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
-    return;
-  }
-
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -1474,37 +1468,40 @@ async function saveBill() {
     return;
   }
 
-  const f = document.getElementById('billForm');
-  const record = {
-      name: f.billName.value, type: f.billType.value, amount: getRaw(f.billAmount.value),
-      frequency: f.billFrequency.value, nextDueDate: f.billNextDueDate.value || null, user_id: currentUser.id
-  };
-  // Add financing fields if financing section is visible (type match, existing data, or FINANCING_META)
-  const financingVisible = !document.getElementById('financingFields').classList.contains('d-none');
-  if (financingVisible) {
-    const interestRate = f.billInterestRate.value;
-    const originalPrincipal = f.billOriginalPrincipal.value;
-    const loanTermMonths = getLoanTermMonths();
-    const startDate = f.billStartDate.value;
-    const paymentsMade = f.billPaymentsMade.value;
-    const totalFinanced = f.billTotalFinanced.value;
-    // Only include fields that have values (graceful if columns don't exist yet)
-    if (interestRate !== '') record.interest_rate = parseFloat(interestRate);
-    if (originalPrincipal !== '') record.original_principal = parseFloat(originalPrincipal);
-    if (loanTermMonths > 0) record.loan_term_months = loanTermMonths;
-    if (startDate) record.start_date = startDate;
-    if (paymentsMade !== '') record.payments_made = parseInt(paymentsMade);
-    if (totalFinanced !== '') {
-      record.total_amount = parseFloat(totalFinanced);
-    } else if (originalPrincipal && loanTermMonths > 0) {
-      // Auto-calculate total_amount from amortization
-      const calc = calculateAmortization(parseFloat(originalPrincipal), parseFloat(interestRate) || 0, loanTermMonths, 0);
-      record.total_amount = calc.totalCost;
+  // Hybrid rate limiting (client + database)
+  const operation = editBillId ? 'update_item' : 'add_bill';
+  const allowed = await withHybridRateLimit('save', operation, async () => {
+    const f = document.getElementById('billForm');
+    const record = {
+        name: f.billName.value, type: f.billType.value, amount: getRaw(f.billAmount.value),
+        frequency: f.billFrequency.value, nextDueDate: f.billNextDueDate.value || null, user_id: currentUser.id
+    };
+    // Add financing fields if financing section is visible (type match, existing data, or FINANCING_META)
+    const financingVisible = !document.getElementById('financingFields').classList.contains('d-none');
+    if (financingVisible) {
+      const interestRate = f.billInterestRate.value;
+      const originalPrincipal = f.billOriginalPrincipal.value;
+      const loanTermMonths = getLoanTermMonths();
+      const startDate = f.billStartDate.value;
+      const paymentsMade = f.billPaymentsMade.value;
+      const totalFinanced = f.billTotalFinanced.value;
+      // Only include fields that have values (graceful if columns don't exist yet)
+      if (interestRate !== '') record.interest_rate = parseFloat(interestRate);
+      if (originalPrincipal !== '') record.original_principal = parseFloat(originalPrincipal);
+      if (loanTermMonths > 0) record.loan_term_months = loanTermMonths;
+      if (startDate) record.start_date = startDate;
+      if (paymentsMade !== '') record.payments_made = parseInt(paymentsMade);
+      if (totalFinanced !== '') {
+        record.total_amount = parseFloat(totalFinanced);
+      } else if (originalPrincipal && loanTermMonths > 0) {
+        // Auto-calculate total_amount from amortization
+        const calc = calculateAmortization(parseFloat(originalPrincipal), parseFloat(interestRate) || 0, loanTermMonths, 0);
+        record.total_amount = calc.totalCost;
+      }
     }
-  }
-  // Attempt save � if new columns don't exist yet, retry without them
-  let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(record);
-  if (error && error.message && error.message.includes('column')) {
+    // Attempt save � if new columns don't exist yet, retry without them
+    let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(record);
+    if (error && error.message && error.message.includes('column')) {
     // Columns don't exist yet in DB � strip new fields and retry
     const baseRecord = {
       name: record.name, type: record.type, amount: record.amount,
@@ -1512,15 +1509,18 @@ async function saveBill() {
     };
     if (record.total_amount) baseRecord.total_amount = record.total_amount;
     if (record.payments_made !== undefined) baseRecord.payments_made = record.payments_made;
-    const retry = editBillId ? await sb.from('bills').update(baseRecord).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(baseRecord);
-    error = retry.error;
-  }
-  if (error) return alert(error.message);
-  bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  clearCache(); // Performance: Clear cache on data mutation
+      const retry = editBillId ? await sb.from('bills').update(baseRecord).eq('id', editBillId).eq('user_id', currentUser.id) : await sb.from('bills').insert(baseRecord);
+      error = retry.error;
+    }
+    if (error) return alert(error.message);
+    bootstrap.Modal.getInstance(f.closest('.modal')).hide();
+    clearCache(); // Performance: Clear cache on data mutation
 
-  await fetchAllDataFromSupabase(true);
-  renderAll();
+    await fetchAllDataFromSupabase(true);
+    renderAll();
+  });
+  
+  if (allowed === null) return; // Rate limited
 }
 function showAmortizationSchedule(billId) {
   const bill = (window.bills || []).find(b => b.id == billId);
@@ -1697,14 +1697,6 @@ function openIncomeModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveIncome() {
-  // Rate limiting
-  if (!rateLimiters.save.allow('saveIncome')) {
-    const remainingMs = rateLimiters.save.getRemainingTime('saveIncome');
-    const remainingSeconds = Math.ceil(remainingMs / 1000);
-    alert(`Too many save requests. Please wait ${remainingSeconds} seconds.`);
-    return;
-  }
-
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
@@ -1715,18 +1707,24 @@ async function saveIncome() {
     return;
   }
 
-  const f = document.getElementById('incomeForm');
-  const record = {
-      name: f.incomeName.value, type: f.incomeType.value, amount: getRaw(f.incomeAmount.value),
-      frequency: f.incomeFrequency.value, nextDueDate: f.incomeNextDueDate.value || null, user_id: currentUser.id
-  };
-  const { error } = editIncomeId ? await sb.from('income').update(record).eq('id', editIncomeId).eq('user_id', currentUser.id) : await sb.from('income').insert(record);
-  if (error) return alert(error.message);
-  bootstrap.Modal.getInstance(f.closest('.modal')).hide();
-  clearCache(); // Performance: Clear cache on data mutation
+  // Hybrid rate limiting (client + database)
+  const operation = editIncomeId ? 'update_item' : 'add_income';
+  const allowed = await withHybridRateLimit('save', operation, async () => {
+    const f = document.getElementById('incomeForm');
+    const record = {
+        name: f.incomeName.value, type: f.incomeType.value, amount: getRaw(f.incomeAmount.value),
+        frequency: f.incomeFrequency.value, nextDueDate: f.incomeNextDueDate.value || null, user_id: currentUser.id
+    };
+    const { error } = editIncomeId ? await sb.from('income').update(record).eq('id', editIncomeId).eq('user_id', currentUser.id) : await sb.from('income').insert(record);
+    if (error) return alert(error.message);
+    bootstrap.Modal.getInstance(f.closest('.modal')).hide();
+    clearCache(); // Performance: Clear cache on data mutation
 
-  await fetchAllDataFromSupabase(true);
-  renderAll();
+    await fetchAllDataFromSupabase(true);
+    renderAll();
+  });
+  
+  if (allowed === null) return; // Rate limited
 }
 function confirmDeleteIncome(id, name) {
   deleteIncomeId = id;

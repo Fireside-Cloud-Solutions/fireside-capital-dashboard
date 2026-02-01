@@ -8,12 +8,15 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-integrate-security-scripts | Add security scripts to 10 HTML files | 🔄 Running |
+| Builder | builder-accessibility-wcag | WCAG AA compliance (aria-labels, focus indicators, keyboard nav) | 🔄 Running |
+| Builder | builder-shared-bill-deletion-warning | Add confirmation dialog for shared bill deletion | 🔄 Running |
+| Builder | builder-rate-limiting | Implement rate limiting (10 connections/hr, 20 bills/min) | 🔄 Running |
 
 ## Completed Sub-Agents (Today - Feb 1)
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-integrate-security-scripts | Security script integration | ✅ Complete (commit b1acdbc, XSS/CSRF active on all pages) |
 | Connector | connector-build-gmail-integration | Gmail integration (bill parsing) | ✅ Built & tested (60% accuracy, commit 89c044a, blocked by GitHub secrets) |
 | Builder | builder-fix-xss-csrf | XSS & CSRF security fixes | ✅ Security modules created (commit df9f738) |
 | Builder | builder-fix-bills-calculation | Monthly bills calculation bug | ✅ Fixed (commit 255ea0a) |

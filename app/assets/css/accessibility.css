@@ -1,0 +1,459 @@
+/* =================================================================
+   Fireside Capital — WCAG 2.1 AA Accessibility Enhancements
+   Target: 95+ axe DevTools score
+   Compliance: WCAG 2.1 Level AA
+   Last Updated: January 2025
+   ================================================================= */
+
+/* -----------------------------------------------------------------
+   SKIP NAVIGATION LINK — WCAG 2.4.1 (Bypass Blocks)
+   ----------------------------------------------------------------- */
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-brand);
+  padding: var(--space-3) var(--space-5);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-body);
+  border-radius: 0 0 var(--radius-md) 0;
+  z-index: var(--z-max);
+  text-decoration: none;
+  box-shadow: var(--shadow-lg);
+  transition: top var(--duration-normal) var(--ease-out);
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------
+   FOCUS INDICATORS — WCAG 2.4.7 (Focus Visible)
+   Enhanced for better visibility across all interactive elements
+   ----------------------------------------------------------------- */
+
+/* Base focus ring for all focusable elements */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Enhanced focus for buttons */
+button:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--color-secondary-rgb), 0.2);
+}
+
+/* Enhanced focus for form controls */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 0;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(var(--color-secondary-rgb), 0.2);
+}
+
+/* Enhanced focus for links */
+a:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Focus for sidebar navigation links */
+.sidebar a:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: -2px;
+  background-color: var(--color-bg-3);
+}
+
+/* Focus for dropdown items */
+.dropdown-item:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: -2px;
+  background-color: var(--color-bg-3);
+}
+
+/* Focus for checkbox and radio inputs */
+.form-check-input:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(var(--color-secondary-rgb), 0.2);
+}
+
+/* Focus for icon-only buttons */
+.btn-icon:focus-visible,
+.btn-close:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--color-secondary-rgb), 0.25);
+}
+
+/* Focus for table action buttons */
+.table .btn:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 1px;
+  position: relative;
+  z-index: 2;
+}
+
+/* -----------------------------------------------------------------
+   KEYBOARD NAVIGATION ENHANCEMENTS
+   ----------------------------------------------------------------- */
+
+/* Ensure button groups maintain focus visibility */
+.btn-group .btn:focus-visible {
+  z-index: 3;
+  outline: 2px solid var(--color-secondary);
+}
+
+/* Card interactive elements */
+.card:focus-within {
+  border-color: var(--color-border-default);
+}
+
+/* -----------------------------------------------------------------
+   SCREEN READER ONLY TEXT — Utility class
+   ----------------------------------------------------------------- */
+
+.sr-only,
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus,
+.visually-hidden-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* -----------------------------------------------------------------
+   COLOR CONTRAST ENHANCEMENTS — WCAG 1.4.3 (Contrast Minimum)
+   Ensure 4.5:1 ratio for normal text, 3:1 for large text
+   ----------------------------------------------------------------- */
+
+/* Increase contrast for secondary text */
+.text-muted,
+.text-secondary,
+small {
+  color: #b8b8b8 !important; /* Increased from #b0b0b0 for better contrast */
+}
+
+/* Table header contrast */
+.table th {
+  color: #c0c0c0 !important; /* Increased contrast */
+}
+
+/* Form label contrast */
+.form-label {
+  color: #c0c0c0 !important; /* Increased contrast */
+}
+
+/* Placeholder text contrast */
+.form-control::placeholder {
+  color: #a0a0a0; /* Increased from #999999 */
+}
+
+/* Card heading contrast */
+.card h5,
+.chart-card h5,
+.dashboard-card h5 {
+  color: #c0c0c0 !important; /* Increased contrast */
+}
+
+/* Light mode contrast fixes */
+body[data-theme='light'] .text-muted,
+body[data-theme='light'] .text-secondary,
+body[data-theme='light'] small {
+  color: #757575 !important; /* Darker for better contrast on light bg */
+}
+
+body[data-theme='light'] .table th {
+  color: #666666 !important;
+}
+
+body[data-theme='light'] .form-label {
+  color: #666666 !important;
+}
+
+body[data-theme='light'] .form-control::placeholder {
+  color: #888888;
+}
+
+/* -----------------------------------------------------------------
+   HOVER AND FOCUS STATES — Ensure clear interactive states
+   ----------------------------------------------------------------- */
+
+/* Button hover + focus combined state */
+.btn:hover:focus-visible {
+  box-shadow: 0 0 0 4px rgba(var(--color-secondary-rgb), 0.3);
+}
+
+/* Link hover + focus combined */
+a:hover:focus-visible {
+  box-shadow: 0 0 0 3px rgba(var(--color-secondary-rgb), 0.2);
+}
+
+/* -----------------------------------------------------------------
+   ARIA LIVE REGIONS — For dynamic content updates
+   ----------------------------------------------------------------- */
+
+[aria-live="polite"],
+[aria-live="assertive"] {
+  position: relative;
+}
+
+/* Visual indicator for live regions (dev mode only - remove in prod) */
+/* [aria-live]:not([aria-live="off"])::before {
+  content: "LIVE";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 10px;
+  color: var(--color-warning);
+  font-weight: bold;
+  opacity: 0.5;
+} */
+
+/* -----------------------------------------------------------------
+   MODAL ACCESSIBILITY ENHANCEMENTS
+   ----------------------------------------------------------------- */
+
+/* Ensure modal backdrop doesn't interfere with focus trap */
+.modal-backdrop {
+  pointer-events: auto;
+}
+
+/* Modal focus trap visual indicator */
+.modal:focus-within {
+  outline: none;
+}
+
+/* -----------------------------------------------------------------
+   TABLE ACCESSIBILITY
+   ----------------------------------------------------------------- */
+
+/* Ensure table headers are clearly distinct */
+.table thead th {
+  font-weight: var(--weight-semibold);
+  border-bottom-width: 2px;
+}
+
+/* Table row hover state for keyboard navigation */
+.table tbody tr:focus-within {
+  background-color: rgba(var(--color-secondary-rgb), 0.08);
+  outline: 2px solid var(--color-secondary);
+  outline-offset: -2px;
+}
+
+/* -----------------------------------------------------------------
+   FORM ACCESSIBILITY
+   ----------------------------------------------------------------- */
+
+/* Required field indicator */
+.form-label .required::after,
+.form-label .text-danger::after {
+  content: " *";
+  color: var(--color-danger);
+}
+
+/* Invalid form controls */
+.form-control:invalid:focus,
+.form-select:invalid:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb), 0.2);
+}
+
+/* Valid form controls */
+.form-control:valid:focus,
+.form-select:valid:focus {
+  border-color: var(--color-success);
+}
+
+/* Error message styling */
+.invalid-feedback,
+.error-message {
+  color: var(--color-danger);
+  font-size: var(--text-body-sm);
+  margin-top: var(--space-1);
+}
+
+/* -----------------------------------------------------------------
+   DROPDOWN ACCESSIBILITY
+   ----------------------------------------------------------------- */
+
+/* Dropdown current selection indicator */
+.dropdown-item:focus,
+.dropdown-item:hover {
+  position: relative;
+}
+
+.dropdown-item[aria-current="true"]::before {
+  content: "✓";
+  position: absolute;
+  left: 8px;
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+/* -----------------------------------------------------------------
+   NOTIFICATION/ALERT ACCESSIBILITY
+   ----------------------------------------------------------------- */
+
+/* Alert role styling */
+[role="alert"],
+.alert {
+  position: relative;
+}
+
+/* Badge accessibility - ensure sufficient contrast */
+.badge {
+  font-weight: var(--weight-semibold);
+  min-width: 20px;
+  text-align: center;
+}
+
+/* -----------------------------------------------------------------
+   RESPONSIVE TOUCH TARGETS — WCAG 2.5.5 (Target Size)
+   Minimum 44x44px for all interactive elements
+   ----------------------------------------------------------------- */
+
+/* Ensure all buttons meet minimum touch target */
+.btn,
+button,
+a.btn,
+.btn-icon {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Form controls touch targets */
+.form-control,
+.form-select,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px;
+}
+
+/* Checkbox and radio larger touch targets */
+.form-check-input {
+  width: 20px;
+  height: 20px;
+  margin-top: 0.125rem;
+}
+
+.form-check {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile touch target enhancements */
+@media (max-width: 575.98px) {
+  .btn,
+  button,
+  .btn-icon {
+    min-height: 48px;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .form-control,
+  .form-select {
+    min-height: 48px;
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+
+  /* Table action buttons on mobile */
+  .table .btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* -----------------------------------------------------------------
+   HIGH CONTRAST MODE SUPPORT
+   ----------------------------------------------------------------- */
+
+@media (prefers-contrast: high) {
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+
+  .btn {
+    border-width: 2px;
+  }
+
+  .form-control,
+  .form-select {
+    border-width: 2px;
+  }
+}
+
+/* -----------------------------------------------------------------
+   REDUCED MOTION SUPPORT — WCAG 2.3.3 (Animation from Interactions)
+   ----------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .skip-link {
+    transition: none;
+  }
+}
+
+/* -----------------------------------------------------------------
+   PRINT ACCESSIBILITY
+   ----------------------------------------------------------------- */
+
+@media print {
+  .skip-link,
+  .sidebar-toggle,
+  .btn-icon,
+  .dropdown {
+    display: none !important;
+  }
+
+  :focus-visible {
+    outline: none;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+}
