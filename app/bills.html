@@ -57,7 +57,7 @@
         <div class="page-header-actions">
           <h2>Bills</h2>
           <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary" id="scanEmailBillsBtn" aria-label="Scan email for bills">
+            <button class="btn btn-secondary" id="scanEmailBillsBtn" aria-label="Scan email for bills">
               <i class="bi bi-envelope-check"></i> Scan Email for Bills
             </button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal" aria-label="Add new bill">
@@ -67,17 +67,17 @@
         </div>
         <div>
           <div id="loggedOutState">
-            <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+            <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
               <i class="bi bi-box-arrow-in-right"></i> Login
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal">
+            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#signupModal">
               <i class="bi bi-person-plus"></i> Sign Up
             </button>
           </div>
           <div id="loggedInState" class="d-none">
             <div class="d-flex align-items-center gap-3">
               <div class="dropdown" id="notificationDropdown">
-                <button class="btn btn-outline-primary btn-icon position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBell">
+                <button class="btn btn-outline-secondary btn-icon position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBell">
                   <i class="bi bi-bell"></i>
                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">0</span>
                 </button>
@@ -91,7 +91,7 @@
                 </ul>
               </div>
               <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                   Welcome, <span id="username">User</span>!
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -335,16 +335,16 @@
               <div class="row g-3 mt-2">
                 <div class="col-12">
                   <label class="form-label">Remaining Balance</label>
-                  <div id="remainingBalanceDisplay" class="form-control-plaintext fw-semibold" style="color: var(--color-primary); font-size: 1.1rem;">—</div>
+                  <div id="remainingBalanceDisplay" class="form-control-plaintext fw-semibold" style="color: var(--color-primary); font-size: 1.1rem;">ï¿½</div>
                 </div>
               </div>
               <div id="loanCalcPreview" class="mt-3 d-none">
                 <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
                   <div class="card-body py-2 px-3">
                     <small style="color: var(--color-text-tertiary);">Calculated Monthly Payment: </small>
-                    <strong id="calcMonthlyPayment" style="color: var(--color-primary);">—</strong>
+                    <strong id="calcMonthlyPayment" style="color: var(--color-primary);">ï¿½</strong>
                     <small class="ms-3" style="color: var(--color-text-tertiary);">Total Interest: </small>
-                    <strong id="calcTotalInterest" style="color: var(--color-secondary);">—</strong>
+                    <strong id="calcTotalInterest" style="color: var(--color-secondary);">ï¿½</strong>
                   </div>
                 </div>
               </div>
