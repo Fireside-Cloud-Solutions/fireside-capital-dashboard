@@ -204,7 +204,7 @@ async function signUp(email, password, firstName, lastName) {
       );
       document.getElementById('signupForm')?.reset();
     } else {
-      // Auto-confirmed â€” session exists
+      // Auto-confirmed â€" session exists
       showAuthAlert('signupAlert', 'âœ… Account created successfully! Logging you in...', 'success');
       setTimeout(() => {
         bootstrap.Modal.getInstance(document.getElementById('signupModal'))?.hide();
@@ -299,7 +299,7 @@ async function logout() { await sb.auth.signOut(); }
 // --- THE DEBUGGING FUNCTION ---
 async function fetchAllDataFromSupabase() {
   if (!currentUser) return; // Exit if no user is logged in
-  
+
   try {
       // Fetch all data streams at the same time
       const [assetsRes, investmentsRes, debtsRes, billsRes, incomeRes, snapshotsRes, settingsRes] = await Promise.all([
@@ -339,14 +339,14 @@ async function fetchAllDataFromSupabase() {
 
 function renderAll() {
   // Render all the tables for the sub-pages
-  renderAssets(); 
-  renderInvestments(); 
-  renderDebts(); 
-  renderBills(); 
+  renderAssets();
+  renderInvestments();
+  renderDebts();
+  renderBills();
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
-  // Use 'totalInvestments' as the check â€” it only exists on the dashboard, not reports.html
+  // Use 'totalInvestments' as the check â€" it only exists on the dashboard, not reports.html
   if (document.getElementById('totalInvestments')) {
       updateDashboardCards();
       renderUpcomingPayments();
@@ -469,7 +469,7 @@ function openInvestmentModal(id = null) {
       if(inv) {
           f.investmentName.value = inv.name; f.investmentType.value = inv.type; f.investmentValue.value = inv.value;
           f.startingBalance.value = inv.startingBalance || '';
-          f.monthlyContribution.value = inv.monthlyContribution; f.annualReturn.value = inv.annualReturn; 
+          f.monthlyContribution.value = inv.monthlyContribution; f.annualReturn.value = inv.annualReturn;
           f.nextContributionDate.value = inv.nextContributionDate;
       }
   }
@@ -1141,11 +1141,11 @@ async function loadAndRenderBudget() {
       // Wait 50 milliseconds and check again
       await new Promise(resolve => setTimeout(resolve, 50));
   }
-  
+
   // If data is still not available after waiting, show a clear error message.
   if (!window.bills || !window.debts) {
       console.error("Budget page timeout: Data is not available after 3 seconds.");
-      document.getElementById('budgetAssignmentTable').innerHTML = `<tr><td colspan="6" class="text-center text-danger">Could not load bill and debt data. Please try refreshing the page.</td></tr>`;
+      document.getElementById('budgetAssignmentTable').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Could not load bill and debt data. Please try refreshing the page.</td></tr>`;
       return;
   }
   // --- END OF FIX #1 ---
@@ -1156,12 +1156,14 @@ async function loadAndRenderBudget() {
   }
 
   let budgetAssignments = {};
+  let allBudgetRecords = [];
   if (currentUser) {
       const { data: assignments, error } = await sb.from('budgets').select('*').eq('user_id', currentUser.id).eq('month', monthString);
       if (error) {
           console.error("Could not fetch saved budget assignments:", error.message);
       } else {
-          (assignments || []).forEach(a => { budgetAssignments[a.item_id] = a.assigned_amount; });
+          allBudgetRecords = assignments || [];
+          allBudgetRecords.forEach(a => { budgetAssignments[a.item_id] = a.assigned_amount; });
       }
   }
 
@@ -1175,7 +1177,7 @@ async function loadAndRenderBudget() {
 
   const tbody = document.getElementById('budgetAssignmentTable');
   tbody.innerHTML = '';
-  
+
   // Filter out paid-off financing items from the budget display
   const budgetItems = [...(window.bills || []), ...(window.debts || [])].filter(item => {
       if (!item) return false;
@@ -1188,6 +1190,9 @@ async function loadAndRenderBudget() {
       return true;
   });
 
+  // Collect IDs of all bills/debts so we can identify standalone budget items
+  const billDebtIds = new Set(budgetItems.map(item => item.id).filter(Boolean));
+
   budgetItems.forEach(item => {
       if (!item.id) {
           debugLog("Skipping an invalid budget item without an ID:", item);
@@ -1198,11 +1203,11 @@ async function loadAndRenderBudget() {
       const assigned = budgetAssignments[itemId] || 0;
       const remaining = needed - assigned;
       const fundingPercent = needed > 0 ? (assigned / needed) * 100 : (assigned > 0 ? 100 : 0);
-      
+
       let progressBarClass = 'bg-dashboard-green';
       if (fundingPercent > 100) progressBarClass = 'bg-dashboard-red';
       else if (fundingPercent < 100) progressBarClass = 'bg-dashboard-yellow';
-      
+
       const remainingTextColor = remaining <= 0 ? 'text-dashboard-green' : 'text-dashboard-yellow';
 
       const row = document.createElement('tr');
@@ -1211,6 +1216,32 @@ async function loadAndRenderBudget() {
           <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${assigned.toFixed(2)}" data-item-id="${item.id}" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
           <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${Math.min(fundingPercent, 100)}%">${Math.round(fundingPercent)}%</div></div></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${item.id}', '${monthString}')" title="Remove from budget"><i class="bi bi-trash"></i></button></td>
+      `;
+      tbody.appendChild(row);
+  });
+
+  // Render standalone budget items (manually added, not tied to a bill/debt)
+  const standaloneItems = allBudgetRecords.filter(rec => rec.item_id && !billDebtIds.has(rec.item_id) && rec.item_type === 'custom');
+  standaloneItems.forEach(rec => {
+      const needed = getRaw(rec.needed_amount) || 0;
+      const assigned = getRaw(rec.assigned_amount) || 0;
+      const remaining = needed - assigned;
+      const fundingPercent = needed > 0 ? (assigned / needed) * 100 : (assigned > 0 ? 100 : 0);
+
+      let progressBarClass = 'bg-dashboard-green';
+      if (fundingPercent > 100) progressBarClass = 'bg-dashboard-red';
+      else if (fundingPercent < 100) progressBarClass = 'bg-dashboard-yellow';
+
+      const remainingTextColor = remaining <= 0 ? 'text-dashboard-green' : 'text-dashboard-yellow';
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+          <td>${escapeHtml(rec.category || 'Custom')}</td><td>${escapeHtml(rec.name || 'Unnamed')}</td><td>${formatCurrency(needed)}</td>
+          <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${assigned.toFixed(2)}" data-item-id="${rec.item_id}" data-item-type="custom" step="0.01"></div></td>
+          <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
+          <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${Math.min(fundingPercent, 100)}%">${Math.round(fundingPercent)}%</div></div></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBudgetItem('${rec.item_id}', '${monthString}')" title="Remove from budget"><i class="bi bi-trash"></i></button></td>
       `;
       tbody.appendChild(row);
   });
@@ -1221,43 +1252,49 @@ async function loadAndRenderBudget() {
       const itemId = e.target.getAttribute('data-item-id');
       const assignedAmount = getRaw(e.target.value);
       if (!currentUser || !itemId) return;
-    
-      // ðŸ§  NEW: Derive item type
-      const isBill = window.bills?.some(b => b.id === itemId);
-      const itemType = isBill ? 'bill' : 'debt';
-    
+
+      // Derive item type (custom items have data-item-type attribute)
+      const explicitType = e.target.getAttribute('data-item-type');
+      let itemType;
+      if (explicitType === 'custom') {
+        itemType = 'custom';
+      } else {
+        const isBill = window.bills?.some(b => b.id === itemId);
+        itemType = isBill ? 'bill' : 'debt';
+      }
+
       await saveBudgetAssignment(itemId, assignedAmount, itemType);
-    
-    
+
+
       const totalIncome = (window.income || []).reduce((sum, i) => sum + getRaw(i.amount), 0);
       const allAssignedInputs = Array.from(document.querySelectorAll('.assigned-input'));
       const newTotalAssigned = allAssignedInputs.reduce((sum, currentInput) => sum + getRaw(currentInput.value), 0);
       const newRemainingToBudget = totalIncome - newTotalAssigned;
-    
+
       if(document.getElementById('assignedAmount')) document.getElementById('assignedAmount').textContent = formatCurrency(newTotalAssigned);
       if(document.getElementById('remainingToBudget')) document.getElementById('remainingToBudget').textContent = formatCurrency(newRemainingToBudget);
-    
+
       const row = e.target.closest('tr');
       const needed = getRaw(row.cells[2].textContent);
       const remainingCell = row.cells[4];
       const progressBar = row.querySelector('.progress-bar');
-    
+
       const remaining = needed - assignedAmount;
       const fundingPercent = needed > 0 ? (assignedAmount / needed) * 100 : (assignedAmount > 0 ? 100 : 0);
-    
+
       remainingCell.textContent = formatCurrency(remaining);
-    
+
       let pBarClass = 'bg-dashboard-green';
       if (fundingPercent > 100) pBarClass = 'bg-dashboard-red';
       else if (fundingPercent < 100) pBarClass = 'bg-dashboard-yellow';
-    
+
       progressBar.className = `progress-bar ${pBarClass}`;
       progressBar.style.width = `${Math.min(fundingPercent, 100)}%`;
       progressBar.textContent = `${Math.round(fundingPercent)}%`;
-    
+
       const remTextColor = remaining <= 0 ? 'text-dashboard-green' : 'text-dashboard-yellow';
       remainingCell.className = `fw-bold ${remTextColor}`;
-    });    
+    });
   });
 }
 async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
@@ -1287,18 +1324,24 @@ async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
   renderAll();
 }
 
-// This function saves a single assignment value to Supabase
+// This function saves a manually-added budget item to Supabase
 async function saveBudgetItem() {
   if (!currentUser) return;
   const monthString = `${currentBudgetMonth.getFullYear()}-${(currentBudgetMonth.getMonth() + 1).toString().padStart(2, '0')}`;
   
+  // Generate a unique item_id for standalone/custom budget items
+  const customItemId = crypto.randomUUID ? crypto.randomUUID() : 'custom-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  const neededAmount = getRaw(document.getElementById('budgetItemNeeded').value);
+
   const record = {
     user_id: currentUser.id,
     month: monthString,
+    item_id: customItemId,
+    item_type: 'custom',
     name: document.getElementById('budgetItemName').value,
     category: document.getElementById('budgetItemCategory').value,
-    needed_amount: getRaw(document.getElementById('budgetItemNeeded').value),
-    assigned_amount: getRaw(document.getElementById('budgetItemNeeded').value)
+    needed_amount: neededAmount,
+    assigned_amount: neededAmount
   };
 
   const { error } = await sb.from('budgets').insert(record);
@@ -1309,13 +1352,36 @@ async function saveBudgetItem() {
     // Hide the modal and reset the form
     bootstrap.Modal.getInstance(document.getElementById('addBudgetItemModal')).hide();
     document.getElementById('budgetItemForm').reset();
-    
+
     // THE FIX: Use the same successful pattern as your other save functions
     // 1. Fetch all data again to get the new item.
-    await fetchAllDataFromSupabase(); 
+    await fetchAllDataFromSupabase();
     // 2. Re-render the entire UI with the fresh data.
-    renderAll(); 
+    renderAll();
   }
+}
+
+// Delete a budget item for a specific month
+async function deleteBudgetItem(itemId, monthString) {
+  if (!currentUser || !itemId) return;
+  if (!confirm('Remove this item from the budget for this month?')) return;
+
+  const { error } = await sb
+    .from('budgets')
+    .delete()
+    .eq('user_id', currentUser.id)
+    .eq('month', monthString)
+    .eq('item_id', itemId);
+
+  if (error) {
+    console.error("Error deleting budget item:", error);
+    alert("Could not delete the budget item: " + error.message);
+    return;
+  }
+
+  // Refresh the budget view
+  await fetchAllDataFromSupabase();
+  loadAndRenderBudget();
 }
 
 // ===== BUDGET AUTO-POPULATION =====
@@ -1601,8 +1667,8 @@ function init() {
   sb.auth.onAuthStateChange((event, session) => {
     debugLog(`AUTH: Event received: ${event}`);
     currentUser = session?.user || null;
-  
-    // Handle password recovery event â€” show reset password modal
+
+    // Handle password recovery event â€" show reset password modal
     if (event === 'PASSWORD_RECOVERY') {
       const resetModal = document.getElementById('resetPasswordModal');
       if (resetModal) {
@@ -1616,20 +1682,20 @@ function init() {
     if (document.getElementById('dataContainer')) {
       document.getElementById('dataContainer').style.visibility = currentUser ? 'visible' : 'hidden';
     }
-  
+
     if (currentUser) {
       document.getElementById('username').textContent = currentUser.user_metadata?.first_name || currentUser.email;
-  
+
       fetchAllDataFromSupabase().then(() => {
         renderAll();
         renderAdditionalCharts();
       });
-  
+
     } else {
       renderAll(); // Render empty tables on logout
     }
   });
-  
+
   // Attach all event listeners safely
   document.body.addEventListener('click', (e) => {
       if (e.target.closest('#logoutButton')) {
