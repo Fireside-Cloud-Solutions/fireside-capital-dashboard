@@ -2,8 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
-const { searchBillEmails } = require('../integrations/gmail/gmail-client');
-const { parseBillEmails } = require('../integrations/gmail/bill-parser');
+const { searchBillEmails } = require('../../integrations/gmail/gmail-client');
+const { parseBillEmails } = require('../../integrations/gmail/bill-parser');
 
 const app = express();
 app.use(express.json());

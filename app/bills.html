@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />`n  <link rel="stylesheet" href="assets/css/polish.css" />
 </head>
 <body data-theme="dark">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
     <i class="bi bi-list"></i>
   </button>
@@ -51,15 +52,15 @@
       </div>
     </div>
 
-    <main class="main-content flex-grow-1">
+    <main class="main-content flex-grow-1" id="main-content">
       <div class="page-header">
         <div class="page-header-actions">
           <h2>Bills</h2>
           <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary" id="scanEmailBillsBtn">
+            <button class="btn btn-outline-primary" id="scanEmailBillsBtn" aria-label="Scan email for bills">
               <i class="bi bi-envelope-check"></i> Scan Email for Bills
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal" aria-label="Add new bill">
               <i class="bi bi-plus-circle"></i> Add Bill
             </button>
           </div>
@@ -83,7 +84,7 @@
                 <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
                   <li class="dropdown-header d-flex justify-content-between align-items-center">
                     <strong>Notifications</strong>
-                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()">Mark all read</button>
+                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
                   </li>
                   <li><hr class="dropdown-divider"></li>
                   <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>
@@ -115,7 +116,7 @@
                   <h5 class="mb-1"><i class="bi bi-envelope-exclamation me-2" style="color: var(--color-warning);"></i>Pending Bills from Email</h5>
                   <p class="text-muted mb-0"><span id="pendingEmailCount">0</span> bills awaiting your review</p>
                 </div>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#emailReviewModal" id="reviewEmailBillsBtn">
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#emailReviewModal" id="reviewEmailBillsBtn" aria-label="Review pending bills from email">
                   <i class="bi bi-eye"></i> Review Bills
                 </button>
               </div>
@@ -590,7 +591,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="confirmShareBillBtn"><i class="bi bi-share me-1"></i>Share Bill</button>
+          <button type="button" class="btn btn-primary" id="confirmShareBillBtn" aria-label="Confirm share bill"><i class="bi bi-share me-1"></i>Share Bill</button>
         </div>
       </div>
     </div>
@@ -649,16 +650,16 @@
           <!-- Batch Actions -->
           <div id="emailReviewBatchActions" class="mb-3 d-none">
             <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-sm btn-success" id="approveAllHighConfidenceBtn">
+              <button class="btn btn-sm btn-success" id="approveAllHighConfidenceBtn" aria-label="Approve all high confidence bills">
                 <i class="bi bi-check-all"></i> Approve All High Confidence (≥70%)
               </button>
-              <button class="btn btn-sm btn-danger" id="rejectAllLowConfidenceBtn">
+              <button class="btn btn-sm btn-danger" id="rejectAllLowConfidenceBtn" aria-label="Reject all low confidence bills">
                 <i class="bi bi-x-circle"></i> Reject All Low Confidence (≤50%)
               </button>
-              <button class="btn btn-sm btn-outline-secondary" id="selectAllBtn">
+              <button class="btn btn-sm btn-outline-secondary" id="selectAllBtn" aria-label="Select all bills">
                 <i class="bi bi-check-square"></i> Select All
               </button>
-              <button class="btn btn-sm btn-outline-secondary" id="deselectAllBtn">
+              <button class="btn btn-sm btn-outline-secondary" id="deselectAllBtn" aria-label="Deselect all bills">
                 <i class="bi bi-square"></i> Deselect All
               </button>
             </div>
@@ -671,7 +672,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="saveEmailReviewBtn">
+          <button type="button" class="btn btn-primary" id="saveEmailReviewBtn" aria-label="Save approved bills">
             <i class="bi bi-check-lg"></i> Save Approved Bills
           </button>
         </div>
