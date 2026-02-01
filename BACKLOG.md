@@ -53,13 +53,13 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 
 | ID | Type | Priority | Size | Status | Title |
 |----|------|----------|------|--------|-------|
-| FC-001 | Bug | P0 | M | In Progress | Assets page routing failure — shows Bills content |
-| FC-002 | Bug | P1 | S | Backlog | Monthly bills total miscalculation |
-| FC-003 | Bug | P2 | XS | Backlog | Shared bill deletion lacks warning dialog |
-| FC-004 | Feature | P1 | L | In Progress | UX/UI polish — match Fireside Cloud Solutions brand |
-| FC-005 | Feature | P1 | L | In Progress | Responsive design — dashboard viz sizing, mobile layouts |
-| FC-006 | Chore | P1 | M | In Progress | Security remediation (remaining items from pentest) |
-| FC-007 | Feature | P1 | M | Backlog | WCAG 2.1 AA accessibility compliance |
+| FC-001 | Bug | P0 | M | Done | Assets page routing failure — shows Bills content |
+| FC-002 | Bug | P1 | S | Done | Monthly bills total miscalculation |
+| FC-003 | Bug | P2 | XS | Done | Shared bill deletion lacks warning dialog |
+| FC-004 | Feature | P1 | L | Done | UX/UI polish — match Fireside Cloud Solutions brand |
+| FC-005 | Feature | P1 | L | Done | Responsive design — dashboard viz sizing, mobile layouts |
+| FC-006 | Chore | P1 | M | In Progress | Security remediation (session security hardening remaining) |
+| FC-007 | Feature | P1 | M | Done | WCAG 2.1 AA accessibility compliance |
 | FC-008 | Chore | P2 | S | Backlog | SEO optimization — meta tags, semantic HTML, sitemap |
 | FC-009 | Spike | P2 | M | In Progress | Competitor research — Mint, YNAB, Monarch, Copilot, Lunch Money |
 | FC-010 | Feature | P2 | L | Backlog | Onboarding flow for new users |
@@ -82,7 +82,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 
 | ID | Type | Priority | Size | Status | Title |
 |----|------|----------|------|--------|-------|
-| EMAIL-001 | Spike | P1 | M | In Progress | Gmail API integration research & plan |
+| EMAIL-001 | Spike | P1 | M | Done | Gmail API integration research & plan |
 | EMAIL-002 | Feature | P1 | XL | Backlog | Gmail bill parsing — auto-detect and import bills |
 | EMAIL-003 | Feature | P2 | XL | Backlog | Gmail inbox management — sort, folders, labels |
 | EMAIL-004 | Feature | P2 | L | Backlog | AI draft replies — suggest/prepare email responses |

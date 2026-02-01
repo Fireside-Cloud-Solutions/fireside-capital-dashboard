@@ -1,6 +1,6 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-01 13:38 EST
+**Last Updated:** 2026-02-01 14:45 EST
 
 ---
 
@@ -8,12 +8,13 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-fix-light-mode-issues | **CRITICAL:** Fix light mode (bell icon, character encoding, blue sidebar) | 🔄 Running (15min) |
+| Builder | builder-session-security-hardening | Session security hardening (MED-02) - Secure/SameSite cookies, timeout monitoring | 🔄 Running (30min) |
 
 ## Recently Completed
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-fix-light-mode-issues | Light mode UX (bell, encoding, blue sidebar) | ✅ Fixed (commit 8bd2682) |
 | Builder | builder-fix-supabase-406-errors | Supabase 406 errors | ✅ Fixed (commit 297545d) |
 | Builder | builder-fix-dashboard-light-mode | Dashboard light mode readability | ✅ Docs created (commit 4d86910) |
 | Auditor | auditor-comprehensive-live-site-qa | Full live site QA audit | ⚠️ Missed critical visual issues |
@@ -98,13 +99,13 @@
 
 | Bug | Severity | Status |
 |-----|----------|--------|
-| **Notification bell invisible in light mode** | CRITICAL | Fix in progress |
-| **Character encoding broken ("??" in UI)** | CRITICAL | Fix in progress |
-| **Light mode too washed out (needs blue sidebar)** | CRITICAL | Fix in progress |
 | **QA process missing obvious visual bugs** | CRITICAL | Process improvements needed |
-| Supabase 406 errors | CRITICAL | ✅ FIXED (commit 297545d) |
-| Dashboard light mode readability | CRITICAL | ✅ FIXED (text readable now) |
-| Shared bill deletion no warning | MEDIUM | ✅ FIXED (commit 9637f3f) |
+| ~~Notification bell invisible in light mode~~ | CRITICAL | ✅ FIXED (commit 8bd2682) |
+| ~~Character encoding broken ("??" in UI)~~ | CRITICAL | ✅ FIXED (commit 8bd2682) |
+| ~~Light mode too washed out (needs blue sidebar)~~ | CRITICAL | ✅ FIXED (commit 8bd2682) |
+| ~~Supabase 406 errors~~ | CRITICAL | ✅ FIXED (commit 297545d) |
+| ~~Dashboard light mode readability~~ | CRITICAL | ✅ FIXED (commit 4d86910) |
+| ~~Shared bill deletion no warning~~ | MEDIUM | ✅ FIXED (commit 9637f3f) |
 
 ---
 

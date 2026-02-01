@@ -1,12 +1,14 @@
 // ===== SESSION SECURITY MODULE =====
 // Implements inactivity timeout, absolute timeout, and security monitoring
 
+// ===== SESSION SECURITY CONFIGURATION (MED-02) =====
+// Updated timeouts for financial application security requirements
 const SESSION_CONFIG = {
-  INACTIVITY_TIMEOUT: 30 * 60 * 1000, // 30 minutes
-  ABSOLUTE_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
+  INACTIVITY_TIMEOUT: 30 * 60 * 1000, // 30 minutes of inactivity
+  ABSOLUTE_TIMEOUT: 8 * 60 * 60 * 1000, // 8 hours maximum session duration (stricter for finance apps)
   ACTIVITY_CHECK_INTERVAL: 60 * 1000, // Check every minute
-  MAX_LOGIN_ATTEMPTS: 5,
-  LOGIN_ATTEMPT_WINDOW: 15 * 60 * 1000, // 15 minutes
+  MAX_LOGIN_ATTEMPTS: 5, // Lock account after 5 failed attempts
+  LOGIN_ATTEMPT_WINDOW: 15 * 60 * 1000, // 15 minute window for failed attempts
   WARNING_THRESHOLD: 5 * 60 * 1000 // Warn 5 minutes before timeout
 };
 
@@ -92,10 +94,10 @@ class SessionSecurityManager {
     const inactiveTime = now - this.lastActivity;
     const sessionDuration = now - this.sessionStartTime;
     
-    // Check absolute timeout (24 hours)
+    // Check absolute timeout (8 hours for financial app security)
     if (sessionDuration > SESSION_CONFIG.ABSOLUTE_TIMEOUT) {
-      console.warn('[Security] Absolute session timeout reached (24 hours)');
-      this.forceLogout('Your session has expired after 24 hours. Please log in again.');
+      console.warn('[Security] Absolute session timeout reached (8 hours)');
+      this.forceLogout('Your session has expired after 8 hours. Please log in again for security.');
       return;
     }
     

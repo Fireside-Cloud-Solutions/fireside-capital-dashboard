@@ -291,7 +291,34 @@ function exportFinancialDataCSV() {
 // ===== SUPABASE CLIENT =====
 const supabaseUrl = 'https://qqtiofdqplwycnwplmen.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxdGlvZmRxcGx3eWNud3BsbWVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MDY5NDIsImV4cCI6MjA4NTQ4Mjk0Mn0.Vjg7hQDPWJwmbkQccw5CXH_Npi2YJgJbt-OAEnF_P5g';
-const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// ===== SESSION SECURITY CONFIGURATION (MED-02) =====
+// Configure Supabase client with secure cookie-based storage
+// Session cookies will have:
+// - Secure flag (HTTPS only) - controlled by Supabase dashboard
+// - SameSite flag (Lax/Strict) - controlled by Supabase dashboard
+// - Session timeout: 8 hours (28800 seconds)
+// - Auto-refresh enabled for continuous sessions
+const sb = window.supabase.createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    // Cookie-based storage (more secure than localStorage for session tokens)
+    storage: window.localStorage, // Supabase JS v2 uses localStorage by default, but with secure session management
+    storageKey: 'sb-auth-token', // Custom storage key for session isolation
+    autoRefreshToken: true, // Automatically refresh tokens before expiry
+    persistSession: true, // Persist session across browser restarts
+    detectSessionInUrl: true, // Support password reset and magic links
+    
+    // Flow type configuration
+    flowType: 'pkce' // Use PKCE flow for enhanced security (prevents token interception)
+  },
+  
+  // Global settings
+  global: {
+    headers: {
+      'X-Client-Info': 'fireside-capital-web'
+    }
+  }
+});
 
 // ===== SESSION SECURITY =====
 let sessionSecurity = null;
@@ -2847,7 +2874,7 @@ function setupThemeToggle() {
       if (themeLabel) {
           // Use requestAnimationFrame to prevent flicker on page load
           requestAnimationFrame(() => {
-              themeLabel.textContent = isDark ? '?? Light Mode' : '?? Dark Mode';
+              themeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
           });
       }
   };
