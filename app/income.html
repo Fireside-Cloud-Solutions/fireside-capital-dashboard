@@ -133,8 +133,8 @@
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="incomeName" class="form-label">Income Name</label>
-              <input type="text" class="form-control" id="incomeName" required>
+              <label for="incomeName" class="form-label">Income Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="incomeName" required placeholder="e.g., Salary, Freelance, Side Hustle">
             </div>
             <div class="mb-3">
               <label for="incomeType" class="form-label">Type</label>
@@ -146,8 +146,8 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="incomeAmount" class="form-label">Amount ($)</label>
-              <input type="number" class="form-control" id="incomeAmount" required min="0" step="0.01">
+              <label for="incomeAmount" class="form-label">Amount ($) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="incomeAmount" required min="0" step="0.01" placeholder="e.g., 5000">
             </div>
             <div class="mb-3">
               <label for="incomeNextDueDate" class="form-label">Next Payment Date</label>

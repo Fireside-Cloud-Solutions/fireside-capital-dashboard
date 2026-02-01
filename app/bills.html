@@ -46,7 +46,7 @@
       <div class="theme-toggle">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" id="themeSwitch">
-          <label class="form-check-label" for="themeSwitch">🌙 Dark Mode</label>
+          <label class="form-check-label" for="themeSwitch">Dark Mode</label>
         </div>
       </div>
     </div>
@@ -234,8 +234,8 @@
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="billName" class="form-label">Bill Name</label>
-              <input type="text" class="form-control" id="billName" required>
+              <label for="billName" class="form-label">Bill Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="billName" required placeholder="e.g., Electric Bill, Netflix">
             </div>
             <div class="mb-3">
               <label for="billType" class="form-label">Type</label>
@@ -251,8 +251,9 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="billAmount" class="form-label">Amount ($)</label>
-              <input type="number" class="form-control" id="billAmount" required min="0" step="0.01">
+              <label for="billAmount" class="form-label">Amount ($) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="billAmount" required min="0" step="0.01" placeholder="e.g., 125.50">
+              <small class="form-text text-muted">Enter the typical monthly amount</small>
             </div>
             <div class="mb-3">
               <label for="billNextDueDate" class="form-label">Next Payment Date</label>

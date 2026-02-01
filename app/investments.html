@@ -135,8 +135,8 @@
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="investmentName" class="form-label">Investment Name</label>
-              <input type="text" class="form-control" id="investmentName" required>
+              <label for="investmentName" class="form-label">Investment Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="investmentName" required placeholder="e.g., 401(k), Roth IRA, Brokerage">
             </div>
             <div class="mb-3">
               <label for="investmentType" class="form-label">Type</label>
@@ -162,8 +162,8 @@
               <input type="number" class="form-control" id="annualReturn" required min="0" step="0.1">
             </div>
             <div class="mb-3">
-              <label for="investmentValue" class="form-label">Current Value ($)</label>
-              <input type="number" class="form-control" id="investmentValue" required min="0" step="0.01">
+              <label for="investmentValue" class="form-label">Current Value ($) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="investmentValue" required min="0" step="0.01" placeholder="e.g., 50000">
             </div>
             <div class="mb-3">
               <label for="nextContributionDate" class="form-label">Next Contribution Date</label>
