@@ -96,7 +96,7 @@ app.post('/create_link_token', strictLimiter, async (req, res) => {
  * Body: { days: number (optional, default: 30) }
  * Returns: { bills: Array, count: number }
  */
-app.post('/api/scan-email-bills', async (req, res) => {
+app.post('/api/scan-email-bills', emailLimiter, async (req, res) => {
   try {
     const days = req.body.days || 30;
     const minConfidence = req.body.minConfidence || 0.4;
