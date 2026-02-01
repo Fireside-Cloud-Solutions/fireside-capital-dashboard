@@ -2883,8 +2883,15 @@ async function loadSharedBillsData() {
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'pending');
   
+  // Load outgoing shares (bills I'm sharing with others) — with bill + friend details
+  const { data: myOutgoingShares } = await sb
+    .from('bill_shares')
+    .select('*, bill:bills!bill_shares_bill_id_fkey(*), shared_user:user_profiles!bill_shares_shared_with_id_user_profiles_fkey(id, username, display_name)')
+    .eq('owner_id', currentUser.id);
+
   renderSharedWithMe(sharedWithMeCache);
   renderPendingShares(pendingShares || []);
+  renderMySharedBills(myOutgoingShares || []);
 }
 
 function renderSharedWithMe(shares) {
@@ -2968,6 +2975,55 @@ function renderPendingShares(shares) {
       </div>
     `;
   }).join('');
+}
+
+function renderMySharedBills(shares) {
+  const section = document.getElementById('mySharedBillsSection');
+  const tbody = document.getElementById('mySharedBillsTableBody');
+  if (!section || !tbody) return;
+
+  if (shares.length === 0) {
+    section.classList.add('d-none');
+    return;
+  }
+
+  section.classList.remove('d-none');
+  tbody.innerHTML = shares.map(share => {
+    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${share.shared_percent}%` : formatCurrency(share.shared_fixed);
+    const statusColor = share.status === 'accepted' ? 'success' : share.status === 'pending' ? 'warning' : 'danger';
+    const statusLabel = share.status === 'accepted' ? 'Active' : share.status === 'pending' ? 'Pending' : 'Declined';
+    return `
+      <tr>
+        <td>${escapeHtml(share.bill?.name || 'Unknown')}</td>
+        <td>
+          <span style="color: var(--color-text-secondary);">${escapeHtml(share.shared_user?.display_name || 'Unknown')}</span>
+          ${share.shared_user?.username ? `<small class="d-block" style="color: var(--color-text-tertiary);">@${escapeHtml(share.shared_user.username)}</small>` : ''}
+        </td>
+        <td><strong style="color: var(--color-primary);">${formatCurrency(share.shared_amount)}</strong></td>
+        <td style="color: var(--color-text-secondary);">${formatCurrency(share.owner_amount)}</td>
+        <td><span class="badge bg-info">${splitLabel}</span></td>
+        <td><span class="badge bg-${statusColor}">${statusLabel}</span></td>
+        <td>
+          <button class="btn btn-outline-danger btn-sm" onclick="revokeShareBill('${share.id}')" title="Revoke share">
+            <i class="bi bi-x-circle me-1"></i>Revoke
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function revokeShareBill(shareId) {
+  if (!confirm('Are you sure you want to revoke this shared bill? The other person will no longer see it.')) return;
+  
+  const { error } = await sb.from('bill_shares').delete().eq('id', shareId).eq('owner_id', currentUser.id);
+  if (error) {
+    alert('Error revoking share: ' + error.message);
+    return;
+  }
+  
+  await loadSharedBillsData();
+  renderBills(); // Re-render to update share indicators
 }
 
 async function openShareBillModal(billId) {
@@ -3226,6 +3282,7 @@ window.openShareBillModal = openShareBillModal;
 window.confirmShareBill = confirmShareBill;
 window.acceptBillShare = acceptBillShare;
 window.declineBillShare = declineBillShare;
+window.revokeShareBill = revokeShareBill;
 window.markAllNotificationsRead = markAllNotificationsRead;
 window.handleNotificationClick = handleNotificationClick;
 window.showAmortizationSchedule = showAmortizationSchedule;
