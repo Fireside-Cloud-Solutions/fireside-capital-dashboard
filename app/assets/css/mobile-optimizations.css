@@ -432,8 +432,9 @@
     padding-top: 72px !important;
   }
 
-  /* ---- Bell + Welcome: fixed top-right on ALL pages ---- */
-  #loggedInState {
+  /* ---- Bell + Welcome OR Login + Sign Up: fixed top-right on ALL pages ---- */
+  #loggedInState,
+  #loggedOutState {
     position: fixed !important;
     top: 12px;
     right: 16px;
