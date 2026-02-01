@@ -18,5 +18,8 @@
     "express": "^5.1.0",
     "googleapis": "^171.0.0",
     "plaid": "^36.0.0"
+  },
+  "devDependencies": {
+    "pg": "^8.18.0"
   }
 }

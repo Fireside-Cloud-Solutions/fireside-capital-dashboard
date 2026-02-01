@@ -37,6 +37,7 @@
                 <a href="debts.html"><i class="bi bi-credit-card me-2"></i> Debts</a>
                 <a href="bills.html"><i class="bi bi-receipt me-2"></i> Bills</a>
                 <a href="income.html"><i class="bi bi-cash-stack me-2"></i> Income</a>
+                <a href="friends.html"><i class="bi bi-people me-2"></i> Friends</a>
                 <a href="budget.html" class="active"><i class="bi bi-calculator me-2"></i> Budget</a>
                 <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
                 <a href="#" onclick="openPlaidLink()"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
@@ -77,15 +78,31 @@
                     </button>
                   </div>
                   <div id="loggedInState" class="d-none">
-                    <div class="dropdown">
-                      <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        Welcome, <span id="username">User</span>!
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="#">Account Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" id="logoutButton">Logout</a></li>
-                      </ul>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="dropdown" id="notificationDropdown">
+                        <button class="btn btn-outline-primary btn-icon position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBell">
+                          <i class="bi bi-bell"></i>
+                          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">0</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
+                          <li class="dropdown-header d-flex justify-content-between align-items-center">
+                            <strong>Notifications</strong>
+                            <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()">Mark all read</button>
+                          </li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>
+                        </ul>
+                      </div>
+                      <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                          Welcome, <span id="username">User</span>!
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                          <li><a class="dropdown-item" href="#">Account Settings</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="#" id="logoutButton">Logout</a></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>

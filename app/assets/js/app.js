@@ -748,15 +748,20 @@ function renderBills() {
     const info = getBillFinancingInfo(b);
     return !(info.isFinancing && info.status === 'paid_off');
   });
-  tbody.innerHTML = activeBills.map(b => `
+  tbody.innerHTML = activeBills.map(b => {
+      const shareInfo = getShareInfoForBill(b.id);
+      const sharedBadge = shareInfo ? `<span class="badge bg-info ms-1" title="Shared with ${escapeHtml(shareInfo.shared_user?.display_name || 'someone')}"><i class="bi bi-link-45deg me-1"></i>${shareInfo.status === 'accepted' ? 'Shared' : 'Pending'}</span>` : '';
+      return `
       <tr>
-          <td>${escapeHtml(b.name)}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}</td>
+          <td>${escapeHtml(b.name)} ${sharedBadge}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}${shareInfo && shareInfo.status === 'accepted' ? `<small class="d-block" style="color: var(--color-text-tertiary);">Your share: ${formatCurrency(shareInfo.owner_amount)}</small>` : ''}</td>
           <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? formatDate(b.nextDueDate) : '-'}</td>
           <td>
+              <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" title="Share bill"><i class="bi bi-share"></i></button>
               <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
           </td>
-      </tr>`).join('');
+      </tr>`;
+  }).join('');
 
   // Render financing cards with progress bars
   const financingContainer = document.getElementById('financingCards');
@@ -814,6 +819,7 @@ function renderBills() {
                     <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
                   </div>
                   <div class="text-end">
+                    <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" title="Share bill"><i class="bi bi-share"></i></button>
                     <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
                   </div>
@@ -2052,12 +2058,24 @@ function init() {
     if (currentUser) {
       document.getElementById('username').textContent = currentUser.user_metadata?.first_name || currentUser.email;
 
+      // Ensure user profile exists for social features
+      ensureUserProfile();
+
       fetchAllDataFromSupabase().then(() => {
         renderAll();
         renderAdditionalCharts();
+        // Initialize social features
+        initNotifications();
+        loadSharedBillsData();
+        loadFriendsPage();
       });
 
     } else {
+      // Clean up realtime subscriptions
+      if (notificationChannel) {
+        sb.removeChannel(notificationChannel);
+        notificationChannel = null;
+      }
       renderAll(); // Render empty tables on logout
     }
   });
@@ -2168,6 +2186,20 @@ if (document.getElementById('budgetAssignmentTable')) {
    setupSidebarToggle();
    initializeAssetForm();
    initializeBudgetPage();
+   initShareBillUI();
+
+   // Friends page search
+   document.getElementById('friendSearchBtn')?.addEventListener('click', () => {
+     const query = document.getElementById('friendSearchInput')?.value;
+     if (query) searchFriends(query);
+   });
+   document.getElementById('friendSearchInput')?.addEventListener('keydown', (e) => {
+     if (e.key === 'Enter') {
+       e.preventDefault();
+       const query = e.target.value;
+       if (query) searchFriends(query);
+     }
+   });
    //renderAdditionalCharts();
 }
 
@@ -2212,6 +2244,775 @@ function setupSidebarToggle() {
   });
 }
 
+// ===== USER PROFILE MANAGEMENT =====
+async function ensureUserProfile() {
+  if (!currentUser) return;
+  const { data: profile } = await sb
+    .from('user_profiles')
+    .select('id')
+    .eq('id', currentUser.id)
+    .single();
+  
+  if (!profile) {
+    const email = currentUser.email || '';
+    const firstName = currentUser.user_metadata?.first_name || '';
+    const lastName = currentUser.user_metadata?.last_name || '';
+    const displayName = firstName ? `${firstName} ${lastName}`.trim() : email.split('@')[0];
+    const username = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 30);
+    
+    await sb.from('user_profiles').upsert({
+      id: currentUser.id,
+      display_name: displayName,
+      username: username
+    }, { onConflict: 'id' });
+  }
+}
+
+// ===== NOTIFICATION SYSTEM =====
+let notificationChannel = null;
+
+async function initNotifications() {
+  if (!currentUser) return;
+  
+  // Fetch unread count
+  await updateNotificationBadge();
+  
+  // Load recent notifications
+  await loadNotifications();
+  
+  // Subscribe to realtime notifications
+  if (notificationChannel) {
+    sb.removeChannel(notificationChannel);
+  }
+  
+  notificationChannel = sb
+    .channel('user-notifications')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${currentUser.id}`
+      },
+      (payload) => {
+        showNotificationToast(payload.new);
+        updateNotificationBadge();
+        loadNotifications();
+        // Refresh friends page if on it
+        if (document.getElementById('friendSearchInput')) {
+          loadFriendsPage();
+        }
+        // Refresh bills page if on it
+        if (document.getElementById('billTableBody')) {
+          loadSharedBillsData();
+        }
+      }
+    )
+    .subscribe();
+}
+
+async function updateNotificationBadge() {
+  if (!currentUser) return;
+  const badge = document.getElementById('notificationBadge');
+  if (!badge) return;
+  
+  const { count } = await sb
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', currentUser.id)
+    .eq('is_read', false);
+  
+  const unread = count || 0;
+  if (unread > 0) {
+    badge.textContent = unread > 99 ? '99+' : unread;
+    badge.classList.remove('d-none');
+  } else {
+    badge.classList.add('d-none');
+  }
+}
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  const listEl = document.getElementById('notificationList');
+  const noNotifEl = document.getElementById('noNotifications');
+  if (!listEl) return;
+  
+  const { data: notifications } = await sb
+    .from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  
+  // Remove old notification items (keep header and divider)
+  const existingItems = listEl.querySelectorAll('.notification-item');
+  existingItems.forEach(el => el.remove());
+  
+  if (!notifications || notifications.length === 0) {
+    if (noNotifEl) noNotifEl.classList.remove('d-none');
+    return;
+  }
+  
+  if (noNotifEl) noNotifEl.classList.add('d-none');
+  
+  const iconMap = {
+    'friend_request': 'bi-person-plus text-primary',
+    'friend_accepted': 'bi-person-check text-success',
+    'bill_shared': 'bi-share text-info',
+    'bill_share_accepted': 'bi-check-circle text-success',
+    'bill_share_declined': 'bi-x-circle text-danger',
+    'bill_amount_updated': 'bi-arrow-repeat text-warning',
+    'bill_deleted': 'bi-trash text-danger',
+    'payment_reminder': 'bi-bell text-warning',
+    'connection_removed': 'bi-person-dash text-danger'
+  };
+  
+  notifications.forEach(notif => {
+    const li = document.createElement('li');
+    li.className = 'notification-item';
+    const iconClass = iconMap[notif.type] || 'bi-bell text-muted';
+    const isUnread = !notif.is_read;
+    const timeAgo = getTimeAgo(notif.created_at);
+    
+    li.innerHTML = `
+      <a class="dropdown-item py-2 px-3 ${isUnread ? '' : 'opacity-75'}" href="#" onclick="handleNotificationClick('${notif.id}', '${notif.type}', ${escapeHtml(JSON.stringify(notif.data || {}))})">
+        <div class="d-flex align-items-start gap-2">
+          <i class="bi ${iconClass} mt-1" style="font-size: 1.1rem;"></i>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+              <strong style="font-size: 0.85rem;">${escapeHtml(notif.title)}</strong>
+              ${isUnread ? '<span class="badge bg-primary" style="font-size: 0.6rem;">NEW</span>' : ''}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--color-text-secondary);">${escapeHtml(notif.body || '')}</div>
+            <small style="color: var(--color-text-tertiary);">${timeAgo}</small>
+          </div>
+        </div>
+      </a>
+    `;
+    listEl.appendChild(li);
+  });
+}
+
+function getTimeAgo(dateStr) {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+  return date.toLocaleDateString();
+}
+
+async function handleNotificationClick(notifId, type, data) {
+  // Mark as read
+  await sb.from('notifications').update({ is_read: true }).eq('id', notifId);
+  await updateNotificationBadge();
+  
+  // Navigate based on type
+  if (type === 'friend_request' || type === 'friend_accepted' || type === 'connection_removed') {
+    window.location.href = 'friends.html';
+  } else if (type.startsWith('bill_share') || type === 'bill_shared' || type === 'bill_amount_updated' || type === 'bill_deleted') {
+    window.location.href = 'bills.html';
+  }
+}
+
+async function markAllNotificationsRead() {
+  if (!currentUser) return;
+  await sb
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('user_id', currentUser.id)
+    .eq('is_read', false);
+  await updateNotificationBadge();
+  await loadNotifications();
+}
+
+function showNotificationToast(notification) {
+  // Create a simple toast notification
+  const toast = document.createElement('div');
+  toast.className = 'position-fixed bottom-0 end-0 p-3';
+  toast.style.zIndex = '9999';
+  toast.innerHTML = `
+    <div class="toast show" role="alert" style="background: var(--color-bg-2); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+      <div class="toast-header" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+        <i class="bi bi-bell-fill text-primary me-2"></i>
+        <strong class="me-auto" style="color: var(--color-text-primary);">${escapeHtml(notification.title)}</strong>
+        <button type="button" class="btn-close" onclick="this.closest('.position-fixed').remove()"></button>
+      </div>
+      <div class="toast-body" style="color: var(--color-text-secondary);">
+        ${escapeHtml(notification.body || '')}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+
+// ===== FRIENDS / CONNECTIONS SYSTEM =====
+async function searchFriends(query) {
+  if (!currentUser || !query || query.length < 2) {
+    const container = document.getElementById('searchResults');
+    if (container) container.innerHTML = '';
+    return;
+  }
+  
+  // Search user_profiles by username or display_name
+  const { data: profiles } = await sb
+    .from('user_profiles')
+    .select('id, username, display_name, avatar_url')
+    .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+    .neq('id', currentUser.id)
+    .limit(20);
+  
+  // Also try email search via RPC
+  let emailResults = [];
+  if (query.includes('@')) {
+    const { data } = await sb.rpc('search_users_by_email', { search_email: query });
+    emailResults = data || [];
+  }
+  
+  // Merge and deduplicate
+  const allResults = [...(profiles || [])];
+  emailResults.forEach(er => {
+    if (!allResults.find(p => p.id === er.id)) {
+      allResults.push(er);
+    }
+  });
+  
+  // Get existing connections to filter
+  const { data: connections } = await sb
+    .from('connections')
+    .select('requester_id, addressee_id, status')
+    .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
+  
+  const connectedIds = new Set();
+  (connections || []).forEach(c => {
+    if (c.status !== 'declined') {
+      connectedIds.add(c.requester_id === currentUser.id ? c.addressee_id : c.requester_id);
+    }
+  });
+  
+  // Filter out already connected users
+  const filtered = allResults.filter(p => !connectedIds.has(p.id));
+  
+  const container = document.getElementById('searchResults');
+  if (!container) return;
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="text-muted mt-2">No users found matching your search.</p>';
+    return;
+  }
+  
+  container.innerHTML = filtered.map(p => `
+    <div class="card mb-2">
+      <div class="card-body p-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--color-bg-3); border: 1px solid var(--color-border-subtle);">
+            ${p.avatar_url ? `<img src="${escapeHtml(p.avatar_url)}" class="rounded-circle" width="40" height="40">` : `<i class="bi bi-person" style="font-size: 1.2rem;"></i>`}
+          </div>
+          <div>
+            <strong style="color: var(--color-text-primary);">${escapeHtml(p.display_name || 'Unknown')}</strong>
+            ${p.username ? `<div style="font-size: 0.8rem; color: var(--color-text-tertiary);">@${escapeHtml(p.username)}</div>` : ''}
+          </div>
+        </div>
+        <button class="btn btn-sm btn-primary" onclick="sendFriendRequest('${p.id}')">
+          <i class="bi bi-person-plus me-1"></i>Add Friend
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function sendFriendRequest(addresseeId) {
+  if (!currentUser) return;
+  
+  const { error } = await sb.from('connections').insert({
+    requester_id: currentUser.id,
+    addressee_id: addresseeId,
+    status: 'pending'
+  });
+  
+  if (error) {
+    if (error.message.includes('duplicate') || error.message.includes('unique')) {
+      alert('You already have a pending connection with this user.');
+    } else {
+      alert('Error sending friend request: ' + error.message);
+    }
+    return;
+  }
+  
+  // Refresh search results and outgoing
+  const searchInput = document.getElementById('friendSearchInput');
+  if (searchInput && searchInput.value) {
+    searchFriends(searchInput.value);
+  }
+  loadFriendsPage();
+}
+
+async function acceptFriendRequest(connectionId) {
+  await sb.from('connections')
+    .update({ status: 'accepted', updated_at: new Date().toISOString() })
+    .eq('id', connectionId)
+    .eq('addressee_id', currentUser.id);
+  loadFriendsPage();
+}
+
+async function declineFriendRequest(connectionId) {
+  await sb.from('connections')
+    .update({ status: 'declined', updated_at: new Date().toISOString() })
+    .eq('id', connectionId)
+    .eq('addressee_id', currentUser.id);
+  loadFriendsPage();
+}
+
+async function cancelFriendRequest(connectionId) {
+  await sb.from('connections')
+    .delete()
+    .eq('id', connectionId)
+    .eq('requester_id', currentUser.id);
+  loadFriendsPage();
+}
+
+async function removeFriend(connectionId, friendName) {
+  if (!confirm(`Are you sure you want to remove ${friendName} from your friends?`)) return;
+  
+  await sb.from('connections')
+    .delete()
+    .eq('id', connectionId);
+  loadFriendsPage();
+}
+
+async function loadFriendsPage() {
+  if (!currentUser || !document.getElementById('friendSearchInput')) return;
+  
+  // Load pending requests (incoming)
+  const { data: pendingIncoming } = await sb
+    .from('connections')
+    .select('id, created_at, requester_id, requester:user_profiles!connections_requester_id_fkey(id, username, display_name, avatar_url)')
+    .eq('addressee_id', currentUser.id)
+    .eq('status', 'pending');
+  
+  const pendingContainer = document.getElementById('pendingRequestsContainer');
+  const pendingSection = document.getElementById('pendingRequestsSection');
+  if (pendingContainer) {
+    if (pendingIncoming && pendingIncoming.length > 0) {
+      pendingSection.classList.remove('d-none');
+      pendingContainer.innerHTML = pendingIncoming.map(req => `
+        <div class="col-xl-4 col-md-6 col-12">
+          <div class="card">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--color-bg-3); border: 1px solid var(--color-border-subtle);">
+                  <i class="bi bi-person" style="font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                  <strong style="color: var(--color-text-primary);">${escapeHtml(req.requester?.display_name || 'Unknown')}</strong>
+                  ${req.requester?.username ? `<div style="font-size: 0.8rem; color: var(--color-text-tertiary);">@${escapeHtml(req.requester.username)}</div>` : ''}
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-success" onclick="acceptFriendRequest('${req.id}')"><i class="bi bi-check-lg"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="declineFriendRequest('${req.id}')"><i class="bi bi-x-lg"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      pendingSection.classList.add('d-none');
+    }
+  }
+  
+  // Load my friends (accepted)
+  const { data: myConnections } = await sb
+    .from('connections')
+    .select('id, status, created_at, requester_id, addressee_id, requester:user_profiles!connections_requester_id_fkey(id, username, display_name, avatar_url), addressee:user_profiles!connections_addressee_id_fkey(id, username, display_name, avatar_url)')
+    .eq('status', 'accepted')
+    .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
+  
+  const friendsContainer = document.getElementById('myFriendsContainer');
+  if (friendsContainer) {
+    const friends = (myConnections || []).map(conn => ({
+      connectionId: conn.id,
+      friend: conn.requester?.id === currentUser.id ? conn.addressee : conn.requester,
+      since: conn.created_at
+    }));
+    
+    if (friends.length > 0) {
+      friendsContainer.innerHTML = friends.map(f => `
+        <div class="col-xl-4 col-md-6 col-12">
+          <div class="card">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--color-bg-3); border: 1px solid var(--color-border-subtle);">
+                  <i class="bi bi-person-fill" style="font-size: 1.2rem; color: var(--color-success);"></i>
+                </div>
+                <div>
+                  <strong style="color: var(--color-text-primary);">${escapeHtml(f.friend?.display_name || 'Unknown')}</strong>
+                  ${f.friend?.username ? `<div style="font-size: 0.8rem; color: var(--color-text-tertiary);">@${escapeHtml(f.friend.username)}</div>` : ''}
+                  <small style="color: var(--color-text-tertiary);">Friends since ${formatDate(f.since?.split('T')[0])}</small>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" onclick="removeFriend('${f.connectionId}', '${escapeHtml(f.friend?.display_name || 'this friend')}')">
+                <i class="bi bi-person-dash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      friendsContainer.innerHTML = '<div class="col-12"><p class="text-muted fst-italic">No friends yet. Search for people to connect with!</p></div>';
+    }
+  }
+  
+  // Load outgoing requests
+  const { data: outgoing } = await sb
+    .from('connections')
+    .select('id, created_at, addressee:user_profiles!connections_addressee_id_fkey(id, username, display_name, avatar_url)')
+    .eq('requester_id', currentUser.id)
+    .eq('status', 'pending');
+  
+  const outgoingContainer = document.getElementById('outgoingRequestsContainer');
+  const outgoingSection = document.getElementById('outgoingRequestsSection');
+  if (outgoingContainer) {
+    if (outgoing && outgoing.length > 0) {
+      outgoingSection.classList.remove('d-none');
+      outgoingContainer.innerHTML = outgoing.map(req => `
+        <div class="col-xl-4 col-md-6 col-12">
+          <div class="card">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--color-bg-3); border: 1px solid var(--color-border-subtle);">
+                  <i class="bi bi-person" style="font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                  <strong style="color: var(--color-text-primary);">${escapeHtml(req.addressee?.display_name || 'Unknown')}</strong>
+                  ${req.addressee?.username ? `<div style="font-size: 0.8rem; color: var(--color-text-tertiary);">@${escapeHtml(req.addressee.username)}</div>` : ''}
+                  <small style="color: var(--color-text-tertiary);">Sent ${formatDate(req.created_at?.split('T')[0])}</small>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary" onclick="cancelFriendRequest('${req.id}')">
+                <i class="bi bi-x-lg me-1"></i>Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      outgoingSection.classList.add('d-none');
+    }
+  }
+}
+
+// ===== BILL SHARING SYSTEM =====
+let billSharesCache = [];
+let sharedWithMeCache = [];
+
+async function loadSharedBillsData() {
+  if (!currentUser) return;
+  
+  // Load shares I own (to show indicators)
+  const { data: myShares } = await sb
+    .from('bill_shares')
+    .select('*, shared_user:user_profiles!bill_shares_shared_with_id_fkey(id, username, display_name)')
+    .eq('owner_id', currentUser.id);
+  billSharesCache = myShares || [];
+  
+  // Load shares shared with me (accepted)
+  const { data: sharedWithMe } = await sb
+    .from('bill_shares')
+    .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_fkey(id, username, display_name)')
+    .eq('shared_with_id', currentUser.id)
+    .eq('status', 'accepted');
+  sharedWithMeCache = sharedWithMe || [];
+  
+  // Load pending shares (awaiting my acceptance)
+  const { data: pendingShares } = await sb
+    .from('bill_shares')
+    .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_fkey(id, username, display_name)')
+    .eq('shared_with_id', currentUser.id)
+    .eq('status', 'pending');
+  
+  renderSharedWithMe(sharedWithMeCache);
+  renderPendingShares(pendingShares || []);
+}
+
+function renderSharedWithMe(shares) {
+  const section = document.getElementById('sharedWithMeSection');
+  const tbody = document.getElementById('sharedWithMeTableBody');
+  if (!section || !tbody) return;
+  
+  if (shares.length === 0) {
+    section.classList.add('d-none');
+    return;
+  }
+  
+  section.classList.remove('d-none');
+  tbody.innerHTML = shares.map(share => {
+    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${share.shared_percent}%` : formatCurrency(share.shared_fixed);
+    return `
+      <tr>
+        <td>${escapeHtml(share.bill?.name || 'Unknown')}</td>
+        <td>
+          <span style="color: var(--color-text-secondary);">${escapeHtml(share.owner?.display_name || 'Unknown')}</span>
+          ${share.owner?.username ? `<small class="d-block" style="color: var(--color-text-tertiary);">@${escapeHtml(share.owner.username)}</small>` : ''}
+        </td>
+        <td><strong style="color: var(--color-primary);">${formatCurrency(share.shared_amount)}</strong></td>
+        <td style="color: var(--color-text-tertiary);">${formatCurrency(share.bill?.amount)}</td>
+        <td><span class="badge bg-info">${splitLabel}</span></td>
+        <td><span class="badge bg-success">Active</span></td>
+        <td>
+          <span class="badge bg-secondary-subtle"><i class="bi bi-link-45deg me-1"></i>Shared</span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderPendingShares(shares) {
+  const section = document.getElementById('pendingSharesSection');
+  const container = document.getElementById('pendingSharesContainer');
+  if (!section || !container) return;
+  
+  if (shares.length === 0) {
+    section.classList.add('d-none');
+    return;
+  }
+  
+  section.classList.remove('d-none');
+  container.innerHTML = shares.map(share => {
+    const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${share.owner_percent}/${share.shared_percent}` : 'Fixed';
+    return `
+      <div class="col-xl-4 col-md-6 col-12">
+        <div class="card">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="mb-0" style="color: var(--color-text-primary);">${escapeHtml(share.bill?.name || 'Unknown Bill')}</h5>
+              <span class="badge bg-warning">Pending</span>
+            </div>
+            <p style="color: var(--color-text-secondary); font-size: 0.85rem;">
+              <i class="bi bi-person me-1"></i>From: ${escapeHtml(share.owner?.display_name || 'Unknown')}
+            </p>
+            <div class="d-flex justify-content-between mb-2">
+              <span style="color: var(--color-text-tertiary);">Full bill:</span>
+              <span style="color: var(--color-text-primary);">${formatCurrency(share.bill?.amount)}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span style="color: var(--color-text-tertiary);">Your portion:</span>
+              <strong style="color: var(--color-primary);">${formatCurrency(share.shared_amount)}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span style="color: var(--color-text-tertiary);">Split:</span>
+              <span class="badge bg-info">${splitLabel}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success btn-sm flex-grow-1" onclick="acceptBillShare('${share.id}')">
+                <i class="bi bi-check-lg me-1"></i>Accept
+              </button>
+              <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="declineBillShare('${share.id}')">
+                <i class="bi bi-x-lg me-1"></i>Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function openShareBillModal(billId) {
+  const bill = (window.bills || []).find(b => b.id == billId);
+  if (!bill) return;
+  
+  document.getElementById('shareBillId').value = bill.id;
+  document.getElementById('shareBillName').value = bill.name;
+  document.getElementById('shareBillAmount').value = formatCurrency(bill.amount);
+  
+  // Reset fields
+  document.getElementById('shareSplitType').value = 'equal';
+  document.getElementById('percentageSplitFields').classList.add('d-none');
+  document.getElementById('fixedSplitFields').classList.add('d-none');
+  document.getElementById('shareOwnerPercent').value = 50;
+  document.getElementById('shareSharedPercent').value = 50;
+  
+  // Load friends into dropdown
+  const friendSelect = document.getElementById('shareFriendSelect');
+  const noFriendsMsg = document.getElementById('noFriendsMsg');
+  friendSelect.innerHTML = '<option value="">Select a friend...</option>';
+  
+  const { data: connections } = await sb
+    .from('connections')
+    .select('id, requester_id, addressee_id, requester:user_profiles!connections_requester_id_fkey(id, username, display_name), addressee:user_profiles!connections_addressee_id_fkey(id, username, display_name)')
+    .eq('status', 'accepted')
+    .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
+  
+  const friends = (connections || []).map(conn => conn.requester?.id === currentUser.id ? conn.addressee : conn.requester).filter(Boolean);
+  
+  if (friends.length === 0) {
+    noFriendsMsg.classList.remove('d-none');
+  } else {
+    noFriendsMsg.classList.add('d-none');
+    friends.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = `${f.display_name || 'Unknown'}${f.username ? ` (@${f.username})` : ''}`;
+      friendSelect.appendChild(opt);
+    });
+  }
+  
+  updateSharePreview();
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('shareBillModal')).show();
+}
+
+function updateSharePreview() {
+  const billAmount = getRaw(document.getElementById('shareBillAmount').value);
+  const splitType = document.getElementById('shareSplitType').value;
+  let ownerAmount = 0, sharedAmount = 0;
+  
+  switch (splitType) {
+    case 'equal':
+      ownerAmount = billAmount / 2;
+      sharedAmount = billAmount / 2;
+      break;
+    case 'percentage':
+      const ownerPct = parseFloat(document.getElementById('shareOwnerPercent').value) || 0;
+      const sharedPct = parseFloat(document.getElementById('shareSharedPercent').value) || 0;
+      ownerAmount = billAmount * (ownerPct / 100);
+      sharedAmount = billAmount * (sharedPct / 100);
+      break;
+    case 'fixed':
+      ownerAmount = parseFloat(document.getElementById('shareOwnerFixed').value) || 0;
+      sharedAmount = parseFloat(document.getElementById('shareSharedFixed').value) || 0;
+      break;
+  }
+  
+  document.getElementById('sharePreviewOwner').textContent = formatCurrency(ownerAmount);
+  document.getElementById('sharePreviewShared').textContent = formatCurrency(sharedAmount);
+}
+
+async function confirmShareBill() {
+  const billId = document.getElementById('shareBillId').value;
+  const friendId = document.getElementById('shareFriendSelect').value;
+  const splitType = document.getElementById('shareSplitType').value;
+  
+  if (!friendId) {
+    alert('Please select a friend to share with.');
+    return;
+  }
+  
+  const bill = (window.bills || []).find(b => b.id == billId);
+  if (!bill) return;
+  
+  let owner_percent, shared_percent, owner_fixed, shared_fixed, owner_amount, shared_amount;
+  
+  switch (splitType) {
+    case 'equal':
+      owner_percent = 50;
+      shared_percent = 50;
+      owner_amount = bill.amount / 2;
+      shared_amount = bill.amount / 2;
+      break;
+    case 'percentage':
+      owner_percent = parseFloat(document.getElementById('shareOwnerPercent').value) || 0;
+      shared_percent = parseFloat(document.getElementById('shareSharedPercent').value) || 0;
+      if (Math.abs((owner_percent + shared_percent) - 100) > 0.01) {
+        document.getElementById('percentageError').classList.remove('d-none');
+        return;
+      }
+      owner_amount = bill.amount * (owner_percent / 100);
+      shared_amount = bill.amount * (shared_percent / 100);
+      break;
+    case 'fixed':
+      owner_fixed = parseFloat(document.getElementById('shareOwnerFixed').value) || 0;
+      shared_fixed = parseFloat(document.getElementById('shareSharedFixed').value) || 0;
+      owner_amount = owner_fixed;
+      shared_amount = shared_fixed;
+      break;
+  }
+  
+  const { error } = await sb.from('bill_shares').insert({
+    bill_id: billId,
+    owner_id: currentUser.id,
+    shared_with_id: friendId,
+    status: 'pending',
+    split_type: splitType,
+    owner_percent: owner_percent || null,
+    shared_percent: shared_percent || null,
+    owner_fixed: owner_fixed || null,
+    shared_fixed: shared_fixed || null,
+    owner_amount: Math.round(owner_amount * 100) / 100,
+    shared_amount: Math.round(shared_amount * 100) / 100
+  });
+  
+  if (error) {
+    if (error.message.includes('unique') || error.message.includes('duplicate')) {
+      alert('This bill is already shared with that user.');
+    } else {
+      alert('Error sharing bill: ' + error.message);
+    }
+    return;
+  }
+  
+  bootstrap.Modal.getInstance(document.getElementById('shareBillModal')).hide();
+  await loadSharedBillsData();
+  renderBills(); // Re-render to show share indicators
+}
+
+async function acceptBillShare(shareId) {
+  await sb.from('bill_shares').update({
+    status: 'accepted',
+    accepted_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }).eq('id', shareId).eq('shared_with_id', currentUser.id);
+  await loadSharedBillsData();
+}
+
+async function declineBillShare(shareId) {
+  await sb.from('bill_shares').update({
+    status: 'declined',
+    updated_at: new Date().toISOString()
+  }).eq('id', shareId).eq('shared_with_id', currentUser.id);
+  await loadSharedBillsData();
+}
+
+// ===== ENHANCED BILL RENDERING (with share indicators) =====
+function getShareInfoForBill(billId) {
+  return billSharesCache.find(s => s.bill_id === billId);
+}
+
+// Initialize share-related UI on bills page
+function initShareBillUI() {
+  if (!document.getElementById('shareBillModal')) return;
+  
+  // Split type toggle
+  document.getElementById('shareSplitType')?.addEventListener('change', (e) => {
+    document.getElementById('percentageSplitFields').classList.toggle('d-none', e.target.value !== 'percentage');
+    document.getElementById('fixedSplitFields').classList.toggle('d-none', e.target.value !== 'fixed');
+    document.getElementById('percentageError')?.classList.add('d-none');
+    updateSharePreview();
+  });
+  
+  // Live preview updates
+  ['shareOwnerPercent', 'shareSharedPercent', 'shareOwnerFixed', 'shareSharedFixed'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateSharePreview);
+  });
+  
+  // Percentage sync
+  document.getElementById('shareOwnerPercent')?.addEventListener('input', (e) => {
+    document.getElementById('shareSharedPercent').value = 100 - (parseFloat(e.target.value) || 0);
+    updateSharePreview();
+  });
+  document.getElementById('shareSharedPercent')?.addEventListener('input', (e) => {
+    document.getElementById('shareOwnerPercent').value = 100 - (parseFloat(e.target.value) || 0);
+    updateSharePreview();
+  });
+  
+  // Confirm share
+  document.getElementById('confirmShareBillBtn')?.addEventListener('click', confirmShareBill);
+}
+
 document.addEventListener('DOMContentLoaded', init);
 
 // ===== GLOBAL EXPORTS =====
@@ -2231,5 +3032,18 @@ window.openIncomeModal = openIncomeModal;
 window.confirmDeleteIncome = confirmDeleteIncome;
 window.deleteIncomeConfirmed = deleteIncomeConfirmed;
 window.generateBudgetForMonth = generateBudgetForMonth;
+// Social features
+window.searchFriends = searchFriends;
+window.sendFriendRequest = sendFriendRequest;
+window.acceptFriendRequest = acceptFriendRequest;
+window.declineFriendRequest = declineFriendRequest;
+window.cancelFriendRequest = cancelFriendRequest;
+window.removeFriend = removeFriend;
+window.openShareBillModal = openShareBillModal;
+window.confirmShareBill = confirmShareBill;
+window.acceptBillShare = acceptBillShare;
+window.declineBillShare = declineBillShare;
+window.markAllNotificationsRead = markAllNotificationsRead;
+window.handleNotificationClick = handleNotificationClick;
 window.showAmortizationSchedule = showAmortizationSchedule;
 window.deleteBudgetItem = deleteBudgetItem;
