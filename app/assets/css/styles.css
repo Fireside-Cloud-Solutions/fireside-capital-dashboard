@@ -1147,6 +1147,14 @@ strong {
   z-index: 1;
 }
 
+/* Ensure the top bar (with user dropdown & notifications) renders
+   above sibling content so Bootstrap dropdown menus aren't clipped
+   by cards/tables that share the same stacking layer. */
+.main-content > .page-header,
+.main-content > .d-flex:first-child {
+  z-index: 10;
+}
+
 /* =================================================================
    LIGHT MODE — Override when toggled
    ================================================================= */
