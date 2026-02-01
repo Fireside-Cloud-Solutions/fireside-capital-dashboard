@@ -1,4 +1,10 @@
 {
+  "routes": [
+    {
+      "route": "/assets",
+      "rewrite": "/assets.html"
+    }
+  ],
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY"
