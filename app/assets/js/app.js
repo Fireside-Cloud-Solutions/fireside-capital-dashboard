@@ -1602,12 +1602,45 @@ function showAmortizationSchedule(billId) {
   bootstrap.Modal.getOrCreateInstance(document.getElementById('amortizationModal')).show();
 }
 
-function confirmDeleteBill(id, name) {
+async function confirmDeleteBill(id, name) {
   deleteBillId = id;
-  // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
-  document.getElementById('deleteBillName').textContent = `"${name}"`;
-  bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
+  
+  // Check if bill is shared with other users (any accepted shares)
+  const acceptedShares = billSharesCache.filter(s => s.bill_id === id && s.status === 'accepted');
+  const isShared = acceptedShares.length > 0;
+  
+  if (isShared) {
+    // Show warning modal for shared bills
+    showSharedBillDeleteWarning(id, name);
+  } else {
+    // Show standard delete confirmation
+    document.getElementById('deleteBillName').textContent = `"${name}"`;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteBillModal')).show();
+  }
 }
+
+function showSharedBillDeleteWarning(id, name) {
+  // Get all shares for this bill (count users it's shared with)
+  const shares = billSharesCache.filter(s => s.bill_id === id && s.status === 'accepted');
+  const sharedUserCount = shares.length;
+  
+  // Populate modal content
+  document.getElementById('sharedBillName').textContent = `"${name}"`;
+  document.getElementById('sharedUserCount').textContent = sharedUserCount;
+  
+  // Set up confirmation handler
+  const confirmBtn = document.getElementById('confirmSharedBillDelete');
+  confirmBtn.onclick = async () => {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('sharedBillDeleteWarningModal'));
+    if (modal) modal.hide();
+    await deleteBillConfirmed();
+  };
+  
+  // Show the warning modal
+  const modal = new bootstrap.Modal(document.getElementById('sharedBillDeleteWarningModal'));
+  modal.show();
+}
+
 async function deleteBillConfirmed() {
   // Rate limiting
   if (!rateLimiters.delete.allow('deleteBill')) {
