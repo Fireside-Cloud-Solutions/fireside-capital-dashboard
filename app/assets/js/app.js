@@ -608,8 +608,9 @@ function getBillFinancingInfo(bill) {
       estimatedPayoffDate: payoffDate
     };
   }
-  // Fall back to hardcoded metadata
-  const meta = FINANCING_META[bill.name];
+  // Fall back to hardcoded metadata (case-insensitive lookup)
+  const metaKey = Object.keys(FINANCING_META).find(k => k.toLowerCase() === (bill.name || '').toLowerCase());
+  const meta = metaKey ? FINANCING_META[metaKey] : null;
   if (!meta) return { isFinancing: false };
   const amountPaid = meta.payments_made * bill.amount;
   const remainingBalance = Math.max(0, meta.total_amount - amountPaid);
