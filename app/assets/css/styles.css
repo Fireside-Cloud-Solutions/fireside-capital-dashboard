@@ -2757,10 +2757,15 @@ body[data-theme='light'] .stat-meta {
   white-space: nowrap !important;
 }
 
-/* Caret: Bootstrap adds ::after as the dropdown arrow.
-   Ensure it stays inline after the text, not wrapping. */
-#userDropdown.dropdown-toggle::after {
-  display: inline-block !important;
+/* Hide Bootstrap's auto-generated caret — we use a manual one */
+#userDropdown::after {
+  display: none !important;
+}
+
+/* Manual caret: always appears after the username */
+#userDropdown .dropdown-caret {
+  font-size: 10px !important;
   vertical-align: middle !important;
-  margin-left: 0.35em !important;
+  margin-left: 2px !important;
+  opacity: 0.8;
 }
