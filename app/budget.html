@@ -160,38 +160,39 @@
 
             </div> <!-- end dataContainer -->
 
-            <!-- Modal: Add Budget Item -->
-            <div class="modal fade" id="addBudgetItemModal" tabindex="-1" aria-labelledby="addBudgetItemLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <form id="budgetItemForm">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="addBudgetItemLabel">Add Budget Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
-                      <div class="modal-body">
-                        <div class="mb-3">
-                          <label for="budgetItemName" class="form-label">Item Name (e.g., Groceries)</label>
-                          <input type="text" class="form-control" id="budgetItemName" required>
-                        </div>
-                        <div class="mb-3">
-                          <label for="budgetItemCategory" class="form-label">Category</label>
-                          <input type="text" class="form-control" id="budgetItemCategory" placeholder="e.g., Food" required>
-                        </div>
-                        <div class="mb-3">
-                          <label for="budgetItemNeeded" class="form-label">Amount Needed ($)</label>
-                          <input type="number" class="form-control" id="budgetItemNeeded" required min="0" step="0.01">
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" id="saveBudgetItemBtn" class="btn btn-primary">Add Item</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
         </main>
     </div>
+
+    <!-- Modal: Add Budget Item -->
+    <div class="modal fade" id="addBudgetItemModal" tabindex="-1" aria-labelledby="addBudgetItemLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="budgetItemForm">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addBudgetItemLabel">Add Budget Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="budgetItemName" class="form-label">Item Name (e.g., Groceries)</label>
+                  <input type="text" class="form-control" id="budgetItemName" required>
+                </div>
+                <div class="mb-3">
+                  <label for="budgetItemCategory" class="form-label">Category</label>
+                  <input type="text" class="form-control" id="budgetItemCategory" placeholder="e.g., Food" required>
+                </div>
+                <div class="mb-3">
+                  <label for="budgetItemNeeded" class="form-label">Amount Needed ($)</label>
+                  <input type="number" class="form-control" id="budgetItemNeeded" required min="0" step="0.01">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="saveBudgetItemBtn" class="btn btn-primary">Add Item</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
     <!-- Shared Modals: Login -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
