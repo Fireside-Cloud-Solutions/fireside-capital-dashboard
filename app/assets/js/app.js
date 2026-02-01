@@ -1175,7 +1175,17 @@ async function loadAndRenderBudget() {
   const tbody = document.getElementById('budgetAssignmentTable');
   tbody.innerHTML = '';
   
-  const budgetItems = [...(window.bills || []), ...(window.debts || [])].filter(Boolean);
+  // Filter out paid-off financing items from the budget display
+  const budgetItems = [...(window.bills || []), ...(window.debts || [])].filter(item => {
+      if (!item) return false;
+      // Skip paid-off or cancelled bills (check DB status field if it exists)
+      const dbStatus = (item.status || '').toLowerCase();
+      if (dbStatus === 'paid_off' || dbStatus === 'cancelled') return false;
+      // Skip paid-off financing items (hardcoded metadata fallback)
+      const info = getBillFinancingInfo(item);
+      if (info.isFinancing && info.status === 'paid_off') return false;
+      return true;
+  });
 
   budgetItems.forEach(item => {
       if (!item.id) {
@@ -1359,7 +1369,10 @@ async function generateBudgetForMonth(monthString) {
     // 4. Create budget entries for bills that don't have one yet
     const newEntries = [];
     for (const bill of (activeBills || [])) {
-      // Skip paid-off financing items
+      // Skip bills with inactive DB status (paid_off, cancelled)
+      const dbStatus = (bill.status || '').toLowerCase();
+      if (dbStatus === 'paid_off' || dbStatus === 'cancelled') continue;
+      // Skip paid-off financing items (hardcoded metadata fallback)
       const info = getBillFinancingInfo(bill);
       if (info.isFinancing && info.status === 'paid_off') continue;
 
@@ -1512,7 +1525,15 @@ function generateMonthlyCashFlowChart() {
       const monthEnd = new Date(today.getFullYear(), today.getMonth() + i + 1, 0);
       months.push(monthStart.toLocaleString('default', { month: 'short' }));
       let monthlyIncome = 0; let monthlyExpenses = 0;
-      [...(window.income || []), ...(window.bills || []), ...(window.debts || []).map(d => ({ ...d, amount: d.monthlyPayment, frequency: 'monthly' }))].forEach(item => {
+      // Filter out paid-off bills from cash flow projections
+      const activeBillsForCashFlow = (window.bills || []).filter(b => {
+          const dbStatus = (b.status || '').toLowerCase();
+          if (dbStatus === 'paid_off' || dbStatus === 'cancelled') return false;
+          const info = getBillFinancingInfo(b);
+          if (info.isFinancing && info.status === 'paid_off') return false;
+          return true;
+      });
+      [...(window.income || []), ...activeBillsForCashFlow, ...(window.debts || []).map(d => ({ ...d, amount: d.monthlyPayment, frequency: 'monthly' }))].forEach(item => {
           if (!item.nextDueDate || !item.frequency) return;
           const isIncome = (typeof item.type === 'string' && (item.type.toLowerCase() === 'w2' || item.type.toLowerCase() === '1099'));
           const amount = getRaw(item.amount);
