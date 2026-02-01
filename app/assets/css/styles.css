@@ -1,82 +1,309 @@
-/* Light Mode Defaults */
+/* =================================================================
+   Fireside Capital Dashboard — Hearthlight Brand
+   Built on Bootstrap 5 · Brand tokens from design-tokens.css
+   Dark-first design system
+   ================================================================= */
+
+@import url('./design-tokens.css');
+
+/* =================================================================
+   BASE STYLES — Dark Default
+   ================================================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
-  background-color: #f8f9fc;
-  font-family: "Segoe UI", sans-serif;
+  background-color: var(--color-bg-1);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h3 {
-  color: #212529;
+/* =================================================================
+   TYPOGRAPHY
+   ================================================================= */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-heading);
 }
 
-#upcomingPaymentsList .border-bottom {
-  border-color: #e9ecef !important;
+h1 { font-size: var(--text-h1); letter-spacing: var(--tracking-tight); }
+h2 { font-size: var(--text-h2); letter-spacing: var(--tracking-snug); }
+h3 { font-size: var(--text-h3); }
+h4 { font-size: var(--text-h4); }
+
+h5, h6 {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
 }
 
-#upcomingPaymentsList strong {
-  font-size: 1rem;
+h5 { font-size: var(--text-h5); }
+h6 { font-size: var(--text-h6); letter-spacing: var(--tracking-wide); }
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--duration-normal) var(--ease-default);
 }
 
-#upcomingPaymentsList small {
-  font-size: 0.75rem;
+a:hover {
+  color: var(--color-accent);
 }
 
-.card {
-  background: #fff;
-  border-radius: 0.75rem;
-  border: 1px solid #e3e6f0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
+
+small, .text-muted {
+  color: var(--color-text-secondary) !important;
+}
+
+strong {
+  color: var(--color-text-primary);
+}
+
+/* =================================================================
+   SIDEBAR
+   ================================================================= */
 
 .sidebar {
   height: 100vh;
-  background-color: #007bff;
-  color: white;
-  padding-top: 1rem;
+  background-color: var(--color-bg-2);
+  color: var(--color-text-primary);
+  padding-top: var(--space-4);
   position: fixed;
   width: 240px;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-right: 1px solid var(--color-border-subtle);
+  z-index: var(--z-sticky);
+}
+
+.sidebar .sidebar-brand {
+  text-align: center;
+  margin-bottom: var(--space-6);
+  padding: 0 var(--space-4);
+}
+
+.sidebar .sidebar-brand h4 {
+  font-family: var(--font-heading);
+  font-size: var(--text-h4);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.sidebar .sidebar-brand .sidebar-logo {
+  flex-shrink: 0;
 }
 
 .sidebar a {
-  color: white;
+  color: var(--color-text-secondary);
   text-decoration: none;
   display: block;
-  padding: 0.75rem 1rem;
-  font-weight: 500;
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-body-sm);
+  transition: all var(--duration-normal) var(--ease-default);
+  border-left: 3px solid transparent;
 }
 
-.sidebar a:hover,
-.sidebar a.active {
-  background-color: #0069d9;
-  border-left: 4px solid white;
+.sidebar a i {
+  color: var(--color-text-tertiary);
+  transition: color var(--duration-normal) var(--ease-default);
 }
+
+.sidebar a:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-3);
+  border-left-color: var(--color-primary);
+}
+
+.sidebar a:hover i {
+  color: var(--color-primary);
+}
+
+.sidebar a.active {
+  color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+  border-left-color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+}
+
+.sidebar a.active i {
+  color: var(--color-primary);
+}
+
+/* =================================================================
+   MAIN CONTENT AREA
+   ================================================================= */
 
 .main-content {
   margin-left: 240px;
-  background-color: #f1f3f6;
+  background-color: var(--color-bg-1);
   min-height: 100vh;
 }
 
+/* =================================================================
+   CARDS
+   ================================================================= */
+
+.card {
+  background: var(--color-bg-2);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-primary);
+  transition: box-shadow var(--duration-slow) var(--ease-default),
+              border-color var(--duration-slow) var(--ease-default);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--color-border-default);
+}
+
+.card h5 {
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+/* =================================================================
+   DASHBOARD STAT CARDS
+   ================================================================= */
+
+.dashboard-card {
+  background: var(--color-bg-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  position: relative;
+  border: 1px solid var(--color-border-subtle);
+  min-width: 220px;
+  flex: 1;
+  transition: box-shadow var(--duration-slow) var(--ease-default),
+              transform var(--duration-normal) var(--ease-default);
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-elevated);
+  transform: translateY(-2px);
+}
+
+.dashboard-card::before {
+  content: "";
+  display: block;
+  height: 4px;
+  width: 100%;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.dashboard-card h5 {
+  margin: 0;
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+.dashboard-card p {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-heading);
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-primary);
+}
+
+/* Card accent colors — Brand palette */
+.card-investments::before { background: var(--gradient-ember); }
+.card-debts::before { background-color: var(--color-error); }
+.card-assets::before { background-color: var(--color-secondary); }
+.card-liabilities::before { background-color: var(--color-accent); }
+.card-networth::before { background-color: var(--color-success); }
+
+/* Budget page accent cards */
+.card-allocated::before { background-color: var(--color-accent); }
+.card-netincome::before { background-color: var(--color-info); }
+.card-remaining::before { background-color: var(--color-success); }
+
+/* =================================================================
+   PROGRESS BARS — Brand Colors
+   ================================================================= */
+
+.progress-bar.bg-dashboard-green {
+  background-color: var(--color-success) !important;
+}
+.progress-bar.bg-dashboard-red {
+  background-color: var(--color-error) !important;
+}
+.progress-bar.bg-dashboard-yellow {
+  background-color: var(--color-accent) !important;
+}
+
+.text-dashboard-green {
+  color: var(--color-success) !important;
+}
+.text-dashboard-red {
+  color: var(--color-error) !important;
+}
+.text-dashboard-yellow {
+  color: var(--color-accent) !important;
+}
+
+.progress {
+  background-color: var(--color-bg-3);
+  border-radius: var(--radius-full);
+}
+
+/* =================================================================
+   STAT BOX
+   ================================================================= */
+
 .stat-box {
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
   text-align: center;
+  background-color: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  color: #6c757d;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
 }
+
+/* =================================================================
+   CHARTS
+   ================================================================= */
 
 .chart-wrapper {
   position: relative;
   width: 100%;
-  height: 100%; /* fills parent */
-  min-height: 250px; /* controls chart height */
+  height: 100%;
+  min-height: 250px;
 }
 
 .chart-wrapper canvas {
@@ -85,123 +312,750 @@ h1, h3 {
   display: block;
 }
 
+/* =================================================================
+   TABLES
+   ================================================================= */
+
+.table {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
+  --bs-table-bg: var(--color-bg-2);
+  --bs-table-color: var(--color-text-primary);
+  --bs-table-border-color: var(--color-border-subtle);
+  --bs-table-striped-bg: rgba(var(--color-bg-3-rgb), 0.5);
+  --bs-table-hover-bg: rgba(var(--color-primary-rgb), 0.08);
+  --bs-table-hover-color: var(--color-text-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.table th {
+  background-color: var(--color-bg-3);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-body-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  border-bottom: 2px solid var(--color-border-default);
+  padding: var(--space-3) var(--space-4);
+}
+
+.table td {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
+  padding: var(--space-3) var(--space-4);
+  vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: rgba(var(--color-bg-3-rgb), 0.3);
+}
+
+table.table {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+/* =================================================================
+   BUTTONS — Bootstrap Overrides
+   ================================================================= */
+
+.btn {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-normal) var(--ease-default);
+  font-size: var(--text-body-sm);
+  padding: var(--space-2) var(--space-4);
+}
+
+/* Primary — Warm Amber with dark text */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-on-brand);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-text-on-brand);
+  box-shadow: var(--shadow-glow-sm);
+}
+
+.btn-primary:active {
+  background-color: var(--color-primary-active);
+  border-color: var(--color-primary-active);
+  color: var(--color-text-on-brand);
+}
+
+/* Outline Primary — Ghost style */
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: transparent;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-on-brand);
+  box-shadow: var(--shadow-glow-sm);
+}
+
+/* Secondary — Copper */
+.btn-secondary {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Danger */
+.btn-danger {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: var(--color-text-on-brand);
+}
+
+.btn-danger:hover {
+  background-color: #D04E48;
+  border-color: #D04E48;
+  color: var(--color-text-on-brand);
+  box-shadow: 0 0 12px rgba(var(--color-error-rgb), 0.3);
+}
+
+/* Success */
+.btn-success {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--color-text-on-brand);
+}
+
+.btn-success:hover {
+  background-color: #4FA44F;
+  border-color: #4FA44F;
+  color: var(--color-text-on-brand);
+}
+
+/* Warning / Accent */
+.btn-warning {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-text-on-brand);
+}
+
+.btn-warning:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  color: var(--color-text-on-brand);
+}
+
+/* Close button — visible on dark */
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* =================================================================
+   FORMS — Bootstrap Overrides
+   ================================================================= */
+
+.form-control,
+.form-select {
+  background-color: var(--color-bg-3);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  transition: border-color var(--duration-normal) var(--ease-default),
+              box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.form-control::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.form-control:disabled {
+  background-color: var(--color-bg-2);
+  color: var(--color-text-tertiary);
+  opacity: 0.7;
+}
+
+.form-select option {
+  background-color: var(--color-bg-3);
+  color: var(--color-text-primary);
+}
+
+.form-label {
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-body-sm);
+}
+
+.form-check-label {
+  color: var(--color-text-secondary);
+}
+
+.input-group-text {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
+.form-check-input {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-default);
+}
+
+.form-check-input:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+  border-color: var(--color-primary);
+}
+
+/* Form Switch */
+.form-switch .form-check-input {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-strong);
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* =================================================================
+   MODALS
+   ================================================================= */
+
+.modal {
+  background: none !important;
+}
+
+.modal-content {
+  background-color: var(--color-bg-2);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-floating);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding: var(--space-4) var(--space-5);
+}
+
+.modal-body {
+  padding: var(--space-5);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: var(--space-4) var(--space-5);
+}
+
+.modal-title {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.modal-dialog {
+  margin: 1.75rem auto;
+  max-width: 600px;
+}
+
+.modal-backdrop {
+  background-color: rgba(var(--color-bg-1-rgb), 0.8);
+}
+
+/* =================================================================
+   DROPDOWNS
+   ================================================================= */
+
+.dropdown-menu {
+  background-color: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.dropdown-item {
+  color: var(--color-text-secondary);
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-3);
+}
+
+.dropdown-divider {
+  border-top-color: var(--color-border-subtle);
+}
+
+/* =================================================================
+   BADGES — Bootstrap Overrides
+   ================================================================= */
+
+.badge.bg-secondary-subtle {
+  background-color: rgba(var(--color-primary-rgb), 0.12) !important;
+  color: var(--color-primary) !important;
+}
+
+.badge.bg-success {
+  background-color: var(--color-success-bg) !important;
+  color: var(--color-success) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--color-warning-bg) !important;
+  color: var(--color-accent) !important;
+}
+
+.badge.bg-info {
+  background-color: var(--color-info-bg) !important;
+  color: var(--color-info) !important;
+}
+
+.text-secondary-emphasis {
+  color: var(--color-primary) !important;
+}
+
+/* =================================================================
+   ALERTS
+   ================================================================= */
+
+.alert-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.alert-danger {
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.alert-warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.alert-info {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+  border-color: var(--color-info);
+}
+
+/* =================================================================
+   UPCOMING PAYMENTS LIST
+   ================================================================= */
+
+#upcomingPaymentsList .border-bottom {
+  border-color: var(--color-border-subtle) !important;
+}
+
+#upcomingPaymentsList strong {
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+}
+
+#upcomingPaymentsList small {
+  font-size: var(--text-caption);
+}
+
+.text-danger {
+  color: var(--color-error) !important;
+}
+
+.text-success {
+  color: var(--color-success) !important;
+}
+
+.text-warning {
+  color: var(--color-accent) !important;
+}
+
+.text-info {
+  color: var(--color-info) !important;
+}
+
+/* =================================================================
+   THEME TOGGLE
+   ================================================================= */
+
+.theme-toggle {
+  padding: var(--space-4);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.theme-toggle .form-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.theme-toggle .form-check-label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-sm);
+}
+
+/* =================================================================
+   BOOTSTRAP VARIABLE OVERRIDES
+   ================================================================= */
+
+:root {
+  --bs-body-bg: var(--color-bg-1);
+  --bs-body-color: var(--color-text-primary);
+  --bs-secondary-color: var(--color-text-secondary);
+  --bs-border-color: var(--color-border-subtle);
+  --bs-primary: var(--color-primary);
+  --bs-primary-rgb: var(--color-primary-rgb);
+  --bs-link-color: var(--color-primary);
+  --bs-link-hover-color: var(--color-accent);
+  --chart-text-color: var(--color-text-primary);
+}
+
+/* =================================================================
+   RESPONSIVE — Mobile sidebar collapse
+   ================================================================= */
 
 @media (max-width: 768px) {
   .d-flex.align-items-stretch {
     flex-direction: column;
   }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
 }
 
-.dashboard-card {
-  background: #fff;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  padding: 1.25rem;
-  position: relative;
-  border: 1px solid #e3e6f0;
-  min-width: 220px;
-  flex: 1;
+/* =================================================================
+   SCROLLBAR — Custom warm styling
+   ================================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.dashboard-card::before {
+::-webkit-scrollbar-track {
+  background: var(--color-bg-1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* =================================================================
+   AMBIENT GLOW — Subtle brand warmth on main content
+   ================================================================= */
+
+.main-content::before {
   content: "";
-  display: block;
-  height: 5px;
-  width: 100%;
-  border-radius: 0.75rem 0.75rem 0 0;
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: 0;
+  left: 240px;
+  right: 0;
+  height: 300px;
+  background: var(--gradient-glow);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.card-investments::before { background-color: #4e73df; }
-.card-debts::before { background-color: #e74a3b; }
-.card-assets::before { background-color: #36b9cc; }
-.card-liabilities::before { background-color: #f6c23e; }
-.card-networth::before { background-color: #1cc88a; }
-
-/* Custom Progress Bar Colors to match Dashboard Cards */
-.progress-bar.bg-dashboard-green {
-  background-color: #1cc88a !important; /* from .card-networth */
-}
-.progress-bar.bg-dashboard-red {
-  background-color: #e74a3b !important; /* from .card-debts */
-}
-.progress-bar.bg-dashboard-yellow {
-  background-color: #f6c23e !important; /* from .card-liabilities */
+.main-content > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* Custom Text Colors to match Dashboard Cards */
-.text-dashboard-green {
-  color: #1cc88a !important; /* from .card-networth */
-}
-.text-dashboard-red {
-  color: #e74a3b !important; /* from .card-debts */
-}
-.text-dashboard-yellow {
-  color: #f6c23e !important; /* from .card-liabilities */
+/* =================================================================
+   LIGHT MODE — Override when toggled
+   ================================================================= */
+
+body[data-theme='light'] {
+  background-color: #FAF8F5;
+  color: #1C1A18;
 }
 
-/*
- * Dark Mode Form Input Fix
- */
-
-/* Styles the '$' sign container */
-[data-theme="dark"] .input-group-text {
-  background-color: #2a2f34; /* A dark background */
-  border-color: #454d55;     /* A slightly lighter border */
-  color: #dee2e6;             /* Light text color for the '$' sign */
+body[data-theme='light'] .sidebar {
+  background-color: #F2EEE9;
+  border-right-color: #E0DBD5;
 }
 
-/* Styles the actual input box */
-[data-theme="dark"] .form-control, 
-[data-theme="dark"] .form-select {
-  background-color: #212529; /* A dark background for the input */
-  border-color: #454d55;
-  color: #f8f9fa;           /* White text for what you type */
+body[data-theme='light'] .sidebar a {
+  color: #5A534A;
 }
 
-/* Changes text color to be light when the input is disabled */
-[data-theme="dark"] .form-control:disabled {
-  background-color: #343a40;
+body[data-theme='light'] .sidebar a:hover {
+  color: #1C1A18;
+  background-color: #EAE6E0;
 }
 
+body[data-theme='light'] .sidebar a.active {
+  color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+}
 
-.dashboard-card h5 { margin: 0; font-size: 1rem; color: #4e4e4e; }
-.dashboard-card p { font-size: 1.5rem; font-weight: 600; margin: 0.25rem 0 0; color: #1a1a1a; }
+body[data-theme='light'] .card,
+body[data-theme='light'] .dashboard-card {
+  background-color: #FFFFFF;
+  border-color: #E0DBD5;
+  color: #1C1A18;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
 
-/* === Dark Mode Styles === */
+body[data-theme='light'] .dashboard-card h5 {
+  color: #5A534A;
+}
+
+body[data-theme='light'] .dashboard-card p {
+  color: #1C1A18;
+}
+
+body[data-theme='light'] h1,
+body[data-theme='light'] h2,
+body[data-theme='light'] h3,
+body[data-theme='light'] h4,
+body[data-theme='light'] h5,
+body[data-theme='light'] h6,
+body[data-theme='light'] strong {
+  color: #1C1A18;
+}
+
+body[data-theme='light'] .card h5 {
+  color: #5A534A;
+}
+
+body[data-theme='light'] .main-content {
+  background-color: #F5F2EE;
+}
+
+body[data-theme='light'] .main-content::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(212, 148, 58, 0.04) 0%, transparent 60%);
+}
+
+body[data-theme='light'] .table th {
+  background-color: #F2EEE9;
+  color: #5A534A;
+  border-color: #E0DBD5;
+}
+
+body[data-theme='light'] .table td {
+  color: #302C28;
+  border-color: #E0DBD5;
+}
+
+body[data-theme='light'] .table {
+  --bs-table-bg: #FFFFFF;
+  --bs-table-border-color: #E0DBD5;
+}
+
+body[data-theme='light'] .table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: #FAF8F5;
+}
+
+body[data-theme='light'] .form-control,
+body[data-theme='light'] .form-select {
+  background-color: #FFFFFF;
+  border-color: #D5D0CA;
+  color: #1C1A18;
+}
+
+body[data-theme='light'] .form-control:focus,
+body[data-theme='light'] .form-select:focus {
+  background-color: #FFFFFF;
+  border-color: var(--color-primary);
+}
+
+body[data-theme='light'] .form-control::placeholder {
+  color: #918880;
+}
+
+body[data-theme='light'] .input-group-text {
+  background-color: #F2EEE9;
+  border-color: #D5D0CA;
+  color: #5A534A;
+}
+
+body[data-theme='light'] .modal-content {
+  background-color: #FFFFFF;
+  border-color: #E0DBD5;
+  color: #1C1A18;
+}
+
+body[data-theme='light'] .modal-header,
+body[data-theme='light'] .modal-footer {
+  border-color: #E0DBD5;
+}
+
+body[data-theme='light'] .modal-title {
+  color: #1C1A18;
+}
+
+body[data-theme='light'] .dropdown-menu {
+  background-color: #FFFFFF;
+  border-color: #E0DBD5;
+}
+
+body[data-theme='light'] .dropdown-item {
+  color: #5A534A;
+}
+
+body[data-theme='light'] .dropdown-item:hover {
+  background-color: #F2EEE9;
+  color: #1C1A18;
+}
+
+body[data-theme='light'] .dropdown-divider {
+  border-top-color: #E0DBD5;
+}
+
+body[data-theme='light'] .btn-close {
+  filter: none;
+}
+
+body[data-theme='light'] .btn-secondary {
+  background-color: #F2EEE9;
+  border-color: #D5D0CA;
+  color: #302C28;
+}
+
+body[data-theme='light'] .btn-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+body[data-theme='light'] small,
+body[data-theme='light'] .text-muted {
+  color: #918880 !important;
+}
+
+body[data-theme='light'] .form-check-label {
+  color: #5A534A;
+}
+
+body[data-theme='light'] .form-check-input {
+  background-color: #FFFFFF;
+  border-color: #D5D0CA;
+}
+
+body[data-theme='light'] .form-switch .form-check-input {
+  background-color: #E0DBD5;
+  border-color: #D5D0CA;
+}
+
+body[data-theme='light'] .theme-toggle {
+  border-top-color: #E0DBD5;
+}
+
+body[data-theme='light'] .stat-box {
+  background-color: #FFFFFF;
+  border-color: #E0DBD5;
+}
+
+body[data-theme='light'] .progress {
+  background-color: #E0DBD5;
+}
+
+body[data-theme='light'] .sidebar .sidebar-brand h4 {
+  color: #1C1A18;
+}
+
+body[data-theme='light'] #upcomingPaymentsList .border-bottom {
+  border-color: #E0DBD5 !important;
+}
+
+body[data-theme='light'] ::-webkit-scrollbar-track {
+  background: #F5F2EE;
+}
+
+body[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background: #D5D0CA;
+}
+
+body[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
+  background: #B5ADA4;
+}
+
+body[data-theme='light'] {
+  --bs-body-color: #1C1A18;
+  --bs-secondary-color: #5A534A;
+  --chart-text-color: #1C1A18;
+}
+
+/* =================================================================
+   DARK MODE EXPLICIT — Matches base (for data-theme='dark')
+   These ensure compatibility with app.js theme toggle
+   ================================================================= */
+
 body[data-theme='dark'] {
-  background-color: #121212;
-  color: #eaeaea;
+  background-color: var(--color-bg-1);
+  color: var(--color-text-primary);
+  --bs-body-color: var(--color-text-primary);
+  --bs-secondary-color: var(--color-text-secondary);
+  --chart-text-color: var(--color-text-primary);
 }
 
 body[data-theme='dark'] .sidebar {
-  background-color: #1f1f1f;
+  background-color: var(--color-bg-2);
+}
+
+body[data-theme='dark'] .main-content {
+  background-color: var(--color-bg-1);
 }
 
 body[data-theme='dark'] .card,
 body[data-theme='dark'] .dashboard-card {
-  background-color: #1e1e1e;
-  color: #eaeaea;
-  border-color: #333;
-}
-
-body[data-theme='dark'] .table th {
-  background-color: #2a2a2a;
-}
-
-body[data-theme='dark'] .sidebar a {
-  color: #eaeaea;
-}
-
-body[data-theme='dark'] .sidebar a.active,
-body[data-theme='dark'] .sidebar a:hover {
-  background-color: #333;
-  border-left-color: #fff;
-}
-body[data-theme='dark'] .main-content {
-  background-color: #181a1b; /* match body for full contrast */
+  background-color: var(--color-bg-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
 }
 
 body[data-theme='dark'] .dashboard-card h5,
@@ -210,187 +1064,93 @@ body[data-theme='dark'] h2,
 body[data-theme='dark'] h5,
 body[data-theme='dark'] small,
 body[data-theme='dark'] strong {
-  color: #eaeaea;
-}
-:root {
-  --chart-text-color: #000;
+  color: var(--color-text-primary);
 }
 
-body[data-theme='dark'] {
-  --chart-text-color: #eaeaea;
+body[data-theme='dark'] .table th {
+  background-color: var(--color-bg-3);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-default);
 }
 
+body[data-theme='dark'] .table td {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
+}
 
-/* Fix muted and small text visibility in dark mode */
-body[data-theme='dark'] {
-  --bs-body-color: #e0e0e0;
-  --bs-secondary-color: #cccccc;
+body[data-theme='dark'] .form-control,
+body[data-theme='dark'] .form-select {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
+}
+
+body[data-theme='dark'] .form-control::placeholder,
+body[data-theme='dark'] .form-select option {
+  color: var(--color-text-tertiary);
+}
+
+body[data-theme='dark'] .form-control:disabled {
+  background-color: var(--color-bg-2);
+}
+
+body[data-theme='dark'] .modal-content {
+  background-color: var(--color-bg-2);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
+}
+
+body[data-theme='dark'] .modal-header,
+body[data-theme='dark'] .modal-body,
+body[data-theme='dark'] .modal-footer {
+  background-color: var(--color-bg-2);
+  border-color: var(--color-border-subtle);
+}
+
+body[data-theme='dark'] .modal-title {
+  color: var(--color-text-primary);
+}
+
+body[data-theme='dark'] .input-group-text {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
+body[data-theme='dark'] .sidebar a {
+  color: var(--color-text-secondary);
+}
+
+body[data-theme='dark'] .sidebar a.active,
+body[data-theme='dark'] .sidebar a:hover {
+  color: var(--color-primary);
+}
+
+body[data-theme='dark'] .dropdown-menu {
+  background-color: var(--color-bg-2);
+  border-color: var(--color-border-subtle);
+}
+
+body[data-theme='dark'] .dropdown-item {
+  color: var(--color-text-secondary);
+}
+
+body[data-theme='dark'] .dropdown-item:hover,
+body[data-theme='dark'] .dropdown-item:focus {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-3);
+}
+
+body[data-theme='dark'] .dropdown-divider {
+  border-top-color: var(--color-border-subtle);
 }
 
 body[data-theme='dark'] .text-muted,
 body[data-theme='dark'] small,
 body[data-theme='dark'] .text-muted small {
-  color: var(--bs-secondary-color) !important;
+  color: var(--color-text-secondary) !important;
 }
-
-.theme-toggle {
-  padding: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.theme-toggle .form-check {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 
 body[data-theme='dark'] .form-check-label {
-  color: #eaeaea;
+  color: var(--color-text-secondary);
 }
-
-/* DARK MODE TABLE OVERRIDES */
-body[data-theme='dark'] table.table {
-  background-color: #1e1e1e;
-  color: #eaeaea;
-  border-color: #333;
-}
-
-body[data-theme='dark'] .table th {
-  background-color: #2a2a2a;
-  color: #ffffff;
-  border-color: #444;
-}
-
-body[data-theme='dark'] .table td {
-  background-color: #1e1e1e;
-  color: #eaeaea;
-  border-color: #444;
-}
-
-body[data-theme='dark'] .table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #2b2b2b;
-}
-/* Enhance tables to match card styling in dark mode */
-body[data-theme='dark'] table.table {
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-}
-
-body[data-theme='dark'] .table th,
-body[data-theme='dark'] .table td {
-  border: 1px solid #444; /* subtle gridlines */
-}
-
-body[data-theme='dark'] .table thead th {
-  border-bottom: 2px solid #555;
-}
-
-/* Optional: enhance tables in light mode too */
-table.table {
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-}
-
-.table th,
-.table td {
-  border: 1px solid #e3e6f0;
-}
-
-.table thead th {
-  border-bottom: 2px solid #dee2e6;
-}
-
-/* Modal appearance in dark mode */
-body[data-theme='dark'] .modal-content {
-  background-color: #1f1f1f;
-  color: #eaeaea;
-  border: none;
-  border-radius: 0.75rem;
-  box-shadow: 0 0 10px rgba(0,0,0,0.6);
-}
-
-body[data-theme='dark'] .modal-header,
-body[data-theme='dark'] .modal-body,
-body[data-theme='dark'] .modal-footer {
-  background-color: #1f1f1f;
-  border-color: #333;
-}
-
-body[data-theme='dark'] .modal-title {
-  color: #fff;
-}
-
-/* Inputs and selects */
-body[data-theme='dark'] .form-control,
-body[data-theme='dark'] .form-select {
-  background-color: #2c2c2c;
-  color: #eaeaea;
-  border: 1px solid #555;
-}
-
-body[data-theme='dark'] .form-control::placeholder,
-body[data-theme='dark'] .form-select option {
-  color: #aaa;
-}
-.modal {
-  background: none !important;
-}
-/* Fix modal alignment in dark mode */
-body[data-theme='dark'] .modal-dialog {
-  margin: 1.75rem auto;
-  max-width: 600px;
-}
-
-body[data-theme='dark'] .modal-content {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 1.25rem;
-  background-color: #1f1f1f;
-  color: #eaeaea;
-  border-radius: 0.75rem;
-  border: 1px solid #333;
-}
-
-/* Ensure inner sections don't break layout */
-body[data-theme='dark'] .modal-header,
-body[data-theme='dark'] .modal-body,
-body[data-theme='dark'] .modal-footer {
-  padding: 1rem 1.25rem;
-}
-
-.card-allocated::before { background-color: #f6c23e; }   /* Yellow */
-.card-netincome::before { background-color: #36b9cc; }   /* Teal */
-.card-remaining::before { background-color: #1cc88a; }   /* Green */
-
-/*
- * Dark Mode Dropdown Menu Fix
- */
-
-/* Sets the background color for the dropdown menu itself */
-[data-theme="dark"] .dropdown-menu {
-  background-color: #2a2f34;
-  border-color: #454d55;
-}
-
-/* Sets the text color for the links inside the dropdown */
-[data-theme="dark"] .dropdown-item {
-  color: #dee2e6;
-}
-
-/* Sets the color and background for a link when you hover over it */
-[data-theme="dark"] .dropdown-item:hover,
-[data-theme="dark"] .dropdown-item:focus {
-  color: #ffffff;
-  background-color: #495057;
-}
-
-/* Makes the horizontal divider line visible in dark mode */
-[data-theme="dark"] .dropdown-divider {
-  border-top-color: #454d55;
-}
-

@@ -1,4 +1,4 @@
-// ===== DEBUG UTILITY =====
+﻿// ===== DEBUG UTILITY =====
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
 
@@ -37,11 +37,11 @@ function getNextDate(currentDate, frequency) {
   return nextDate;
 }
 function getThemeColors() {
-  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const isDark = document.body.getAttribute('data-theme') !== 'light';
   return {
-      fill: isDark ? 'rgba(78, 115, 223, 0.2)' : 'rgba(78, 115, 223, 0.1)',
-      text: isDark ? '#eaeaea' : '#333',
-      grid: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+      fill: isDark ? 'rgba(212, 148, 58, 0.15)' : 'rgba(212, 148, 58, 0.1)',
+      text: isDark ? '#F2EBE3' : '#1C1A18',
+      grid: isDark ? 'rgba(242, 235, 227, 0.08)' : 'rgba(28, 26, 24, 0.1)'
   };
 }
 function dedupeSnapshotsByDate(snaps) {
@@ -199,13 +199,13 @@ async function signUp(email, password, firstName, lastName) {
     } else if (data?.user && !data?.session) {
       // User created but no session = email confirmation required
       showAuthAlert('signupAlert',
-        '✅ Account created! Please check your email (including spam folder) and click the confirmation link before logging in.',
+        'âœ… Account created! Please check your email (including spam folder) and click the confirmation link before logging in.',
         'success'
       );
       document.getElementById('signupForm')?.reset();
     } else {
-      // Auto-confirmed — session exists
-      showAuthAlert('signupAlert', '✅ Account created successfully! Logging you in...', 'success');
+      // Auto-confirmed â€” session exists
+      showAuthAlert('signupAlert', 'âœ… Account created successfully! Logging you in...', 'success');
       setTimeout(() => {
         bootstrap.Modal.getInstance(document.getElementById('signupModal'))?.hide();
       }, 1000);
@@ -230,7 +230,7 @@ async function login(email, password) {
       return;
     }
 
-    showAuthAlert('loginAlert', '✅ Login successful!', 'success');
+    showAuthAlert('loginAlert', 'âœ… Login successful!', 'success');
     setTimeout(() => {
       bootstrap.Modal.getInstance(document.getElementById('loginModal'))?.hide();
       hideAuthAlert('loginAlert');
@@ -261,7 +261,7 @@ async function forgotPassword(email) {
       return;
     }
 
-    showAuthAlert('forgotAlert', '✅ Password reset link sent! Check your email (including spam folder).', 'success');
+    showAuthAlert('forgotAlert', 'âœ… Password reset link sent! Check your email (including spam folder).', 'success');
   } catch (err) {
     showAuthAlert('forgotAlert', 'An unexpected error occurred. Please try again.', 'danger');
     console.error('Forgot password error:', err);
@@ -280,7 +280,7 @@ async function updatePassword(newPassword) {
       return;
     }
 
-    showAuthAlert('resetPasswordAlert', '✅ Password updated successfully! Redirecting...', 'success');
+    showAuthAlert('resetPasswordAlert', 'âœ… Password updated successfully! Redirecting...', 'success');
     setTimeout(() => {
       bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal'))?.hide();
       window.location.hash = '';
@@ -346,7 +346,7 @@ function renderAll() {
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
-  // Use 'totalInvestments' as the check — it only exists on the dashboard, not reports.html
+  // Use 'totalInvestments' as the check â€” it only exists on the dashboard, not reports.html
   if (document.getElementById('totalInvestments')) {
       updateDashboardCards();
       renderUpcomingPayments();
@@ -691,7 +691,7 @@ function renderEmergencyFundChart() {
               labels: ['Goal', 'Current'],
               datasets: [{
                   data: [emergencyGoal, emergencyCurrent],
-                  backgroundColor: ['#f6c23e', '#1cc88a'],
+                  backgroundColor: ['#F0B848', '#5CB85C'],
                   barThickness: 50
               }]
           },
@@ -778,10 +778,10 @@ async function renderAdditionalCharts() {
       datasets: [{
         label: 'Change ($)',
         data: netData,
-        backgroundColor: ctx => ctx.raw < 0 ? '#e74a3b' : '#1cc88a'
+        backgroundColor: ctx => ctx.raw < 0 ? '#E85B54' : '#5CB85C'
       }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { ticks: { color: '#ccc' }, grid: { display: false } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#B5ADA4' }, grid: { color: 'rgba(242,235,227,0.08)' } }, x: { ticks: { color: '#B5ADA4' }, grid: { display: false } } } }
   }, 'Net Worth Delta');
 
   // --- Spending Categories ---
@@ -799,10 +799,10 @@ async function renderAdditionalCharts() {
       labels: spendLabels,
       datasets: [{
         data: spendValues,
-        backgroundColor: ['#4e73df', '#36b9cc', '#f6c23e', '#e74a3b', '#858796']
+        backgroundColor: ['#D4943A', '#C07848', '#F0B848', '#E85B54', '#918880']
       }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccc' } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#B5ADA4' } } } }
   }, 'Spending Categories');
 
   // --- Savings Rate Over Time (WARN-07 FIX: per-month calculation) ---
@@ -853,18 +853,18 @@ async function renderAdditionalCharts() {
         label: 'Savings Rate %',
         data: savingsData,
         fill: true,
-        borderColor: '#1cc88a',
-        backgroundColor: 'rgba(28, 200, 138, 0.2)',
+        borderColor: '#5CB85C',
+        backgroundColor: 'rgba(92, 184, 92, 0.15)',
         tension: 0.4
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#ccc' } } },
+      plugins: { legend: { labels: { color: '#B5ADA4' } } },
       scales: {
-        y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-        x: { ticks: { color: '#ccc' }, grid: { display: false } }
+        y: { ticks: { color: '#B5ADA4' }, grid: { color: 'rgba(242,235,227,0.08)' } },
+        x: { ticks: { color: '#B5ADA4' }, grid: { display: false } }
       }
     }
   }, 'Savings Rate');
@@ -901,18 +901,18 @@ async function renderAdditionalCharts() {
         label: 'Projected Value ($)',
         data: investData,
         fill: true,
-        borderColor: '#4e73df',
-        backgroundColor: 'rgba(78, 115, 223, 0.2)',
+        borderColor: '#D4943A',
+        backgroundColor: 'rgba(212, 148, 58, 0.15)',
         tension: 0.3
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#ccc' } } },
+      plugins: { legend: { labels: { color: '#B5ADA4' } } },
       scales: {
-        y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-        x: { ticks: { color: '#ccc' }, grid: { display: false } }
+        y: { ticks: { color: '#B5ADA4' }, grid: { color: 'rgba(242,235,227,0.08)' } },
+        x: { ticks: { color: '#B5ADA4' }, grid: { display: false } }
       }
     }
   }, 'Investment Growth');
@@ -1008,7 +1008,7 @@ async function loadAndRenderBudget() {
       const assignedAmount = getRaw(e.target.value);
       if (!currentUser || !itemId) return;
     
-      // 🧠 NEW: Derive item type
+      // ðŸ§  NEW: Derive item type
       const isBill = window.bills?.some(b => b.id === itemId);
       const itemType = isBill ? 'bill' : 'debt';
     
@@ -1155,7 +1155,7 @@ function renderNetWorthChart() {
   if (netWorthChart) netWorthChart.destroy();
   const snaps = dedupeSnapshotsByDate(window.snapshots || []);
   const theme = getThemeColors();
-  netWorthChart = safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#4e73df', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
+  netWorthChart = safeCreateChart(ctx, { type: 'line', data: { labels: snaps.map(s => s.date), datasets: [{ label: 'Net Worth', data: snaps.map(s => getRaw(s.netWorth)), borderColor: '#D4943A', backgroundColor: theme.fill, tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => formatCurrency(v), color: theme.text }, grid: { color: theme.grid } }, x: { ticks: { color: theme.text }, grid: { display: false } } }, plugins: { legend: { display: false } } } }, 'Net Worth Timeline');
 }
 function generateMonthlyCashFlowChart() {
   const ctx = document.getElementById('cashFlowChart');
@@ -1184,7 +1184,7 @@ function generateMonthlyCashFlowChart() {
       });
       incomeTotals.push(monthlyIncome); expenseTotals.push(monthlyExpenses);
   }
-  cashFlowChart = safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#1cc88a' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#e74a3b' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
+  cashFlowChart = safeCreateChart(ctx, { type: 'bar', data: { labels: months, datasets: [{ label: 'Income', data: incomeTotals, backgroundColor: '#5CB85C' }, { label: 'Expenses', data: expenseTotals, backgroundColor: '#E85B54' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { color: theme.text }, grid: { display: false } }, y: { stacked: true, ticks: { color: theme.text }, grid: { color: theme.grid } } }, plugins: { legend: { labels: { color: theme.text } } } } }, 'Cash Flow');
 }
 
 // ===== INITIALIZATION =====
@@ -1199,7 +1199,7 @@ function setupThemeToggle() {
       document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
       themeSwitch.checked = isDark;
       if (themeLabel) {
-          themeLabel.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+          themeLabel.textContent = isDark ? 'â˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
       }
   };
 
@@ -1216,7 +1216,7 @@ function setupThemeToggle() {
   });
 
   // On page load, apply the theme that was saved in localStorage
-  applyTheme(localStorage.getItem('theme') === 'dark');
+  applyTheme(localStorage.getItem('theme') !== 'light');
 }
 function initializeAssetForm() {
   const assetTypeDropdown = document.getElementById("assetType");
@@ -1236,7 +1236,7 @@ function init() {
     debugLog(`AUTH: Event received: ${event}`);
     currentUser = session?.user || null;
   
-    // Handle password recovery event — show reset password modal
+    // Handle password recovery event â€” show reset password modal
     if (event === 'PASSWORD_RECOVERY') {
       const resetModal = document.getElementById('resetPasswordModal');
       if (resetModal) {
