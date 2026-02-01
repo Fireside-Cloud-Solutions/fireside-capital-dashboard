@@ -81,6 +81,16 @@ function sanitizeHTML(str) {
     return div.innerHTML;
 }
 
+function escapeAttribute(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 // ===== UTILITY & HELPER FUNCTIONS =====
 function getRaw(value) {
   if (typeof value === 'number') return value;
@@ -145,7 +155,10 @@ async function safeCreateChart(ctx, config, chartName) {
     console.error(`Failed to render ${chartName || 'chart'}:`, err);
     const el = (typeof ctx === 'string') ? document.getElementById(ctx) : ctx;
     if (el && el.parentElement) {
-      el.parentElement.innerHTML = '<p class="text-muted text-center mt-3">Chart could not be loaded.</p>';
+      const errorMsg = document.createElement('p');
+      errorMsg.className = 'text-muted text-center mt-3';
+      errorMsg.textContent = 'Chart could not be loaded.';
+      el.parentElement.replaceChildren(errorMsg);
     }
     return null;
   }
@@ -516,8 +529,8 @@ function renderAssets() {
           <td>${formatCurrency(a.loan)}</td><td>${formatCurrency(Math.max(getRaw(a.value) - getRaw(a.loan), 0))}</td>
           <td>${a.nextDueDate ? formatDate(a.nextDueDate) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openAssetModal('${a.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAsset('${a.id}', '${escapeHtml(a.name)}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openAssetModal('${a.id}')" aria-label="Edit ${escapeHtml(a.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAsset('${a.id}', '${escapeHtml(a.name)}')" aria-label="Delete ${escapeHtml(a.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -584,8 +597,8 @@ function renderInvestments() {
           <td>${formatCurrency(inv.monthlyContribution)}</td><td>${inv.annualReturn ? inv.annualReturn + '%' : '-'}</td>
           <td>${inv.nextContributionDate ? formatDate(inv.nextContributionDate) : '-'}</td><td>${formatCurrency(inv.value)}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openInvestmentModal('${inv.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${inv.id}', '${escapeHtml(inv.name)}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openInvestmentModal('${inv.id}')" aria-label="Edit ${escapeHtml(inv.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${inv.id}', '${escapeHtml(inv.name)}')" aria-label="Delete ${escapeHtml(inv.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -646,8 +659,8 @@ function renderDebts() {
           <td>${d.term || '-'} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
           <td>${d.nextDueDate ? formatDate(d.nextDueDate) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openDebtModal('${d.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${d.id}', '${escapeHtml(d.name)}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openDebtModal('${d.id}')" aria-label="Edit ${escapeHtml(d.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${d.id}', '${escapeHtml(d.name)}')" aria-label="Delete ${escapeHtml(d.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -895,9 +908,9 @@ function renderBills() {
           <td>${escapeHtml(b.name)} ${sharedBadge}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}${shareInfo && shareInfo.status === 'accepted' ? `<small class="d-block" style="color: var(--color-text-tertiary);">Your share: ${formatCurrency(shareInfo.owner_amount)}</small>` : ''}</td>
           <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? formatDate(b.nextDueDate) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" title="Share bill"><i class="bi bi-share"></i></button>
-              <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" aria-label="Share ${escapeHtml(b.name)}"><i class="bi bi-share"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')" aria-label="Edit ${escapeHtml(b.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')" aria-label="Delete ${escapeHtml(b.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`;
   }).join('');
@@ -958,9 +971,9 @@ function renderBills() {
                     <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
                   </div>
                   <div class="text-end">
-                    <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" title="Share bill"><i class="bi bi-share"></i></button>
-                    <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${b.id}')" aria-label="Share ${escapeHtml(b.name)}"><i class="bi bi-share"></i></button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')" aria-label="Edit ${escapeHtml(b.name)}"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')" aria-label="Delete ${escapeHtml(b.name)}"><i class="bi bi-trash"></i></button>
                   </div>
                 </div>
                 <div class="mb-3">
@@ -1020,8 +1033,8 @@ function renderBills() {
                   <span class="badge bg-success">Paid Off</span>
                 </div>
                 <div class="text-end">
-                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')"><i class="bi bi-trash"></i></button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')" aria-label="Edit ${escapeHtml(b.name)}"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}', '${escapeHtml(b.name)}')" aria-label="Delete ${escapeHtml(b.name)}"><i class="bi bi-trash"></i></button>
                 </div>
               </div>
               <div class="mb-3">
@@ -1346,8 +1359,8 @@ function renderIncome() {
           <td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.type)}</td><td>${formatCurrency(i.amount)}</td>
           <td>${escapeHtml(i.frequency)}</td><td>${i.nextDueDate ? formatDate(i.nextDueDate) : '-'}</td>
           <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="openIncomeModal('${i.id}')"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${i.id}', '${escapeHtml(i.name)}')"><i class="bi bi-trash"></i></button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openIncomeModal('${i.id}')" aria-label="Edit ${escapeHtml(i.name)}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${i.id}', '${escapeHtml(i.name)}')" aria-label="Delete ${escapeHtml(i.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
 }
@@ -1404,7 +1417,7 @@ async function renderEmergencyFundChart() {
 
   // Clear any previous chart or message
   if (emergencyFundChart) emergencyFundChart.destroy();
-  wrapper.innerHTML = '';
+  wrapper.textContent = '';
 
   const emergencyGoal = window.settings?.emergency_fund_goal || 0;
   const emergencyFundAsset = (window.investments || []).find(a => a.name.toLowerCase().includes('emergency fund'));
@@ -1685,7 +1698,14 @@ async function loadAndRenderBudget() {
   // If data is still not available after waiting, show a clear error message.
   if (!window.bills || !window.debts) {
       console.error("Budget page timeout: Data is not available after 10 seconds.");
-      document.getElementById('budgetAssignmentTable').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Could not load bill and debt data. Please try refreshing the page.</td></tr>`;
+      const tbody = document.getElementById('budgetAssignmentTable');
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 7;
+      cell.className = 'text-center text-danger';
+      cell.textContent = 'Could not load bill and debt data. Please try refreshing the page.';
+      row.appendChild(cell);
+      tbody.replaceChildren(row);
       return;
   }
   // --- END OF FIX #1 ---
@@ -1732,7 +1752,18 @@ async function loadAndRenderBudget() {
       incomeWarning = document.createElement('div');
       incomeWarning.id = 'incomeWarningBanner';
       incomeWarning.className = 'alert alert-warning mb-3';
-      incomeWarning.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>?? No income sources found for this month. <a href="income.html" class="alert-link">Add income on the Income page</a> to track your budget accurately.';
+      const icon = document.createElement('i');
+      icon.className = 'bi bi-exclamation-triangle-fill me-2';
+      const text1 = document.createTextNode('​​ No income sources found for this month. ');
+      const link = document.createElement('a');
+      link.href = 'income.html';
+      link.className = 'alert-link';
+      link.textContent = 'Add income on the Income page';
+      const text2 = document.createTextNode(' to track your budget accurately.');
+      incomeWarning.appendChild(icon);
+      incomeWarning.appendChild(text1);
+      incomeWarning.appendChild(link);
+      incomeWarning.appendChild(text2);
       tableCard.parentNode.insertBefore(incomeWarning, tableCard);
     }
   } else if (incomeWarning) {
@@ -1740,7 +1771,7 @@ async function loadAndRenderBudget() {
   }
 
   const tbody = document.getElementById('budgetAssignmentTable');
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   // Fetch shared bills for budget display (same logic as generateBudgetForMonth)
   let sharedBillsForDisplay = [];
@@ -2790,7 +2821,10 @@ async function loadNotifications() {
     const timeAgo = getTimeAgo(notif.created_at);
     
     li.innerHTML = `
-      <a class="dropdown-item py-2 px-3 ${isUnread ? '' : 'opacity-75'}" href="#" onclick="handleNotificationClick('${notif.id}', '${notif.type}', ${escapeHtml(JSON.stringify(notif.data || {}))})">
+      <a class="dropdown-item py-2 px-3 ${isUnread ? '' : 'opacity-75'}" href="#" 
+         data-notif-id="${escapeAttribute(notif.id)}" 
+         data-notif-type="${escapeAttribute(notif.type)}" 
+         data-notif-data="${escapeAttribute(JSON.stringify(notif.data || {}))}">
         <div class="d-flex align-items-start gap-2">
           <i class="bi ${iconClass} mt-1" style="font-size: 1.1rem;"></i>
           <div class="flex-grow-1">
@@ -2804,6 +2838,14 @@ async function loadNotifications() {
         </div>
       </a>
     `;
+    const link = li.querySelector('a');
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const id = this.dataset.notifId;
+      const type = this.dataset.notifType;
+      const data = JSON.parse(this.dataset.notifData);
+      handleNotificationClick(id, type, data);
+    });
     listEl.appendChild(li);
   });
 }
@@ -2868,7 +2910,7 @@ function showNotificationToast(notification) {
 async function searchFriends(query) {
   if (!currentUser || !query || query.length < 2) {
     const container = document.getElementById('searchResults');
-    if (container) container.innerHTML = '';
+    if (container) container.textContent = '';
     return;
   }
   
@@ -2915,7 +2957,10 @@ async function searchFriends(query) {
   if (!container) return;
   
   if (filtered.length === 0) {
-    container.innerHTML = '<p class="text-muted mt-2">No users found matching your search.</p>';
+    const message = document.createElement('p');
+    message.className = 'text-muted mt-2';
+    message.textContent = 'No users found matching your search.';
+    container.replaceChildren(message);
     return;
   }
   
@@ -3027,8 +3072,8 @@ async function loadFriendsPage() {
                 </div>
               </div>
               <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-success" onclick="acceptFriendRequest('${req.id}')"><i class="bi bi-check-lg"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="declineFriendRequest('${req.id}')"><i class="bi bi-x-lg"></i></button>
+                <button class="btn btn-sm btn-success" onclick="acceptFriendRequest('${req.id}')" aria-label="Accept friend request from ${escapeHtml(req.friend_email)}"><i class="bi bi-check-lg"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="declineFriendRequest('${req.id}')" aria-label="Decline friend request from ${escapeHtml(req.friend_email)}"><i class="bi bi-x-lg"></i></button>
               </div>
             </div>
           </div>
@@ -3077,7 +3122,13 @@ async function loadFriendsPage() {
         </div>
       `).join('');
     } else {
-      friendsContainer.innerHTML = '<div class="col-12"><p class="text-muted fst-italic">No friends yet. Search for people to connect with!</p></div>';
+      const col = document.createElement('div');
+      col.className = 'col-12';
+      const message = document.createElement('p');
+      message.className = 'text-muted fst-italic';
+      message.textContent = 'No friends yet. Search for people to connect with!';
+      col.appendChild(message);
+      friendsContainer.replaceChildren(col);
     }
   }
   
@@ -3310,7 +3361,10 @@ async function openShareBillModal(billId) {
   // Load friends into dropdown
   const friendSelect = document.getElementById('shareFriendSelect');
   const noFriendsMsg = document.getElementById('noFriendsMsg');
-  friendSelect.innerHTML = '<option value="">Select a friend...</option>';
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select a friend...';
+  friendSelect.replaceChildren(defaultOption);
   
   const { data: connections } = await sb
     .from('connections')

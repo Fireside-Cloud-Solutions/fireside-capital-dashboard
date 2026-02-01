@@ -162,7 +162,7 @@ function populateEmailReviewModal() {
   loadingEl?.classList.remove('d-none');
   emptyEl?.classList.add('d-none');
   batchActionsEl?.classList.add('d-none');
-  if (listEl) listEl.innerHTML = '';
+  if (listEl) listEl.textContent = '';
 
   // Simulate loading delay for UX
   setTimeout(() => {
