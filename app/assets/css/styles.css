@@ -24,6 +24,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Prevent horizontal overflow globally */
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+* {
+  max-width: 100%;
 }
 
 /* =================================================================
@@ -85,11 +96,14 @@ strong {
   margin-bottom: var(--space-6);
   flex-wrap: wrap;
   gap: var(--space-3);
+  max-width: 100%;
+  overflow: visible;
 }
 
 .page-header h2 {
   margin: 0;
   font-size: var(--text-h2);
+  word-break: break-word;
 }
 
 .page-header-actions {
@@ -97,6 +111,7 @@ strong {
   align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
+  max-width: 100%;
 }
 
 /* =================================================================
@@ -435,12 +450,15 @@ strong {
   width: 100%;
   height: 100%;
   min-height: 250px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .chart-wrapper canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
+  max-width: 100%;
 }
 
 /* =================================================================
@@ -1087,10 +1105,21 @@ strong {
     font-size: var(--text-h4);
   }
 
+  /* Tables — Ensure horizontal scroll works */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 600px; /* Force horizontal scroll on small screens */
+  }
+
   .table th,
   .table td {
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-caption);
+    white-space: nowrap; /* Prevent text wrapping that breaks layout */
   }
 
   /* Enhanced touch targets — Minimum 44px for mobile */
@@ -1207,6 +1236,70 @@ strong {
 }
 
 /* =================================================================
+   RESPONSIVE — Very small mobile (320px - 375px)
+   ================================================================= */
+
+@media (max-width: 375px) {
+  /* Reduce font sizes for better fit */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.1rem; }
+
+  /* Ensure cards don't overflow */
+  .card, .dashboard-card, .chart-card, .table-card {
+    margin-left: 0;
+    margin-right: 0;
+    overflow: visible;
+  }
+
+  /* Make stat values smaller on tiny screens */
+  .dashboard-card p {
+    font-size: 1.5rem;
+  }
+
+  /* Reduce padding in tight spaces */
+  .card-body-padded {
+    padding: var(--space-3);
+  }
+
+  /* Make buttons stack better */
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+    margin-bottom: var(--space-1);
+  }
+
+  /* Ensure dropdown menus don't overflow */
+  .dropdown-menu {
+    max-width: calc(100vw - 2rem);
+    left: 1rem !important;
+    right: 1rem !important;
+  }
+
+  /* Word wrap for long text */
+  p, span, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Tables must scroll horizontally */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0;
+  }
+
+  .table {
+    min-width: 650px;
+  }
+}
+
+/* =================================================================
    RESPONSIVE — Extra small mobile (360px and below)
    ================================================================= */
 
@@ -1226,6 +1319,17 @@ strong {
 
   h3, h4 {
     font-size: var(--text-h5);
+  }
+
+  /* Ensure tables scroll on very small screens */
+  .table {
+    min-width: 700px;
+  }
+
+  .table th,
+  .table td {
+    font-size: 11px;
+    padding: var(--space-1-5) var(--space-2);
   }
 }
 
