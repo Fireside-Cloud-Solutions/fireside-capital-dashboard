@@ -402,15 +402,64 @@
 }
 
 /* =================================================================
+   MOBILE TOP BAR — Bell + Welcome in same row as hamburger
+   Fix: Move notification/welcome to fixed header row on mobile
+   Fix: Center icons properly, make them bigger
+   ================================================================= */
+
+@media (max-width: 991.98px) {
+  /* Move notification/welcome bar to fixed position at top-right */
+  .main-content > .d-flex:first-child {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    left: auto;
+    z-index: calc(var(--z-sticky) + 10);
+    margin-bottom: 0 !important;
+  }
+
+  /* Bigger, properly centered hamburger toggle */
+  .sidebar-toggle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .sidebar-toggle .bi-list {
+    font-size: 1.75rem;
+  }
+
+  /* Fix icon centering in buttons on mobile */
+  /* The mobile .btn padding override breaks .btn-icon centering */
+  .btn.btn-icon {
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Bigger notification bell */
+  #notificationBell {
+    width: 48px;
+    height: 48px;
+  }
+
+  #notificationBell .bi-bell {
+    font-size: 1.35rem;
+  }
+}
+
+/* =================================================================
    NOTIFICATION DROPDOWN — Mobile full width
    ================================================================= */
 
 @media (max-width: 575.98px) {
   #notificationDropdown .dropdown-menu {
-    width: calc(100vw - 2rem) !important;
-    max-width: 100vw !important;
+    position: fixed !important;
+    top: 64px !important;
     right: 1rem !important;
     left: 1rem !important;
+    width: calc(100vw - 2rem) !important;
+    max-width: 100vw !important;
   }
 }
 
