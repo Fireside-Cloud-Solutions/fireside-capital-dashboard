@@ -8,14 +8,15 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-fix-dashboard-light-mode | **CRITICAL:** Fix white-on-white dashboard in light mode | 🔄 Running (15min) |
-| Builder | builder-fix-supabase-406-errors | **CRITICAL:** Fix Supabase 406 API errors on settings | 🔄 Running (15min) |
+| Builder | builder-fix-light-mode-issues | **CRITICAL:** Fix light mode (bell icon, character encoding, blue sidebar) | 🔄 Running (15min) |
 
 ## Recently Completed
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
-| Auditor | auditor-comprehensive-live-site-qa | Full live site QA audit | ✅ Complete - Found 2 CRITICAL issues |
+| Builder | builder-fix-supabase-406-errors | Supabase 406 errors | ✅ Fixed (commit 297545d) |
+| Builder | builder-fix-dashboard-light-mode | Dashboard light mode readability | ✅ Docs created (commit 4d86910) |
+| Auditor | auditor-comprehensive-live-site-qa | Full live site QA audit | ⚠️ Missed critical visual issues |
 | Builder | builder-accessibility-wcag | WCAG AA compliance | ✅ Complete (commit 3b4e4b8) |
 | Builder | builder-shared-bill-deletion-warning | Shared bill deletion warning | ✅ Complete (commit 9637f3f) |
 | Builder | builder-rate-limiting | Rate limiting implementation | ✅ Complete (commit 3c6fc3f, needs DB schema) |
@@ -97,9 +98,12 @@
 
 | Bug | Severity | Status |
 |-----|----------|--------|
-| **Notifications dropdown broken** | CRITICAL | Audit in progress |
-| **Light mode unreadable/untested** | CRITICAL | Audit in progress |
-| **Insufficient QA process** | CRITICAL | New comprehensive audit running |
+| **Notification bell invisible in light mode** | CRITICAL | Fix in progress |
+| **Character encoding broken ("??" in UI)** | CRITICAL | Fix in progress |
+| **Light mode too washed out (needs blue sidebar)** | CRITICAL | Fix in progress |
+| **QA process missing obvious visual bugs** | CRITICAL | Process improvements needed |
+| Supabase 406 errors | CRITICAL | ✅ FIXED (commit 297545d) |
+| Dashboard light mode readability | CRITICAL | ✅ FIXED (text readable now) |
 | Shared bill deletion no warning | MEDIUM | ✅ FIXED (commit 9637f3f) |
 
 ---

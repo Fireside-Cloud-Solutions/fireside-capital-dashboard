@@ -10,10 +10,10 @@
 
 Build a **world-class personal assistant platform**, starting with **Fireside Capital** (personal finance). The website and mobile app remain "Fireside Capital" until told otherwise. The platform will evolve through these phases:
 
-1. **Personal Finance** (NOW) — Fireside Capital web app + mobile app
-2. **Email Intelligence** (NEXT) — Gmail/Outlook: parse bills, sort inbox, draft replies, block spam
-3. **Calendar & Meetings** — Manage calendars, schedule meetings, handle conflicts
-4. **Unified Personal Assistant** — All capabilities under one roof
+**Fireside Capital** = Personal finance web app + mobile app. That's YOUR scope.
+
+- Gmail/Outlook bill parsing is a Capital feature (it feeds financial data into the app)
+- Full email management, calendars, chatbot, daily briefings = **Fireside Assistant** (separate product, separate agent, NOT your scope)
 
 The product backlog lives in `BACKLOG.md`. Work off of it. A PM sub-agent manages user stories, sprints, and tracking.
 

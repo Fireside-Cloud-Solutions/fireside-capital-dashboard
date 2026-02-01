@@ -24,17 +24,26 @@
 **Status:** Planning  
 **Description:** React Native + Expo mobile app for Fireside Capital. Same features as web, native feel.
 
-### EPIC-003: Email Intelligence
+### EPIC-003: Email Bill Parsing (Fireside Capital feature)
 **Status:** Backlog  
-**Description:** AI-powered email management — parse bills, sort inbox, draft replies, block spam. Gmail first, then Outlook, then expandable to other providers.
+**Description:** Parse bills from Gmail/Outlook and auto-import into Fireside Capital. This is a FINANCE feature — it feeds data into the personal finance app. Not full email management.
 
-### EPIC-004: Calendar & Meeting Management
+### EPIC-004: DevOps Integration
 **Status:** Backlog  
-**Description:** Manage calendars, schedule meetings, send invites, handle conflicts. Google Calendar + Outlook Calendar.
+**Description:** Azure DevOps project for backlog management, sprint tracking, CI/CD pipelines.
 
-### EPIC-005: Personal Assistant Platform
-**Status:** Future  
-**Description:** Unified personal assistant that manages finances, email, calendar, tasks, and more. The long-term vision.
+---
+
+### ⚠️ SEPARATE PRODUCT: Fireside Assistant
+The following epics belong to **Fireside Assistant** — a separate desktop application with its own codebase, agent, and project. NOT part of Fireside Capital.
+
+- **Email Intelligence** — Full inbox management, sorting, draft replies, spam blocking (Gmail + Outlook + more)
+- **Calendar & Meetings** — Manage calendars, schedule meetings, handle conflicts
+- **Daily Briefings** — Morning/evening digests, email summaries, action items
+- **Chatbot** — Interactive assistant for availability questions, business info, services
+- **Desktop App** — Native .exe with system tray, real-time monitoring, notifications
+
+These will be tracked in a separate backlog when Fireside Assistant development begins.
 
 ---
 
@@ -91,6 +100,14 @@
 | CAL-003 | Feature | P3 | L | Backlog | Schedule meetings & send invites |
 | CAL-004 | Feature | P3 | M | Backlog | Conflict detection & resolution |
 | CAL-005 | Feature | P4 | L | Backlog | Smart scheduling — find optimal meeting times |
+
+### EPIC-004: DevOps Integration
+
+| ID | Type | Priority | Size | Status | Title |
+|----|------|----------|------|--------|-------|
+| DEVOPS-001 | Chore | P2 | L | Backlog | Set up Azure DevOps project + boards |
+| DEVOPS-002 | Feature | P2 | M | Backlog | Sync BACKLOG.md ↔ Azure DevOps work items |
+| DEVOPS-003 | Chore | P3 | M | Backlog | CI/CD pipeline in DevOps (replace GitHub Actions) |
 
 ---
 
