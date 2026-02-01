@@ -560,18 +560,208 @@ async function deleteDebtConfirmed() {
 }
 
 // --- BILLS ---
+// Financing metadata for payoff tracking (used until DB schema has these columns)
+const FINANCING_META = {
+  'Golf Clubs':    { total_amount: 2501.04, payments_made: 12, total_payments: 12, status: 'paid_off', end_date: '2025-12-01' },
+  'Big Green Egg': { total_amount: 7788.48, payments_made: 8,  total_payments: 24, status: 'active' },
+  'XGIMI':         { total_amount: 1636.32, payments_made: 10, total_payments: 12, status: 'active' },
+  'BMW Payment':   { total_amount: 92040,   payments_made: 24, total_payments: 60, status: 'active' },
+  'BMW 430i':      { total_amount: 24660,   payments_made: 24, total_payments: 60, status: 'active' },
+  'Chevy Tahoe':   { total_amount: 45855.36,payments_made: 12, total_payments: 72, status: 'active' }
+};
+
+function getBillFinancingInfo(bill) {
+  // Check DB columns first (if Architect migration has run)
+  if (bill.total_amount && bill.total_amount > 0) {
+    const paymentsMade = bill.payments_made || 0;
+    const totalPayments = bill.total_amount > 0 && bill.amount > 0
+      ? Math.ceil(bill.total_amount / bill.amount) : 0;
+    const amountPaid = paymentsMade * bill.amount;
+    const remainingBalance = Math.max(0, bill.total_amount - amountPaid);
+    const percentPaid = bill.total_amount > 0 ? Math.min(100, (amountPaid / bill.total_amount) * 100) : 0;
+    const remainingPayments = Math.max(0, totalPayments - paymentsMade);
+    const payoffDate = new Date();
+    payoffDate.setMonth(payoffDate.getMonth() + remainingPayments);
+    return {
+      isFinancing: true,
+      status: bill.status || 'active',
+      totalAmount: bill.total_amount,
+      amountPaid,
+      remainingBalance,
+      percentPaid,
+      paymentsMade,
+      totalPayments,
+      remainingPayments,
+      estimatedPayoffDate: payoffDate
+    };
+  }
+  // Fall back to hardcoded metadata
+  const meta = FINANCING_META[bill.name];
+  if (!meta) return { isFinancing: false };
+  const amountPaid = meta.payments_made * bill.amount;
+  const remainingBalance = Math.max(0, meta.total_amount - amountPaid);
+  const percentPaid = meta.total_amount > 0 ? Math.min(100, (amountPaid / meta.total_amount) * 100) : 0;
+  const remainingPayments = Math.max(0, meta.total_payments - meta.payments_made);
+  const payoffDate = new Date();
+  payoffDate.setMonth(payoffDate.getMonth() + remainingPayments);
+  return {
+    isFinancing: true,
+    status: meta.status,
+    totalAmount: meta.total_amount,
+    amountPaid,
+    remainingBalance,
+    percentPaid,
+    paymentsMade: meta.payments_made,
+    totalPayments: meta.total_payments,
+    remainingPayments,
+    estimatedPayoffDate: meta.end_date ? new Date(meta.end_date + 'T00:00:00') : payoffDate
+  };
+}
+
 function renderBills() {
   const tbody = document.getElementById('billTableBody');
   if (!tbody) return;
-  tbody.innerHTML = (window.bills || []).map(b => `
+
+  const allBills = window.bills || [];
+  const isFinancingType = (b) => {
+    const type = (b.type || '').toLowerCase();
+    return type === 'financing' || getBillFinancingInfo(b).isFinancing;
+  };
+
+  // Split bills: recurring vs financing
+  const recurringBills = allBills.filter(b => !isFinancingType(b));
+  const financingBills = allBills.filter(b => isFinancingType(b));
+  const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off');
+  const completedFinancing = financingBills.filter(b => getBillFinancingInfo(b).status === 'paid_off');
+
+  // Render recurring bills table
+  tbody.innerHTML = recurringBills.map(b => `
       <tr>
-          <td>${escapeHtml(b.name)}</td><td>${escapeHtml(b.type)}</td><td>${formatCurrency(b.amount)}</td>
+          <td>${escapeHtml(b.name)}</td><td><span class="badge bg-info">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}</td>
           <td>${escapeHtml(b.frequency)}</td><td>${b.nextDueDate ? formatDate(b.nextDueDate) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
+
+  // Render financing cards with progress bars
+  const financingContainer = document.getElementById('financingCards');
+  if (financingContainer) {
+    financingContainer.innerHTML = activeFinancing.length > 0
+      ? activeFinancing.map(b => {
+          const info = getBillFinancingInfo(b);
+          const progressColor = info.percentPaid >= 75 ? 'var(--color-success)' : 'var(--color-primary)';
+          const payoffStr = info.estimatedPayoffDate
+            ? info.estimatedPayoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            : 'N/A';
+          return `
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="card h-100">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">${escapeHtml(b.name)}</h5>
+                    <span class="badge bg-warning">${escapeHtml(b.type)}</span>
+                  </div>
+                  <div class="text-end">
+                    <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between mb-1">
+                    <small style="color: var(--color-text-secondary);">Progress</small>
+                    <small style="color: var(--color-text-secondary);">${Math.round(info.percentPaid)}%</small>
+                  </div>
+                  <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
+                    <div class="progress-bar" role="progressbar"
+                         style="width: ${info.percentPaid}%; background-color: ${progressColor};"
+                         aria-valuenow="${info.percentPaid}" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-2 text-center">
+                  <div class="col-4">
+                    <small class="d-block" style="color: var(--color-text-tertiary);">Monthly</small>
+                    <strong style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
+                  </div>
+                  <div class="col-4">
+                    <small class="d-block" style="color: var(--color-text-tertiary);">Remaining</small>
+                    <strong style="color: var(--color-text-primary);">${formatCurrency(info.remainingBalance)}</strong>
+                  </div>
+                  <div class="col-4">
+                    <small class="d-block" style="color: var(--color-text-tertiary);">Payoff</small>
+                    <strong style="color: var(--color-text-primary);">${payoffStr}</strong>
+                  </div>
+                </div>
+                <div class="mt-2 text-center">
+                  <small style="color: var(--color-text-tertiary);">${info.paymentsMade} of ${info.totalPayments} payments made</small>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')
+      : '<div class="col-12"><p class="text-muted fst-italic">No active financing items.</p></div>';
+  }
+
+  // Render completed/paid-off section
+  const completedSection = document.getElementById('completedSection');
+  const completedContainer = document.getElementById('completedCards');
+  if (completedSection && completedContainer) {
+    if (completedFinancing.length > 0) {
+      completedSection.classList.remove('d-none');
+      completedContainer.innerHTML = completedFinancing.map(b => {
+        const info = getBillFinancingInfo(b);
+        return `
+        <div class="col-xl-4 col-md-6 col-12">
+          <div class="card h-100" style="border-color: var(--color-success); opacity: 0.85;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">
+                    ✅ ${escapeHtml(b.name)}
+                  </h5>
+                  <span class="badge bg-success">Paid Off</span>
+                </div>
+                <div class="text-end">
+                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${b.id}')"><i class="bi bi-trash"></i></button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
+                  <div class="progress-bar" role="progressbar"
+                       style="width: 100%; background-color: var(--color-success);"
+                       aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+              <div class="row g-2 text-center">
+                <div class="col-6">
+                  <small class="d-block" style="color: var(--color-text-tertiary);">Total Paid</small>
+                  <strong style="color: var(--color-success);">${formatCurrency(info.totalAmount)}</strong>
+                </div>
+                <div class="col-6">
+                  <small class="d-block" style="color: var(--color-text-tertiary);">Completed</small>
+                  <strong style="color: var(--color-success);">${info.paymentsMade} payments</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      completedSection.classList.add('d-none');
+    }
+  }
+
+  // Update summary cards
+  const totalBills = allBills.reduce((sum, b) => sum + getRaw(b.amount), 0);
+  if (document.getElementById('billsTotal')) document.getElementById('billsTotal').textContent = formatCurrency(totalBills);
+  if (document.getElementById('billsRecurringCount')) document.getElementById('billsRecurringCount').textContent = recurringBills.length;
+  if (document.getElementById('billsFinancingCount')) document.getElementById('billsFinancingCount').textContent = activeFinancing.length;
+  if (document.getElementById('billsPaidOffCount')) document.getElementById('billsPaidOffCount').textContent = completedFinancing.length;
 }
 function openBillModal(id = null) {
   editBillId = id;
@@ -1104,6 +1294,142 @@ async function saveBudgetItem() {
   }
 }
 
+// ===== BUDGET AUTO-POPULATION =====
+async function generateBudgetForMonth(monthString) {
+  if (!currentUser) {
+    alert('Please log in first.');
+    return;
+  }
+
+  const statusEl = document.getElementById('generateBudgetStatus');
+  if (statusEl) {
+    statusEl.textContent = 'Generating...';
+    statusEl.className = 'ms-2 text-info small';
+  }
+
+  try {
+    // 1. Fetch all active recurring bills
+    const { data: activeBills, error: billsError } = await sb
+      .from('bills')
+      .select('*')
+      .eq('user_id', currentUser.id);
+
+    if (billsError) throw billsError;
+
+    // 2. Fetch existing budget entries for this month
+    const { data: existingBudgets, error: budgetError } = await sb
+      .from('budgets')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .eq('month', monthString);
+
+    if (budgetError) throw budgetError;
+
+    // Build a set of already-budgeted item IDs
+    const budgetedItemIds = new Set((existingBudgets || []).map(b => b.item_id));
+
+    // 3. Fetch last month's budget for variable bill amounts
+    const [year, month] = monthString.split('-').map(Number);
+    const lastMonthDate = new Date(year, month - 2, 1); // month-1 for 0-index, then -1 more
+    const lastMonthString = `${lastMonthDate.getFullYear()}-${(lastMonthDate.getMonth() + 1).toString().padStart(2, '0')}`;
+    const { data: lastMonthBudgets } = await sb
+      .from('budgets')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .eq('month', lastMonthString);
+    const lastMonthMap = {};
+    (lastMonthBudgets || []).forEach(b => { lastMonthMap[b.item_id] = b.assigned_amount; });
+
+    // Known variable bills (until DB has is_variable column)
+    const variableBillNames = ['electric', 'water', 'sewage', 'peoples gas', 'west penn power', 'american water'];
+
+    // 4. Create budget entries for bills that don't have one yet
+    const newEntries = [];
+    for (const bill of (activeBills || [])) {
+      // Skip paid-off financing items
+      const info = getBillFinancingInfo(bill);
+      if (info.isFinancing && info.status === 'paid_off') continue;
+
+      if (!budgetedItemIds.has(bill.id)) {
+        // Determine needed amount
+        const isVariable = bill.is_variable ||
+          variableBillNames.includes((bill.name || '').toLowerCase());
+        let neededAmount = getRaw(bill.amount);
+
+        // For variable bills, use last month's actual if available
+        if (isVariable && lastMonthMap[bill.id]) {
+          neededAmount = getRaw(lastMonthMap[bill.id]);
+        }
+
+        newEntries.push({
+          user_id: currentUser.id,
+          month: monthString,
+          item_id: bill.id,
+          item_type: 'bill',
+          assigned_amount: neededAmount,
+          needed_amount: neededAmount,
+          name: bill.name,
+          category: bill.type
+        });
+      }
+    }
+
+    // Also add debts that aren't budgeted yet
+    const { data: debts } = await sb
+      .from('debts')
+      .select('*')
+      .eq('user_id', currentUser.id);
+
+    for (const debt of (debts || [])) {
+      if (!budgetedItemIds.has(debt.id)) {
+        newEntries.push({
+          user_id: currentUser.id,
+          month: monthString,
+          item_id: debt.id,
+          item_type: 'debt',
+          assigned_amount: getRaw(debt.monthlyPayment),
+          needed_amount: getRaw(debt.monthlyPayment),
+          name: debt.name,
+          category: debt.type
+        });
+      }
+    }
+
+    if (newEntries.length === 0) {
+      if (statusEl) {
+        statusEl.textContent = 'Budget already up to date!';
+        statusEl.className = 'ms-2 text-success small';
+      }
+      setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
+      return;
+    }
+
+    // 5. Insert new budget entries
+    const { error: insertError } = await sb
+      .from('budgets')
+      .insert(newEntries);
+
+    if (insertError) throw insertError;
+
+    if (statusEl) {
+      statusEl.textContent = `✅ Generated ${newEntries.length} budget entries!`;
+      statusEl.className = 'ms-2 text-success small';
+    }
+    setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
+
+    // 6. Refresh the budget view
+    await fetchAllDataFromSupabase();
+    loadAndRenderBudget();
+
+  } catch (error) {
+    console.error('Error generating budget:', error);
+    if (statusEl) {
+      statusEl.textContent = 'Error: ' + (error.message || 'Could not generate budget');
+      statusEl.className = 'ms-2 text-danger small';
+    }
+  }
+}
+
 // This function will be the entry point for the budget page
 function initializeBudgetPage() {
   // Only run this if we are on the budget page
@@ -1118,6 +1444,11 @@ function initializeBudgetPage() {
   document.getElementById('nextMonth')?.addEventListener('click', () => {
       currentBudgetMonth.setMonth(currentBudgetMonth.getMonth() + 1);
       loadAndRenderBudget();
+  });
+
+  document.getElementById('generateBudgetBtn')?.addEventListener('click', () => {
+      const monthString = `${currentBudgetMonth.getFullYear()}-${(currentBudgetMonth.getMonth() + 1).toString().padStart(2, '0')}`;
+      generateBudgetForMonth(monthString);
   });
 }
 
@@ -1432,3 +1763,4 @@ window.deleteBillConfirmed = deleteBillConfirmed;
 window.openIncomeModal = openIncomeModal;
 window.confirmDeleteIncome = confirmDeleteIncome;
 window.deleteIncomeConfirmed = deleteIncomeConfirmed;
+window.generateBudgetForMonth = generateBudgetForMonth;
