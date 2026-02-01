@@ -55,9 +55,14 @@
       <div class="page-header">
         <div class="page-header-actions">
           <h2>Bills</h2>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal">
-            <i class="bi bi-plus-circle"></i> Add Bill
-          </button>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" id="scanEmailBillsBtn">
+              <i class="bi bi-envelope-check"></i> Scan Email for Bills
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal">
+              <i class="bi bi-plus-circle"></i> Add Bill
+            </button>
+          </div>
         </div>
         <div>
           <div id="loggedOutState">
@@ -100,6 +105,23 @@
       </div>
 
       <div id="dataContainer" style="visibility: hidden;">
+
+        <!-- Pending Email Bills Section -->
+        <div id="pendingEmailBillsSection" class="d-none mb-4">
+          <div class="card" style="border: 2px solid var(--color-warning); background: var(--color-bg-2);">
+            <div class="card-body-padded">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h5 class="mb-1"><i class="bi bi-envelope-exclamation me-2" style="color: var(--color-warning);"></i>Pending Bills from Email</h5>
+                  <p class="text-muted mb-0"><span id="pendingEmailCount">0</span> bills awaiting your review</p>
+                </div>
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#emailReviewModal" id="reviewEmailBillsBtn">
+                  <i class="bi bi-eye"></i> Review Bills
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Summary Cards -->
         <div class="row g-3 g-xl-4 mb-4">
@@ -434,6 +456,18 @@
   <script src="assets/js/polish-utilities.js"></script>`n  <script src="assets/js/app.js"></script>
   <script src="assets/js/app-polish-enhancements.js"></script>
   <script src="assets/js/plaid.js"></script>
+  <script src="assets/js/email-bills.js"></script>
+  <script>
+    // Initialize email bills feature after authentication
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for auth check to complete
+      setTimeout(() => {
+        if (currentUser && typeof initEmailBills === 'function') {
+          initEmailBills();
+        }
+      }, 500);
+    });
+  </script>
 
   <!-- Modal: Amortization Schedule -->
   <div class="modal fade" id="amortizationModal" tabindex="-1" aria-labelledby="amortizationModalLabel" aria-hidden="true">
@@ -581,6 +615,65 @@
             </div>
             <button type="submit" class="btn btn-primary" id="resetPasswordBtn">Update Password</button>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Email Bill Review -->
+  <div class="modal fade" id="emailReviewModal" tabindex="-1" aria-labelledby="emailReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="emailReviewModalLabel">
+            <i class="bi bi-envelope-check me-2"></i>Review Bills from Email
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Loading State -->
+          <div id="emailReviewLoading" class="text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted">Loading pending bills...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div id="emailReviewEmpty" class="text-center py-5 d-none">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: var(--color-text-tertiary);"></i>
+            <p class="text-muted mt-3">No pending bills to review</p>
+            <button class="btn btn-outline-primary mt-2" data-bs-dismiss="modal">Close</button>
+          </div>
+
+          <!-- Batch Actions -->
+          <div id="emailReviewBatchActions" class="mb-3 d-none">
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-sm btn-success" id="approveAllHighConfidenceBtn">
+                <i class="bi bi-check-all"></i> Approve All High Confidence (≥70%)
+              </button>
+              <button class="btn btn-sm btn-danger" id="rejectAllLowConfidenceBtn">
+                <i class="bi bi-x-circle"></i> Reject All Low Confidence (≤50%)
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" id="selectAllBtn">
+                <i class="bi bi-check-square"></i> Select All
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" id="deselectAllBtn">
+                <i class="bi bi-square"></i> Deselect All
+              </button>
+            </div>
+          </div>
+
+          <!-- Bills List -->
+          <div id="emailReviewList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveEmailReviewBtn">
+            <i class="bi bi-check-lg"></i> Save Approved Bills
+          </button>
         </div>
       </div>
     </div>

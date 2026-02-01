@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polish Utilities Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/design-tokens.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/polish.css" />
+</head>
+<body data-theme="dark">
+  <div class="container mt-5">
+    <h1 class="mb-4">🎨 Polish Utilities Demo</h1>
+    <p class="lead">Test all the new polish enhancements</p>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Toast Notifications</h5>
+          </div>
+          <div class="card-body">
+            <button class="btn btn-success mb-2 w-100" onclick="ToastManager.success('Operation completed successfully!')">
+              Success Toast
+            </button>
+            <button class="btn btn-danger mb-2 w-100" onclick="ToastManager.error('Something went wrong!')">
+              Error Toast
+            </button>
+            <button class="btn btn-warning mb-2 w-100" onclick="ToastManager.warning('Please be careful!')">
+              Warning Toast
+            </button>
+            <button class="btn btn-info mb-2 w-100" onclick="ToastManager.info('Just so you know...')">
+              Info Toast
+            </button>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Loading States</h5>
+          </div>
+          <div class="card-body">
+            <button class="btn btn-primary mb-3 w-100" id="loadingBtn" onclick="demoButtonLoading()">
+              Click to Test Button Loading
+            </button>
+            <button class="btn btn-secondary w-100" onclick="demoOverlayLoading()">
+              Test Overlay Loading
+            </button>
+            <div id="overlayContainer" class="mt-3 p-4 border rounded" style="min-height: 200px;">
+              <h6>Content Area</h6>
+              <p>This will be covered by a loading overlay when you click the button above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Form Validation</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="emailTest" class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="emailTest" placeholder="test@example.com">
+              <button class="btn btn-sm btn-outline-primary mt-2" onclick="testEmailValidation()">Validate</button>
+            </div>
+            <div class="mb-3">
+              <label for="currencyTest" class="form-label">Amount ($)</label>
+              <input type="number" class="form-control" id="currencyTest" placeholder="e.g., 125.50" step="0.01">
+              <button class="btn btn-sm btn-outline-primary mt-2" onclick="testCurrencyValidation()">Validate</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Empty State</h5>
+          </div>
+          <div class="card-body">
+            <div id="emptyStateDemo"></div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Confirmation Dialog</h5>
+          </div>
+          <div class="card-body">
+            <button class="btn btn-danger w-100" onclick="testConfirmDialog()">
+              Delete Something (Demo)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Micro-interactions Demo</h5>
+          </div>
+          <div class="card-body">
+            <p>Hover over these elements to see the effects:</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-primary">Hover Me</button>
+              <button class="btn btn-secondary">And Me</button>
+              <button class="btn btn-success">Me Too</button>
+              <a href="#" class="btn btn-outline-primary">Link Effect</a>
+            </div>
+            <div class="table-responsive mt-4">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Sample Item 1</td>
+                    <td>$100.00</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>Sample Item 2</td>
+                    <td>$250.00</td>
+                    <td><span class="badge bg-warning">Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td>Sample Item 3</td>
+                    <td>$75.00</td>
+                    <td><span class="badge bg-danger">Overdue</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/polish-utilities.js"></script>
+  
+  <script>
+    // Demo functions
+    function demoButtonLoading() {
+      const btn = document.getElementById('loadingBtn');
+      LoadingState.buttonStart(btn);
+      
+      setTimeout(() => {
+        LoadingState.buttonEnd(btn);
+        ToastManager.success('Loading complete!');
+      }, 2000);
+    }
+
+    function demoOverlayLoading() {
+      const container = document.getElementById('overlayContainer');
+      LoadingState.overlayStart(container, 'Fetching data...');
+      
+      setTimeout(() => {
+        LoadingState.overlayEnd(container);
+        ToastManager.success('Data loaded!');
+      }, 3000);
+    }
+
+    function testEmailValidation() {
+      const input = document.getElementById('emailTest');
+      const result = FormValidation.validateEmail(input.value);
+      
+      if (result.valid) {
+        FormValidation.setValid(input, 'Looks good!');
+        ToastManager.success('Valid email!');
+      } else {
+        FormValidation.setInvalid(input, result.message);
+        ToastManager.error(result.message);
+      }
+    }
+
+    function testCurrencyValidation() {
+      const input = document.getElementById('currencyTest');
+      const result = FormValidation.validateCurrency(input.value, 'Amount');
+      
+      if (result.valid) {
+        FormValidation.setValid(input);
+        ToastManager.success('Valid amount!');
+      } else {
+        FormValidation.setInvalid(input, result.message);
+        ToastManager.error(result.message);
+      }
+    }
+
+    async function testConfirmDialog() {
+      const confirmed = await ConfirmDialog.show({
+        title: 'Delete Item?',
+        message: 'Are you sure you want to delete this item? This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        confirmClass: 'btn-danger'
+      });
+      
+      if (confirmed) {
+        ToastManager.success('Item deleted (demo only)');
+      } else {
+        ToastManager.info('Deletion cancelled');
+      }
+    }
+
+    // Initialize empty state demo
+    EmptyState.render('emptyStateDemo', {
+      icon: 'bi-inbox',
+      title: 'No Items Found',
+      message: 'This is what an empty state looks like. Click below to see a success toast.',
+      actionText: 'Add First Item',
+      actionCallback: () => {
+        ToastManager.success('Item added! (demo only)');
+        document.getElementById('emptyStateDemo').innerHTML = '<p class="text-success"><i class="bi bi-check-circle-fill me-2"></i>Success! Empty state cleared.</p>';
+      }
+    });
+
+    // Auto-format demo
+    formatCurrencyInput('currencyTest');
+  </script>
+</body>
+</html>

@@ -1617,3 +1617,94 @@ body[data-theme='dark'] #amortTable tbody td {
   background-color: var(--color-primary);
   color: #fff;
 }
+
+/* =================================================================
+   EMAIL BILL INTEGRATION — Pending Bills Review
+   ================================================================= */
+
+/* Pending bill card styling */
+.pending-bill-card {
+  border: 1px solid var(--color-border-subtle);
+  transition: all 0.2s var(--ease-out);
+}
+
+.pending-bill-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pending-bill-card.selected {
+  border-color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+body[data-theme='dark'] .pending-bill-card.selected {
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+}
+
+/* Email snippet preview */
+.email-snippet {
+  background-color: var(--color-bg-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  line-height: var(--leading-relaxed);
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Form label small variant */
+.form-label-sm {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--space-1);
+  color: var(--color-text-secondary);
+}
+
+/* Confidence badges */
+.badge.bg-success {
+  background-color: var(--color-success) !important;
+  color: #fff;
+}
+
+.badge.bg-warning {
+  background-color: var(--color-warning) !important;
+  color: var(--color-bg-1);
+}
+
+.badge.bg-danger {
+  background-color: var(--color-danger) !important;
+  color: #fff;
+}
+
+/* Email review modal enhancements */
+#emailReviewModal .modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+#emailReviewModal .modal-xl {
+  max-width: 1200px;
+}
+
+/* Loading spinner styling */
+.spinner-border.text-primary {
+  color: var(--color-primary) !important;
+  border-width: 3px;
+}
+
+/* Batch actions bar */
+#emailReviewBatchActions {
+  background-color: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+/* Button gap spacing */
+.d-flex.gap-2 {
+  gap: var(--space-2);
+}

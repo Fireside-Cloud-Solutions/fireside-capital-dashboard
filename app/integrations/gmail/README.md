@@ -1,252 +1,350 @@
-# Gmail Bill Integration — Fireside Capital
+# Gmail Bill Integration — Setup Guide
 
-Automatically searches your Gmail inbox for bills, statements, and invoices, then extracts structured data (vendor, amount, due date, category) ready for the dashboard.
+This feature automatically scans your Gmail inbox for bills (electricity, internet, subscriptions, etc.), extracts key data (vendor, amount, due date), and allows you to approve or reject them with one click.
 
 ---
 
-## 📁 Files
+## 🎯 What It Does
 
-| File | Purpose |
-|------|---------|
-| `gmail-client.js` | OAuth 2.0 authentication + Gmail API wrapper |
-| `bill-parser.js` | Email parsing, amount/date extraction, categorization |
-| `README.md` | This file — setup guide |
+1. **Scans** your Gmail inbox for bill-related emails (last 30 days by default)
+2. **Parses** vendor name, amount, due date, and category using AI-powered extraction
+3. **Stores** results in a `pending_bills` table for review
+4. **Allows** you to approve (add to Bills), reject, or edit before saving
+
+---
+
+## ✅ Phase 1 Features (Completed)
+
+- ✅ Manual "Scan Email for Bills" button on Bills page
+- ✅ Pending bills section with badge count
+- ✅ Review modal with individual bill cards
+- ✅ Approve/reject/edit actions for each bill
+- ✅ Batch actions: "Approve All High Confidence", "Reject All Low Confidence"
+- ✅ Confidence scoring (high ≥70%, low ≤50%)
+- ✅ Database schema: `pending_bills` table
+- ✅ Backend API endpoint: `POST /api/scan-email-bills`
 
 ---
 
 ## 🔧 Setup Instructions
 
-### Step 1: Create a Google Cloud Project
+### 1. Database Migration
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Click the project dropdown (top left) → **New Project**
-3. Name it: `Fireside Capital` (or anything you like)
-4. Click **Create**
-5. Make sure the new project is selected in the dropdown
+Run the SQL migration to create the `pending_bills` table:
 
-### Step 2: Enable the Gmail API
+```bash
+# In Supabase Dashboard > SQL Editor, run:
+app/migrations/001_create_pending_bills_table.sql
+```
 
-1. In the Google Cloud Console, go to **APIs & Services** → **Library**
-2. Search for **"Gmail API"**
-3. Click on it → click **Enable**
+Or execute manually:
 
-### Step 3: Configure the OAuth Consent Screen
+```sql
+CREATE TABLE pending_bills (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  vendor TEXT NOT NULL,
+  amount NUMERIC(10, 2) NOT NULL,
+  due_date DATE,
+  category TEXT,
+  confidence NUMERIC(3, 2),
+  source_email_id TEXT,
+  email_subject TEXT,
+  email_snippet TEXT,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-1. Go to **APIs & Services** → **OAuth consent screen**
-2. Select **External** user type → click **Create**
-3. Fill in:
-   - **App name:** `Fireside Capital`
-   - **User support email:** your email
-   - **Developer contact email:** your email
-4. Click **Save and Continue**
-5. On the **Scopes** page, click **Add or Remove Scopes**
-   - Search for `gmail.readonly`
-   - Check the box for `https://www.googleapis.com/auth/gmail.readonly`
-   - Click **Update** → **Save and Continue**
-6. On the **Test users** page, click **Add Users**
-   - Add your Gmail address
-   - Click **Save and Continue**
-7. Review and click **Back to Dashboard**
+-- Indexes + RLS policies (see full migration file)
+```
 
-> ⚠️ **Note:** While the app is in "Testing" status, only test users can authorize. This is fine for personal use. If you want to skip the "unverified app" warning, you can publish the app later.
+### 2. Google Cloud OAuth Setup
 
-### Step 4: Create OAuth 2.0 Credentials
+To connect to Gmail, you need OAuth 2.0 credentials:
 
-1. Go to **APIs & Services** → **Credentials**
-2. Click **+ Create Credentials** → **OAuth client ID**
+#### A. Create a Google Cloud Project
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Create a new project (e.g., "Fireside Capital Gmail")
+3. Enable the **Gmail API** (APIs & Services > Library > search "Gmail API")
+
+#### B. Create OAuth 2.0 Credentials
+
+1. Go to **APIs & Services > Credentials**
+2. Click **+ CREATE CREDENTIALS > OAuth client ID**
 3. Application type: **Web application**
-4. Name: `Fireside Capital Dashboard`
-5. Under **Authorized redirect URIs**, add:
-   - `http://localhost:3000/auth/google/callback`
-6. Click **Create**
-7. Copy the **Client ID** and **Client Secret**
+4. Name: `Fireside Capital Gmail Integration`
+5. **Authorized redirect URIs**:
+   - `http://localhost:3000/auth/google/callback` (development)
+   - `https://nice-cliff-05b13880f.2.azurestaticapps.net/auth/google/callback` (production)
+6. Click **Create** and download the JSON file
 
-### Step 5: Configure Environment Variables
+#### C. Add Credentials to `.env`
 
-Add these to your `app/.env` file:
-
-```env
-# Gmail API OAuth 2.0
+```bash
+# Gmail OAuth Credentials
 GMAIL_CLIENT_ID=your-client-id-here.apps.googleusercontent.com
 GMAIL_CLIENT_SECRET=your-client-secret-here
 GMAIL_REDIRECT_URI=http://localhost:3000/auth/google/callback
 ```
 
-### Step 6: Install Dependencies
+### 3. First-Time OAuth Authorization
 
-From the `app/` directory:
-
-```bash
-npm install googleapis
-```
-
-### Step 7: Run First Authorization
+The first time you run a Gmail scan, you'll need to authorize the app:
 
 ```bash
+# From the app/ directory
 cd app
-node integrations/gmail/bill-parser.js 30
+npm install googleapis
+
+# Run the authorization flow
+node integrations/gmail/gmail-client.js
 ```
 
 This will:
-1. Print a URL — open it in your browser
-2. Sign in with your Google account
-3. Grant permission to read emails
-4. Copy the authorization code and paste it back in the terminal
-5. A refresh token will be generated and saved
+1. Print an authorization URL
+2. Ask you to visit it and log in with your Google account
+3. Paste the authorization code back
+4. Save a refresh token to `.gmail-token.json` and `.env`
 
-After the first run, add the refresh token to your `.env`:
+Once complete, copy the `GMAIL_REFRESH_TOKEN` to your `.env`:
 
-```env
+```bash
 GMAIL_REFRESH_TOKEN=your-refresh-token-here
 ```
 
-This ensures future runs don't need the interactive flow.
+### 4. Start the Backend Server
 
----
-
-## 🚀 Usage
-
-### CLI — Quick Scan
+The Gmail scanning endpoint runs on the Express server:
 
 ```bash
-# Search last 30 days (default)
-node integrations/gmail/bill-parser.js
-
-# Search last 90 days
-node integrations/gmail/bill-parser.js 90
-
-# Search last 60 days, minimum 0.6 confidence
-node integrations/gmail/bill-parser.js 60 0.6
+# From app/ directory
+npm install
+node assets/js/server.js
 ```
 
-### Programmatic — In Your App
+Server should be running on `http://localhost:3000`
+
+### 5. Test the Integration
+
+1. Open the dashboard: `http://localhost:3000` (or live URL)
+2. Log in to your account
+3. Navigate to **Bills** page
+4. Click **"Scan Email for Bills"** button
+5. Wait for the scan to complete (5-30 seconds depending on inbox size)
+6. Review parsed bills in the modal
+7. Approve, reject, or edit bills
+
+---
+
+## 📋 Usage
+
+### Manual Scan
+
+1. Go to **Bills** page
+2. Click **"Scan Email for Bills"**
+3. Wait for results
+4. Review in the modal:
+   - ✅ **Approve** → adds to Bills table
+   - ❌ **Reject** → marks as rejected
+   - ✏️ **Edit** → adjust amount/category/date
+
+### Batch Actions
+
+- **Approve All High Confidence**: Auto-approves bills with ≥70% confidence
+- **Reject All Low Confidence**: Auto-rejects bills with ≤50% confidence
+- **Select All / Deselect All**: Bulk selection
+
+### Pending Bills Section
+
+- Appears at the top of Bills page when pending bills exist
+- Shows count badge (e.g., "3 bills awaiting review")
+- Click "Review Bills" to open modal
+
+---
+
+## 🔍 How It Works
+
+### Email Search Queries
+
+The scanner searches for emails matching:
+- `subject:(bill OR statement OR invoice)`
+- `subject:(payment due OR amount due)`
+- `subject:(your bill is ready OR payment reminder)`
+- `from:(noreply OR billing OR payments OR invoices)`
+
+### Parsing Logic
+
+1. **Amount Extraction**
+   - Regex patterns: "Amount Due: $123.45", "Total: $85.50", etc.
+   - Confidence: Higher for explicit labels, lower for generic dollar signs
+
+2. **Due Date Extraction**
+   - Patterns: "Due Date: January 15, 2026", "Due by: 01/15/2026"
+   - Assumes current/next year if no year specified
+
+3. **Vendor Extraction**
+   - Checks known vendor map (`VENDOR_MAP` in `bill-parser.js`)
+   - Falls back to sender domain or display name
+
+4. **Category Classification**
+   - Heuristic rules based on vendor and keywords
+   - Categories: utilities, housing, auto, insurance, subscriptions, health, other
+
+### Confidence Scoring
+
+Each bill gets a confidence score (0.0–1.0) based on:
+- Amount extraction confidence (explicit "Amount Due" = high)
+- Date extraction confidence (full date with year = high)
+- Category classification confidence (known vendor = high)
+
+Overall confidence = average of component scores.
+
+---
+
+## 🛠️ Troubleshooting
+
+### "Scan failed: Gmail integration may not be set up yet"
+
+**Cause**: Missing or invalid OAuth credentials.
+
+**Fix**:
+1. Check `.env` has `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`
+2. Run authorization flow: `node integrations/gmail/gmail-client.js`
+3. Restart the server
+
+### "Failed to save bills: permission denied"
+
+**Cause**: Row Level Security (RLS) policy issue.
+
+**Fix**:
+1. Verify RLS policies are enabled on `pending_bills` table
+2. Check `user_id` matches `auth.uid()` in Supabase
+3. Verify you're logged in (check `currentUser` in console)
+
+### No bills found despite having bill emails
+
+**Cause**: Search queries may not match your email format.
+
+**Fix**:
+1. Check email subjects/senders in your inbox
+2. Adjust `BILL_SEARCH_QUERIES` in `gmail-client.js`
+3. Lower `minConfidence` threshold (default: 0.4)
+
+### Bills showing wrong category
+
+**Cause**: Heuristic classifier needs training.
+
+**Fix**:
+1. Add your vendors to `VENDOR_MAP` in `bill-parser.js`
+2. Add keywords to `CATEGORY_RULES`
+3. Use the "Edit" button to correct category before approving
+
+---
+
+## 📦 Dependencies
+
+- `googleapis` — Google APIs Node.js client
+- `express` — Backend API server
+- `dotenv` — Environment variable management
+- `@supabase/supabase-js` — Database client
+
+Install:
+
+```bash
+npm install googleapis express dotenv cors
+```
+
+---
+
+## 🚧 Phase 2 Preview (Next Steps)
+
+- **Settings page integration**: Enable/disable auto-scan, set frequency
+- **Gmail OAuth UI**: In-app authorization flow (no CLI needed)
+- **Automated scanning**: Cron job to scan every 6/12/24 hours
+- **Discord notifications**: Alert when new bills are found
+- **Improved editing**: Inline editing for vendor/amount/date
+- **Email preview**: Show full email body in modal
+
+---
+
+## 📝 Files Overview
+
+| File | Purpose |
+|------|---------|
+| `gmail-client.js` | OAuth + Gmail API wrapper |
+| `bill-parser.js` | Email → structured bill data |
+| `server.js` | Express API endpoint (`POST /api/scan-email-bills`) |
+| `email-bills.js` | Frontend UI logic (scan button, review modal) |
+| `bills.html` | Updated UI (scan button, pending section, modal) |
+| `styles.css` | Email bill card styling |
+| `001_create_pending_bills_table.sql` | Database migration |
+
+---
+
+## 🎓 Developer Notes
+
+### Adding New Vendors
+
+Edit `bill-parser.js`:
 
 ```javascript
-const { searchBillEmails } = require('./integrations/gmail/gmail-client');
-const { parseBillEmails } = require('./integrations/gmail/bill-parser');
+const VENDOR_MAP = {
+  'yourutility.com': 'Your Utility Co.',
+  'yourbank.com': 'Your Bank',
+};
+```
 
-async function scanForBills() {
-  // Search Gmail for bill emails from the last 30 days
-  const emails = await searchBillEmails({ days: 30, maxResults: 200 });
-  
-  // Parse and extract structured bill data
-  const bills = parseBillEmails(emails, { minConfidence: 0.5 });
-  
-  // Each bill looks like:
-  // {
-  //   vendor: "AT&T",
-  //   amount: 85.50,
-  //   due_date: "2026-02-15",
-  //   category: "utilities",
-  //   source_email_id: "msg_abc123",
-  //   confidence: 0.85
-  // }
-  
-  return bills;
-}
+### Adjusting Search Queries
+
+Edit `gmail-client.js`:
+
+```javascript
+const BILL_SEARCH_QUERIES = [
+  'subject:(your custom query)',
+  'from:(specific-sender@example.com)',
+];
+```
+
+### Changing Confidence Thresholds
+
+Edit `email-bills.js`:
+
+```javascript
+const CONFIDENCE_THRESHOLDS = {
+  HIGH: 0.8,  // More strict
+  LOW: 0.3,   // More lenient
+};
 ```
 
 ---
 
-## 📤 Output Format
+## ✅ Testing Checklist
 
-Each extracted bill is a JSON object ready for Supabase:
-
-```json
-{
-  "vendor": "AT&T",
-  "amount": 85.50,
-  "due_date": "2026-02-15",
-  "category": "utilities",
-  "source_email_id": "18d4a5b3c2e1f000",
-  "confidence": 0.85
-}
-```
-
-### Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `vendor` | string | Cleaned vendor name (from sender or subject) |
-| `amount` | number | Dollar amount due |
-| `due_date` | string\|null | Due date in YYYY-MM-DD format (null if not found) |
-| `category` | string | Auto-classified: `utilities`, `insurance`, `subscriptions`, `housing`, `loans`, `credit_cards`, `medical`, `other` |
-| `source_email_id` | string | Gmail message ID for reference |
-| `confidence` | number | 0.0–1.0 confidence score for the extraction |
+- [ ] Database migration runs without errors
+- [ ] OAuth authorization completes successfully
+- [ ] Server starts and `/api/scan-email-bills` responds
+- [ ] "Scan Email for Bills" button triggers scan
+- [ ] Pending bills section appears when bills exist
+- [ ] Review modal loads and displays bills correctly
+- [ ] Approve action adds bill to `bills` table
+- [ ] Reject action marks bill as rejected
+- [ ] Batch actions work (approve all high, reject all low)
+- [ ] Page reloads show correct bill counts
 
 ---
 
-## 🔒 Security
+## 📞 Support
 
-- **No credentials in code.** All secrets are in `.env` (which is `.gitignore`'d).
-- **Read-only scope.** The `gmail.readonly` scope cannot modify or delete emails.
-- **Token storage.** The `.gmail-token.json` file is created locally and should NOT be committed. It's in `.gitignore`.
-- **No data leaves your machine** — parsing happens locally.
-
-### Required `.env` Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GMAIL_CLIENT_ID` | OAuth 2.0 Client ID | ✅ Yes |
-| `GMAIL_CLIENT_SECRET` | OAuth 2.0 Client Secret | ✅ Yes |
-| `GMAIL_REDIRECT_URI` | Redirect URI (default: `http://localhost:3000/auth/google/callback`) | Optional |
-| `GMAIL_REFRESH_TOKEN` | Refresh token (generated after first auth) | Recommended |
+For issues or questions:
+1. Check server logs for detailed error messages
+2. Review Supabase logs for database errors
+3. Test OAuth flow manually: `node integrations/gmail/gmail-client.js`
+4. Ping Capital (orchestrator) in Discord #commands channel
 
 ---
 
-## 🏗️ Architecture
+**Phase 1 Complete!** 🎉
 
-```
-Gmail Inbox
-    │
-    ▼
-gmail-client.js ──── OAuth 2.0 ────► Google API
-    │                                    │
-    │ searchBillEmails()                 │ messages.list()
-    │                                    │ messages.get()
-    ▼                                    ▼
-bill-parser.js ◄──── raw emails ────────┘
-    │
-    ├── extractVendor()     → "AT&T"
-    ├── extractAmount()     → $85.50
-    ├── extractDueDate()    → "2026-02-15"
-    └── classifyCategory()  → "utilities"
-    │
-    ▼
-Structured Bill Data ────► Supabase (future)
-                     ────► Dashboard (future)
-                     ────► Discord alerts (future)
-```
-
----
-
-## 🔮 Next Steps
-
-After setup and initial testing:
-
-1. **Validate parsing accuracy** — Review the extracted bills for correctness
-2. **Wire into Supabase** — Auto-insert bills into the `bills` table
-3. **Dashboard integration** — Show parsed bills on the web dashboard
-4. **Scheduled scanning** — Run on a cron/timer (daily or weekly)
-5. **Discord alerts** — Post new bills to #alerts channel
-6. **Extend vendor map** — Add more vendors as they appear
-
----
-
-## 🐛 Troubleshooting
-
-### "Missing GMAIL_CLIENT_ID or GMAIL_CLIENT_SECRET"
-→ Add them to `app/.env`. See Step 4-5 above.
-
-### "invalid_grant" or token errors
-→ Your refresh token may have expired. Delete `.gmail-token.json` and re-run the auth flow.
-
-### No bills found
-→ Try a longer time range: `node integrations/gmail/bill-parser.js 90`
-→ Check that you have bill emails in your inbox (not just trash/spam)
-
-### Low confidence scores
-→ The parser uses heuristic regex patterns. Bills with non-standard formatting may score lower. Review `_meta` fields for debugging.
-
-### Google "This app isn't verified" warning
-→ This is normal for apps in "Testing" mode. Click **Advanced** → **Go to Fireside Capital (unsafe)** to proceed. It's your own app on your own account.
+Ready to move to Phase 2 (Settings UI + Automated Scanning)?
