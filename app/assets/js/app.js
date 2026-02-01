@@ -583,15 +583,90 @@ const FINANCING_META = {
   'Chevy Tahoe':   { total_amount: 45855.36,payments_made: 12, total_payments: 72, status: 'active' }
 };
 
+// Client-side amortization calculation
+function calculateAmortization(principal, annualRate, termMonths, paymentsMade) {
+  paymentsMade = paymentsMade || 0;
+  const result = { monthlyPayment: 0, totalCost: 0, totalInterest: 0,
+    interestPaidToDate: 0, principalPaidToDate: 0, remainingBalance: principal, schedule: [] };
+  if (!principal || principal <= 0 || !termMonths || termMonths <= 0) return result;
+
+  let monthlyPayment;
+  if (!annualRate || annualRate === 0) {
+    // 0% APR — simple division
+    monthlyPayment = principal / termMonths;
+    result.monthlyPayment = Math.round(monthlyPayment * 100) / 100;
+    result.totalCost = Math.round(principal * 100) / 100;
+    result.totalInterest = 0;
+    let balance = principal;
+    for (let i = 1; i <= termMonths; i++) {
+      const principalPortion = Math.min(monthlyPayment, balance);
+      balance = Math.max(0, balance - principalPortion);
+      const entry = { payment: i, paymentAmount: Math.round(principalPortion * 100) / 100,
+        principal: Math.round(principalPortion * 100) / 100, interest: 0,
+        balance: Math.round(balance * 100) / 100 };
+      result.schedule.push(entry);
+      if (i <= paymentsMade) {
+        result.principalPaidToDate += principalPortion;
+      }
+    }
+    result.principalPaidToDate = Math.round(result.principalPaidToDate * 100) / 100;
+    result.remainingBalance = Math.round(Math.max(0, principal - result.principalPaidToDate) * 100) / 100;
+    return result;
+  }
+
+  // Standard amortization: M = P[r(1+r)^n] / [(1+r)^n – 1]
+  const r = annualRate / 100 / 12;
+  const n = termMonths;
+  const factor = Math.pow(1 + r, n);
+  monthlyPayment = principal * (r * factor) / (factor - 1);
+  result.monthlyPayment = Math.round(monthlyPayment * 100) / 100;
+  result.totalCost = Math.round(monthlyPayment * n * 100) / 100;
+  result.totalInterest = Math.round((result.totalCost - principal) * 100) / 100;
+
+  let balance = principal;
+  for (let i = 1; i <= n; i++) {
+    const interestPortion = balance * r;
+    const principalPortion = monthlyPayment - interestPortion;
+    balance = Math.max(0, balance - principalPortion);
+    // Fix rounding on final payment
+    if (i === n) balance = 0;
+    const entry = { payment: i, paymentAmount: Math.round(monthlyPayment * 100) / 100,
+      principal: Math.round(principalPortion * 100) / 100,
+      interest: Math.round(interestPortion * 100) / 100,
+      balance: Math.round(balance * 100) / 100 };
+    result.schedule.push(entry);
+    if (i <= paymentsMade) {
+      result.interestPaidToDate += interestPortion;
+      result.principalPaidToDate += principalPortion;
+    }
+  }
+  result.interestPaidToDate = Math.round(result.interestPaidToDate * 100) / 100;
+  result.principalPaidToDate = Math.round(result.principalPaidToDate * 100) / 100;
+  result.remainingBalance = Math.round(Math.max(0, principal - result.principalPaidToDate) * 100) / 100;
+  return result;
+}
+
 function getBillFinancingInfo(bill) {
   // Check DB columns first (if Architect migration has run)
   if (bill.total_amount && bill.total_amount > 0) {
     const paymentsMade = bill.payments_made || 0;
-    const totalPayments = bill.total_amount > 0 && bill.amount > 0
-      ? Math.ceil(bill.total_amount / bill.amount) : 0;
+    const hasLoanDetails = bill.original_principal && bill.original_principal > 0;
+    const interestRate = bill.interest_rate || 0;
+    const originalPrincipal = bill.original_principal || 0;
+    const loanTermMonths = bill.loan_term_months || 0;
+    const startDate = bill.start_date || null;
+
+    // Use amortization if we have loan details
+    let amortData = null;
+    if (hasLoanDetails && loanTermMonths > 0) {
+      amortData = calculateAmortization(originalPrincipal, interestRate, loanTermMonths, paymentsMade);
+    }
+
+    const totalPayments = loanTermMonths > 0 ? loanTermMonths
+      : (bill.total_amount > 0 && bill.amount > 0 ? Math.ceil(bill.total_amount / bill.amount) : 0);
     const amountPaid = paymentsMade * bill.amount;
-    const remainingBalance = Math.max(0, bill.total_amount - amountPaid);
-    const percentPaid = bill.total_amount > 0 ? Math.min(100, (amountPaid / bill.total_amount) * 100) : 0;
+    const remainingBalance = amortData ? amortData.remainingBalance : Math.max(0, bill.total_amount - amountPaid);
+    const percentPaid = totalPayments > 0 ? Math.min(100, (paymentsMade / totalPayments) * 100) : 0;
     const remainingPayments = Math.max(0, totalPayments - paymentsMade);
     const payoffDate = new Date();
     payoffDate.setMonth(payoffDate.getMonth() + remainingPayments);
@@ -605,7 +680,17 @@ function getBillFinancingInfo(bill) {
       paymentsMade,
       totalPayments,
       remainingPayments,
-      estimatedPayoffDate: payoffDate
+      estimatedPayoffDate: payoffDate,
+      // Enhanced loan data
+      interestRate,
+      originalPrincipal,
+      loanTermMonths,
+      startDate,
+      hasLoanDetails,
+      totalInterest: amortData ? amortData.totalInterest : null,
+      interestPaidToDate: amortData ? amortData.interestPaidToDate : null,
+      principalPaidToDate: amortData ? amortData.principalPaidToDate : null,
+      amortization: amortData
     };
   }
   // Fall back to hardcoded metadata (case-insensitive lookup)
@@ -628,7 +713,17 @@ function getBillFinancingInfo(bill) {
     paymentsMade: meta.payments_made,
     totalPayments: meta.total_payments,
     remainingPayments,
-    estimatedPayoffDate: meta.end_date ? new Date(meta.end_date + 'T00:00:00') : payoffDate
+    estimatedPayoffDate: meta.end_date ? new Date(meta.end_date + 'T00:00:00') : payoffDate,
+    // No loan details from hardcoded meta
+    interestRate: null,
+    originalPrincipal: null,
+    loanTermMonths: null,
+    startDate: null,
+    hasLoanDetails: false,
+    totalInterest: null,
+    interestPaidToDate: null,
+    principalPaidToDate: null,
+    amortization: null
   };
 }
 
@@ -669,6 +764,42 @@ function renderBills() {
           const payoffStr = info.estimatedPayoffDate
             ? info.estimatedPayoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
             : 'N/A';
+          // APR badge
+          const aprBadge = info.interestRate !== null && info.interestRate !== undefined
+            ? `<span class="badge ${info.interestRate === 0 ? 'bg-success' : 'bg-warning text-dark'} ms-1" style="font-size: 0.7rem;">${info.interestRate}% APR</span>`
+            : '';
+          // Principal vs Interest breakdown (only when loan details exist)
+          const hasBreakdown = info.hasLoanDetails && info.interestPaidToDate !== null;
+          const breakdownHtml = hasBreakdown ? `
+                <div class="mt-3 mb-2">
+                  <div class="d-flex justify-content-between mb-1">
+                    <small style="color: var(--color-text-secondary);">Principal vs Interest Paid</small>
+                  </div>
+                  <div class="progress" style="height: 8px; border-radius: var(--radius-full);">
+                    <div class="progress-bar" role="progressbar"
+                         style="width: ${info.amountPaid > 0 ? (info.principalPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0}%; background-color: var(--color-primary);"
+                         title="Principal: ${formatCurrency(info.principalPaidToDate)}">
+                    </div>
+                    <div class="progress-bar" role="progressbar"
+                         style="width: ${info.amountPaid > 0 ? (info.interestPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0}%; background-color: var(--color-secondary);"
+                         title="Interest: ${formatCurrency(info.interestPaidToDate)}">
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-1">
+                    <small style="color: var(--color-primary);">Principal: ${formatCurrency(info.principalPaidToDate)}</small>
+                    <small style="color: var(--color-secondary);">Interest: ${formatCurrency(info.interestPaidToDate)}</small>
+                  </div>
+                </div>` : '';
+          // Total interest line
+          const totalInterestHtml = info.totalInterest !== null
+            ? `<div class="col-4">
+                    <small class="d-block" style="color: var(--color-text-tertiary);">Total Interest</small>
+                    <strong style="color: var(--color-secondary);">${formatCurrency(info.totalInterest)}</strong>
+                  </div>` : '';
+          // View Schedule button (only when loan details exist)
+          const scheduleBtn = info.hasLoanDetails
+            ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showAmortizationSchedule('${b.id}')"><i class="bi bi-table me-1"></i>View Schedule</button>`
+            : '';
           return `
           <div class="col-xl-4 col-md-6 col-12">
             <div class="card h-100">
@@ -676,7 +807,7 @@ function renderBills() {
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div>
                     <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">${escapeHtml(b.name)}</h5>
-                    <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>
+                    <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
                   </div>
                   <div class="text-end">
                     <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${b.id}')"><i class="bi bi-pencil"></i></button>
@@ -694,23 +825,24 @@ function renderBills() {
                          aria-valuenow="${info.percentPaid}" aria-valuemin="0" aria-valuemax="100">
                     </div>
                   </div>
-                </div>
+                </div>${breakdownHtml}
                 <div class="row g-2 text-center">
-                  <div class="col-4">
+                  <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
                     <small class="d-block" style="color: var(--color-text-tertiary);">Monthly</small>
                     <strong style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
                   </div>
-                  <div class="col-4">
+                  <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
                     <small class="d-block" style="color: var(--color-text-tertiary);">Remaining</small>
                     <strong style="color: var(--color-text-primary);">${formatCurrency(info.remainingBalance)}</strong>
                   </div>
-                  <div class="col-4">
+                  <div class="${totalInterestHtml ? 'col-2' : 'col-4'}">
                     <small class="d-block" style="color: var(--color-text-tertiary);">Payoff</small>
                     <strong style="color: var(--color-text-primary);">${payoffStr}</strong>
-                  </div>
+                  </div>${totalInterestHtml}
                 </div>
                 <div class="mt-2 text-center">
                   <small style="color: var(--color-text-tertiary);">${info.paymentsMade} of ${info.totalPayments} payments made</small>
+                  ${scheduleBtn}
                 </div>
               </div>
             </div>
@@ -777,17 +909,83 @@ function renderBills() {
   if (document.getElementById('billsFinancingCount')) document.getElementById('billsFinancingCount').textContent = activeFinancing.length;
   if (document.getElementById('billsPaidOffCount')) document.getElementById('billsPaidOffCount').textContent = completedFinancing.length;
 }
+function isFinancingBillType(type) {
+  const t = (type || '').toLowerCase();
+  return t === 'financing' || t === 'auto' || t === 'housing';
+}
+
+function toggleFinancingFields() {
+  const typeVal = document.getElementById('billType').value;
+  const fieldsDiv = document.getElementById('financingFields');
+  if (fieldsDiv) {
+    fieldsDiv.classList.toggle('d-none', !isFinancingBillType(typeVal));
+  }
+}
+
+function updateLoanCalcPreview() {
+  const principal = parseFloat(document.getElementById('billOriginalPrincipal').value) || 0;
+  const rate = parseFloat(document.getElementById('billInterestRate').value) || 0;
+  const term = parseInt(document.getElementById('billLoanTermMonths').value) || 0;
+  const preview = document.getElementById('loanCalcPreview');
+  if (!preview) return;
+  if (principal > 0 && term > 0) {
+    const calc = calculateAmortization(principal, rate, term, 0);
+    document.getElementById('calcMonthlyPayment').textContent = formatCurrency(calc.monthlyPayment);
+    document.getElementById('calcTotalInterest').textContent = formatCurrency(calc.totalInterest);
+    preview.classList.remove('d-none');
+    // Auto-fill total financed if blank
+    const totalField = document.getElementById('billTotalFinanced');
+    if (!totalField.value) {
+      totalField.placeholder = formatCurrency(calc.totalCost) + ' (auto)';
+    }
+  } else {
+    preview.classList.add('d-none');
+  }
+}
+
 function openBillModal(id = null) {
   editBillId = id;
   const f = document.getElementById('billForm');
   f.reset();
+  // Reset financing fields
+  const financingFields = document.getElementById('financingFields');
+  if (financingFields) financingFields.classList.add('d-none');
+  const preview = document.getElementById('loanCalcPreview');
+  if (preview) preview.classList.add('d-none');
+
   if (id) {
-      const b = window.bills.find(x => x.id == id); // FIX: Changed === to ==
+      const b = window.bills.find(x => x.id == id);
       if (b) {
           f.billName.value = b.name; f.billType.value = b.type; f.billAmount.value = b.amount;
           f.billFrequency.value = b.frequency; f.billNextDueDate.value = b.nextDueDate;
+          // Populate financing fields if available
+          if (isFinancingBillType(b.type)) {
+            if (financingFields) financingFields.classList.remove('d-none');
+            if (b.interest_rate !== undefined && b.interest_rate !== null) f.billInterestRate.value = b.interest_rate;
+            if (b.original_principal) f.billOriginalPrincipal.value = b.original_principal;
+            if (b.loan_term_months) f.billLoanTermMonths.value = b.loan_term_months;
+            if (b.start_date) f.billStartDate.value = b.start_date;
+            if (b.payments_made) f.billPaymentsMade.value = b.payments_made;
+            if (b.total_amount) f.billTotalFinanced.value = b.total_amount;
+            // Also check FINANCING_META fallback for payments_made/total_amount
+            const metaKey = Object.keys(FINANCING_META).find(k => k.toLowerCase() === (b.name || '').toLowerCase());
+            const meta = metaKey ? FINANCING_META[metaKey] : null;
+            if (meta && !b.payments_made) f.billPaymentsMade.value = meta.payments_made || '';
+            if (meta && !b.total_amount) f.billTotalFinanced.value = meta.total_amount || '';
+            updateLoanCalcPreview();
+          }
       }
   }
+  // Add event listeners for dynamic show/hide and preview calc
+  const typeSelect = document.getElementById('billType');
+  typeSelect.removeEventListener('change', toggleFinancingFields);
+  typeSelect.addEventListener('change', toggleFinancingFields);
+  // Loan calc preview listeners
+  ['billOriginalPrincipal', 'billInterestRate', 'billLoanTermMonths'].forEach(fid => {
+    const el = document.getElementById(fid);
+    if (el) { el.removeEventListener('input', updateLoanCalcPreview); el.addEventListener('input', updateLoanCalcPreview); }
+  });
+
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveBill() {
@@ -796,12 +994,126 @@ async function saveBill() {
       name: f.billName.value, type: f.billType.value, amount: getRaw(f.billAmount.value),
       frequency: f.billFrequency.value, nextDueDate: f.billNextDueDate.value || null, user_id: currentUser.id
   };
-  const { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId) : await sb.from('bills').insert(record);
+  // Add financing fields if type is financing/auto/housing
+  if (isFinancingBillType(f.billType.value)) {
+    const interestRate = f.billInterestRate.value;
+    const originalPrincipal = f.billOriginalPrincipal.value;
+    const loanTermMonths = f.billLoanTermMonths.value;
+    const startDate = f.billStartDate.value;
+    const paymentsMade = f.billPaymentsMade.value;
+    const totalFinanced = f.billTotalFinanced.value;
+    // Only include fields that have values (graceful if columns don't exist yet)
+    if (interestRate !== '') record.interest_rate = parseFloat(interestRate);
+    if (originalPrincipal !== '') record.original_principal = parseFloat(originalPrincipal);
+    if (loanTermMonths !== '') record.loan_term_months = parseInt(loanTermMonths);
+    if (startDate) record.start_date = startDate;
+    if (paymentsMade !== '') record.payments_made = parseInt(paymentsMade);
+    if (totalFinanced !== '') {
+      record.total_amount = parseFloat(totalFinanced);
+    } else if (originalPrincipal && loanTermMonths) {
+      // Auto-calculate total_amount from amortization
+      const calc = calculateAmortization(parseFloat(originalPrincipal), parseFloat(interestRate) || 0, parseInt(loanTermMonths), 0);
+      record.total_amount = calc.totalCost;
+    }
+  }
+  // Attempt save — if new columns don't exist yet, retry without them
+  let { error } = editBillId ? await sb.from('bills').update(record).eq('id', editBillId) : await sb.from('bills').insert(record);
+  if (error && error.message && error.message.includes('column')) {
+    // Columns don't exist yet in DB — strip new fields and retry
+    const baseRecord = {
+      name: record.name, type: record.type, amount: record.amount,
+      frequency: record.frequency, nextDueDate: record.nextDueDate, user_id: record.user_id
+    };
+    if (record.total_amount) baseRecord.total_amount = record.total_amount;
+    if (record.payments_made !== undefined) baseRecord.payments_made = record.payments_made;
+    const retry = editBillId ? await sb.from('bills').update(baseRecord).eq('id', editBillId) : await sb.from('bills').insert(baseRecord);
+    error = retry.error;
+  }
   if (error) return alert(error.message);
   bootstrap.Modal.getInstance(f.closest('.modal')).hide();
   await fetchAllDataFromSupabase();
   renderAll();
 }
+function showAmortizationSchedule(billId) {
+  const bill = (window.bills || []).find(b => b.id == billId);
+  if (!bill) return;
+  const info = getBillFinancingInfo(bill);
+  if (!info.hasLoanDetails || !info.amortization) {
+    alert('Loan details are required to view the amortization schedule. Edit this bill and add principal, rate, and term.');
+    return;
+  }
+  const amort = info.amortization;
+
+  // Populate summary
+  const summaryEl = document.getElementById('amortSummary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div class="col-md-3 col-6">
+        <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+          <div class="card-body py-2 px-3 text-center">
+            <small style="color: var(--color-text-tertiary);">Monthly Payment</small>
+            <div><strong style="color: var(--color-primary);">${formatCurrency(amort.monthlyPayment)}</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+          <div class="card-body py-2 px-3 text-center">
+            <small style="color: var(--color-text-tertiary);">Total Cost</small>
+            <div><strong style="color: var(--color-text-primary);">${formatCurrency(amort.totalCost)}</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+          <div class="card-body py-2 px-3 text-center">
+            <small style="color: var(--color-text-tertiary);">Total Interest</small>
+            <div><strong style="color: var(--color-secondary);">${formatCurrency(amort.totalInterest)}</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+          <div class="card-body py-2 px-3 text-center">
+            <small style="color: var(--color-text-tertiary);">Remaining Balance</small>
+            <div><strong style="color: var(--color-text-primary);">${formatCurrency(amort.remainingBalance)}</strong></div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Populate schedule table
+  const tbody = document.getElementById('amortTableBody');
+  if (tbody) {
+    const paymentsMade = info.paymentsMade || 0;
+    tbody.innerHTML = amort.schedule.map(row => {
+      const isPast = row.payment <= paymentsMade;
+      const isCurrent = row.payment === paymentsMade + 1;
+      let rowClass = '';
+      let rowStyle = '';
+      if (isCurrent) {
+        rowClass = 'table-active';
+        rowStyle = 'border-left: 3px solid var(--color-primary); font-weight: 600;';
+      } else if (isPast) {
+        rowStyle = 'opacity: 0.6;';
+      }
+      return `<tr class="${rowClass}" style="${rowStyle}">
+        <td>${isCurrent ? '<i class="bi bi-arrow-right-circle-fill me-1" style="color: var(--color-primary);"></i>' : ''}${row.payment}</td>
+        <td>${formatCurrency(row.paymentAmount)}</td>
+        <td>${formatCurrency(row.principal)}</td>
+        <td>${formatCurrency(row.interest)}</td>
+        <td>${formatCurrency(row.balance)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Update modal title
+  const title = document.getElementById('amortizationModalLabel');
+  if (title) title.textContent = `Amortization Schedule — ${bill.name}`;
+
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('amortizationModal')).show();
+}
+
 function confirmDeleteBill(id) {
   deleteBillId = id;
   document.getElementById('deleteBillName').textContent = `"${window.bills.find(b=>b.id===id).name}"`;

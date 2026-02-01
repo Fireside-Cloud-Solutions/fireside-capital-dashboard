@@ -1565,3 +1565,47 @@ body[data-theme='dark'] .table-card {
 .dashboard-card:nth-child(2) { animation-delay: 50ms; }
 .dashboard-card:nth-child(3) { animation-delay: 100ms; }
 .dashboard-card:nth-child(4) { animation-delay: 150ms; }
+
+/* =================================================================
+   AMORTIZATION SCHEDULE TABLE
+   ================================================================= */
+
+#amortTable thead th {
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-tertiary);
+  border-bottom-color: var(--color-border-subtle);
+  padding: var(--space-2) var(--space-3);
+}
+
+#amortTable tbody td {
+  font-size: var(--text-body-sm);
+  padding: var(--space-2) var(--space-3);
+  border-bottom-color: var(--color-border-subtle);
+  color: var(--color-text-secondary);
+}
+
+#amortTable tbody tr.table-active td {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-text-primary);
+}
+
+body[data-theme='dark'] #amortTable tbody td {
+  border-bottom-color: var(--color-border-subtle);
+}
+
+/* Financing card enhancements */
+.financing-breakdown .progress {
+  overflow: visible;
+}
+
+.btn-outline-info {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline-info:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
