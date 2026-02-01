@@ -2228,6 +2228,12 @@ function init() {
     }
   });
 
+  // Explicitly check session on page load to trigger auth state
+  sb.auth.getSession().then(({ data: { session } }) => {
+    debugLog("INIT: Initial session check complete");
+    // The onAuthStateChange listener above will handle the session
+  });
+
   // Attach all event listeners safely
   document.body.addEventListener('click', (e) => {
       if (e.target.closest('#logoutButton')) {
