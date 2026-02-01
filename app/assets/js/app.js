@@ -2,6 +2,52 @@
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
 
+// BUG-002 DEBUG: Manual bill calculation checker (call from console: window.debugBillsCalculation())
+window.debugBillsCalculation = function() {
+  console.log('=== BILLS CALCULATION DEBUG ===');
+  const allBills = window.bills || [];
+  console.log(`Total bills in database: ${allBills.length}`);
+  
+  const activeBills = allBills.filter(b => {
+    const info = getBillFinancingInfo(b);
+    return !(info.isFinancing && info.status === 'paid_off');
+  });
+  console.log(`Active bills (excluding paid-off financing): ${activeBills.length}`);
+  
+  let totalMonthly = 0;
+  const billDetails = [];
+  
+  activeBills.forEach((b, index) => {
+    if (!b.amount || b.amount === 0 || !b.frequency) {
+      console.warn(`Skipping bill #${index + 1}: "${b.name}" - invalid amount or frequency`);
+      return;
+    }
+    
+    const shareInfo = getShareInfoForBill(b.id);
+    const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
+    const monthlyAmount = normalizeToMonthly(userAmount, b.frequency);
+    
+    billDetails.push({
+      name: b.name,
+      type: b.type,
+      frequency: b.frequency,
+      billAmount: b.amount,
+      userAmount: userAmount,
+      monthlyAmount: monthlyAmount,
+      isShared: !!shareInfo,
+      shareStatus: shareInfo?.status || 'N/A'
+    });
+    
+    totalMonthly += monthlyAmount;
+  });
+  
+  console.table(billDetails);
+  console.log(`TOTAL MONTHLY: ${formatCurrency(totalMonthly)}`);
+  console.log('=== END DEBUG ===');
+  
+  return { billDetails, totalMonthly };
+};
+
 // ===== PERFORMANCE: LAZY LOAD CHART.JS =====
 let chartJsLoaded = false;
 let chartJsLoading = false;
@@ -140,10 +186,12 @@ function normalizeToMonthly(amount, frequency) {
     case 'daily': return rawAmount * 30; // Approximate
     case 'weekly': return rawAmount * 52 / 12;
     case 'bi-weekly': return rawAmount * 26 / 12;
+    case 'biweekly': return rawAmount * 26 / 12; // Handle no-hyphen variant
     case 'twice monthly': return rawAmount * 2;
     case 'semi-monthly': return rawAmount * 2;
     case 'monthly': return rawAmount;
     case 'quarterly': return rawAmount / 3;
+    case 'semi-annually': return rawAmount / 6;
     case 'annually': return rawAmount / 12;
     case 'annual': return rawAmount / 12;
     default:
@@ -1238,16 +1286,42 @@ function renderBills() {
   }
 
   // Update summary cards
-  // BUG FIX: Use owner_amount for shared bills AND normalize all bills to monthly amounts
+  // BUG-002 FIX: Use owner_amount for shared bills AND normalize all bills to monthly amounts
   // Only count active bills (exclude paid-off financing)
   const totalBills = activeBills.reduce((sum, b) => {
+    // Skip bills with null/undefined amounts or invalid frequencies
+    if (!b.amount || b.amount === 0 || !b.frequency) {
+      if (DEBUG) console.warn(`Skipping bill "${b.name}": amount=${b.amount}, frequency=${b.frequency}`);
+      return sum;
+    }
+    
     const shareInfo = getShareInfoForBill(b.id);
     // If bill is shared (and accepted), use owner_amount; otherwise use full amount
     const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
+    
+    // Skip if user amount is invalid
+    if (!userAmount || userAmount === 0) {
+      if (DEBUG) console.warn(`Skipping bill "${b.name}": userAmount=${userAmount}`);
+      return sum;
+    }
+    
     // Normalize to monthly amount based on frequency
     const monthlyAmount = normalizeToMonthly(userAmount, b.frequency);
+    
+    // Debug logging to help identify calculation issues
+    if (DEBUG) {
+      console.log(`Bill: ${b.name} | Frequency: ${b.frequency} | Amount: ${formatCurrency(b.amount)} | ` +
+        `User Amount: ${formatCurrency(userAmount)} | Monthly: ${formatCurrency(monthlyAmount)} | ` +
+        `Shared: ${shareInfo ? 'Yes' : 'No'}`);
+    }
+    
     return sum + monthlyAmount;
   }, 0);
+  
+  if (DEBUG) {
+    console.log(`Total Monthly Bills: ${formatCurrency(totalBills)} (from ${activeBills.length} active bills)`);
+  }
+  
   if (document.getElementById('billsTotal')) document.getElementById('billsTotal').textContent = formatCurrency(totalBills);
   if (document.getElementById('billsRecurringCount')) document.getElementById('billsRecurringCount').textContent = recurringBills.length;
   if (document.getElementById('billsFinancingCount')) document.getElementById('billsFinancingCount').textContent = activeFinancing.length;
