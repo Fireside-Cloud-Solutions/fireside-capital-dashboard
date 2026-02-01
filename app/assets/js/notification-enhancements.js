@@ -305,24 +305,33 @@
     if (originalLoadNotifications) {
       window.loadNotifications = async function() {
         showLoadingState();
-        await originalLoadNotifications();
         
-        // Apply enhancements to loaded notifications
-        const items = document.querySelectorAll('.notification-item');
-        items.forEach(item => {
-          // Add tabindex for keyboard navigation
-          item.setAttribute('tabindex', '0');
+        try {
+          await originalLoadNotifications();
           
-          // Add transition
-          item.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-        });
+          // Apply enhancements to loaded notifications
+          const items = document.querySelectorAll('.notification-item');
+          items.forEach(item => {
+            // Add tabindex for keyboard navigation
+            item.setAttribute('tabindex', '0');
+            
+            // Add transition
+            item.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+          });
 
-        // Announce to screen reader
-        announceToScreenReader(`${items.length} notification${items.length !== 1 ? 's' : ''} loaded`);
+          // Announce to screen reader
+          announceToScreenReader(`${items.length} notification${items.length !== 1 ? 's' : ''} loaded`);
 
-        // Render empty state if needed
-        if (items.length === 0) {
-          renderEmptyState();
+          // Render empty state if needed
+          if (items.length === 0) {
+            renderEmptyState();
+          }
+        } finally {
+          // Always hide the loading spinner
+          const loadingEl = document.querySelector('.notification-loading');
+          if (loadingEl) {
+            loadingEl.remove();
+          }
         }
       };
     }

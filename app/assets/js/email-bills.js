@@ -125,7 +125,7 @@ async function loadPendingEmailBills() {
 
   try {
     const { data, error } = await sb
-      .from('pending_bills')
+      .from('bills')
       .select('*')
       .eq('user_id', currentUser.id)
       .eq('status', 'pending')

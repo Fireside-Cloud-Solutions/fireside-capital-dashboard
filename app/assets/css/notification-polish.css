@@ -62,7 +62,10 @@
 }
 
 /* ===== NOTIFICATION DROPDOWN ===== */
-#notificationList {
+#notificationList,
+#notificationDropdown .dropdown-menu {
+  width: 420px;
+  max-width: 95vw;
   padding: 0;
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);

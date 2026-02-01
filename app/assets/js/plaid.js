@@ -19,21 +19,53 @@ function initializePlaid() {
 
 // Create Plaid Link handler
 function createPlaidLinkHandler(linkToken) {
-  plaidLinkHandler = Plaid.create({
-    token: linkToken,
-    onSuccess: (public_token, metadata) => {
-      // Send public_token to your server
-      exchangePublicToken(public_token);
-    },
-    onExit: (err, metadata) => {
-      if (err != null) {
-        // Handle error
-      }
-    },
-    onEvent: (eventName, metadata) => {
-      // Optional: track events
+  try {
+    if (typeof Plaid === 'undefined') {
+      console.warn('[Plaid] Plaid SDK not loaded - connection feature disabled');
+      disablePlaidButtons();
+      return;
     }
+    
+    plaidLinkHandler = Plaid.create({
+      token: linkToken,
+      onSuccess: (public_token, metadata) => {
+        // Send public_token to your server
+        exchangePublicToken(public_token);
+      },
+      onExit: (err, metadata) => {
+        if (err != null) {
+          // Handle error
+        }
+      },
+      onEvent: (eventName, metadata) => {
+        // Optional: track events
+      }
+    });
+    
+    if (!plaidLinkHandler) {
+      throw new Error('Plaid handler initialization failed');
+    }
+  } catch (error) {
+    console.error('[Plaid] Failed to initialize:', error);
+    disablePlaidButtons();
+    showPlaidError('Bank connections temporarily unavailable. Please try again later.');
+  }
+}
+
+// Helper function to disable Plaid buttons
+function disablePlaidButtons() {
+  const connectButtons = document.querySelectorAll('[onclick*="openPlaid"], .connect-account-btn');
+  connectButtons.forEach(btn => {
+    btn.disabled = true;
+    btn.title = 'Bank connections temporarily unavailable';
+    btn.style.opacity = '0.5';
   });
+}
+
+// Helper function to show Plaid error
+function showPlaidError(message) {
+  // Optional: show user-friendly error message
+  console.log('[Plaid] Error shown to user:', message);
 }
 
 // Exchange public token for access token
