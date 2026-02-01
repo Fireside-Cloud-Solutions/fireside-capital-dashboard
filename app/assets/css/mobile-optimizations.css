@@ -427,6 +427,11 @@
     line-height: 1;
   }
 
+  /* Push sidebar content below the hamburger button */
+  .sidebar {
+    padding-top: 72px !important;
+  }
+
   /* ---- Bell + Welcome: fixed top-right on ALL pages ---- */
   #loggedInState {
     position: fixed !important;
@@ -457,22 +462,32 @@
 }
 
 /* =================================================================
-   NOTIFICATION DROPDOWN — Full-width mobile overlay
-   No scrollbar, proper text wrapping, clean mobile UX
+   NOTIFICATION DROPDOWN — Full-screen mobile takeover
+   Covers entire viewport below top bar, solid background,
+   scrolls internally. Tap the bell again to close.
    ================================================================= */
 
 @media (max-width: 991.98px) {
   #notificationDropdown .dropdown-menu {
     position: fixed !important;
     top: 68px !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: auto !important;
-    max-width: none !important;
-    max-height: calc(100vh - 84px) !important;
-    overflow-y: auto;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    border-radius: 0 !important;
+    z-index: 499 !important;
+    background-color: var(--color-bg-1) !important;
+    margin: 0 !important;
+    transform: none !important;
+    border: none !important;
+    border-top: 1px solid var(--color-border-subtle) !important;
+    box-shadow: none !important;
+    min-width: 0 !important;
   }
 
   /* Hide scrollbar but keep scroll functionality */
