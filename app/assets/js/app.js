@@ -660,6 +660,9 @@ async function renderAll() {
   renderReportsSummary();
 }
 function renderReportsSummary() {
+    // Only run on the reports page
+    if (!document.getElementById('reportNetWorth') && !document.getElementById('reportInvestments')) return;
+
     // Check if there's any data to report on
     const hasAnyData = (window.assets && window.assets.length > 0) ||
                         (window.investments && window.investments.length > 0) ||
