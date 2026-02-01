@@ -1,0 +1,411 @@
+/* =================================================================
+   MOBILE OPTIMIZATIONS — Fix Stacking Issues
+   Improves mobile UX with responsive layouts and reduced heights
+   ================================================================= */
+
+/* =================================================================
+   STAT CARDS — Better Mobile Stacking
+   ================================================================= */
+
+/* Mid-range phones (480px - 768px): 2-column grid for stat cards */
+@media (min-width: 480px) and (max-width: 767.98px) {
+  .dashboard-card {
+    padding: var(--space-4);
+  }
+  
+  .dashboard-card h5 {
+    font-size: 10px;
+    margin-bottom: var(--space-1);
+  }
+  
+  .dashboard-card p {
+    font-size: 1.5rem;
+    margin-top: var(--space-1);
+  }
+}
+
+/* Small mobile (<480px): Reduce card padding and font sizes */
+@media (max-width: 479.98px) {
+  .dashboard-card {
+    padding: var(--space-3-5);
+  }
+  
+  .dashboard-card h5 {
+    font-size: 10px;
+    margin-bottom: var(--space-1);
+  }
+  
+  .dashboard-card p {
+    font-size: 1.4rem;
+    margin-top: var(--space-1);
+  }
+  
+  /* Reduce gap between cards */
+  .row.g-3 {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+  }
+}
+
+/* =================================================================
+   CHART CARDS — Responsive Heights
+   ================================================================= */
+
+/* Tablets and below: Reduce chart heights */
+@media (max-width: 991.98px) {
+  .chart-card {
+    padding: var(--space-4);
+  }
+  
+  .chart-card h5 {
+    font-size: 11px;
+    margin-bottom: var(--space-3);
+  }
+  
+  .chart-wrapper {
+    min-height: 220px !important;
+  }
+  
+  .chart-wrapper[style*="height: 300px"] {
+    height: 240px !important;
+  }
+  
+  .chart-wrapper[style*="height: 260px"] {
+    height: 220px !important;
+  }
+}
+
+/* Mobile: Further reduce chart heights */
+@media (max-width: 767.98px) {
+  .chart-card {
+    padding: var(--space-3-5);
+  }
+  
+  .chart-wrapper {
+    min-height: 200px !important;
+  }
+  
+  .chart-wrapper[style*="height: 300px"] {
+    height: 220px !important;
+  }
+  
+  .chart-wrapper[style*="height: 260px"] {
+    height: 200px !important;
+  }
+}
+
+/* Small mobile: Compact chart cards */
+@media (max-width: 479.98px) {
+  .chart-card {
+    padding: var(--space-3);
+  }
+  
+  .chart-card h5 {
+    font-size: 10px;
+    margin-bottom: var(--space-2);
+  }
+  
+  .chart-wrapper {
+    min-height: 180px !important;
+  }
+  
+  .chart-wrapper[style*="height: 300px"] {
+    height: 200px !important;
+  }
+  
+  .chart-wrapper[style*="height: 260px"] {
+    height: 180px !important;
+  }
+  
+  /* Reduce spacing between chart sections */
+  .mb-4 {
+    margin-bottom: var(--space-3) !important;
+  }
+}
+
+/* =================================================================
+   UPCOMING PAYMENTS LIST — Optimize mobile view
+   ================================================================= */
+
+@media (max-width: 767.98px) {
+  #upcomingPaymentsList {
+    max-height: 200px !important;
+  }
+}
+
+@media (max-width: 479.98px) {
+  #upcomingPaymentsList {
+    max-height: 180px !important;
+    font-size: 0.85rem;
+  }
+  
+  #upcomingPaymentsList strong {
+    font-size: 0.9rem;
+  }
+  
+  #upcomingPaymentsList small {
+    font-size: 0.75rem;
+  }
+  
+  #upcomingPaymentsList > div {
+    padding: var(--space-2) 0;
+  }
+}
+
+/* =================================================================
+   EMERGENCY FUND PROGRESS — Mobile optimization
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  #emergencyFundChartWrapper {
+    height: 180px !important;
+    padding: var(--space-2);
+  }
+  
+  #emergencyFundChartWrapper p,
+  #emergencyFundChartWrapper .text-center {
+    font-size: 0.85rem;
+  }
+  
+  #emergencyFundChartWrapper .btn {
+    font-size: 0.8rem;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* =================================================================
+   PAGE HEADER — Mobile optimization
+   ================================================================= */
+
+@media (max-width: 767.98px) {
+  .main-content .d-flex.mb-4 {
+    margin-bottom: var(--space-3) !important;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .main-content .d-flex.mb-4 {
+    margin-bottom: var(--space-2-5) !important;
+  }
+}
+
+/* =================================================================
+   BUTTON GROUPS — Stack better on mobile
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  .btn-group {
+    flex-wrap: wrap;
+  }
+  
+  .btn-sm {
+    font-size: 0.75rem;
+    padding: var(--space-1-5) var(--space-2-5);
+  }
+}
+
+/* =================================================================
+   MODALS — Better mobile experience
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  .modal-dialog {
+    margin: var(--space-2);
+  }
+  
+  .modal-content {
+    border-radius: var(--radius-lg);
+  }
+  
+  .modal-header,
+  .modal-footer {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .modal-body {
+    padding: var(--space-4);
+    font-size: 0.9rem;
+  }
+  
+  .modal-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* =================================================================
+   FORMS — Mobile-friendly inputs
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  .form-label {
+    font-size: 0.85rem;
+    margin-bottom: var(--space-1);
+  }
+  
+  .form-control,
+  .form-select {
+    font-size: 16px; /* Prevents iOS zoom */
+    padding: var(--space-2-5) var(--space-3);
+  }
+  
+  .form-group,
+  .mb-3 {
+    margin-bottom: var(--space-2-5) !important;
+  }
+}
+
+/* =================================================================
+   HORIZONTAL SCROLL FOR DENSE CONTENT (OPTION 3)
+   - For sections that shouldn't stack, use horizontal scroll
+   ================================================================= */
+
+/* Stats row: Enable horizontal scroll as alternative (disabled by default) */
+.stats-scroll-mobile {
+  display: none;
+}
+
+@media (max-width: 575.98px) {
+  .stats-scroll-mobile {
+    display: flex;
+    overflow-x: auto;
+    gap: var(--space-3);
+    padding-bottom: var(--space-2);
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  
+  .stats-scroll-mobile .dashboard-card {
+    min-width: 280px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+}
+
+/* =================================================================
+   COLLAPSIBLE SECTIONS (OPTION 2)
+   - For dense content, use expand/collapse
+   ================================================================= */
+
+.mobile-collapse {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+}
+
+.mobile-collapse summary {
+  padding: var(--space-3);
+  cursor: pointer;
+  font-weight: var(--weight-semibold);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+.mobile-collapse summary::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-collapse summary::after {
+  content: "▼";
+  font-size: 0.8em;
+  transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.mobile-collapse[open] summary::after {
+  transform: rotate(-180deg);
+}
+
+.mobile-collapse .collapse-content {
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+/* =================================================================
+   RESPONSIVE TEXT SIZING
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  /* Ensure readable but compact text */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.1rem; }
+  h5 { font-size: 0.95rem; }
+  
+  /* Body text */
+  body { font-size: 0.9rem; }
+  
+  /* Small text even smaller */
+  small, .text-muted { font-size: 0.8rem; }
+}
+
+/* =================================================================
+   NOTIFICATION DROPDOWN — Mobile full width
+   ================================================================= */
+
+@media (max-width: 575.98px) {
+  #notificationDropdown .dropdown-menu {
+    width: calc(100vw - 2rem) !important;
+    max-width: 100vw !important;
+    right: 1rem !important;
+    left: 1rem !important;
+  }
+}
+
+/* =================================================================
+   USER DROPDOWN — Better mobile positioning
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  .dropdown-menu {
+    font-size: 0.9rem;
+  }
+  
+  .dropdown-item {
+    padding: var(--space-2-5) var(--space-3);
+  }
+}
+
+/* =================================================================
+   LOADING STATES — Mobile optimization
+   ================================================================= */
+
+@media (max-width: 479.98px) {
+  .spinner-border {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+/* =================================================================
+   ACCESSIBILITY — Enhanced touch targets
+   ================================================================= */
+
+@media (max-width: 767.98px) and (pointer: coarse) {
+  /* Minimum 44x44px touch targets */
+  .btn,
+  .form-control,
+  .form-select,
+  a {
+    min-height: 44px;
+  }
+  
+  /* Sidebar links */
+  .sidebar a {
+    min-height: 48px;
+    padding: var(--space-3) var(--space-5);
+  }
+  
+  /* Table action buttons */
+  .table .btn-sm {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
