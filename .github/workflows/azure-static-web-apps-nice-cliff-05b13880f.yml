@@ -27,10 +27,9 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "app"           # App source files location
-          api_location: "app/api"       # Azure Functions API
+          api_location: ""              # No API - using Supabase backend
           output_location: ""           # Empty for skip_app_build
           skip_app_build: true          # Skip build - deploy static files as-is
-          skip_api_build: false         # Build and deploy API functions
           
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
