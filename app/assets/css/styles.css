@@ -380,6 +380,9 @@ strong {
   background-color: var(--color-bg-1);
   min-height: 100vh;
   padding: 32px 48px; /* 32px top/bottom, 48px left/right for breathing room */
+  min-width: 0; /* Allow flex child to shrink below content width */
+  overflow-x: auto; /* Prevent content from blowing out the viewport */
+  max-width: calc(100vw - 260px); /* Never exceed viewport minus sidebar */
 }
 
 /* =================================================================
