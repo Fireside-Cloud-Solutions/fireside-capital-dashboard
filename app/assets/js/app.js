@@ -620,6 +620,7 @@ async function renderAll() {
   renderInvestments();
   renderDebts();
   renderBills();
+  renderFinancingCards(); // Financing cards on Debts page (data from window.bills)
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
@@ -1235,9 +1236,7 @@ function renderBills() {
       </tr>`;
   }).join('');
 
-  // Financing cards now render on the Debts page (see renderFinancingCards)
-  // They still appear as line items in the bills table above
-  renderFinancingCards(activeFinancing, completedFinancing);
+  // Financing cards now render on the Debts page (called from renderAll)
 
   // Update summary cards
   // BUG-002 FIX: Use owner_amount for shared bills AND normalize all bills to monthly amounts
@@ -1287,9 +1286,18 @@ function renderBills() {
   if (document.getElementById('billsSharedCount')) document.getElementById('billsSharedCount').textContent = sharedCount;
 }
 // Render financing cards on the Debts page (moved from Bills page)
-function renderFinancingCards(activeFinancing, completedFinancing) {
+function renderFinancingCards() {
   const financingContainer = document.getElementById('financingCards');
   if (!financingContainer) return; // Not on the debts page
+
+  const allBills = window.bills || [];
+  const isFinancingType = (b) => {
+    const type = (b.type || '').toLowerCase();
+    return type === 'financing' || getBillFinancingInfo(b).isFinancing;
+  };
+  const financingBills = allBills.filter(b => isFinancingType(b));
+  const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off');
+  const completedFinancing = financingBills.filter(b => getBillFinancingInfo(b).status === 'paid_off');
 
   if (activeFinancing.length > 0) {
     financingContainer.innerHTML = activeFinancing.map(b => {
