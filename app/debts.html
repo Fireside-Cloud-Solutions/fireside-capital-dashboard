@@ -327,6 +327,276 @@
   <script src="assets/js/notification-enhancements.js"></script>
   <script src="assets/js/plaid.js"></script>
 
+  <!-- Bill Edit Modal (for financing cards) -->
+  <div class="modal fade" id="addBillModal" tabindex="-1" aria-labelledby="addBillLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="billForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addBillLabel">Edit Financing Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="billName" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="billName" required>
+            </div>
+            <div class="mb-3">
+              <label for="billType" class="form-label">Type</label>
+              <select class="form-select" id="billType" required>
+                <option value="">Choose...</option>
+                <option value="housing">Housing</option>
+                <option value="auto">Auto</option>
+                <option value="utilities">Utilities</option>
+                <option value="financing">Financing</option>
+                <option value="health">Health</option>
+                <option value="subscriptions">Subscriptions</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="billAmount" class="form-label">Monthly Payment ($) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="billAmount" required min="0" step="0.01">
+            </div>
+            <div class="mb-3">
+              <label for="billNextDueDate" class="form-label">Next Payment Date</label>
+              <input type="date" class="form-control" id="billNextDueDate">
+            </div>
+            <div class="mb-3">
+              <label for="billFrequency" class="form-label">Frequency</label>
+              <select class="form-select" id="billFrequency" required>
+                <option value="">Choose...</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-Weekly</option>
+                <option value="semi-monthly">Semi-Monthly</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="semi-annually">Semi-Annually</option>
+                <option value="annually">Annually</option>
+              </select>
+            </div>
+            <div id="financingFields" class="d-none">
+              <hr class="my-3">
+              <h6 class="mb-3" style="color: var(--color-primary);"><i class="bi bi-bank me-1"></i> Loan Details</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="billInterestRate" class="form-label">Interest Rate (APR %)</label>
+                  <input type="number" class="form-control" id="billInterestRate" min="0" max="100" step="0.01">
+                </div>
+                <div class="col-md-6">
+                  <label for="billOriginalPrincipal" class="form-label">Original Loan Amount ($)</label>
+                  <input type="number" class="form-control" id="billOriginalPrincipal" min="0" step="0.01">
+                </div>
+              </div>
+              <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                  <label class="form-label">Loan Term</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="billLoanTermValue" min="1" step="1">
+                    <select class="form-select" id="billLoanTermUnit" style="max-width: 110px;">
+                      <option value="months">Months</option>
+                      <option value="years">Years</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="billStartDate" class="form-label">Start Date</label>
+                  <input type="date" class="form-control" id="billStartDate">
+                </div>
+              </div>
+              <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                  <label for="billPaymentsMade" class="form-label">Payments Made</label>
+                  <input type="number" class="form-control" id="billPaymentsMade" min="0" step="1">
+                </div>
+                <div class="col-md-6">
+                  <label for="billTotalFinanced" class="form-label">Total Cost (incl. interest) ($)</label>
+                  <input type="number" class="form-control" id="billTotalFinanced" min="0" step="0.01">
+                </div>
+              </div>
+              <div class="row g-3 mt-2">
+                <div class="col-12">
+                  <label class="form-label">Remaining Balance</label>
+                  <div id="remainingBalanceDisplay" class="form-control-plaintext fw-semibold" style="color: var(--color-primary); font-size: 1.1rem;">—</div>
+                </div>
+              </div>
+              <div id="loanCalcPreview" class="mt-3 d-none">
+                <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+                  <div class="card-body py-2 px-3">
+                    <small style="color: var(--color-text-tertiary);">Calculated Monthly Payment: </small>
+                    <strong id="calcMonthlyPayment" style="color: var(--color-primary);">—</strong>
+                    <small class="ms-3" style="color: var(--color-text-tertiary);">Total Interest: </small>
+                    <strong id="calcTotalInterest" style="color: var(--color-secondary);">—</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="saveBillBtn" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bill Delete Confirmation -->
+  <div class="modal fade" id="confirmDeleteBillModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete <strong id="deleteBillName"></strong>?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="deleteBillConfirmed()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Bill Deletion Warning -->
+  <div class="modal fade" id="sharedBillDeleteWarningModal" tabindex="-1" aria-labelledby="sharedBillDeleteWarningLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title" id="sharedBillDeleteWarningLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Shared Bill?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong id="sharedBillName"></strong> is shared with <strong id="sharedUserCount"></strong> other user(s).</p>
+          <p class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Deleting this bill will remove it from their accounts as well.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmSharedBillDelete">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amortization Schedule Modal -->
+  <div class="modal fade" id="amortizationModal" tabindex="-1" aria-labelledby="amortizationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="amortizationModalLabel">Amortization Schedule</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="amortSummary" class="row g-3 mb-4"></div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0" id="amortTable">
+              <thead>
+                <tr><th>#</th><th>Payment</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>
+              </thead>
+              <tbody id="amortTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Bill Modal -->
+  <div class="modal fade" id="shareBillModal" tabindex="-1" aria-labelledby="shareBillLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shareBillLabel"><i class="bi bi-share me-2"></i>Share Bill</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Bill</label>
+            <input type="text" class="form-control" id="shareBillName" disabled>
+            <input type="hidden" id="shareBillId">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Bill Amount</label>
+            <input type="text" class="form-control" id="shareBillAmount" disabled>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Share With</label>
+            <select class="form-select" id="shareFriendSelect">
+              <option value="">Select a friend...</option>
+            </select>
+            <div id="noFriendsMsg" class="form-text text-warning d-none">
+              <i class="bi bi-info-circle me-1"></i>You need to add friends first. <a href="friends.html">Go to Friends</a>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Split Type</label>
+            <select class="form-select" id="shareSplitType">
+              <option value="equal">Equal (50/50)</option>
+              <option value="percentage">Percentage</option>
+              <option value="fixed">Fixed Amount</option>
+            </select>
+          </div>
+          <div id="percentageSplitFields" class="d-none">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label">Your %</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="shareOwnerPercent" value="50" min="0" max="100" step="1">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Their %</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="shareSharedPercent" value="50" min="0" max="100" step="1">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+            </div>
+            <div id="percentageError" class="text-danger small d-none">Must add up to 100%</div>
+          </div>
+          <div id="fixedSplitFields" class="d-none">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label">Your Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="shareOwnerFixed" min="0" step="0.01">
+                </div>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Their Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="shareSharedFixed" min="0" step="0.01">
+                </div>
+              </div>
+            </div>
+            <div id="fixedAmountError" class="text-danger small d-none">Amount exceeds the bill total.</div>
+          </div>
+          <div class="card p-3 mt-3" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+            <div class="d-flex justify-content-between">
+              <span style="color: var(--color-text-secondary);">Your portion:</span>
+              <strong id="sharePreviewOwner" style="color: var(--color-primary);">$0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="color: var(--color-text-secondary);">Their portion:</span>
+              <strong id="sharePreviewShared" style="color: var(--color-secondary);">$0.00</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmShareBillBtn"><i class="bi bi-share me-1"></i>Share</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
       <div class="modal-content">
