@@ -3149,6 +3149,7 @@ function init() {
     // Update UI based on auth state
     document.getElementById('loggedInState')?.classList.toggle('d-none', !currentUser);
     document.getElementById('loggedOutState')?.classList.toggle('d-none', !!currentUser);
+    document.body.classList.add('auth-resolved');
     if (document.getElementById('dataContainer')) {
       document.getElementById('dataContainer').style.visibility = currentUser ? 'visible' : 'hidden';
     }
