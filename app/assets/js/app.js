@@ -1235,154 +1235,9 @@ function renderBills() {
       </tr>`;
   }).join('');
 
-  // Render financing cards with progress bars
-  const financingContainer = document.getElementById('financingCards');
-  if (financingContainer) {
-    financingContainer.innerHTML = activeFinancing.length > 0
-      ? activeFinancing.map(b => {
-          const info = getBillFinancingInfo(b);
-          const progressColor = info.percentPaid >= 75 ? 'var(--color-success)' : 'var(--color-primary)';
-          const payoffStr = info.estimatedPayoffDate
-            ? escapeHtml(info.estimatedPayoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }))
-            : 'N/A';
-          // APR badge
-          const aprBadge = info.interestRate !== null && info.interestRate !== undefined
-            ? `<span class="badge ${info.interestRate === 0 ? 'bg-success' : 'bg-warning text-dark'} ms-1" style="font-size: 0.7rem;">${escapeHtml(info.interestRate)}% APR</span>`
-            : '';
-          // Principal vs Interest breakdown (only when loan details exist)
-          const hasBreakdown = info.hasLoanDetails && info.interestPaidToDate !== null;
-          const breakdownHtml = hasBreakdown ? `
-                <div class="mt-3 mb-2">
-                  <div class="d-flex justify-content-between mb-1">
-                    <small style="color: var(--color-text-secondary);">Principal vs Interest Paid</small>
-                  </div>
-                  <div class="progress" style="height: 8px; border-radius: var(--radius-full);">
-                    <div class="progress-bar" role="progressbar"
-                         style="width: ${escapeAttribute(String(info.amountPaid > 0 ? (info.principalPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0))}%; background-color: var(--color-primary);"
-                         title="Principal: ${escapeAttribute(formatCurrency(info.principalPaidToDate))}">
-                    </div>
-                    <div class="progress-bar" role="progressbar"
-                         style="width: ${escapeAttribute(String(info.amountPaid > 0 ? (info.interestPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0))}%; background-color: var(--color-secondary);"
-                         title="Interest: ${escapeAttribute(formatCurrency(info.interestPaidToDate))}">
-                    </div>
-                  </div>
-                  <div class="d-flex justify-content-between mt-1">
-                    <small style="color: var(--color-primary);">Principal: ${formatCurrency(info.principalPaidToDate)}</small>
-                    <small style="color: var(--color-secondary);">Interest: ${formatCurrency(info.interestPaidToDate)}</small>
-                  </div>
-                </div>` : '';
-          // Total interest line
-          const totalInterestHtml = info.totalInterest !== null
-            ? `<div class="col-4">
-                    <small class="d-block" style="color: var(--color-text-tertiary);">Total Interest</small>
-                    <strong style="color: var(--color-secondary);">${formatCurrency(info.totalInterest)}</strong>
-                  </div>` : '';
-          // View Schedule button (only when loan details exist)
-          const scheduleBtn = info.hasLoanDetails
-            ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showAmortizationSchedule('${escapeAttribute(b.id)}')"><i class="bi bi-table me-1"></i>View Schedule</button>`
-            : '';
-          return `
-          <div class="col-xl-4 col-md-6 col-12">
-            <div class="card h-100">
-              <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div>
-                    <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">${escapeHtml(b.name)}</h5>
-                    <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
-                  </div>
-                  <div class="text-end">
-                    <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
-                    <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <div class="d-flex justify-content-between mb-1">
-                    <small style="color: var(--color-text-secondary);">Progress</small>
-                    <small style="color: var(--color-text-secondary);">${escapeHtml(Math.round(info.percentPaid))}%</small>
-                  </div>
-                  <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
-                    <div class="progress-bar" role="progressbar"
-                         style="width: ${escapeAttribute(String(info.percentPaid))}%; background-color: ${escapeAttribute(progressColor)};"
-                         aria-valuenow="${escapeAttribute(String(info.percentPaid))}" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                  </div>
-                </div>${breakdownHtml}
-                <div class="row g-2 text-center">
-                  <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
-                    <small class="d-block" style="color: var(--color-text-tertiary);">Monthly</small>
-                    <strong style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
-                  </div>
-                  <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
-                    <small class="d-block" style="color: var(--color-text-tertiary);">Remaining</small>
-                    <strong style="color: var(--color-text-primary);">${formatCurrency(info.remainingBalance)}</strong>
-                  </div>
-                  <div class="${totalInterestHtml ? 'col-2' : 'col-4'}">
-                    <small class="d-block" style="color: var(--color-text-tertiary);">Payoff</small>
-                    <strong style="color: var(--color-text-primary);">${payoffStr}</strong>
-                  </div>${totalInterestHtml}
-                </div>
-                <div class="mt-2 text-center">
-                  <small style="color: var(--color-text-tertiary);">${escapeHtml(info.paymentsMade)} of ${escapeHtml(info.totalPayments)} payments made</small>
-                  ${scheduleBtn}
-                </div>
-              </div>
-            </div>
-          </div>`;
-        }).join('')
-      : '<div class="col-12"><p class="text-muted fst-italic">No active financing items.</p></div>';
-  }
-
-  // Render completed/paid-off section
-  const completedSection = document.getElementById('completedSection');
-  const completedContainer = document.getElementById('completedCards');
-  if (completedSection && completedContainer) {
-    if (completedFinancing.length > 0) {
-      completedSection.classList.remove('d-none');
-      completedContainer.innerHTML = completedFinancing.map(b => {
-        const info = getBillFinancingInfo(b);
-        return `
-        <div class="col-xl-4 col-md-6 col-12">
-          <div class="card h-100" style="border-color: var(--color-success); opacity: 0.85;">
-            <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                  <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">
-                    ? ${escapeHtml(b.name)}
-                  </h5>
-                  <span class="badge bg-success">Paid Off</span>
-                </div>
-                <div class="text-end">
-                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
-                </div>
-              </div>
-              <div class="mb-3">
-                <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
-                  <div class="progress-bar" role="progressbar"
-                       style="width: 100%; background-color: var(--color-success);"
-                       aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                  </div>
-                </div>
-              </div>
-              <div class="row g-2 text-center">
-                <div class="col-6">
-                  <small class="d-block" style="color: var(--color-text-tertiary);">Total Paid</small>
-                  <strong style="color: var(--color-success);">${formatCurrency(info.totalAmount)}</strong>
-                </div>
-                <div class="col-6">
-                  <small class="d-block" style="color: var(--color-text-tertiary);">Completed</small>
-                  <strong style="color: var(--color-success);">${escapeHtml(info.paymentsMade)} payments</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-    } else {
-      completedSection.classList.add('d-none');
-    }
-  }
+  // Financing cards now render on the Debts page (see renderFinancingCards)
+  // They still appear as line items in the bills table above
+  renderFinancingCards(activeFinancing, completedFinancing);
 
   // Update summary cards
   // BUG-002 FIX: Use owner_amount for shared bills AND normalize all bills to monthly amounts
@@ -1428,9 +1283,158 @@ function renderBills() {
   
   if (document.getElementById('billsTotal')) document.getElementById('billsTotal').textContent = formatCurrency(totalBills);
   if (document.getElementById('billsRecurringCount')) document.getElementById('billsRecurringCount').textContent = recurringBills.length;
-  if (document.getElementById('billsFinancingCount')) document.getElementById('billsFinancingCount').textContent = activeFinancing.length;
-  if (document.getElementById('billsPaidOffCount')) document.getElementById('billsPaidOffCount').textContent = completedFinancing.length;
+  const sharedCount = (window.sharedBillsForDisplay || []).length;
+  if (document.getElementById('billsSharedCount')) document.getElementById('billsSharedCount').textContent = sharedCount;
 }
+// Render financing cards on the Debts page (moved from Bills page)
+function renderFinancingCards(activeFinancing, completedFinancing) {
+  const financingContainer = document.getElementById('financingCards');
+  if (!financingContainer) return; // Not on the debts page
+
+  if (activeFinancing.length > 0) {
+    financingContainer.innerHTML = activeFinancing.map(b => {
+      const info = getBillFinancingInfo(b);
+      const progressColor = info.percentPaid >= 75 ? 'var(--color-success)' : 'var(--color-primary)';
+      const payoffStr = info.estimatedPayoffDate
+        ? escapeHtml(info.estimatedPayoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }))
+        : 'N/A';
+      const aprBadge = info.interestRate !== null && info.interestRate !== undefined
+        ? `<span class="badge ${info.interestRate === 0 ? 'bg-success' : 'bg-warning text-dark'} ms-1" style="font-size: 0.7rem;">${escapeHtml(info.interestRate)}% APR</span>`
+        : '';
+      const hasBreakdown = info.hasLoanDetails && info.interestPaidToDate !== null;
+      const breakdownHtml = hasBreakdown ? `
+            <div class="mt-3 mb-2">
+              <div class="d-flex justify-content-between mb-1">
+                <small style="color: var(--color-text-secondary);">Principal vs Interest Paid</small>
+              </div>
+              <div class="progress" style="height: 8px; border-radius: var(--radius-full);">
+                <div class="progress-bar" role="progressbar"
+                     style="width: ${escapeAttribute(String(info.amountPaid > 0 ? (info.principalPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0))}%; background-color: var(--color-primary);"
+                     title="Principal: ${escapeAttribute(formatCurrency(info.principalPaidToDate))}">
+                </div>
+                <div class="progress-bar" role="progressbar"
+                     style="width: ${escapeAttribute(String(info.amountPaid > 0 ? (info.interestPaidToDate / (info.principalPaidToDate + info.interestPaidToDate) * 100) : 0))}%; background-color: var(--color-secondary);"
+                     title="Interest: ${escapeAttribute(formatCurrency(info.interestPaidToDate))}">
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small style="color: var(--color-primary);">Principal: ${formatCurrency(info.principalPaidToDate)}</small>
+                <small style="color: var(--color-secondary);">Interest: ${formatCurrency(info.interestPaidToDate)}</small>
+              </div>
+            </div>` : '';
+      const totalInterestHtml = info.totalInterest !== null
+        ? `<div class="col-4">
+                <small class="d-block" style="color: var(--color-text-tertiary);">Total Interest</small>
+                <strong style="color: var(--color-secondary);">${formatCurrency(info.totalInterest)}</strong>
+              </div>` : '';
+      const scheduleBtn = info.hasLoanDetails
+        ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showAmortizationSchedule('${escapeAttribute(b.id)}')"><i class="bi bi-table me-1"></i>View Schedule</button>`
+        : '';
+      return `
+      <div class="col-xl-4 col-md-6 col-12">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">${escapeHtml(b.name)}</h5>
+                <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
+              </div>
+              <div class="text-end">
+                <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <small style="color: var(--color-text-secondary);">Progress</small>
+                <small style="color: var(--color-text-secondary);">${escapeHtml(Math.round(info.percentPaid))}%</small>
+              </div>
+              <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
+                <div class="progress-bar" role="progressbar"
+                     style="width: ${escapeAttribute(String(info.percentPaid))}%; background-color: ${escapeAttribute(progressColor)};"
+                     aria-valuenow="${escapeAttribute(String(info.percentPaid))}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </div>${breakdownHtml}
+            <div class="row g-2 text-center">
+              <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
+                <small class="d-block" style="color: var(--color-text-tertiary);">Monthly</small>
+                <strong style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
+              </div>
+              <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
+                <small class="d-block" style="color: var(--color-text-tertiary);">Remaining</small>
+                <strong style="color: var(--color-text-primary);">${formatCurrency(info.remainingBalance)}</strong>
+              </div>
+              <div class="${totalInterestHtml ? 'col-2' : 'col-4'}">
+                <small class="d-block" style="color: var(--color-text-tertiary);">Payoff</small>
+                <strong style="color: var(--color-text-primary);">${payoffStr}</strong>
+              </div>${totalInterestHtml}
+            </div>
+            <div class="mt-2 text-center">
+              <small style="color: var(--color-text-tertiary);">${escapeHtml(info.paymentsMade)} of ${escapeHtml(info.totalPayments)} payments made</small>
+              ${scheduleBtn}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    financingContainer.innerHTML = '<div class="col-12"><p class="text-muted fst-italic">No active financing items.</p></div>';
+  }
+
+  // Completed/paid-off section
+  const completedSection = document.getElementById('completedSection');
+  const completedContainer = document.getElementById('completedCards');
+  if (completedSection && completedContainer) {
+    if (completedFinancing.length > 0) {
+      completedSection.classList.remove('d-none');
+      completedContainer.innerHTML = completedFinancing.map(b => {
+        const info = getBillFinancingInfo(b);
+        return `
+        <div class="col-xl-4 col-md-6 col-12">
+          <div class="card h-100" style="border-color: var(--color-success); opacity: 0.85;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">
+                    ✓ ${escapeHtml(b.name)}
+                  </h5>
+                  <span class="badge bg-success">Paid Off</span>
+                </div>
+                <div class="text-end">
+                  <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="progress" style="height: 12px; border-radius: var(--radius-full);">
+                  <div class="progress-bar" role="progressbar"
+                       style="width: 100%; background-color: var(--color-success);"
+                       aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+              <div class="row g-2 text-center">
+                <div class="col-6">
+                  <small class="d-block" style="color: var(--color-text-tertiary);">Total Paid</small>
+                  <strong style="color: var(--color-success);">${formatCurrency(info.totalAmount)}</strong>
+                </div>
+                <div class="col-6">
+                  <small class="d-block" style="color: var(--color-text-tertiary);">Completed</small>
+                  <strong style="color: var(--color-success);">${escapeHtml(info.paymentsMade)} payments</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      completedSection.classList.add('d-none');
+    }
+  }
+}
+
 function isFinancingBillType(type) {
   const t = (type || '').toLowerCase();
   return t === 'financing' || t === 'auto' || t === 'housing';
