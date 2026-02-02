@@ -442,8 +442,9 @@
     margin: 0 !important;
   }
 
-  /* Prevent flash of wrong auth state — hide login buttons until JS resolves */
-  body:not(.auth-resolved) #loggedOutState {
+  /* Prevent flash of wrong auth state — hide BOTH states until JS resolves */
+  body:not(.auth-resolved) #loggedOutState,
+  body:not(.auth-resolved) #loggedInState {
     opacity: 0 !important;
     pointer-events: none;
   }
