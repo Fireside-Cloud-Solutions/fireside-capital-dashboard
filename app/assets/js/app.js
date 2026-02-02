@@ -1338,9 +1338,9 @@ function renderFinancingCards() {
       <div class="col-xl-4 col-md-6 col-12">
         <div class="card h-100">
           <div class="card-body p-4 d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-start" style="min-height: 72px; margin-bottom: 12px;">
+            <div class="financing-card-header d-flex justify-content-between align-items-start" style="margin-bottom: 12px;">
               <div style="flex: 1; min-width: 0;">
-                <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5); line-height: 1.3;">${escapeHtml(b.name)}</h5>
+                <h5 class="mb-1" title="${escapeAttribute(b.name)}" style="color: var(--color-text-primary); font-size: var(--text-h5); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(b.name)}</h5>
                 <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
               </div>
               <div class="text-end" style="flex-shrink: 0; margin-left: 8px;">
