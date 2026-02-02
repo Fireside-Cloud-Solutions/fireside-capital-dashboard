@@ -217,6 +217,23 @@ strong {
   max-width: 100%;
 }
 
+/* Consistent height for ALL buttons in the page header area */
+.page-header .btn,
+.page-header-actions .btn {
+  height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Icon-only buttons in page header should be square */
+.page-header .btn.btn-icon {
+  width: 40px;
+  padding: 0;
+  justify-content: center;
+}
+
 /* Mobile page header stacking */
 @media (max-width: 575.98px) {
   .page-header {

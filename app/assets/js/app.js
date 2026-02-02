@@ -2253,12 +2253,6 @@ async function loadAndRenderBudget() {
 
   const tbody = document.getElementById('budgetAssignmentTable');
   tbody.textContent = '';
-  
-  // Check if there's any budget data to display
-  const hasBudgetData = (window.bills && window.bills.length > 0) || (window.debts && window.debts.length > 0) || (window.income && window.income.length > 0);
-  if (typeof toggleEmptyState === 'function') {
-    toggleEmptyState('dataContainer', 'budget', hasBudgetData);
-  }
 
   // Fetch shared bills for budget display (same logic as generateBudgetForMonth)
   let sharedBillsForDisplay = [];
@@ -2286,6 +2280,16 @@ async function loadAndRenderBudget() {
         is_variable: share.bill.is_variable
       }));
     }
+  }
+
+  // Check if there's any budget data to display (moved AFTER shared bills fetch)
+  const hasBudgetData = (window.bills && window.bills.length > 0) ||
+    (window.debts && window.debts.length > 0) ||
+    (window.income && window.income.length > 0) ||
+    sharedBillsForDisplay.length > 0 ||
+    allBudgetRecords.length > 0;
+  if (typeof toggleEmptyState === 'function') {
+    toggleEmptyState('dataContainer', 'budget', hasBudgetData);
   }
 
   // Filter out paid-off financing items from the budget display
@@ -3991,6 +3995,10 @@ async function loadSharedBillsData() {
   // Re-render dashboard if on that page
   if (document.getElementById('netWorthValue')) {
     updateDashboardCards();
+  }
+  // Re-render budget if on that page
+  if (document.getElementById('budgetAssignmentTable')) {
+    loadAndRenderBudget();
   }
 }
 
