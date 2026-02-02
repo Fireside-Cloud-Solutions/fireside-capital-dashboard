@@ -381,7 +381,7 @@ strong {
   min-height: 100vh;
   padding: 32px 48px; /* 32px top/bottom, 48px left/right for breathing room */
   min-width: 0; /* Allow flex child to shrink below content width */
-  overflow-x: auto; /* Prevent content from blowing out the viewport */
+  overflow-x: hidden; /* Contain content within viewport */
   max-width: calc(100vw - 260px); /* Never exceed viewport minus sidebar */
 }
 
@@ -721,6 +721,7 @@ strong {
   box-shadow: var(--shadow-md);
   overflow: hidden;
   padding: 0;
+  max-width: 100%; /* Never exceed parent width */
   transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
               border-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -728,6 +729,10 @@ strong {
 .table-card:hover {
   box-shadow: var(--shadow-lg);
   border-color: var(--color-border-default);
+}
+
+.table-card .table-responsive {
+  overflow-x: auto; /* Ensure table scrolls horizontally within the card */
 }
 
 .table-card .table {
