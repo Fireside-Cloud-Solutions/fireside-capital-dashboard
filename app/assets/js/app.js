@@ -1175,7 +1175,10 @@ function renderBills() {
   const tbody = document.getElementById('billTableBody');
   if (!tbody) return;
 
-  const allBills = window.bills || [];
+  // Merge owned bills with shared-with-me bills for unified display
+  const ownedBills = window.bills || [];
+  const sharedBills = window.sharedBillsForDisplay || [];
+  const allBills = [...ownedBills, ...sharedBills];
   
   // Toggle empty state for bills page
   if (typeof toggleEmptyState === 'function') {
@@ -1198,6 +1201,26 @@ function renderBills() {
     return !(info.isFinancing && info.status === 'paid_off');
   });
   tbody.innerHTML = activeBills.map(b => {
+      // Shared-with-me bills: show "Shared by X" badge, read-only actions
+      if (b.isSharedWithMe) {
+        const sharedByBadge = `<span class="badge bg-info ms-1" title="Shared by ${escapeAttribute(b.sharedByName)}"><i class="bi bi-link-45deg me-1"></i>${escapeHtml(b.splitLabel)}</span>`;
+        return `
+        <tr>
+            <td>${escapeHtml(b.name)} ${sharedByBadge}
+              <small class="d-block" style="color: var(--color-text-tertiary);">from ${escapeHtml(b.sharedByName)}</small>
+            </td>
+            <td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td>
+            <td><strong style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
+              <small class="d-block" style="color: var(--color-text-tertiary);">of ${formatCurrency(b.fullAmount)}</small>
+            </td>
+            <td>${escapeHtml(b.frequency || 'monthly')}</td>
+            <td>${b.nextDueDate ? escapeHtml(formatDate(b.nextDueDate)) : '-'}</td>
+            <td>
+              <span class="badge bg-secondary-subtle"><i class="bi bi-link-45deg me-1"></i>Shared</span>
+            </td>
+        </tr>`;
+      }
+      // Owned bills: original rendering with edit/delete/share buttons
       const shareInfo = getShareInfoForBill(b.id);
       const sharedBadge = shareInfo ? `<span class="badge bg-info ms-1" title="Shared with ${escapeAttribute(shareInfo.shared_user?.display_name || 'someone')}"><i class="bi bi-link-45deg me-1"></i>${escapeHtml(shareInfo.status === 'accepted' ? 'Shared' : 'Pending')}</span>` : '';
       return `
@@ -1371,6 +1394,11 @@ function renderBills() {
       return sum;
     }
     
+    // For shared-with-me bills, amount is already the user's portion
+    if (b.isSharedWithMe) {
+      const monthlyAmount = normalizeToMonthly(b.amount, b.frequency);
+      return sum + monthlyAmount;
+    }
     const shareInfo = getShareInfoForBill(b.id);
     // If bill is shared (and accepted), use owner_amount; otherwise use full amount
     const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
@@ -2929,6 +2957,7 @@ async function updateDashboardCards() {
                       (window.investments && window.investments.length > 0) ||
                       (window.debts && window.debts.length > 0) ||
                       (window.bills && window.bills.length > 0) ||
+                      (window.sharedBillsForDisplay && window.sharedBillsForDisplay.length > 0) ||
                       (window.income && window.income.length > 0);
   
   if (typeof toggleEmptyState === 'function') {
@@ -2940,7 +2969,7 @@ async function updateDashboardCards() {
     const assets = window.assets || [];
     const investments = window.investments || [];
     const debts = window.debts || [];
-    const bills = window.bills || [];
+    const bills = [...(window.bills || []), ...(window.sharedBillsForDisplay || [])];
     const income = window.income || [];
     
     const totalAssets = assets.reduce((sum, a) => sum + (getRaw(a.value) || 0), 0);
@@ -2954,6 +2983,12 @@ async function updateDashboardCards() {
       const info = getBillFinancingInfo(bill);
       if (info.isFinancing && info.status === 'paid_off') {
         return sum;
+      }
+      
+      // Shared-with-me bills: amount is already the user's portion
+      if (bill.isSharedWithMe) {
+        const amount = getRaw(bill.amount) || 0;
+        return sum + normalizeToMonthly(amount, bill.frequency);
       }
       
       // Use owner's share if bill is shared
@@ -3041,7 +3076,7 @@ function renderUpcomingPayments() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const upcoming = [...(window.debts || []).map(d => ({ ...d, amount: d.monthlyPayment, category: 'Debt' })), ...(window.bills || [])].filter(item => {
+  const upcoming = [...(window.debts || []).map(d => ({ ...d, amount: d.monthlyPayment, category: 'Debt' })), ...(window.bills || []), ...(window.sharedBillsForDisplay || [])].filter(item => {
       if (!item.nextDueDate) return false;
       const d = new Date(item.nextDueDate + 'T00:00:00');
       return d >= today && d <= nextWeek;
@@ -3049,13 +3084,17 @@ function renderUpcomingPayments() {
   c.innerHTML = upcoming.length ? upcoming.map(item => {
     // BUG FIX: Use owner_amount for shared bills in upcoming payments
     let displayAmount = item.amount;
-    if (item.category !== 'Debt' && item.id) {
+    if (item.isSharedWithMe) {
+      // Amount is already the user's portion for shared-with-me bills
+      displayAmount = item.amount;
+    } else if (item.category !== 'Debt' && item.id) {
       const shareInfo = getShareInfoForBill(item.id);
       if (shareInfo && shareInfo.status === 'accepted') {
         displayAmount = shareInfo.owner_amount;
       }
     }
-    return `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span></div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(displayAmount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`;
+    const sharedTag = item.isSharedWithMe ? `<small class="d-block text-muted">from ${escapeHtml(item.sharedByName)}</small>` : '';
+    return `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span>${sharedTag}</div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(displayAmount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`;
   }).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
 }
 async function renderNetWorthChart() {
@@ -3078,7 +3117,7 @@ async function generateMonthlyCashFlowChart() {
       months.push(monthStart.toLocaleString('default', { month: 'short' }));
       let monthlyIncome = 0; let monthlyExpenses = 0;
       // Filter out paid-off bills from cash flow projections
-      const activeBillsForCashFlow = (window.bills || []).filter(b => {
+      const activeBillsForCashFlow = [...(window.bills || []), ...(window.sharedBillsForDisplay || [])].filter(b => {
           const dbStatus = (b.status || '').toLowerCase();
           if (dbStatus === 'paid_off' || dbStatus === 'cancelled') return false;
           const info = getBillFinancingInfo(b);
@@ -3090,7 +3129,9 @@ async function generateMonthlyCashFlowChart() {
           const isIncome = (typeof item.type === 'string' && (item.type.toLowerCase() === 'w2' || item.type.toLowerCase() === '1099'));
           // BUG FIX: Use owner_amount for shared bills in cash flow calculations
           let amount = item.amount;
-          if (!isIncome && item.id) { // Check if it's an expense (bill) with an id
+          if (item.isSharedWithMe) {
+            // Amount is already the user's portion
+          } else if (!isIncome && item.id) {
             const shareInfo = getShareInfoForBill(item.id);
             if (shareInfo && shareInfo.status === 'accepted') {
               amount = shareInfo.owner_amount;
@@ -3922,6 +3963,35 @@ async function loadSharedBillsData() {
   renderSharedWithMe(sharedWithMeCache);
   renderPendingShares(pendingShares || []);
   renderMySharedBills(myOutgoingShares || []);
+
+  // Build synthetic bill objects from accepted shared bills so they appear
+  // in the recurring bills table, monthly total, and budget
+  window.sharedBillsForDisplay = sharedWithMeCache.map(share => ({
+    id: `shared_${share.id}`,
+    originalBillId: share.bill?.id,
+    name: share.bill?.name || 'Unknown Bill',
+    amount: share.shared_amount || (share.bill?.amount * 0.5),
+    fullAmount: share.bill?.amount,
+    type: share.bill?.type || 'Other',
+    frequency: share.bill?.frequency || 'monthly',
+    nextDueDate: share.bill?.next_due_date || share.bill?.nextDueDate,
+    isSharedWithMe: true,
+    sharedByName: share.owner?.display_name || 'Unknown',
+    sharedByUsername: share.owner?.username || '',
+    splitType: share.split_type,
+    splitLabel: share.split_type === 'equal' ? '50/50'
+      : share.split_type === 'percentage' ? `${share.shared_percent}%`
+      : formatCurrency(share.shared_fixed),
+    shareId: share.id,
+    status: share.bill?.status
+  }));
+
+  // Re-render bills to include shared bills in the recurring list + totals
+  renderBills();
+  // Re-render dashboard if on that page
+  if (document.getElementById('netWorthValue')) {
+    updateDashboardCards();
+  }
 }
 
 function renderSharedWithMe(shares) {
