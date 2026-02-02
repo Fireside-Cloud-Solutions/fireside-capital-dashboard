@@ -220,17 +220,20 @@ strong {
 /* Consistent height for ALL buttons in the page header area */
 .page-header .btn,
 .page-header-actions .btn {
-  height: 40px;
-  padding-top: 0;
-  padding-bottom: 0;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
 }
 
 /* Icon-only buttons in page header should be square */
 .page-header .btn.btn-icon {
   width: 40px;
-  padding: 0;
+  padding: 0 !important;
   justify-content: center;
 }
 
