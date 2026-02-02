@@ -27,6 +27,25 @@
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   
   <!-- Performance: Chart.js removed from head - will be lazy loaded when needed -->
+  <style>
+    /* Critical inline: prevent layout shift on mobile auth elements */
+    @media (max-width: 991.98px) {
+      #loggedInState, #loggedOutState {
+        position: fixed !important;
+        top: 12px;
+        right: 16px;
+        z-index: 500;
+        opacity: 0;
+        pointer-events: none;
+      }
+      body.auth-resolved #loggedInState,
+      body.auth-resolved #loggedOutState {
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 0.15s ease;
+      }
+    }
+  </style>
 </head>
 
 <body data-theme="dark">
