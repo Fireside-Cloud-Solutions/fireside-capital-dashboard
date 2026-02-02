@@ -1331,9 +1331,9 @@ function renderFinancingCards() {
               </div>
             </div>` : '';
       const totalInterestHtml = info.totalInterest !== null
-        ? `<div class="col-4">
-                <small class="d-block" style="color: var(--color-text-tertiary);">Total Interest</small>
-                <strong style="color: var(--color-secondary);">${formatCurrency(info.totalInterest)}</strong>
+        ? `<div class="col-6 col-lg-3">
+                <small class="d-block text-nowrap" style="color: var(--color-text-tertiary);">Total Interest</small>
+                <strong class="text-nowrap" style="color: var(--color-secondary);">${formatCurrency(info.totalInterest)}</strong>
               </div>` : '';
       const scheduleBtn = info.hasLoanDetails
         ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showAmortizationSchedule('${escapeAttribute(b.id)}')"><i class="bi bi-table me-1"></i>View Schedule</button>`
@@ -1366,17 +1366,17 @@ function renderFinancingCards() {
               </div>
             </div>${breakdownHtml}
             <div class="row g-2 text-center">
-              <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
-                <small class="d-block" style="color: var(--color-text-tertiary);">Monthly</small>
-                <strong style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
+              <div class="${totalInterestHtml ? 'col-6 col-lg-3' : 'col-4'}">
+                <small class="d-block text-nowrap" style="color: var(--color-text-tertiary);">Monthly</small>
+                <strong class="text-nowrap" style="color: var(--color-primary);">${formatCurrency(b.amount)}</strong>
               </div>
-              <div class="${totalInterestHtml ? 'col-3' : 'col-4'}">
-                <small class="d-block" style="color: var(--color-text-tertiary);">Remaining</small>
-                <strong style="color: var(--color-text-primary);">${formatCurrency(info.remainingBalance)}</strong>
+              <div class="${totalInterestHtml ? 'col-6 col-lg-3' : 'col-4'}">
+                <small class="d-block text-nowrap" style="color: var(--color-text-tertiary);">Remaining</small>
+                <strong class="text-nowrap" style="color: var(--color-text-primary);">${formatCurrency(info.remainingBalance)}</strong>
               </div>
-              <div class="${totalInterestHtml ? 'col-2' : 'col-4'}">
-                <small class="d-block" style="color: var(--color-text-tertiary);">Payoff</small>
-                <strong style="color: var(--color-text-primary);">${payoffStr}</strong>
+              <div class="${totalInterestHtml ? 'col-6 col-lg-3' : 'col-4'}">
+                <small class="d-block text-nowrap" style="color: var(--color-text-tertiary);">Payoff</small>
+                <strong class="text-nowrap" style="color: var(--color-text-primary);">${payoffStr}</strong>
               </div>${totalInterestHtml}
             </div>
             <div class="mt-2 text-center">
