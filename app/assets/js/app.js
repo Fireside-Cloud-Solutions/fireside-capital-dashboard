@@ -1296,7 +1296,8 @@ function renderFinancingCards() {
     return type === 'financing' || getBillFinancingInfo(b).isFinancing;
   };
   const financingBills = allBills.filter(b => isFinancingType(b));
-  const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off');
+  const activeFinancing = financingBills.filter(b => getBillFinancingInfo(b).status !== 'paid_off')
+    .sort((a, b) => getBillFinancingInfo(b).remainingBalance - getBillFinancingInfo(a).remainingBalance);
   const completedFinancing = financingBills.filter(b => getBillFinancingInfo(b).status === 'paid_off');
 
   if (activeFinancing.length > 0) {
@@ -1336,13 +1337,13 @@ function renderFinancingCards() {
       return `
       <div class="col-xl-4 col-md-6 col-12">
         <div class="card h-100">
-          <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5);">${escapeHtml(b.name)}</h5>
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start" style="min-height: 72px; margin-bottom: 12px;">
+              <div style="flex: 1; min-width: 0;">
+                <h5 class="mb-1" style="color: var(--color-text-primary); font-size: var(--text-h5); line-height: 1.3;">${escapeHtml(b.name)}</h5>
                 <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
               </div>
-              <div class="text-end">
+              <div class="text-end" style="flex-shrink: 0; margin-left: 8px;">
                 <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
                 <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
