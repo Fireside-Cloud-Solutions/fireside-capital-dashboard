@@ -2342,7 +2342,7 @@ async function loadAndRenderBudget() {
 
       const row = document.createElement('tr');
       row.innerHTML = `
-          <td>${escapeHtml(toTitleCase(item.type) || 'N/A')}</td><td>${escapeHtml(item.name || 'Unnamed')}</td><td>${formatCurrency(needed)}</td>
+          <td>${escapeHtml(item.name || 'Unnamed')}</td><td>${escapeHtml(toTitleCase(item.type) || 'N/A')}</td><td>${formatCurrency(needed)}</td>
           <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${escapeAttribute(assigned.toFixed(2))}" data-item-id="${escapeAttribute(item.id)}" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
           <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${escapeAttribute(String(Math.min(fundingPercent, 100)))}%">${escapeHtml(Math.round(fundingPercent))}%</div></div></td>
@@ -2367,7 +2367,7 @@ async function loadAndRenderBudget() {
 
       const row = document.createElement('tr');
       row.innerHTML = `
-          <td>${escapeHtml(toTitleCase(rec.category) || 'Custom')}</td><td>${escapeHtml(rec.name || 'Unnamed')}</td><td>${formatCurrency(needed)}</td>
+          <td>${escapeHtml(rec.name || 'Unnamed')}</td><td>${escapeHtml(toTitleCase(rec.category) || 'Custom')}</td><td>${formatCurrency(needed)}</td>
           <td><div class="input-group input-group-sm"><span class="input-group-text">$</span><input type="number" class="form-control assigned-input" value="${escapeAttribute(assigned.toFixed(2))}" data-item-id="${escapeAttribute(rec.item_id)}" data-item-type="custom" step="0.01"></div></td>
           <td class="${remainingTextColor} fw-bold">${formatCurrency(remaining)}</td>
           <td><div class="progress" style="height: 20px;"><div class="progress-bar ${progressBarClass}" style="width: ${escapeAttribute(String(Math.min(fundingPercent, 100)))}%">${escapeHtml(Math.round(fundingPercent))}%</div></div></td>
@@ -2388,8 +2388,8 @@ async function loadAndRenderBudget() {
       const row = document.createElement('tr');
       row.style.opacity = '0.45';
       row.innerHTML = `
-          <td>${escapeHtml(toTitleCase(rec.category) || 'N/A')}</td>
           <td><s>${escapeHtml(rec.name || 'Unnamed')}</s></td>
+          <td>${escapeHtml(toTitleCase(rec.category) || 'N/A')}</td>
           <td class="text-muted">${formatCurrency(needed)}</td>
           <td class="text-muted">�</td>
           <td class="text-muted">�</td>
