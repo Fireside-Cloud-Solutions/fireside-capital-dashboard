@@ -442,16 +442,30 @@
     margin: 0 !important;
   }
 
+  /* CRITICAL: Override Bootstrap d-none so elements stay in fixed layout tree.
+     display:none→block causes a 1-frame layout glitch on mobile Safari/Chrome
+     where the element renders at flow position before fixed positioning applies.
+     By keeping display:block + visibility:hidden, position:fixed always holds. */
+  #loggedInState.d-none,
+  #loggedOutState.d-none {
+    display: block !important;
+    visibility: hidden;
+  }
+
   /* Prevent flash of wrong auth state — hide BOTH states until JS resolves */
   body:not(.auth-resolved) #loggedOutState,
   body:not(.auth-resolved) #loggedInState {
     opacity: 0 !important;
     pointer-events: none;
+    visibility: hidden;
   }
 
   /* Smooth fade-in once auth resolves */
-  #loggedOutState,
-  #loggedInState {
+  body.auth-resolved #loggedOutState:not(.d-none),
+  body.auth-resolved #loggedInState:not(.d-none) {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
     transition: opacity 0.15s ease;
   }
 

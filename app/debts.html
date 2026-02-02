@@ -25,11 +25,18 @@
         right: 16px;
         z-index: 500;
         opacity: 0;
+        visibility: hidden;
         pointer-events: none;
       }
-      body.auth-resolved #loggedInState,
-      body.auth-resolved #loggedOutState {
+      /* Override d-none: keep element in fixed layout tree to prevent position glitch */
+      #loggedInState.d-none, #loggedOutState.d-none {
+        display: block !important;
+        visibility: hidden;
+      }
+      body.auth-resolved #loggedInState:not(.d-none),
+      body.auth-resolved #loggedOutState:not(.d-none) {
         opacity: 1;
+        visibility: visible;
         pointer-events: auto;
         transition: opacity 0.15s ease;
       }
