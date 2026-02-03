@@ -2423,8 +2423,8 @@ main {
 }
 
 /* Welcome button: always stays on one line, vertically centered text.
-   Uses inline-block + line-height for bulletproof vertical centering
-   (flex align-items:center was not centering text due to font metrics). */
+   Uses inline-flex + align-items:center for true centering that accounts
+   for borders (btn-outline-secondary has 1px border). */
 #userDropdown {
   white-space: nowrap !important;
   min-width: auto !important;
@@ -2433,9 +2433,10 @@ main {
   height: 44px !important;
   padding: 0 16px !important;
   font-size: 13px !important;
-  line-height: 44px !important;
-  display: inline-block !important;
-  text-align: center !important;
+  line-height: normal !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   vertical-align: middle !important;
   overflow: visible !important;
   text-overflow: unset !important;
@@ -2443,14 +2444,13 @@ main {
   box-sizing: border-box !important;
 }
 
-/* All spans inside welcome button */
+/* All spans inside welcome button — flex children, no extra line-height */
 #userDropdown span {
   font-size: inherit !important;
   font-weight: inherit !important;
   display: inline !important;
   white-space: nowrap !important;
-  line-height: inherit !important;
-  vertical-align: baseline !important;
+  line-height: normal !important;
 }
 
 /* Hide Bootstrap's auto-generated caret - we use a manual one */
