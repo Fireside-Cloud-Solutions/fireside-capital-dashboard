@@ -14,7 +14,7 @@
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
-| Capital | (direct fix) | Mobile nav complete overhaul | ✅ Complete (commit 57744e1: hamburger fixed position, sidebar full-width on small screens, proper alignment) |
+| Capital | (direct fix) | Mobile sidebar z-index fix | ✅ Complete (commit b8ec4e1: sidebar z-index 900, above overlay 450, menu items now clickable) |
 | Builder | builder-mobile-critical-fixes | Phase 1 mobile fixes (charts, table scroll, buttons, sidebar, card width) | ✅ Complete (commits 70c2244 + 2c09607, all 5 critical issues fixed) |
 | Auditor | auditor-mobile-responsiveness | Mobile responsiveness audit (4 viewports, 5 pages) | ✅ Complete (8 critical issues, 12 medium, report: audits/mobile-responsiveness-audit-2026-02-02.md) |
 | Auditor | auditor-full-site-audit-feb1 | Full site audit (all 10 pages) | ✅ Complete (Grade B-, 3 critical issues, report: reports/audit-full-site-feb1-2026.md, commit 744e330) |

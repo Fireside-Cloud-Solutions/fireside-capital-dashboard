@@ -530,6 +530,9 @@
     background: var(--color-bg-2);
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-md);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Center the hamburger/close icon properly */
@@ -572,6 +575,9 @@
     right: 16px;
     z-index: 1000; /* Same as hamburger for alignment */
     margin: 0 !important;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
   }
 
   /* CRITICAL: Override Bootstrap d-none so elements stay in fixed layout tree.
@@ -604,7 +610,7 @@
   /* Match button heights in the top bar */
   #loggedOutState .btn,
   #loggedInState .btn {
-    height: 40px;
+    height: 48px; /* Match hamburger height */
     padding-top: 0;
     padding-bottom: 0;
     display: inline-flex;
