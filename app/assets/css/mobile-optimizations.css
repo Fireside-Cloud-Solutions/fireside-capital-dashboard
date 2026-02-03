@@ -268,11 +268,14 @@
     white-space: normal !important;
   }
   
-  /* FIX: Welcome dropdown - truncate username on very small screens */
+  /* Welcome dropdown on extra small screens — let button size to fit content.
+     Previously had max-width: 160px which caused text wrapping. */
   #userDropdown {
-    max-width: 160px !important;
+    max-width: none !important;
+    white-space: nowrap !important;
   }
   
+  /* Truncate long usernames but keep "Welcome, Name" on one line */
   #username {
     max-width: 80px;
     display: inline-block;
