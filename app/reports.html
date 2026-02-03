@@ -96,22 +96,30 @@
       /* Match button heights in the top bar */
       #loggedOutState .btn,
       #loggedInState .btn {
-        height: 48px;
-        padding-top: 0;
-        padding-bottom: 0;
-        display: inline-flex;
-        align-items: center;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         font-size: 13px;
-        box-sizing: border-box;
-        margin: 0;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        border: 1px solid var(--bs-btn-border-color, #2a2a2a) !important;
       }
       
       /* Bell icon button */
       #loggedInState .btn.btn-icon {
-        width: 48px;
-        padding-left: 0;
-        padding-right: 0;
-        justify-content: center;
+        width: 48px !important;
+        min-width: 48px !important;
+        max-width: 48px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
       }
     }
   </style>
