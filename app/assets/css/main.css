@@ -223,11 +223,11 @@ strong {
 /* Consistent height for ALL buttons in the page header area */
 .page-header .btn,
 .page-header-actions .btn {
-  height: 40px !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -236,7 +236,7 @@ strong {
 /* Icon-only buttons in page header should be square */
 .page-header .btn.btn-icon {
   width: 40px;
-  padding: 0 !important;
+  padding: 0;
   justify-content: center;
 }
 
@@ -1205,43 +1205,43 @@ strong {
 }
 
 .badge.bg-secondary-subtle {
-  background-color: rgba(var(--color-primary-rgb), 0.12) !important;
-  color: var(--color-primary) !important;
+  background-color: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary);
 }
 
 .badge.bg-success {
-  background-color: var(--color-success-bg) !important;
-  color: var(--color-success) !important;
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .badge.bg-danger {
-  background-color: var(--color-error-bg) !important;
-  color: var(--color-error) !important;
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
 }
 
 .badge.bg-warning {
-  background-color: var(--color-warning-bg) !important;
-  color: var(--color-warning) !important;
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .badge.bg-info {
-  background-color: var(--color-info-bg) !important;
-  color: var(--color-info) !important;
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .badge.bg-primary {
-  background-color: rgba(59, 130, 246, 0.12) !important;
-  color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
 }
 
 .badge.bg-purple {
-  background-color: rgba(139, 92, 246, 0.12) !important;
-  color: #8b5cf6 !important;
+  background-color: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
 }
 
 .badge.bg-indigo {
-  background-color: rgba(99, 102, 241, 0.12) !important;
-  color: #6366f1 !important;
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
 }
 
 .text-secondary-emphasis {
@@ -2063,17 +2063,17 @@ body[data-theme='dark'] .pending-bill-card.selected {
 
 /* Confidence badges */
 .badge.bg-success {
-  background-color: var(--color-success) !important;
+  background-color: var(--color-success);
   color: #fff;
 }
 
 .badge.bg-warning {
-  background-color: var(--color-warning) !important;
+  background-color: var(--color-warning);
   color: var(--color-bg-1);
 }
 
 .badge.bg-danger {
-  background-color: var(--color-danger) !important;
+  background-color: var(--color-danger);
   color: #fff;
 }
 
