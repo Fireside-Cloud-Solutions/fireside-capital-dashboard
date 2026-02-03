@@ -3408,8 +3408,12 @@ function setupSidebarToggle() {
     sidebar.classList.add('show');
     if (overlay) overlay.classList.add('show');
     toggle.innerHTML = '<i class="bi bi-x-lg"></i>';
-    // Prevent body scrolling when sidebar is open
+    // Prevent body scrolling when sidebar is open (mobile-safe approach)
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${window.scrollY}px`;
+    document.body.dataset.scrollY = window.scrollY;
   };
 
   const closeSidebar = () => {
@@ -3417,7 +3421,12 @@ function setupSidebarToggle() {
     if (overlay) overlay.classList.remove('show');
     toggle.innerHTML = '<i class="bi bi-list"></i>';
     // Restore body scrolling when sidebar is closed
+    const scrollY = document.body.dataset.scrollY || '0';
     document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.top = '';
+    window.scrollTo(0, parseInt(scrollY));
   };
 
   toggle.addEventListener('click', () => {
