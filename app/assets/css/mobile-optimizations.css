@@ -671,17 +671,16 @@ body.sidebar-open {
   /* Match button heights in the top bar */
   #loggedOutState .btn,
   #loggedInState .btn {
-    height: 40px;
+    height: 48px;
     padding: 0 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
-    line-height: 40px;
+    line-height: 1;
     box-sizing: border-box;
     margin: 0;
     white-space: nowrap;
-    vertical-align: middle;
   }
 
   /* Fix icon centering in buttons on mobile */

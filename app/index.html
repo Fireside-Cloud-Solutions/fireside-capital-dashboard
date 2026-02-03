@@ -100,7 +100,9 @@
       /* Match button heights in the top bar */
       #loggedOutState .btn,
       #loggedInState .btn {
-        height: 40px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
         padding: 0 12px !important;
         display: inline-flex !important;
         flex-direction: row !important;
@@ -108,11 +110,10 @@
         align-items: center !important;
         justify-content: center !important;
         font-size: 13px !important;
-        line-height: 40px !important;
+        line-height: 1 !important;
         box-sizing: border-box !important;
         margin: 0 !important;
         white-space: nowrap !important;
-        vertical-align: middle !important;
       }
       
             /* Prevent text wrapping inside buttons */
@@ -154,9 +155,9 @@
       
       /* Bell icon button */
       #loggedInState .btn.btn-icon {
-        width: 40px !important;
-        min-width: 40px !important;
-        max-width: 40px !important;
+        width: 48px !important;
+        min-width: 48px !important;
+        max-width: 48px !important;
         padding: 0 !important;
         justify-content: center !important;
       }
