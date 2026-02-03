@@ -771,8 +771,8 @@ body.sidebar-open {
   .btn.btn-icon {
     padding: 0 !important;
     display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    align-items: center;
+    justify-content: center;
   }
 
   /* User dropdown menu: ensure it opens visibly on mobile */
