@@ -175,3 +175,25 @@ body:has(#loggedOutState:not(.d-none)) .logged-out-cta {
 .logged-out-cta[data-page="friends"] .logged-out-cta-logo {
   background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
 }
+
+/* ===== LOGGED-OUT STATE FIXES ===== */
+
+/* Hide sidebar when logged out */
+body:has(#loggedOutState:not(.d-none)) .sidebar {
+  display: none !important;
+}
+
+/* Hide hamburger menu when logged out */
+body:has(#loggedOutState:not(.d-none)) .sidebar-toggle {
+  display: none !important;
+}
+
+/* Hide sidebar overlay when logged out */
+body:has(#loggedOutState:not(.d-none)) .sidebar-overlay {
+  display: none !important;
+}
+
+/* Hide top-right header buttons when full-page welcome CTA is shown */
+body:has(.logged-out-cta) #loggedOutState {
+  display: none !important;
+}
