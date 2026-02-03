@@ -52,20 +52,19 @@
     flex: 1 1 100% !important;
   }
   
-  /* ISSUE 2 FIX: Force ALL Bootstrap columns to full width on mobile */
-  /* Enhanced selectors to override all possible Bootstrap grid classes */
-  .row > [class*="col-"],
-  .row > [class*="col"],
-  .row > [class^="col-"],
-  .row > div[class*="col-"],
-  .row > div[class*="col"] {
-    width: 100% !important;
-    flex: 0 0 100% !important;
-    max-width: none !important;
-    min-width: 100% !important;
-    flex-basis: 100% !important;
+  /* ISSUE 2 FIX: Force specific Bootstrap columns to full width on mobile */
+  /* Targeted selectors - allows col-6 and col-4 for intentional multi-column mobile layouts */
+  .row > [class^="col-xs-"],
+  .row > [class^="col-sm-"],
+  .row > [class^="col-md-"],
+  .row > [class^="col-lg-"],
+  .row > [class^="col-xl-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
     margin-bottom: var(--space-3);
   }
+  
+  /* Allow .col-6 and .col-4 for intentional multi-column mobile layouts */
   
   /* Ensure all cards inside columns are uniform width (fixes varying card widths on mobile) */
   .row > [class*="col-"] > .card,
