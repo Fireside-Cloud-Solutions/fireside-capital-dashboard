@@ -16,14 +16,19 @@
   }
 
   /* Ensure all containers fit viewport */
+  /* ISSUE 2 FIX: Force row to full width with no side margins */
   .container,
   .container-fluid,
   .row {
     max-width: 100%;
+    width: 100% !important;
     overflow-x: hidden;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   
   /* CRITICAL FIX: Ensure all cards are full-width on mobile */
+  /* ISSUE 2 FIX: Enhanced to prevent any card width variations */
   .card,
   .dashboard-card,
   .stat-card,
@@ -34,20 +39,30 @@
   .bills-stats,
   .budget-header,
   .page-header,
-  div[class*="card"] {
+  div[class*="card"],
+  [class*="stat-card"],
+  [class*="chart-card"] {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     flex-basis: 100% !important;
+    flex: 1 1 100% !important;
   }
   
-  /* Fix Bootstrap column widths - force full width on mobile */
-  .row > [class*="col-"] {
+  /* ISSUE 2 FIX: Force ALL Bootstrap columns to full width on mobile */
+  /* Enhanced selectors to override all possible Bootstrap grid classes */
+  .row > [class*="col-"],
+  .row > [class*="col"],
+  .row > [class^="col-"],
+  .row > div[class*="col-"],
+  .row > div[class*="col"] {
     width: 100% !important;
     flex: 0 0 100% !important;
-    max-width: 100% !important;
+    max-width: none !important;
+    min-width: 100% !important;
+    flex-basis: 100% !important;
     margin-bottom: var(--space-3);
   }
   
@@ -69,12 +84,13 @@
   }
   
   /* Ensure main content uses full width with proper padding */
+  /* ISSUE 1 FIX: Add safe-area-inset-top to padding */
   .main-content {
     width: 100%;
     max-width: 100%;
     padding-left: var(--space-3);
     padding-right: var(--space-3);
-    padding-top: 76px !important; /* Space for fixed hamburger + bell/welcome row */
+    padding-top: calc(76px + env(safe-area-inset-top)) !important; /* Space for fixed hamburger + bell/welcome row + notch */
   }
   
   /* Fix container widths */
@@ -532,6 +548,20 @@
 }
 
 /* =================================================================
+   SCROLL LOCK UTILITY — Fix sidebar scroll lock bug
+   ISSUE 3 FIX: Use CSS class instead of inline styles for reliable scroll restoration
+   ================================================================= */
+
+body.sidebar-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  top: var(--scroll-lock-offset, 0) !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* =================================================================
    MOBILE TOP BAR — Bell + Welcome in same row as hamburger
    Targets #loggedInState directly so it works on ALL pages
    (dashboard, assets, bills, etc. have different HTML structures)
@@ -540,9 +570,10 @@
 @media (max-width: 991.98px) {
   /* ---- Hamburger toggle ---- */
   /* FIXED: Must be position:fixed to align with bell/welcome */
+  /* ISSUE 1 FIX: Use safe-area-inset-top for iOS notch compatibility */
   .sidebar-toggle {
     position: fixed !important;
-    top: 12px !important;
+    top: max(12px, env(safe-area-inset-top)) !important;
     left: 16px !important;
     z-index: 1000 !important; /* Above sidebar so X button is always clickable */
     width: 48px;
@@ -591,10 +622,11 @@
   }
 
   /* ---- Bell + Welcome OR Login + Sign Up: fixed top-right on ALL pages ---- */
+  /* ISSUE 1 FIX: Use safe-area-inset-top for iOS notch compatibility */
   #loggedInState,
   #loggedOutState {
     position: fixed !important;
-    top: 12px;
+    top: max(12px, env(safe-area-inset-top)) !important;
     right: 16px;
     z-index: 1000; /* Same as hamburger for alignment */
     margin: 0 !important;

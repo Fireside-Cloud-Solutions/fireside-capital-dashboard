@@ -3408,25 +3408,27 @@ function setupSidebarToggle() {
     sidebar.classList.add('show');
     if (overlay) overlay.classList.add('show');
     toggle.innerHTML = '<i class="bi bi-x-lg"></i>';
-    // Prevent body scrolling when sidebar is open (mobile-safe approach)
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.top = `-${window.scrollY}px`;
-    document.body.dataset.scrollY = window.scrollY;
+    
+    // ISSUE 3 FIX: Use CSS class approach for reliable scroll lock
+    const scrollY = window.scrollY;
+    document.body.dataset.scrollY = scrollY;
+    document.body.style.setProperty('--scroll-lock-offset', `-${scrollY}px`);
+    document.body.classList.add('sidebar-open');
   };
 
   const closeSidebar = () => {
     sidebar.classList.remove('show');
     if (overlay) overlay.classList.remove('show');
     toggle.innerHTML = '<i class="bi bi-list"></i>';
-    // Restore body scrolling when sidebar is closed
-    const scrollY = document.body.dataset.scrollY || '0';
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.width = '';
-    document.body.style.top = '';
-    window.scrollTo(0, parseInt(scrollY));
+    
+    // ISSUE 3 FIX: Save scroll position BEFORE clearing styles, restore after
+    const scrollY = parseInt(document.body.dataset.scrollY || '0');
+    document.body.classList.remove('sidebar-open');
+    document.body.style.removeProperty('--scroll-lock-offset');
+    document.body.removeAttribute('data-scroll-y');
+    
+    // Restore scroll position (no delay needed with CSS class approach)
+    window.scrollTo(0, scrollY);
   };
 
   toggle.addEventListener('click', () => {
