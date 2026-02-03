@@ -48,6 +48,17 @@
     margin-bottom: var(--space-3);
   }
   
+  /* Ensure all cards inside columns are uniform width (fixes varying card widths on mobile) */
+  .row > [class*="col-"] > .card,
+  .row > [class*="col-"] > .dashboard-card,
+  .row > [class*="col-"] > .stat-card,
+  .row > [class*="col-"] > .chart-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
   /* Ensure main content uses full width with proper padding */
   .main-content {
     width: 100%;
@@ -533,6 +544,9 @@
     display: flex !important;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box; /* Include border in 48px height */
+    padding: 0;
+    margin: 0;
   }
 
   /* Center the hamburger/close icon properly */
@@ -616,6 +630,8 @@
     display: inline-flex;
     align-items: center;
     font-size: 13px;
+    box-sizing: border-box;
+    margin: 0;
   }
 
   /* Fix icon centering in buttons on mobile */
