@@ -14,12 +14,13 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-onboarding-flow | FC-010: Onboarding flow for new users (16h, large feature) | Running |
+| — | — | — | No active sub-agents |
 
 ## Recently Completed (Today)
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-onboarding-flow | FC-010: Onboarding flow for new users (5-step wizard + feature tour) | ✅ Complete (commit 5887543, migration 001) |
 | Capital | fc-009-competitor-research | Competitor analysis (Mint, YNAB, Monarch, Copilot, Lunch Money) | ✅ Complete (report in reports/) |
 | Builder | builder-dashboard-viz-improvements | FC-011 Dashboard viz improvements (time filters, asset allocation, DTI gauge, projections) | ✅ Complete (commit 05f9c1e) |
 | Capital | auth-error-messages | Fixed email enumeration security vulnerability | ✅ Complete (commit 6d086d3) |

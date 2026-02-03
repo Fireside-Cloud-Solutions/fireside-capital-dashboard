@@ -62,7 +62,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-007 | Feature | P1 | M | Done | WCAG 2.1 AA accessibility compliance |
 | FC-008 | Chore | P2 | S | Done | SEO optimization — meta tags, semantic HTML, sitemap |
 | FC-009 | Spike | P2 | M | Done | Competitor research — Mint, YNAB, Monarch, Copilot, Lunch Money |
-| FC-010 | Feature | P2 | L | Backlog | Onboarding flow for new users |
+| FC-010 | Feature | P2 | L | Done | Onboarding flow for new users |
 | FC-011 | Feature | P2 | M | Done | Dashboard data visualization improvements |
 | FC-012 | Feature | P3 | M | Backlog | Dark mode polish and theme consistency |
 | FC-013 | Chore | P2 | S | Done | Workspace cleanup — organize 80+ root files |
