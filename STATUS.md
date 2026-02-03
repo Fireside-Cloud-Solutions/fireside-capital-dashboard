@@ -20,6 +20,9 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | seo-optimization | SEO improvements (sitemap, robots.txt, meta tags template, documentation) | ✅ Complete (sitemap.xml, robots.txt, docs) |
+| Capital | error-messages-ux | User-friendly error message system (auth, database, network, validation) | ✅ Complete (error-messages.js, docs) |
+| Capital | toast-notifications-ux | Toast notification system (replaces browser alerts) | ✅ Complete (toast-notifications.js/.css, docs) |
 | Capital | loading-states-ux | Loading states utility (spinners, overlays, skeletons, empty states) | ✅ Complete (loading-states.js/.css, docs) |
 | Capital | scheduled-budget-generation | Automatic monthly budget creation (1st of month, copies previous month) | ✅ Complete (scripts/generate-monthly-budget.js, docs) |
 | Capital | discord-automated-reports | Discord financial report generator (weekly/monthly summaries) | ✅ Complete (scripts/generate-financial-report.js, docs) |

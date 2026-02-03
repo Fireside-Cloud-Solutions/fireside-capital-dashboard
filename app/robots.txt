@@ -1,0 +1,12 @@
+# robots.txt for Fireside Capital
+# https://nice-cliff-05b13880f.2.azurestaticapps.net
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://nice-cliff-05b13880f.2.azurestaticapps.net/sitemap.xml
+
+# Disallow private/auth pages (if any)
+# Disallow: /admin/
+# Disallow: /api/
