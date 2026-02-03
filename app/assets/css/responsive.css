@@ -118,14 +118,14 @@
 
   /* Fix: table-card overflow:hidden clips table scroll — override on mobile */
   .table-card {
-    overflow: visible !important;
+    overflow: visible;
   }
 
   /* Tables must scroll horizontally */
   .table-responsive {
     display: block;
     width: 100%;
-    overflow-x: auto !important;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 1rem;
     border-radius: 12px; /* Preserve rounded corners here since table-card overflow is visible */
@@ -262,7 +262,7 @@
   .main-content h2,
   .page-header h1,
   .page-header h2 {
-    word-break: keep-all !important;
+    word-break: keep-all;
     overflow-wrap: normal !important;
     hyphens: none !important;
     white-space: normal !important;
