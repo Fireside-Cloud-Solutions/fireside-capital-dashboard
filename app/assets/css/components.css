@@ -1291,6 +1291,34 @@ tbody.loading {
 }
 
 /* =================================================================
+   WELCOME BUTTON - VERTICAL ALIGNMENT FIX
+   ================================================================= */
+
+/* Fix Welcome dropdown button alignment (QA Bug Report fix) */
+#userDropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.welcome-prefix {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.dropdown-caret {
+  display: inline-block;
+  font-size: 0.7em;
+  margin-left: 4px;
+  vertical-align: middle;
+  transition: transform 150ms ease;
+}
+
+#userDropdown[aria-expanded="true"] .dropdown-caret {
+  transform: rotate(180deg);
+}
+
+/* =================================================================
    RESPONSIVE ADJUSTMENTS
    ================================================================= */
 
