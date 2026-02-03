@@ -2429,9 +2429,9 @@ main {
   max-width: none !important;
   width: auto !important;
   height: 48px !important;
-  padding: 0 12px !important;
+  padding: 0 16px !important;
   font-size: 13px !important;
-  line-height: 48px !important;
+  line-height: normal !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2440,15 +2440,17 @@ main {
   overflow: visible !important;
   text-overflow: unset !important;
   flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
-/* All spans inside welcome button: inherit size, stay inline */
+/* All spans inside welcome button: stay inline, centered */
 #userDropdown span {
   font-size: inherit !important;
   font-weight: inherit !important;
   display: inline !important;
   white-space: nowrap !important;
-  line-height: inherit !important;
+  line-height: normal !important;
+  vertical-align: middle !important;
 }
 
 /* Hide Bootstrap's auto-generated caret - we use a manual one */
