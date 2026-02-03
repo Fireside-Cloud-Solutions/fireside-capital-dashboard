@@ -8,13 +8,13 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-mobile-critical-fixes | Fix 4 critical mobile responsiveness issues (charts rendering, table scroll, button wrapping, sidebar overlay) | 🔄 Running (est. 5 hours) |
 | Builder | builder-fix-critical-audit-issues | Fix critical audit issues (welcome message bug, empty chart states, debug logging) | 🔄 Running |
 
 ## Recently Completed
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-mobile-critical-fixes | Phase 1 mobile fixes (charts, table scroll, buttons, sidebar) | ✅ Complete (commit 70c2244, 4 critical issues fixed) |
 | Auditor | auditor-mobile-responsiveness | Mobile responsiveness audit (4 viewports, 5 pages) | ✅ Complete (8 critical issues, 12 medium, report: audits/mobile-responsiveness-audit-2026-02-02.md) |
 | Auditor | auditor-full-site-audit-feb1 | Full site audit (all 10 pages) | ✅ Complete (Grade B-, 3 critical issues, report: reports/audit-full-site-feb1-2026.md, commit 744e330) |
 | Builder | builder-dashboard-stats-enhancement | Dashboard stats cards enhancement | ✅ Complete (icons, trends, hover effects, commit add0bbc) |
