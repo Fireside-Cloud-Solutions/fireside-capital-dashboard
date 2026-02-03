@@ -14,12 +14,14 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-dashboard-viz-improvements | FC-011: Dashboard visualization improvements (time filters, charts, projections) | Running |
+| — | — | — | No active sub-agents |
 
 ## Recently Completed (Today)
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | fc-009-competitor-research | Competitor analysis (Mint, YNAB, Monarch, Copilot, Lunch Money) | ✅ Complete (report in reports/) |
+| Builder | builder-dashboard-viz-improvements | FC-011 Dashboard viz improvements (time filters, asset allocation, DTI gauge, projections) | ✅ Complete (commit 05f9c1e) |
 | Capital | auth-error-messages | Fixed email enumeration security vulnerability | ✅ Complete (commit 6d086d3) |
 | Capital | fc-025-enum-normalization | Normalized 29 database rows + added 8 enum constraints | ✅ Complete (commits 20a0611, migrations 004) |
 | Capital | fc-backlog-cleanup | Updated backlog - marked 10 completed items as Done | ✅ Complete |
