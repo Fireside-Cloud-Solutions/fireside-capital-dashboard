@@ -173,11 +173,21 @@ function getNextDate(currentDate, frequency) {
   return nextDate;
 }
 function getThemeColors() {
-  return {
+  const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+  
+  if (currentTheme === 'light') {
+    return {
+      fill: 'rgba(244, 78, 36, 0.15)',
+      text: '#1a1a1a',
+      grid: 'rgba(0, 0, 0, 0.08)'
+    };
+  } else {
+    return {
       fill: 'rgba(244, 78, 36, 0.15)',
       text: '#f0f0f0',
       grid: 'rgba(240, 240, 240, 0.08)'
-  };
+    };
+  }
 }
 function normalizeToMonthly(amount, frequency) {
   const rawAmount = getRaw(amount);
@@ -3579,7 +3589,7 @@ if (document.getElementById('budgetAssignmentTable')) {
 
 
    // 3. Setup remaining UI components.
-   // setupThemeToggle() removed � dark mode only
+   setupThemeToggle();
    setupSidebarToggle();
    setupNotificationScrollLock();
    initializeAssetForm();
@@ -3599,6 +3609,60 @@ if (document.getElementById('budgetAssignmentTable')) {
      }
    });
    //renderAdditionalCharts();
+}
+
+// ===== THEME TOGGLE =====
+function setupThemeToggle() {
+  const themeSwitch = document.getElementById('themeSwitch');
+  const themeSwitchLabel = document.querySelector('label[for="themeSwitch"]');
+  
+  if (!themeSwitch) return;
+  
+  // Function to update the label text based on current theme
+  function updateThemeLabel() {
+    const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+    if (themeSwitchLabel) {
+      if (currentTheme === 'dark') {
+        themeSwitchLabel.innerHTML = '🌙 Dark Mode';
+      } else {
+        themeSwitchLabel.innerHTML = '☀️ Light Mode';
+      }
+    }
+  }
+  
+  // Function to set theme
+  function setTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    
+    // Update checkbox state to match theme
+    if (themeSwitch) {
+      themeSwitch.checked = (theme === 'light');
+    }
+    
+    updateThemeLabel();
+    
+    // Refresh charts if they exist to apply new theme colors
+    if (typeof renderNetWorthChart === 'function' && document.getElementById('netWorthTimelineChart')) {
+      renderNetWorthChart();
+    }
+    if (typeof generateMonthlyCashFlowChart === 'function' && document.getElementById('cashFlowChart')) {
+      generateMonthlyCashFlowChart();
+    }
+  }
+  
+  // Load saved theme or default to dark
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  setTheme(savedTheme);
+  
+  // Listen for toggle changes
+  themeSwitch.addEventListener('change', function() {
+    const newTheme = this.checked ? 'light' : 'dark';
+    setTheme(newTheme);
+  });
+  
+  // Update label on initial load
+  updateThemeLabel();
 }
 
 // ===== MOBILE SIDEBAR TOGGLE =====
