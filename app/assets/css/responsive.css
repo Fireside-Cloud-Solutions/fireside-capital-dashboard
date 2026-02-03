@@ -179,7 +179,7 @@
    ================================================================= */
 
 /* Mid-range phones (480px - 768px): 2-column grid for stat cards */
-@media (min-width: 480px) and (max-width: 767.98px) {
+@media (min-width: 576px) and (max-width: 767.98px) {
   .dashboard-card {
     padding: var(--space-4);
   }
@@ -196,7 +196,7 @@
 }
 
 /* Small mobile (<480px): Reduce card padding and font sizes */
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   /* Extra small screens - even tighter spacing */
   .main-content {
     padding-left: var(--space-2);
@@ -371,7 +371,7 @@
 }
 
 /* Small mobile: Compact chart cards */
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   .chart-card {
     padding: var(--space-3);
   }
@@ -436,7 +436,7 @@
   }
 }
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   #upcomingPaymentsList {
     max-height: 180px !important;
     font-size: 0.85rem;
@@ -459,7 +459,7 @@
    EMERGENCY FUND PROGRESS — Mobile optimization
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   #emergencyFundChartWrapper {
     height: 180px !important;
     padding: var(--space-2);
@@ -486,7 +486,7 @@
   }
 }
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   .main-content .d-flex.mb-4 {
     margin-bottom: var(--space-2-5) !important;
   }
@@ -496,7 +496,7 @@
    BUTTON GROUPS — Stack better on mobile
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   .btn-group {
     flex-wrap: wrap;
   }
@@ -511,7 +511,7 @@
    MODALS — Better mobile experience
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   .modal-dialog {
     margin: var(--space-2);
   }
@@ -539,7 +539,7 @@
    FORMS — Mobile-friendly inputs
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   /* FIX: Form labels - 0.9rem minimum for readability */
   .form-label {
     font-size: 0.9rem !important; /* Was 0.85rem */
@@ -630,7 +630,7 @@
    RESPONSIVE TEXT SIZING
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   /* Ensure readable but compact text */
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
@@ -786,7 +786,7 @@ body.sidebar-open {
   }
 
   /* Hide "Welcome," prefix on very narrow screens to prevent Y-axis shift */
-  @media (max-width: 480px) {
+  @media (max-width: 575.98px) {
     .welcome-prefix {
       display: none !important;
     }
@@ -863,7 +863,7 @@ body.sidebar-open {
    USER DROPDOWN — Better mobile positioning
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   .dropdown-menu {
     font-size: 0.9rem;
   }
@@ -877,7 +877,7 @@ body.sidebar-open {
    LOADING STATES — Mobile optimization
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   .spinner-border {
     width: 2rem;
     height: 2rem;
@@ -925,7 +925,7 @@ body.sidebar-open {
    BUDGET PAGE MOBILE FIXES
    ================================================================= */
 
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   /* FIX: Month selector - larger touch targets */
   .month-selector {
     display: flex;

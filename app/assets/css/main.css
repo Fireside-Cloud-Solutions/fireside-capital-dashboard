@@ -2468,7 +2468,7 @@ main {
 }
 
 /* On very small screens, truncate username (not "Welcome,") */
-@media (max-width: 479.98px) {
+@media (max-width: 575.98px) {
   #username {
     max-width: 80px;
     display: inline-block;
