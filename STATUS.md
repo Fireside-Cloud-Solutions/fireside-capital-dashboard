@@ -14,12 +14,13 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| — | — | — | No active sub-agents |
+| Builder | builder-dashboard-viz-improvements | FC-011: Dashboard visualization improvements (time filters, charts, projections) | Running |
 
 ## Recently Completed (Today)
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | auth-error-messages | Fixed email enumeration security vulnerability | ✅ Complete (commit 6d086d3) |
 | Capital | fc-025-enum-normalization | Normalized 29 database rows + added 8 enum constraints | ✅ Complete (commits 20a0611, migrations 004) |
 | Capital | fc-backlog-cleanup | Updated backlog - marked 10 completed items as Done | ✅ Complete |
 | Capital | fc-023-css-cleanup | Removed commented-out code from accessibility.css | ✅ Complete (commit 0ff7f75) |
