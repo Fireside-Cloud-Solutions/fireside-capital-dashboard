@@ -20,7 +20,10 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
-| Capital | database-constraints | Database CHECK constraints (46 constraints across 8 tables) | ✅ Complete (migration + docs ready to deploy) |
+| Capital | fc-backlog-cleanup | Updated backlog - marked 8 completed items as Done (FC-015/016/017/018/020/021/023, FC-008/013) | ✅ Complete |
+| Capital | fc-023-css-cleanup | Removed commented-out code from accessibility.css | ✅ Complete (commit 0ff7f75) |
+| Capital | fc-021-mobile-icons | Reduced empty state icon size on mobile (80px → 64px) | ✅ Complete (commit 83e97a7) |
+| Capital | database-constraints | Database CHECK constraints (30 constraints deployed to production) | ✅ Complete (migration applied successfully) |
 | Auditor | auditor-fc014-css-review | FC-014 CSS !important removal audit | ✅ Complete — PASS, production ready |
 | Builder | builder-fc014-css-refactor | FC-014 CSS !important removal (Phases 1+2) | ✅ Complete (62 removed, 243 remaining, 26 commits) |
 | Capital | seo-optimization | SEO improvements (sitemap, robots.txt, meta tags template, documentation) | ✅ Complete (sitemap.xml, robots.txt, docs) |

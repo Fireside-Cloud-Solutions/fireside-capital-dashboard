@@ -73,9 +73,9 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-018 | Bug | P1 | S | Done | Missing aria-labels on icon-only buttons (accessibility) |
 | FC-019 | Bug | P2 | M | Backlog | Inline styles in HTML preventing responsive CSS overrides |
 | FC-020 | Bug | P2 | XS | Done | JavaScript debug code left in production (console pollution) |
-| FC-021 | Bug | P2 | XS | Backlog | Empty state icons too large on mobile devices |
+| FC-021 | Bug | P2 | XS | Done | Empty state icons too large on mobile devices |
 | FC-022 | Chore | P3 | S | Backlog | Duplicate/redundant CSS rules bloating stylesheet |
-| FC-023 | Chore | P3 | XS | Backlog | Commented-out code left in CSS files |
+| FC-023 | Chore | P3 | XS | Done | Commented-out code left in CSS files |
 | FC-024 | Chore | P3 | M | Backlog | Magic numbers in CSS — replace with CSS custom properties |
 | FC-025 | Chore | P2 | M | Backlog | Database enum normalization — standardize type/frequency field casing |
 
