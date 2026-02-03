@@ -640,6 +640,28 @@ strong {
   opacity: 0.7;
 }
 
+/* Stat Card Trends (FC-011) */
+.stat-trend {
+  margin-top: 8px;
+  min-height: 40px;
+}
+
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.trend-label {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
 /* =================================================================
    CHARTS
    ================================================================= */
@@ -658,6 +680,69 @@ strong {
   height: 100%;
   display: block;
   max-width: 100%;
+}
+
+/* Time Range Filter Buttons */
+.time-range-filter {
+  display: flex;
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.time-range-filter .btn {
+  border-radius: 0;
+  font-size: 12px;
+  padding: 6px 12px;
+  min-height: 32px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--color-border-default);
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.time-range-filter .btn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.time-range-filter .btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.time-range-filter .btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(244, 78, 36, 0.3);
+}
+
+.time-range-filter .btn-outline-secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-default);
+}
+
+.time-range-filter .btn-outline-secondary:hover {
+  background: var(--color-bg-3);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+/* Mobile responsive for time range filters */
+@media (max-width: 575.98px) {
+  .time-range-filter {
+    width: 100%;
+  }
+  
+  .time-range-filter .btn {
+    flex: 1;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
 }
 
 /* =================================================================

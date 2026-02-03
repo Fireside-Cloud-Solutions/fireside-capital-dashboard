@@ -3073,8 +3073,11 @@ async function calculateAndDisplayTrends(currentValues) {
     return `
       <span class="trend-indicator" style="color: ${color};">
         <span style="font-size: 1.2em;">${arrow}</span>
-        <span>${sign}${Math.abs(percentChange).toFixed(1)}%</span>
+        <span>${sign}${formatCurrency(Math.abs(change))} (${Math.abs(percentChange).toFixed(1)}%)</span>
       </span>
+      <div class="trend-label" style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 4px;">
+        vs last month
+      </div>
     `;
   }
   
