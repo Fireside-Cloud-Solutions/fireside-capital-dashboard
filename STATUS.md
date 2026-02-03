@@ -20,6 +20,7 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | discord-automated-reports | Discord financial report generator (weekly/monthly summaries) | ✅ Complete (scripts/generate-financial-report.js, docs) |
 | Capital | database-constraints | Database validation constraints (prevent negative amounts, future dates, invalid enums) | ✅ Complete (migration 003, docs/database-constraints.md) |
 | Capital | update-priorities-doc | Updated NEXT_PRIORITIES.md to reflect all P0/P1/P2 complete | ✅ Complete |
 | Capital | priority-verification-sweep | Verified all top priorities complete (tested live site, reviewed code, checked git history) | ✅ Complete — all P0/P1 items done |
