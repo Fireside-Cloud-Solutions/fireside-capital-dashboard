@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="assets/css/mobile-optimizations.css" />
   <link rel="stylesheet" href="assets/css/brand-polish.css" />
   <link rel="stylesheet" href="assets/css/accessibility.css" />
+  <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
   
   <!-- Performance: Chart.js removed from head - will be lazy loaded when needed -->
   <style>
@@ -119,13 +120,31 @@
         white-space: nowrap !important;
       }
       
-      /* Prevent text wrapping inside buttons */
+            /* Prevent text wrapping inside buttons */
       #loggedOutState .btn *,
       #loggedInState .btn * {
         white-space: nowrap !important;
       }
       
+      /* CRITICAL FIX: Welcome dropdown button text wrapping */
+      /* The global * { max-width: 100%; } was constraining the button width */
+      #loggedInState .dropdown-toggle {
+        white-space: nowrap !important;
+        max-width: none !important; /* Override global max-width constraint */
+        flex-shrink: 0 !important; /* Prevent flex container from shrinking the button */
+      }
+      
+      /* On very narrow screens, truncate the name instead of wrapping */
+      @media (max-width: 374.98px) {
+        #loggedInState .dropdown-toggle {
+          max-width: calc(100vw - 48px - 48px - 32px - 16px) !important; /* viewport - hamburger - bell - gaps - margin */
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+      }
+      
       /* Bell icon button */
+
       #loggedInState .btn.btn-icon {
         width: 48px !important;
         min-width: 48px !important;

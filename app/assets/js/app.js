@@ -343,6 +343,109 @@ const sb = window.supabase.createClient(supabaseUrl, supabaseKey, {
 let sessionSecurity = null;
 // Initialize after DOM loads (will be set up in init())
 
+// ===== LOGGED-OUT CTA CONFIGURATION =====
+const LOGGED_OUT_CTA_CONFIG = {
+  dashboard: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>`,
+    title: 'Welcome to Fireside Capital',
+    description: 'Your personal finance dashboard. Track assets, manage bills, monitor investments, and achieve your financial goals.'
+  },
+  assets: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>`,
+    title: 'Track Your Assets',
+    description: 'Monitor real estate, vehicles, and other valuables. See your total net worth and track equity over time.'
+  },
+  bills: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>`,
+    title: 'Manage Your Bills',
+    description: 'Never miss a payment. Track due dates, split bills with friends, and manage recurring expenses effortlessly.'
+  },
+  budget: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>`,
+    title: 'Create Your Budget',
+    description: 'Plan your spending, allocate funds to categories, and stay on top of your monthly budget with ease.'
+  },
+  debts: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>`,
+    title: 'Conquer Your Debts',
+    description: 'Track loans, credit cards, and payment plans. See payoff timelines and plan your debt-free journey.'
+  },
+  friends: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`,
+    title: 'Share with Friends',
+    description: 'Split bills and expenses with friends and roommates. Keep everyone accountable and make sharing simple.'
+  },
+  income: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+    title: 'Track Your Income',
+    description: 'Monitor all income sources from W2, 1099, side hustles, and more. See your total earnings at a glance.'
+  },
+  investments: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>`,
+    title: 'Grow Your Investments',
+    description: 'Track 401(k), IRA, brokerage accounts, and crypto. Watch your wealth compound and reach financial freedom.'
+  },
+  reports: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`,
+    title: 'Financial Reports',
+    description: 'Analyze your net worth trends, spending patterns, and financial health with detailed reports and charts.'
+  },
+  settings: {
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`,
+    title: 'Customize Your Experience',
+    description: 'Configure your preferences, emergency fund goals, and personalize your Fireside Capital dashboard.'
+  }
+};
+
+function getPageName() {
+  const path = window.location.pathname;
+  const page = path.split('/').pop().replace('.html', '') || 'dashboard';
+  return page === 'index' ? 'dashboard' : page;
+}
+
+function toggleLoggedOutCTA(show) {
+  const container = document.getElementById('dataContainer');
+  if (!container) return;
+  
+  let ctaEl = container.querySelector('.logged-out-cta');
+  
+  if (show) {
+    // Show CTA
+    if (!ctaEl) {
+      // Create CTA if it doesn't exist
+      const pageName = getPageName();
+      const config = LOGGED_OUT_CTA_CONFIG[pageName] || LOGGED_OUT_CTA_CONFIG.dashboard;
+      
+      ctaEl = document.createElement('div');
+      ctaEl.className = 'logged-out-cta show';
+      ctaEl.setAttribute('data-page', pageName);
+      ctaEl.innerHTML = `
+        <div class="logged-out-cta-logo">
+          ${config.icon}
+        </div>
+        <h2>${escapeHtml(config.title)}</h2>
+        <p>${escapeHtml(config.description)}</p>
+        <div class="logged-out-cta-actions">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+          </button>
+          <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#signupModal">
+            <i class="bi bi-person-plus me-2"></i>Sign Up
+          </button>
+        </div>
+      `;
+      container.prepend(ctaEl);
+    } else {
+      ctaEl.classList.add('show');
+    }
+  } else {
+    // Hide CTA
+    if (ctaEl) {
+      ctaEl.classList.remove('show');
+    }
+  }
+}
+
 // ===== STATE & GLOBAL VARIABLES =====
 let currentUser = null;
 let editAssetId = null, deleteAssetId = null;
@@ -3229,6 +3332,8 @@ function init() {
     document.body.classList.add('auth-resolved');
     if (document.getElementById('dataContainer')) {
       document.getElementById('dataContainer').style.visibility = currentUser ? 'visible' : 'hidden';
+      // Show/hide logged-out CTA based on auth state
+      toggleLoggedOutCTA(!currentUser);
     }
 
     if (currentUser) {

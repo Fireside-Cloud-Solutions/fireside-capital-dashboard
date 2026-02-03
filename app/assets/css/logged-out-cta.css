@@ -1,0 +1,131 @@
+/* =================================================================
+   LOGGED-OUT CTA COMPONENT
+   Shown when user is not authenticated
+   ================================================================= */
+
+.logged-out-cta {
+  display: none; /* Hidden by default, shown by JS when logged out */
+  max-width: 600px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.logged-out-cta.show {
+  display: block;
+}
+
+.logged-out-cta-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 12px rgba(244, 78, 36, 0.3);
+}
+
+.logged-out-cta-logo svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.logged-out-cta h2 {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  letter-spacing: var(--tracking-tight);
+}
+
+.logged-out-cta p {
+  font-size: 1.125rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  line-height: var(--leading-relaxed);
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logged-out-cta-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.logged-out-cta-actions .btn {
+  min-width: 140px;
+  font-weight: var(--weight-semibold);
+  padding: 0.75rem 1.5rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 575.98px) {
+  .logged-out-cta {
+    margin: 2rem 1rem;
+    padding: 2rem 1.5rem;
+  }
+  
+  .logged-out-cta h2 {
+    font-size: 1.5rem;
+  }
+  
+  .logged-out-cta p {
+    font-size: 1rem;
+  }
+  
+  .logged-out-cta-actions {
+    flex-direction: column;
+  }
+  
+  .logged-out-cta-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Page-specific color accents */
+.logged-out-cta[data-page="assets"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-info));
+}
+
+.logged-out-cta[data-page="bills"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-warning), var(--color-primary));
+}
+
+.logged-out-cta[data-page="budget"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-success), var(--color-secondary));
+}
+
+.logged-out-cta[data-page="debts"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-danger), var(--color-warning));
+}
+
+.logged-out-cta[data-page="income"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-success), var(--color-primary));
+}
+
+.logged-out-cta[data-page="investments"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-info), var(--color-primary));
+}
+
+.logged-out-cta[data-page="reports"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+}
+
+.logged-out-cta[data-page="settings"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-text-secondary), var(--color-text-tertiary));
+}
+
+.logged-out-cta[data-page="friends"] .logged-out-cta-logo {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+}

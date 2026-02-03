@@ -690,6 +690,23 @@ body.sidebar-open {
     justify-content: center !important;
   }
 
+  /* CRITICAL FIX: Welcome dropdown button text wrapping */
+  /* The global * { max-width: 100%; } was constraining the button width */
+  #loggedInState .dropdown-toggle {
+    white-space: nowrap !important;
+    max-width: none !important; /* Override global max-width constraint */
+    flex-shrink: 0; /* Prevent flex container from shrinking the button */
+  }
+  
+  /* On very narrow screens, truncate the name instead of wrapping */
+  @media (max-width: 374.98px) {
+    #loggedInState .dropdown-toggle {
+      max-width: calc(100vw - 48px - 48px - 32px - 16px) !important; /* viewport - hamburger - bell - gaps - margin */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
   /* Bigger notification bell */
   #notificationBell {
     width: 48px;
@@ -812,5 +829,98 @@ body.sidebar-open {
   .table .btn-sm {
     min-height: 40px;
     min-width: 40px;
+  }
+}
+
+/* =================================================================
+   ADDITIONAL RESPONSIVE FIXES — Final audit pass
+   ================================================================= */
+
+@media (max-width: 767.98px) {
+  /* Ensure dropdown menus don't overflow viewport */
+  .dropdown-menu {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  /* Fix page header button wrapping */
+  .page-header-actions {
+    width: 100%;
+  }
+  
+  .page-header-actions .btn-group {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .page-header-actions .btn-group .btn {
+    width: 100%;
+    border-radius: var(--radius-md) !important;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Ensure tables scroll horizontally with visible scrollbar hint */
+  .table-responsive {
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 -1px 0 var(--color-border-subtle);
+  }
+  
+  /* Fix long text in table cells */
+  .table td {
+    word-break: break-word;
+  }
+  
+  /* Currency columns should not break */
+  .table td[class*="text-end"],
+  .table td.currency-value {
+    white-space: nowrap;
+  }
+  
+  /* Fix budget table overflow */
+  .budget-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+  }
+  
+  /* Ensure stat cards don't get too small */
+  .dashboard-card {
+    min-height: 120px;
+  }
+  
+  /* Fix notification dropdown on mobile */
+  #notificationDropdown .dropdown-menu {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 76px !important; /* Below top bar */
+    max-height: calc(100vh - 76px) !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* Extra small devices - additional fixes */
+@media (max-width: 374.98px) {
+  /* Ensure very long names don't break layout */
+  .dashboard-card p,
+  .summary-card h4 {
+    font-size: 1.25rem;
+  }
+  
+  /* Compact page headers */
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  /* Reduce modal padding on tiny screens */
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Stack form groups tighter */
+  .form-group,
+  .mb-3 {
+    margin-bottom: 0.75rem !important;
   }
 }
