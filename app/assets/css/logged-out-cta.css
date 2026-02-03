@@ -92,6 +92,17 @@
   .logged-out-cta-actions .btn {
     width: 100%;
   }
+  
+  /* Reduce icon size on mobile for better proportions */
+  .logged-out-cta-logo {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .logged-out-cta-logo svg {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 /* Page-specific color accents */

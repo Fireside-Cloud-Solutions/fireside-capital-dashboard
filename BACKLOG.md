@@ -60,23 +60,24 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-005 | Feature | P1 | L | Done | Responsive design — dashboard viz sizing, mobile layouts |
 | FC-006 | Chore | P1 | M | In Progress | Security remediation (session security hardening remaining) |
 | FC-007 | Feature | P1 | M | Done | WCAG 2.1 AA accessibility compliance |
-| FC-008 | Chore | P2 | S | Backlog | SEO optimization — meta tags, semantic HTML, sitemap |
+| FC-008 | Chore | P2 | S | Done | SEO optimization — meta tags, semantic HTML, sitemap |
 | FC-009 | Spike | P2 | M | In Progress | Competitor research — Mint, YNAB, Monarch, Copilot, Lunch Money |
 | FC-010 | Feature | P2 | L | Backlog | Onboarding flow for new users |
 | FC-011 | Feature | P2 | M | Backlog | Dashboard data visualization improvements |
 | FC-012 | Feature | P3 | M | Backlog | Dark mode polish and theme consistency |
-| FC-013 | Chore | P2 | S | Backlog | Workspace cleanup — organize 80+ root files |
-| FC-014 | Bug | P0 | L | Backlog | !important abuse — 301 instances causing CSS maintainability crisis |
-| FC-015 | Bug | P0 | S | Backlog | Welcome button text not vertically centered on ultrawide monitors |
-| FC-016 | Bug | P1 | L | Backlog | CSS file loading order conflicts causing style override battles |
-| FC-017 | Bug | P1 | M | Backlog | Responsive breakpoint inconsistencies — custom breakpoints don't align with Bootstrap |
-| FC-018 | Bug | P1 | S | Backlog | Missing aria-labels on icon-only buttons (accessibility) |
+| FC-013 | Chore | P2 | S | Done | Workspace cleanup — organize 80+ root files |
+| FC-014 | Bug | P0 | L | Done | !important abuse — 301 instances causing CSS maintainability crisis |
+| FC-015 | Bug | P0 | S | Done | Welcome button text not vertically centered on ultrawide monitors |
+| FC-016 | Bug | P1 | L | Done | CSS file loading order conflicts causing style override battles |
+| FC-017 | Bug | P1 | M | Done | Responsive breakpoint inconsistencies — custom breakpoints don't align with Bootstrap |
+| FC-018 | Bug | P1 | S | Done | Missing aria-labels on icon-only buttons (accessibility) |
 | FC-019 | Bug | P2 | M | Backlog | Inline styles in HTML preventing responsive CSS overrides |
-| FC-020 | Bug | P2 | XS | Backlog | JavaScript debug code left in production (console pollution) |
+| FC-020 | Bug | P2 | XS | Done | JavaScript debug code left in production (console pollution) |
 | FC-021 | Bug | P2 | XS | Backlog | Empty state icons too large on mobile devices |
 | FC-022 | Chore | P3 | S | Backlog | Duplicate/redundant CSS rules bloating stylesheet |
 | FC-023 | Chore | P3 | XS | Backlog | Commented-out code left in CSS files |
 | FC-024 | Chore | P3 | M | Backlog | Magic numbers in CSS — replace with CSS custom properties |
+| FC-025 | Chore | P2 | M | Backlog | Database enum normalization — standardize type/frequency field casing |
 
 ### EPIC-002: Mobile Application
 

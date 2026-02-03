@@ -20,6 +20,9 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | database-constraints | Database CHECK constraints (46 constraints across 8 tables) | ✅ Complete (migration + docs ready to deploy) |
+| Auditor | auditor-fc014-css-review | FC-014 CSS !important removal audit | ✅ Complete — PASS, production ready |
+| Builder | builder-fc014-css-refactor | FC-014 CSS !important removal (Phases 1+2) | ✅ Complete (62 removed, 243 remaining, 26 commits) |
 | Capital | seo-optimization | SEO improvements (sitemap, robots.txt, meta tags template, documentation) | ✅ Complete (sitemap.xml, robots.txt, docs) |
 | Capital | error-messages-ux | User-friendly error message system (auth, database, network, validation) | ✅ Complete (error-messages.js, docs) |
 | Capital | toast-notifications-ux | Toast notification system (replaces browser alerts) | ✅ Complete (toast-notifications.js/.css, docs) |

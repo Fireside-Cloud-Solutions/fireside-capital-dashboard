@@ -40,7 +40,7 @@ All P0/P1/P2 priorities are complete. The web app is secure, accessible, respons
 ### Low-Priority Security Enhancements
 | Task | Effort | Impact | Status |
 |------|--------|--------|--------|
-| Database constraints (negative amounts, future dates) | 4 hours | Medium | **NEXT** |
+| Database constraints (negative amounts, future dates) | 4 hours | Medium | ✅ **COMPLETE** |
 | Subresource Integrity (SRI) hashes for CDN | 4 hours | Low | Backlog |
 | Enhanced password policy | 3 hours | Low | Backlog |
 | Remove debug console.logs | 2 hours | Low | Backlog |
