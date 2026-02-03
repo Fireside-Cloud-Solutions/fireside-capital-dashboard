@@ -14,7 +14,7 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-transaction-categorization | Transaction auto-categorization with OpenAI (competitor gap #1, multi-phase) | Running |
+| Builder | builder-transaction-phases-2-3 | Transaction Phases 2-3: Plaid import + AI categorization (OpenAI integration) | Running |
 
 ## Recently Completed (Today)
 
