@@ -87,7 +87,10 @@ html {
   max-width: 100%;
 }
 
-* {
+/* NOTE: Removed global * { max-width: 100% } — it was causing cascading issues
+   with fixed-position UI elements (welcome button, dropdowns). Horizontal overflow
+   is already prevented by html { overflow-x: hidden } and targeted rules below. */
+img, video, canvas, svg, table {
   max-width: 100%;
 }
 
