@@ -77,7 +77,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-022 | Chore | P3 | S | Backlog | Duplicate/redundant CSS rules bloating stylesheet |
 | FC-023 | Chore | P3 | XS | Done | Commented-out code left in CSS files |
 | FC-024 | Chore | P3 | M | Backlog | Magic numbers in CSS — replace with CSS custom properties |
-| FC-025 | Chore | P2 | M | Backlog | Database enum normalization — standardize type/frequency field casing |
+| FC-025 | Chore | P2 | M | Done | Database enum normalization — standardize type/frequency field casing |
 
 ### EPIC-002: Mobile Application
 

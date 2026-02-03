@@ -20,7 +20,8 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
-| Capital | fc-backlog-cleanup | Updated backlog - marked 8 completed items as Done (FC-015/016/017/018/020/021/023, FC-008/013) | ✅ Complete |
+| Capital | fc-025-enum-normalization | Normalized 29 database rows + added 8 enum constraints | ✅ Complete (commits 20a0611, migrations 004) |
+| Capital | fc-backlog-cleanup | Updated backlog - marked 10 completed items as Done | ✅ Complete |
 | Capital | fc-023-css-cleanup | Removed commented-out code from accessibility.css | ✅ Complete (commit 0ff7f75) |
 | Capital | fc-021-mobile-icons | Reduced empty state icon size on mobile (80px → 64px) | ✅ Complete (commit 83e97a7) |
 | Capital | database-constraints | Database CHECK constraints (30 constraints deployed to production) | ✅ Complete (migration applied successfully) |

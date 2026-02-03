@@ -491,8 +491,9 @@ function setButtonLoading(btnId, loading) {
 function getFriendlyAuthError(error) {
   const msg = (error.message || '').toLowerCase();
   if (msg.includes('email not confirmed')) return 'Your email is not confirmed. Please check your inbox (and spam folder) for the confirmation link.';
+  // Security: Use generic message for login failures to prevent email enumeration
   if (msg.includes('invalid login credentials')) return 'Invalid email or password. Please try again.';
-  if (msg.includes('user not found')) return 'No account found with that email address.';
+  if (msg.includes('user not found')) return 'Invalid email or password. Please try again.';
   if (msg.includes('email rate limit exceeded')) return 'Too many attempts. Please wait a few minutes and try again.';
   if (msg.includes('user already registered')) return 'An account with this email already exists. Try logging in instead.';
   if (msg.includes('password') && msg.includes('at least')) return error.message;
