@@ -673,7 +673,7 @@ body.sidebar-open {
     position: fixed !important;
     top: max(12px, env(safe-area-inset-top)) !important;
     left: 16px !important;
-    z-index: 1000 !important; /* Above sidebar so X button is always clickable */
+    z-index: 1000; /* Above sidebar so X button is always clickable */
     width: 48px;
     height: 48px;
     background: var(--color-bg-2);
@@ -701,7 +701,7 @@ body.sidebar-open {
 
   /* Push sidebar content below the hamburger button */
   .sidebar {
-    z-index: 900 !important; /* ABOVE overlay so menu items are clickable */
+    z-index: 900; /* ABOVE overlay so menu items are clickable */
     padding-top: 72px !important;
     width: 85% !important; /* Use 85% width on mobile for better UX */
     max-width: 320px !important; /* Cap at 320px on larger phones */
@@ -710,7 +710,7 @@ body.sidebar-open {
   /* Ensure proper z-index stacking:
      Hamburger/X (1000) > Sidebar (900) > Overlay (450) > Main content (1) */
   .sidebar-overlay {
-    z-index: 450 !important; /* Below sidebar, above main content */
+    z-index: 450; /* Below sidebar, above main content */
     position: fixed;
     top: 0;
     left: 0;
@@ -781,7 +781,7 @@ body.sidebar-open {
     top: calc(max(12px, env(safe-area-inset-top)) + 56px) !important; /* Below the welcome button */
     right: 16px !important;
     left: auto !important;
-    z-index: 1001 !important;
+    z-index: 1001;
     min-width: 200px;
   }
 
@@ -822,7 +822,7 @@ body.sidebar-open {
     max-height: none !important;
     overflow-y: auto !important;
     border-radius: 0;
-    z-index: 499 !important;
+    z-index: 499;
     background-color: var(--color-bg-1) !important;
     margin: 0 !important;
     transform: none !important;
