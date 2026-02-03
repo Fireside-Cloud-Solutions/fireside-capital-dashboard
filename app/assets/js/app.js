@@ -3016,12 +3016,19 @@ async function calculateAndDisplayTrends(currentValues) {
   
   // Helper function to create trend HTML
   function getTrendHTML(currentValue, lastMonthValue, isInverse = false) {
-    if (!lastMonthValue || lastMonthValue === 0) {
+    // CRITICAL FIX: Ensure we handle all falsy values (undefined, null, 0, NaN)
+    // Never show "No data yet" text - always show either a trend or a dash
+    if (lastMonthValue === undefined || lastMonthValue === null || lastMonthValue === 0 || isNaN(lastMonthValue)) {
       return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
     }
     
     const change = currentValue - lastMonthValue;
     const percentChange = (change / lastMonthValue) * 100;
+    
+    // Handle edge case where percentChange is NaN or Infinity
+    if (!isFinite(percentChange)) {
+      return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+    }
     
     // Determine if this is good or bad
     // isInverse = true means decrease is good (e.g., for debts)
@@ -3081,10 +3088,15 @@ async function calculateAndDisplayTrends(currentValues) {
       );
     }
   } else {
-    // No historical trend data — show a dash instead of confusing "No data yet" alongside real values
-    if (el('netWorthTrend')) {
-      el('netWorthTrend').innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
-    }
+    // No historical trend data — show a dash for all trend elements
+    // CRITICAL FIX: Ensure ALL trend elements show dash, never "No data yet" text
+    const trendElements = ['netWorthTrend', 'assetsTrend', 'investmentsTrend', 'debtsTrend', 'billsTrend', 'incomeTrend'];
+    trendElements.forEach(elementId => {
+      const element = el(elementId);
+      if (element) {
+        element.innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+      }
+    });
   }
 }
 
