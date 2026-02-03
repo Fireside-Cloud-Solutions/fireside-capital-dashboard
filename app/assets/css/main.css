@@ -2425,7 +2425,7 @@ main {
 /* Welcome button: always stays on one line, vertically centered text.
    Uses symmetric padding instead of fixed height to ensure perfect centering. */
 #userDropdown {
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center !important;
   justify-content: center !important;
   height: auto !important;
@@ -2435,7 +2435,7 @@ main {
   line-height: 1 !important;
   white-space: nowrap !important;
   font-size: 13px !important;
-  box-sizing: border-box !important;
+  box-sizing: border-box;
   overflow: visible !important;
   text-overflow: unset !important;
   flex-shrink: 0 !important;

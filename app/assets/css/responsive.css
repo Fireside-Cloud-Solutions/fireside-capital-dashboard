@@ -157,7 +157,7 @@
   /* Button groups stack vertically */
   .page-header-actions {
     width: 100%;
-    flex-direction: column !important;
+    flex-direction: column;
   }
 
   .page-header-actions .btn,
@@ -821,7 +821,7 @@ body.sidebar-open {
     height: auto !important;
     max-height: none !important;
     overflow-y: auto !important;
-    border-radius: 0 !important;
+    border-radius: 0;
     z-index: 499 !important;
     background-color: var(--color-bg-1) !important;
     margin: 0 !important;
@@ -1011,7 +1011,7 @@ body.sidebar-open {
   
   .page-header-actions .btn-group .btn {
     width: 100%;
-    border-radius: var(--radius-md) !important;
+    border-radius: var(--radius-md);
     margin-bottom: 0.5rem;
   }
   
@@ -1051,7 +1051,7 @@ body.sidebar-open {
     right: 0 !important;
     top: 76px !important; /* Below top bar */
     max-height: calc(100vh - 76px) !important;
-    border-radius: 0 !important;
+    border-radius: 0;
   }
 }
 
