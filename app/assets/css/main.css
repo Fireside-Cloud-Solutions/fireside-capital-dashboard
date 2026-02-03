@@ -263,6 +263,8 @@ strong {
   color: var(--color-text-primary);
   padding: 0;
   position: fixed;
+  top: 0;
+  left: 0;
   width: 260px;
   display: flex;
   flex-direction: column;
