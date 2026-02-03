@@ -39,9 +39,26 @@
         width: 48px;
         height: 48px;
         box-sizing: border-box;
+        /* ADDED: All visual properties to prevent snap when external CSS loads */
+        background: #1a1a1a !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 0.5rem !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Hamburger icon */
+      .sidebar-toggle i {
+        font-size: 1.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 100%;
+        height: 100%;
+        line-height: 1;
       }
       
       /* Auth elements: fixed position from first render */
@@ -55,17 +72,48 @@
         visibility: hidden;
         pointer-events: none;
       }
+      
+      /* When visible (not .d-none): apply flex layout */
+      #loggedInState:not(.d-none),
+      #loggedOutState:not(.d-none) {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+      }
+      
       /* Override d-none: keep element in fixed layout tree to prevent position glitch */
       #loggedInState.d-none, #loggedOutState.d-none {
         display: block !important;
         visibility: hidden;
       }
+      
       body.auth-resolved #loggedInState:not(.d-none),
       body.auth-resolved #loggedOutState:not(.d-none) {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
         transition: opacity 0.15s ease;
+      }
+      
+      /* Match button heights in the top bar */
+      #loggedOutState .btn,
+      #loggedInState .btn {
+        height: 48px;
+        padding-top: 0;
+        padding-bottom: 0;
+        display: inline-flex;
+        align-items: center;
+        font-size: 13px;
+        box-sizing: border-box;
+        margin: 0;
+      }
+      
+      /* Bell icon button */
+      #loggedInState .btn.btn-icon {
+        width: 48px;
+        padding-left: 0;
+        padding-right: 0;
+        justify-content: center;
       }
     }
   </style>
