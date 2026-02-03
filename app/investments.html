@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="assets/css/main.css?v=20260203" />
   
   <link rel="stylesheet" href="assets/css/components.css?v=20260203" />
-  <link rel="stylesheet" href="assets/css/responsive.css?v=20260203" />
+  <link rel="stylesheet" href="assets/css/responsive.css?v=20260203" />`n  <link rel="stylesheet" href="assets/css/utilities.css?v=20260203" />
   
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
@@ -92,7 +92,7 @@
       <div class="page-header">
         <div class="page-header-actions">
           <h2>Investments</h2>
-          <div id="pageActions" style="display: none;">
+          <div id="pageActions" class="initially-hidden">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInvestmentModal" aria-label="Add new investment">
               <i class="bi bi-plus-circle"></i> Add Investment
             </button>
@@ -114,7 +114,7 @@
                   <i class="bi bi-bell"></i>
                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">0</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
+                <ul class="dropdown-menu dropdown-menu-end" class="dropdown-menu-wide" id="notificationList">
                   <li class="dropdown-header d-flex justify-content-between align-items-center">
                     <strong>Notifications</strong>
                     <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
@@ -138,7 +138,7 @@
         </div>
       </div>
 
-      <div id="dataContainer" style="visibility: hidden;">
+      <div id="dataContainer" class="data-hidden">
         <div class="table-card">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
@@ -332,3 +332,5 @@
   </div>
 </body>
 </html>
+
+

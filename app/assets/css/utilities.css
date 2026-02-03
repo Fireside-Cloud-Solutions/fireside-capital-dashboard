@@ -1,0 +1,308 @@
+/* =================================================================
+   Fireside Capital - Utility Classes
+   Replaces inline styles with reusable CSS classes
+   Created: FC-019 Inline Styles Cleanup
+   ================================================================= */
+
+/* =================================================================
+   DISPLAY & VISIBILITY UTILITIES
+   ================================================================= */
+
+/* Hidden state for page actions before data loads */
+.initially-hidden {
+  display: none;
+}
+
+/* Hidden state for data containers during loading */
+.data-hidden {
+  visibility: hidden;
+}
+
+/* =================================================================
+   DROPDOWN MENU UTILITIES
+   ================================================================= */
+
+/* Standard notification/action dropdown width */
+.dropdown-menu-wide {
+  width: 360px !important;
+  max-height: 500px !important;
+  overflow-y: auto;
+}
+
+/* Responsive adjustment */
+@media (max-width: 575.98px) {
+  .dropdown-menu-wide {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    min-width: 300px !important;
+  }
+}
+
+/* =================================================================
+   CHART WRAPPER HEIGHT UTILITIES
+   ================================================================= */
+
+.chart-height-sm {
+  height: 260px;
+}
+
+.chart-height-md {
+  height: 300px;
+}
+
+.chart-height-lg {
+  height: 350px;
+}
+
+/* Special chart wrapper with flex centering */
+.chart-wrapper-centered {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive chart heights */
+@media (max-width: 991.98px) {
+  .chart-height-sm { height: 220px !important; }
+  .chart-height-md { height: 240px !important; }
+  .chart-height-lg { height: 260px !important; }
+  .chart-wrapper-centered { height: 220px !important; }
+}
+
+@media (max-width: 767.98px) {
+  .chart-height-sm { height: 200px !important; }
+  .chart-height-md { height: 220px !important; }
+  .chart-height-lg { height: 240px !important; }
+  .chart-wrapper-centered { height: 200px !important; }
+}
+
+@media (max-width: 575.98px) {
+  .chart-height-sm { height: 180px !important; }
+  .chart-height-md { height: 200px !important; }
+  .chart-height-lg { height: 220px !important; }
+  .chart-wrapper-centered { height: 180px !important; }
+}
+
+/* =================================================================
+   ICON COLOR UTILITIES (Using CSS Variables)
+   ================================================================= */
+
+.icon-primary {
+  color: var(--color-primary);
+}
+
+.icon-secondary {
+  color: var(--color-secondary);
+}
+
+.icon-success {
+  color: var(--color-success);
+}
+
+.icon-warning {
+  color: var(--color-warning);
+}
+
+.icon-error {
+  color: var(--color-error);
+}
+
+.icon-info {
+  color: var(--color-info);
+}
+
+.icon-tertiary {
+  color: var(--color-text-tertiary);
+}
+
+/* =================================================================
+   FORM UTILITIES
+   ================================================================= */
+
+/* Compact select dropdowns for term units */
+.form-select-compact {
+  max-width: 120px;
+}
+
+/* =================================================================
+   SCROLLABLE LIST UTILITIES
+   ================================================================= */
+
+/* Scrollable list with max height (e.g., upcoming payments) */
+.list-scrollable {
+  overflow-y: auto;
+  max-height: 300px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile optimization */
+@media (max-width: 767.98px) {
+  .list-scrollable {
+    max-height: 200px !important;
+  }
+  
+  /* Add fade indicator at bottom */
+  .list-scrollable::after {
+    content: "";
+    position: sticky;
+    bottom: 0;
+    display: block;
+    height: 30px;
+    background: linear-gradient(transparent, var(--color-bg-2));
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .list-scrollable {
+    max-height: 180px !important;
+  }
+}
+
+/* =================================================================
+   CARD BORDER UTILITIES
+   ================================================================= */
+
+/* Warning-bordered card (for pending email bills) */
+.card-warning-border {
+  border: 2px solid var(--color-warning);
+  background: var(--color-bg-2);
+}
+
+/* Info card background */
+.card-bg-info {
+  background: var(--color-bg-3);
+  border-color: var(--color-border-subtle);
+}
+
+/* =================================================================
+   TEXT UTILITIES
+   ================================================================= */
+
+/* Prevent text wrapping */
+.text-no-wrap {
+  white-space: nowrap;
+}
+
+/* =================================================================
+   TABLE UTILITIES
+   ================================================================= */
+
+/* Specific column width percentages for budget table */
+.col-width-10 { width: 10%; }
+.col-width-13 { width: 13%; }
+.col-width-14 { width: 14%; }
+.col-width-15 { width: 15%; }
+.col-width-22 { width: 22%; }
+
+/* =================================================================
+   SPACING UTILITIES (Using CSS Variables)
+   ================================================================= */
+
+/* Card with share preview styling */
+.card-share-preview {
+  background: var(--color-bg-3);
+  border-color: var(--color-border-subtle);
+}
+
+/* Text color utilities */
+.text-color-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-color-tertiary {
+  color: var(--color-text-tertiary);
+}
+
+/* =================================================================
+   PROGRESS BAR UTILITIES
+   ================================================================= */
+
+/* Onboarding progress bar width */
+.progress-bar-width-0 { width: 0%; }
+
+/* Dynamic width set by JavaScript - just provide base styling */
+.onboarding-progress-bar {
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+/* =================================================================
+   BORDER UTILITIES
+   ================================================================= */
+
+/* Top border for separation */
+.border-top-separator {
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* =================================================================
+   LAYOUT UTILITIES
+   ================================================================= */
+
+/* Settings page max-width card */
+.card-max-width-md {
+  max-width: 700px;
+}
+
+/* Centered content */
+.content-centered {
+  margin: 0 auto;
+}
+
+/* =================================================================
+   TYPOGRAPHY UTILITIES
+   ================================================================= */
+
+/* Override default h5 styling for specific use cases */
+.heading-no-transform {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* =================================================================
+   BUTTON ALIGNMENT UTILITIES
+   ================================================================= */
+
+/* Center button groups */
+.button-group-centered {
+  justify-content: center;
+}
+
+/* =================================================================
+   ACCESSIBILITY
+   ================================================================= */
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* =================================================================
+   RESPONSIVE VISIBILITY UTILITIES
+   ================================================================= */
+
+/* Hide on mobile */
+@media (max-width: 575.98px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+@media (min-width: 576px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}

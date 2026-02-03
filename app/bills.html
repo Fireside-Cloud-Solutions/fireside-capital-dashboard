@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="assets/css/main.css?v=20260203" />
   
   <link rel="stylesheet" href="assets/css/components.css?v=20260203" />
-  <link rel="stylesheet" href="assets/css/responsive.css?v=20260203" />
+  <link rel="stylesheet" href="assets/css/responsive.css?v=20260203" />`n  <link rel="stylesheet" href="assets/css/utilities.css?v=20260203" />
   
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
@@ -92,7 +92,7 @@
       <div class="page-header">
         <div class="page-header-actions">
           <h2>Bills</h2>
-          <div id="pageActions" style="display: none;">
+          <div id="pageActions" class="initially-hidden">
             <div class="d-flex gap-2">
               <button class="btn btn-secondary" id="scanEmailBillsBtn" aria-label="Scan email for bills">
                 <i class="bi bi-envelope-check"></i> Scan Email for Bills
@@ -119,7 +119,7 @@
                   <i class="bi bi-bell"></i>
                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">0</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-wide" id="notificationList">
                   <li class="dropdown-header d-flex justify-content-between align-items-center">
                     <strong>Notifications</strong>
                     <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
@@ -143,15 +143,15 @@
         </div>
       </div>
 
-      <div id="dataContainer" style="visibility: hidden;">
+      <div id="dataContainer" class="data-hidden">
 
         <!-- Pending Email Bills Section -->
         <div id="pendingEmailBillsSection" class="d-none mb-4">
-          <div class="card" style="border: 2px solid var(--color-warning); background: var(--color-bg-2);">
+          <div class="card card-warning-border">
             <div class="card-body-padded">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  <h5 class="mb-1"><i class="bi bi-envelope-exclamation me-2" style="color: var(--color-warning);"></i>Pending Bills from Email</h5>
+                  <h5 class="mb-1"><i class="bi bi-envelope-exclamation me-2 icon-warning"></i>Pending Bills from Email</h5>
                   <p class="text-muted mb-0"><span id="pendingEmailCount">0</span> bills awaiting your review</p>
                 </div>
                 <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#emailReviewModal" id="reviewEmailBillsBtn" aria-label="Review pending bills from email">
@@ -225,7 +225,7 @@
 
         <!-- Shared With Me Section -->
         <div id="sharedWithMeSection" class="d-none">
-          <h4 class="mb-3"><i class="bi bi-share me-2" style="color: var(--color-info);"></i>Bills Shared With Me</h4>
+          <h4 class="mb-3"><i class="bi bi-share me-2 icon-info"></i>Bills Shared With Me</h4>
           <div class="table-card mb-4">
             <div class="table-responsive">
               <table class="table align-middle mb-0">
@@ -249,14 +249,14 @@
 
         <!-- Pending Shared Bills (awaiting my acceptance) -->
         <div id="pendingSharesSection" class="d-none">
-          <h4 class="mb-3"><i class="bi bi-hourglass-split me-2" style="color: var(--color-warning);"></i>Pending Shared Bills</h4>
+          <h4 class="mb-3"><i class="bi bi-hourglass-split me-2 icon-warning"></i>Pending Shared Bills</h4>
           <div id="pendingSharesContainer" class="row g-3 mb-4">
           </div>
         </div>
 
         <!-- Bills I'm Sharing (outgoing shares) -->
         <div id="mySharedBillsSection" class="d-none">
-          <h4 class="mb-3"><i class="bi bi-send me-2" style="color: var(--color-primary);"></i>Bills I'm Sharing</h4>
+          <h4 class="mb-3"><i class="bi bi-send me-2 icon-primary"></i>Bills I'm Sharing</h4>
           <div class="table-card mb-4">
             <div class="table-responsive">
               <table class="table align-middle mb-0">
@@ -335,7 +335,7 @@
             <!-- Financing/Loan Fields (shown only for financing, auto, housing types) -->
             <div id="financingFields" class="d-none">
               <hr class="my-3">
-              <h6 class="mb-3" style="color: var(--color-primary);"><i class="bi bi-bank me-1"></i> Loan Details</h6>
+              <h6 class="mb-3 icon-primary"><i class="bi bi-bank me-1"></i> Loan Details</h6>
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="billInterestRate" class="form-label">Interest Rate (APR %)</label>
@@ -351,7 +351,7 @@
                   <label class="form-label">Loan Term</label>
                   <div class="input-group">
                     <input type="number" class="form-control" id="billLoanTermValue" min="1" step="1" placeholder="e.g. 5">
-                    <select class="form-select" id="billLoanTermUnit" style="max-width: 110px;">
+                    <select class="form-select form-select-compact" id="billLoanTermUnit">
                       <option value="months">Months</option>
                       <option value="years">Years</option>
                     </select>
@@ -375,16 +375,16 @@
               <div class="row g-3 mt-2">
                 <div class="col-12">
                   <label class="form-label">Remaining Balance</label>
-                  <div id="remainingBalanceDisplay" class="form-control-plaintext fw-semibold" style="color: var(--color-primary); font-size: 1.1rem;">�</div>
+                  <div id="remainingBalanceDisplay" class="form-control-plaintext fw-semibold" class="icon-primary" style="font-size: 1.1rem;">�</div>
                 </div>
               </div>
               <div id="loanCalcPreview" class="mt-3 d-none">
-                <div class="card" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+                <div class="card" class="card-bg-info">
                   <div class="card-body py-2 px-3">
-                    <small style="color: var(--color-text-tertiary);">Calculated Monthly Payment: </small>
-                    <strong id="calcMonthlyPayment" style="color: var(--color-primary);">�</strong>
-                    <small class="ms-3" style="color: var(--color-text-tertiary);">Total Interest: </small>
-                    <strong id="calcTotalInterest" style="color: var(--color-secondary);">�</strong>
+                    <small class="text-color-tertiary">Calculated Monthly Payment: </small>
+                    <strong id="calcMonthlyPayment" class="icon-primary">�</strong>
+                    <small class="ms-3" class="text-color-tertiary">Total Interest: </small>
+                    <strong id="calcTotalInterest" class="icon-secondary">�</strong>
                   </div>
                 </div>
               </div>
@@ -654,14 +654,14 @@
             </div>
             <div id="fixedAmountError" class="text-danger small d-none">Amount exceeds the bill total.</div>
           </div>
-          <div class="card p-3 mt-3" style="background: var(--color-bg-3); border-color: var(--color-border-subtle);">
+          <div class="card p-3 mt-3" class="card-bg-info">
             <div class="d-flex justify-content-between">
-              <span style="color: var(--color-text-secondary);">Your portion:</span>
-              <strong id="sharePreviewOwner" style="color: var(--color-primary);">$0.00</strong>
+              <span class="text-color-secondary">Your portion:</span>
+              <strong id="sharePreviewOwner" class="icon-primary">$0.00</strong>
             </div>
             <div class="d-flex justify-content-between mt-1">
-              <span style="color: var(--color-text-secondary);">Their portion:</span>
-              <strong id="sharePreviewShared" style="color: var(--color-secondary);">$0.00</strong>
+              <span class="text-color-secondary">Their portion:</span>
+              <strong id="sharePreviewShared" class="icon-secondary">$0.00</strong>
             </div>
           </div>
         </div>
@@ -718,7 +718,7 @@
 
           <!-- Empty State -->
           <div id="emailReviewEmpty" class="text-center py-5 d-none">
-            <i class="bi bi-inbox" style="font-size: 3rem; color: var(--color-text-tertiary);"></i>
+            <i class="bi bi-inbox text-color-tertiary" style="font-size: 3rem;"></i>
             <p class="text-muted mt-3">No pending bills to review</p>
             <button class="btn btn-outline-primary mt-2" data-bs-dismiss="modal">Close</button>
           </div>
@@ -757,4 +757,13 @@
   </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
