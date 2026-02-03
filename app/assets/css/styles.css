@@ -2423,25 +2423,26 @@ main {
 }
 
 /* Welcome button: always stays on one line, vertically centered text.
-   Uses inline-flex + align-items:center for true centering that accounts
-   for borders (btn-outline-secondary has 1px border). */
+   Uses symmetric padding instead of fixed height to ensure perfect centering. */
 #userDropdown {
-  white-space: nowrap !important;
-  min-width: auto !important;
-  max-width: none !important;
-  width: auto !important;
-  height: 44px !important;
-  padding: 0 16px !important;
-  font-size: 13px !important;
-  line-height: normal !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  vertical-align: middle !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 10px 16px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  box-sizing: border-box !important;
   overflow: visible !important;
   text-overflow: unset !important;
   flex-shrink: 0 !important;
-  box-sizing: border-box !important;
+  vertical-align: middle !important;
+  min-width: auto !important;
+  max-width: none !important;
+  width: auto !important;
 }
 
 /* All spans inside welcome button — flex children, no extra line-height */
