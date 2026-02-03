@@ -1290,7 +1290,7 @@ strong {
    ================================================================= */
 
 #upcomingPaymentsList .border-bottom {
-  border-color: var(--color-border-subtle) !important;
+  border-color: var(--color-border-subtle);
 }
 
 #upcomingPaymentsList strong {
