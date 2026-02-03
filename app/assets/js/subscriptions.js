@@ -370,6 +370,12 @@ if (typeof document !== 'undefined') {
         // Load insights if on bills page
         if (document.getElementById('subscriptionInsights')) {
           renderSubscriptionInsights();
+          
+          // Check for ?filter=subscriptions URL parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('filter') === 'subscriptions') {
+            filterBillsToSubscriptions();
+          }
         }
       }
     }, 500);
