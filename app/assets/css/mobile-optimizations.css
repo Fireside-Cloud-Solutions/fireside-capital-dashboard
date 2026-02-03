@@ -54,6 +54,7 @@
     max-width: 100%;
     padding-left: var(--space-3);
     padding-right: var(--space-3);
+    padding-top: 76px !important; /* Space for fixed hamburger + bell/welcome row */
   }
   
   /* Fix container widths */
@@ -518,12 +519,17 @@
 
 @media (max-width: 991.98px) {
   /* ---- Hamburger toggle ---- */
-  /* Stay above sidebar (z-modal=400) so it's clickable to close */
+  /* FIXED: Must be position:fixed to align with bell/welcome */
   .sidebar-toggle {
+    position: fixed !important;
+    top: 12px !important;
+    left: 16px !important;
     z-index: 500 !important;
-    position: relative;
     width: 48px;
     height: 48px;
+    background: var(--color-bg-2);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
   }
 
   /* Center the hamburger/close icon properly */
@@ -541,6 +547,8 @@
   .sidebar {
     z-index: 400 !important;
     padding-top: 72px !important;
+    width: 85% !important; /* Use 85% width on mobile for better UX */
+    max-width: 320px !important; /* Cap at 320px on larger phones */
   }
   
   /* Ensure proper z-index stacking:
@@ -703,6 +711,12 @@
   .spinner-border-sm {
     width: 1rem;
     height: 1rem;
+  }
+  
+  /* Full-width sidebar on small screens to prevent content bleed */
+  .sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
