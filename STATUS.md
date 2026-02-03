@@ -14,7 +14,7 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| — | — | — | No active sub-agents |
+| Builder | builder-onboarding-flow | FC-010: Onboarding flow for new users (16h, large feature) | Running |
 
 ## Recently Completed (Today)
 
