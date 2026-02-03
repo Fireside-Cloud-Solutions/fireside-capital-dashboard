@@ -33,11 +33,14 @@
   .table-card,
   .bills-stats,
   .budget-header,
-  .page-header {
+  .page-header,
+  div[class*="card"] {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    flex-basis: 100% !important;
   }
   
   /* Fix Bootstrap column widths - force full width on mobile */
@@ -52,11 +55,17 @@
   .row > [class*="col-"] > .card,
   .row > [class*="col-"] > .dashboard-card,
   .row > [class*="col-"] > .stat-card,
-  .row > [class*="col-"] > .chart-card {
+  .row > [class*="col-"] > .chart-card,
+  .row > [class*="col-"] .card,
+  .row > [class*="col-"] .dashboard-card,
+  .row > [class*="col-"] .stat-card,
+  .row > [class*="col-"] .chart-card {
     width: 100% !important;
     max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    min-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    flex: 1 1 100% !important;
   }
   
   /* Ensure main content uses full width with proper padding */
@@ -589,6 +598,11 @@
     right: 16px;
     z-index: 1000; /* Same as hamburger for alignment */
     margin: 0 !important;
+  }
+  
+  /* Only apply flex when visible (not d-none) */
+  #loggedInState:not(.d-none),
+  #loggedOutState:not(.d-none) {
     display: flex !important;
     align-items: center;
     gap: 8px;
