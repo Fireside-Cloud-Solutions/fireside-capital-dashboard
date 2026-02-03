@@ -196,6 +196,90 @@ app.post('/api/transactions/sync', strictLimiter, async (req, res) => {
   }
 });
 
+// ===== AI CATEGORIZATION ENDPOINT =====
+
+/**
+ * POST /api/categorize-transaction
+ * Uses OpenAI to categorize a transaction based on merchant name and amount.
+ * 
+ * Body: { merchant_name: string, amount: number }
+ * Returns: { category: string, confidence: number }
+ */
+app.post('/api/categorize-transaction', strictLimiter, async (req, res) => {
+  try {
+    const { merchant_name, amount } = req.body;
+    
+    if (!merchant_name || amount === undefined) {
+      return res.status(400).json({ error: 'Missing merchant_name or amount' });
+    }
+    
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'YOUR_OPENAI_API_KEY') {
+      console.warn('[Categorizer] OpenAI API key not configured - using fallback');
+      return res.json({
+        category: 'other',
+        confidence: 0.5,
+        ai_generated: false,
+        note: 'OpenAI API key not configured'
+      });
+    }
+    
+    // Call OpenAI API
+    const prompt = `Categorize this transaction into ONE of these categories: dining, groceries, transportation, utilities, entertainment, shopping, healthcare, travel, bills, income, other.
+
+Merchant: ${merchant_name}
+Amount: $${Math.abs(amount).toFixed(2)}
+
+Respond with ONLY the category name (lowercase, one word).`;
+
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: 'You are a transaction categorization expert. Respond with only the category name.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 10
+      })
+    });
+    
+    if (!openaiResponse.ok) {
+      throw new Error(`OpenAI API error: ${openaiResponse.status} ${openaiResponse.statusText}`);
+    }
+    
+    const data = await openaiResponse.json();
+    const category = data.choices[0].message.content.trim().toLowerCase();
+    
+    // Validate category
+    const validCategories = ['dining', 'groceries', 'transportation', 'utilities', 'entertainment', 'shopping', 'healthcare', 'travel', 'bills', 'income', 'other'];
+    const finalCategory = validCategories.includes(category) ? category : 'other';
+    
+    // Calculate confidence (OpenAI doesn't provide this, so we estimate based on response quality)
+    const confidence = finalCategory === category ? 0.9 : 0.5;
+    
+    res.json({
+      category: finalCategory,
+      confidence,
+      ai_generated: true
+    });
+    
+  } catch (error) {
+    console.error('[Categorizer] Error calling OpenAI:', error);
+    res.status(500).json({ 
+      error: 'Categorization failed',
+      category: 'other',
+      confidence: 0.3,
+      ai_generated: false
+    });
+  }
+});
+
 // ===== START SERVER =====
 
 app.listen(3000, () => console.log('Server running on port 3000'));

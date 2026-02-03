@@ -1,7 +1,6 @@
 // categorizer.js - AI-Powered Transaction Categorization
-
-const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY';  // TODO: Move to backend for security
+// Security: OpenAI API calls are proxied through the backend (/api/categorize-transaction)
+//           to keep the API key secure. Never call OpenAI directly from frontend code.
 
 // Standard categories (must match transactions.js)
 const CATEGORIES = [
@@ -32,49 +31,31 @@ async function categorizeTransaction(transaction) {
       };
     }
     
-    // Use OpenAI for unknown merchants
-    const prompt = `Categorize this transaction into ONE of these categories: dining, groceries, transportation, utilities, entertainment, shopping, healthcare, travel, bills, income, other.
-
-Merchant: ${transaction.merchant_name || transaction.name}
-Amount: $${Math.abs(transaction.amount).toFixed(2)}
-
-Respond with ONLY the category name (lowercase, one word).`;
-
-    const response = await fetch(OPENAI_API_ENDPOINT, {
+    // Call backend categorization endpoint (keeps API key secure)
+    const response = await fetch('http://localhost:3000/api/categorize-transaction', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 10
+        merchant_name: transaction.merchant_name || transaction.name,
+        amount: transaction.amount
       })
     });
     
     if (!response.ok) {
-      console.warn('[Categorizer] OpenAI API error, falling back to "other"');
-      return { category: 'other', confidence: 0, ai_generated: false };
+      console.error(`[Categorizer] Backend error: ${response.status}`);
+      return {
+        category: 'other',
+        confidence: 0.3,
+        ai_generated: false
+      };
     }
     
-    const data = await response.json();
-    const category = data.choices[0].message.content.trim().toLowerCase();
+    const result = await response.json();
+    console.log(`[Categorizer] AI categorized "${transaction.merchant_name || transaction.name}" as "${result.category}" (confidence: ${result.confidence})`);
     
-    // Validate category
-    if (!CATEGORIES.includes(category)) {
-      console.warn(`[Categorizer] Invalid category "${category}", using "other"`);
-      return { category: 'other', confidence: 0, ai_generated: false };
-    }
-    
-    console.log(`[Categorizer] AI categorized "${transaction.merchant_name}" as "${category}"`);
-    
-    return {
-      category,
-      confidence: 0.8,
-      ai_generated: true
-    };
+    return result;
     
   } catch (error) {
     console.error('Categorization error:', error);
