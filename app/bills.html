@@ -183,8 +183,23 @@
           </div>
         </div>
 
+        <!-- Subscription Insights -->
+        <div id="subscriptionInsights" class="mb-4">
+          <!-- Populated by subscriptions.js -->
+        </div>
+
         <!-- Recurring Bills Table -->
-        <h4 class="mb-3"><i class="bi bi-receipt me-2"></i>Recurring Bills</h4>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Recurring Bills</h4>
+          <div class="btn-group" role="group" aria-label="Bill filters">
+            <button type="button" class="btn btn-sm btn-outline-secondary active" id="showAllBillsBtn" onclick="showAllBills()">
+              All Bills
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-warning" id="showSubscriptionsBtn" onclick="filterBillsToSubscriptions()">
+              <i class="bi bi-credit-card-2-front me-1"></i>Subscriptions Only
+            </button>
+          </div>
+        </div>
         <div class="table-card mb-4">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
@@ -516,6 +531,7 @@
   <script src="assets/js/app-polish-enhancements.js"></script>
   <script src="assets/js/notification-enhancements.js"></script>
   <script src="assets/js/plaid.js"></script>
+  <script src="assets/js/subscriptions.js"></script>
   <script src="assets/js/email-bills.js"></script>
   <script>
     // Initialize email bills feature after authentication

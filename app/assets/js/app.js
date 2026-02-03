@@ -820,6 +820,11 @@ async function renderAll() {
       updateDashboardCards();
       renderUpcomingPayments();
       
+      // Load subscription widget
+      if (typeof loadSubscriptionWidget === 'function') {
+        loadSubscriptionWidget();
+      }
+      
       // Performance: Load critical chart first (Net Worth is most important)
       await renderNetWorthChart();
       

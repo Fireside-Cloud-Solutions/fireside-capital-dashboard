@@ -255,6 +255,35 @@
           </div>
         </div>
 
+        <!-- Subscriptions Widget Row -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-12">
+            <div class="chart-card" id="subscriptionsWidget">
+              <h5>
+                <i class="bi bi-credit-card-2-front me-2" style="color: var(--color-warning);"></i>
+                Subscriptions
+                <span class="badge bg-secondary ms-2" id="subscriptionCount">0</span>
+              </h5>
+              
+              <div id="subscriptionsList" class="mt-3">
+                <!-- Populated by subscriptions.js -->
+                <div class="text-center py-3">
+                  <div class="spinner-border spinner-border-sm text-muted" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid var(--color-border-subtle);">
+                <strong>Total: <span id="subscriptionTotal">$0.00</span>/month</strong>
+                <a href="bills.html?filter=subscriptions" class="btn btn-sm btn-outline-secondary">
+                  View All <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Row 2: Upcoming + Net Worth Timeline + Cash Flow -->
         <div class="row g-3 g-xl-4 mb-4">
           <div class="col-xl-3 col-lg-12 col-md-12 col-12">
@@ -362,6 +391,7 @@
   <script src="assets/js/security-patch.js"></script>
   <script src="assets/js/app-polish-enhancements.js"></script>
   <script src="assets/js/plaid.js"></script>
+  <script src="assets/js/subscriptions.js"></script>
   <script src="assets/js/charts.js"></script>
 
   <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">

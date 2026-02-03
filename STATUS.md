@@ -14,7 +14,7 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| — | — | — | No active sub-agents |
+| Builder | builder-subscription-detection | Recurring subscription detection (competitor gap #2) | Running |
 
 ## Recently Completed (Today)
 

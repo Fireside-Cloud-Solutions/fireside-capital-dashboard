@@ -261,7 +261,7 @@ strong {
   height: 100vh;
   background-color: var(--color-bg-2);
   color: var(--color-text-primary);
-  padding-top: 0;
+  padding: 0;
   position: fixed;
   width: 260px;
   display: flex;
@@ -273,10 +273,17 @@ strong {
   overflow-y: auto;
 }
 
+/* Remove any potential margin/padding from sidebar children */
+.sidebar > div {
+  padding: 0;
+  margin: 0;
+}
+
 .sidebar .sidebar-brand {
   text-align: center;
   margin-bottom: var(--space-6);
   padding: var(--space-4) var(--space-4) 0 var(--space-4);
+  margin-top: 0;
 }
 
 .sidebar .sidebar-brand h4 {
@@ -289,6 +296,8 @@ strong {
   justify-content: center;
   gap: var(--space-2);
   margin: 0;
+  padding: 0;
+  line-height: 1;
 }
 
 .sidebar .sidebar-brand .sidebar-logo {
