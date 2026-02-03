@@ -17,6 +17,7 @@
 
 .logged-out-cta.show {
   display: block;
+  visibility: visible !important; /* Override dataContainer visibility:hidden */
 }
 
 .logged-out-cta-logo {
