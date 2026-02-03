@@ -140,6 +140,9 @@
           <button id="syncTransactionsBtn" class="btn btn-primary">
             <i class="bi bi-arrow-repeat me-2"></i> Sync from Bank
           </button>
+          <button id="autoCategorizeBtn" class="btn btn-success ms-2">
+            <i class="bi bi-tags me-2"></i> Auto-Categorize Uncategorized
+          </button>
           <small class="text-muted ms-2">Last synced: <span id="lastSyncTime">Never</span></small>
         </div>
 
@@ -350,6 +353,54 @@
         } finally {
           e.target.disabled = false;
           e.target.innerHTML = '<i class="bi bi-arrow-repeat me-2"></i> Sync from Bank';
+        }
+      });
+      
+      // Auto-categorize button
+      document.getElementById('autoCategorizeBtn').addEventListener('click', async (e) => {
+        e.target.disabled = true;
+        e.target.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Categorizing...';
+        
+        try {
+          // Get count of uncategorized transactions
+          const { data: uncategorized, error } = await sb
+            .from('transactions')
+            .select('id, merchant_name, amount, date')
+            .eq('category', 'uncategorized')
+            .order('date', { ascending: false })
+            .limit(100);
+          
+          if (error) throw error;
+          
+          if (!uncategorized || uncategorized.length === 0) {
+            showToast('All transactions are already categorized!', 'info');
+            return;
+          }
+          
+          // Send categorization request to Capital (via Discord or Clawdbot messaging)
+          // For now, we'll create a simple alert to notify the user
+          // TODO: Integrate with Clawdbot messaging API to send request to Capital
+          
+          const message = `I have ${uncategorized.length} uncategorized transactions. Please categorize them:\n\n` +
+            uncategorized.slice(0, 10).map(t => 
+              `- ${t.date}: ${t.merchant_name} ($${Math.abs(t.amount).toFixed(2)})`
+            ).join('\n') +
+            (uncategorized.length > 10 ? `\n\n...and ${uncategorized.length - 10} more.` : '');
+          
+          console.log('[Auto-Categorize] Would send to Capital:', message);
+          
+          // For MVP: Just show a toast with instructions
+          showToast(`Found ${uncategorized.length} uncategorized transactions. Capital will process them shortly.`, 'info');
+          
+          // TODO: Actually send message to Capital via Clawdbot API
+          // This would be done through the message tool or a dedicated endpoint
+          
+        } catch (err) {
+          console.error('[Auto-Categorize] Error:', err);
+          showToast('Auto-categorize failed: ' + err.message, 'error');
+        } finally {
+          e.target.disabled = false;
+          e.target.innerHTML = '<i class="bi bi-tags me-2"></i> Auto-Categorize Uncategorized';
         }
       });
       

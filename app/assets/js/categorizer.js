@@ -1,6 +1,6 @@
-// categorizer.js - AI-Powered Transaction Categorization
-// Security: OpenAI API calls are proxied through the backend (/api/categorize-transaction)
-//           to keep the API key secure. Never call OpenAI directly from frontend code.
+// categorizer.js - Transaction Categorization (Pattern Matching + Capital AI Agent)
+// Uses learned patterns to categorize known merchants instantly.
+// Uncategorized transactions are processed by Capital (Clawdbot AI agent) on demand.
 
 // Standard categories (must match transactions.js)
 const CATEGORIES = [
@@ -14,10 +14,17 @@ const CATEGORIES = [
   'travel',
   'bills',
   'income',
-  'other'
+  'other',
+  'uncategorized'
 ];
 
-// Categorize a single transaction using OpenAI
+/**
+ * Categorize a single transaction using learned patterns only.
+ * Does NOT call external APIs - uncategorized transactions are handled by Capital.
+ * 
+ * @param {Object} transaction - Transaction object with merchant_name, amount, etc.
+ * @returns {Object} { category, confidence, ai_generated }
+ */
 async function categorizeTransaction(transaction) {
   try {
     // Check for learned patterns first
@@ -31,35 +38,21 @@ async function categorizeTransaction(transaction) {
       };
     }
     
-    // Call backend categorization endpoint (keeps API key secure)
-    const response = await fetch('http://localhost:3000/api/categorize-transaction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        merchant_name: transaction.merchant_name || transaction.name,
-        amount: transaction.amount
-      })
-    });
-    
-    if (!response.ok) {
-      console.error(`[Categorizer] Backend error: ${response.status}`);
-      return {
-        category: 'other',
-        confidence: 0.3,
-        ai_generated: false
-      };
-    }
-    
-    const result = await response.json();
-    console.log(`[Categorizer] AI categorized "${transaction.merchant_name || transaction.name}" as "${result.category}" (confidence: ${result.confidence})`);
-    
-    return result;
+    // No pattern found - mark as uncategorized for Capital to process later
+    console.log(`[Categorizer] No pattern for "${transaction.merchant_name}" - marking uncategorized`);
+    return {
+      category: 'uncategorized',
+      confidence: 0.0,
+      ai_generated: false
+    };
     
   } catch (error) {
-    console.error('Categorization error:', error);
-    return { category: 'other', confidence: 0, ai_generated: false };
+    console.error('[Categorizer] Error checking patterns:', error);
+    return {
+      category: 'uncategorized',
+      confidence: 0.0,
+      ai_generated: false
+    };
   }
 }
 
