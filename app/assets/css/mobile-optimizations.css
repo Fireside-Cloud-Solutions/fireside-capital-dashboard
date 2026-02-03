@@ -116,13 +116,19 @@
     padding: var(--space-4) var(--space-3);
   }
 
+  /* Fix: table-card overflow:hidden clips table scroll — override on mobile */
+  .table-card {
+    overflow: visible !important;
+  }
+
   /* Tables must scroll horizontally */
   .table-responsive {
     display: block;
     width: 100%;
-    overflow-x: auto;
+    overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 1rem;
+    border-radius: 12px; /* Preserve rounded corners here since table-card overflow is visible */
   }
 
   .table {
