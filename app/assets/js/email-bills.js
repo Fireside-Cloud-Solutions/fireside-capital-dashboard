@@ -5,6 +5,10 @@
  * and approval/rejection workflow.
  */
 
+// Debug mode (set to true for development logging)
+const DEBUG_EMAIL_BILLS = false;
+function debugLog(...args) { if (DEBUG_EMAIL_BILLS) console.log('[Email Bills]', ...args); }
+
 // ===== STATE =====
 let pendingEmailBills = [];
 let selectedBillIds = new Set();
@@ -111,7 +115,7 @@ async function storePendingBills(bills) {
     throw new Error(`Failed to save bills: ${error.message}`);
   }
 
-  console.log(`[Email Bills] Stored ${data.length} pending bills`);
+  debugLog(`Stored ${data.length} pending bills`);
   return data;
 }
 

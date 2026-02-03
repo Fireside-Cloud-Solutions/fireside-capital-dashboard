@@ -2,6 +2,10 @@
 // Uses learned patterns to categorize known merchants instantly.
 // Uncategorized transactions are processed by Capital (Clawdbot AI agent) on demand.
 
+// Debug mode (set to true for development logging)
+const DEBUG_CATEGORIZER = false;
+function debugLog(...args) { if (DEBUG_CATEGORIZER) console.log('[Categorizer]', ...args); }
+
 // Standard categories (must match transactions.js)
 const CATEGORIES = [
   'dining',
@@ -30,7 +34,7 @@ async function categorizeTransaction(transaction) {
     // Check for learned patterns first
     const learned = await checkLearnedPattern(transaction.merchant_name);
     if (learned) {
-      console.log(`[Categorizer] Using learned pattern for "${transaction.merchant_name}": ${learned.category}`);
+      debugLog(`Using learned pattern for "${transaction.merchant_name}": ${learned.category}`);
       return {
         category: learned.category,
         confidence: learned.confidence,
@@ -39,7 +43,7 @@ async function categorizeTransaction(transaction) {
     }
     
     // No pattern found - mark as uncategorized for Capital to process later
-    console.log(`[Categorizer] No pattern for "${transaction.merchant_name}" - marking uncategorized`);
+    debugLog(`No pattern for "${transaction.merchant_name}" - marking uncategorized`);
     return {
       category: 'uncategorized',
       confidence: 0.0,
@@ -58,7 +62,7 @@ async function categorizeTransaction(transaction) {
 
 // Batch categorize multiple transactions
 async function categorizeTransactionsBatch(transactions) {
-  console.log(`[Categorizer] Categorizing ${transactions.length} transactions...`);
+  debugLog(`Categorizing ${transactions.length} transactions...`);
   const results = [];
   
   for (const t of transactions) {
@@ -73,7 +77,7 @@ async function categorizeTransactionsBatch(transactions) {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  console.log(`[Categorizer] Categorization complete`);
+  debugLog('Categorization complete');
   return results;
 }
 
@@ -124,7 +128,7 @@ async function learnCategoryPattern(transactionId, category) {
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '');
     
-    console.log(`[Categorizer] Learning pattern: "${merchantPattern}" -> ${category}`);
+    debugLog(`Learning pattern: "${merchantPattern}" -> ${category}`);
     
     // Check if pattern already exists
     const { data: existing } = await sb
@@ -159,9 +163,9 @@ async function learnCategoryPattern(transactionId, category) {
         });
     }
     
-    console.log(`[Categorizer] Pattern learned successfully`);
+    debugLog('Pattern learned successfully');
     
   } catch (error) {
-    console.error('Learn pattern error:', error);
+    console.error('[Categorizer] Learn pattern error:', error);
   }
 }

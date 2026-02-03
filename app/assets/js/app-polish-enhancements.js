@@ -255,8 +255,6 @@ function initializePolishEnhancements() {
   setupDoubleSubmitPrevention();
   initializeTooltips();
   makeTablesResponsive();
-  
-  console.log('✨ Polish enhancements initialized');
 }
 
 // Run on DOMContentLoaded

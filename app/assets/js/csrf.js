@@ -2,6 +2,10 @@
 // This module provides CSRF token generation and validation for all state-changing operations
 
 const CSRF = (function() {
+  // Debug mode (set to true for development logging)
+  const DEBUG_CSRF = false;
+  function debugLog(...args) { if (DEBUG_CSRF) console.log('[CSRF]', ...args); }
+  
   const CSRF_TOKEN_KEY = 'csrfToken';
   const TOKEN_EXPIRY_MS = 3600000; // 1 hour
   const TOKEN_EXPIRY_KEY = 'csrfTokenExpiry';
@@ -29,7 +33,7 @@ const CSRF = (function() {
       const token = generateCSRFToken();
       sessionStorage.setItem(CSRF_TOKEN_KEY, token);
       sessionStorage.setItem(TOKEN_EXPIRY_KEY, (now + TOKEN_EXPIRY_MS).toString());
-      console.log('CSRF token generated');
+      debugLog('CSRF token generated');
       return token;
     }
 
@@ -128,7 +132,7 @@ const CSRF = (function() {
       addTokenToForm(formId);
     });
 
-    console.log(`CSRF protection applied to ${protectedFormIds.length} forms`);
+    debugLog(`CSRF protection applied to ${protectedFormIds.length} forms`);
   }
 
   /**
@@ -180,7 +184,7 @@ const CSRF = (function() {
   function clearToken() {
     sessionStorage.removeItem(CSRF_TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
-    console.log('CSRF token cleared');
+    debugLog('CSRF token cleared');
   }
 
   // Auto-initialize on module load
