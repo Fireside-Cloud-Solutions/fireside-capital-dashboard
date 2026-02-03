@@ -14,7 +14,7 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-subscription-detection | Recurring subscription detection (competitor gap #2) | Running |
+| Builder | builder-transaction-categorization | Transaction auto-categorization with OpenAI (competitor gap #1, multi-phase) | Running |
 
 ## Recently Completed (Today)
 

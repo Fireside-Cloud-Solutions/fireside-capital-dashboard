@@ -90,6 +90,12 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | MOB-005 | Feature | P3 | L | Backlog | Push notifications for payment reminders |
 | MOB-006 | Chore | P3 | M | Backlog | App Store / Play Store submission prep |
 
+### Transaction Management
+
+| ID | Type | Priority | Size | Status | Title |
+|----|------|----------|------|--------|-------|
+| TRANS-001 | Feature | P1 | XL | In Progress | Transaction auto-categorization system (Phase 1 complete: DB schema) |
+
 ### EPIC-003: Email Intelligence
 
 | ID | Type | Priority | Size | Status | Title |
