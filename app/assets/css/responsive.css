@@ -828,7 +828,7 @@ body.sidebar-open {
     transform: none !important;
     border: none !important;
     border-top: 1px solid var(--color-border-subtle) !important;
-    box-shadow: none !important;
+    box-shadow: none;
     min-width: 0 !important;
     
     /* FIX: Add touch scroll optimization */
