@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-03 (QA audit findings added)
+**Last Updated:** 2026-02-03 (Data import feature added)
 
 ---
 
@@ -71,13 +71,14 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-016 | Bug | P1 | L | Done | CSS file loading order conflicts causing style override battles |
 | FC-017 | Bug | P1 | M | Done | Responsive breakpoint inconsistencies — custom breakpoints don't align with Bootstrap |
 | FC-018 | Bug | P1 | S | Done | Missing aria-labels on icon-only buttons (accessibility) |
-| FC-019 | Bug | P2 | M | Backlog | Inline styles in HTML preventing responsive CSS overrides |
+| FC-019 | Bug | P2 | M | Done | Inline styles in HTML preventing responsive CSS overrides |
 | FC-020 | Bug | P2 | XS | Done | JavaScript debug code left in production (console pollution) |
 | FC-021 | Bug | P2 | XS | Done | Empty state icons too large on mobile devices |
 | FC-022 | Chore | P3 | S | Backlog | Duplicate/redundant CSS rules bloating stylesheet |
 | FC-023 | Chore | P3 | XS | Done | Commented-out code left in CSS files |
 | FC-024 | Chore | P3 | M | Backlog | Magic numbers in CSS — replace with CSS custom properties |
 | FC-025 | Chore | P2 | M | Done | Database enum normalization — standardize type/frequency field casing |
+| FC-026 | Feature | P1 | XL | Backlog | Data import system — YNAB budget import + spreadsheet uploads with column mapping |
 
 ### EPIC-002: Mobile Application
 
@@ -94,7 +95,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 
 | ID | Type | Priority | Size | Status | Title |
 |----|------|----------|------|--------|-------|
-| TRANS-001 | Feature | P1 | XL | In Progress | Transaction auto-categorization system (Phase 1 complete: DB schema) |
+| TRANS-001 | Feature | P1 | XL | Done | Transaction auto-categorization system (Phases 1-4 complete: DB schema, Plaid import, AI categorization, UI page) |
 
 ### EPIC-003: Email Intelligence
 

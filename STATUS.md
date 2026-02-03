@@ -14,12 +14,16 @@ All core functionality, security, accessibility, and UX issues have been resolve
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-transaction-phases-2-3 | Transaction Phases 2-3: Plaid import + AI categorization (OpenAI integration) | Running |
+| None | - | - | Idle |
 
 ## Recently Completed (Today)
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Builder | builder-capital-categorization | TRANS-001 Phase 4b: Refactor to Capital AI categorization (removed external API) | ✅ Complete (commit 5a6976f) |
+| Builder | builder-secure-categorizer | TRANS-001 Phase 4a: Move OpenAI API key to backend | ✅ Complete (commit 2926686) |
+| Builder | builder-transactions-ui-phase4 | TRANS-001 Phase 4: transactions.html UI page | ✅ Complete (commits 4076a47, 2ca7528) |
+| Builder | builder-transaction-phases-2-3 | TRANS-001 Phases 2-3: Plaid import + AI categorization | ✅ Complete (commit fa99b5b) |
 | Builder | builder-onboarding-flow | FC-010: Onboarding flow for new users (5-step wizard + feature tour) | ✅ Complete (commit 5887543, migration 001) |
 | Capital | fc-009-competitor-research | Competitor analysis (Mint, YNAB, Monarch, Copilot, Lunch Money) | ✅ Complete (report in reports/) |
 | Builder | builder-dashboard-viz-improvements | FC-011 Dashboard viz improvements (time filters, asset allocation, DTI gauge, projections) | ✅ Complete (commit 05f9c1e) |
