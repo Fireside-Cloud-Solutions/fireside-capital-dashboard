@@ -1208,17 +1208,10 @@ async function deleteDebtConfirmed() {
 }
 
 // --- BILLS ---
-// Category badge color mapping for bill types
+// Category badge styling - single neutral color for all categories (per boss feedback)
+// Replaced colored badges with clean, minimal design
 function getCategoryBadgeClass(type) {
-  switch ((type || '').toLowerCase()) {
-    case 'housing':       return 'bg-primary';           // blue
-    case 'utilities':     return 'bg-info text-dark';    // teal/cyan
-    case 'auto':          return 'bg-warning text-dark'; // orange
-    case 'financing':     return 'bg-purple';            // purple (custom)
-    case 'subscriptions': return 'bg-indigo';            // indigo/violet (custom)
-    case 'health':        return 'bg-success';           // green (reserved)
-    default:              return 'bg-secondary';         // fallback grey
-  }
+  return 'bg-secondary text-white';  // Single neutral badge for all categories
 }
 
 // Financing metadata for payoff tracking (used until DB schema has these columns)
