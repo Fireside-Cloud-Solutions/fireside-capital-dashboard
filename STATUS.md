@@ -8,7 +8,7 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-mobile-fix-remaining-pages | Apply mobile fixes to all 9 remaining HTML pages (assets, bills, budget, debts, friends, income, investments, reports, settings) | 🔄 Running |
+| Builder | builder-sync-critical-css | Sync critical inline CSS with external CSS (add !important to top, add margin) on all 10 HTML files | 🔄 Running |
 | Builder | builder-fix-critical-audit-issues | Fix critical audit issues (welcome message bug, empty chart states, debug logging) | 🔄 Running |
 
 ## Recently Completed
