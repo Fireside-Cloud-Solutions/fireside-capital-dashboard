@@ -1,0 +1,393 @@
+/* =================================================================
+   FIRESIDE CAPITAL - ONBOARDING STYLES
+   Multi-step onboarding wizard for new users
+   ================================================================= */
+
+/* Onboarding Modal Wrapper */
+#onboardingModal .modal-dialog {
+  max-width: 600px;
+  margin: 1.75rem auto;
+}
+
+#onboardingModal .modal-content {
+  background: var(--color-bg-2, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+#onboardingModal .modal-header {
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+  padding: 24px;
+}
+
+#onboardingModal .modal-body {
+  padding: 32px 24px;
+}
+
+#onboardingModal .modal-footer {
+  border-top: 1px solid var(--color-border, #2a2a2a);
+  padding: 24px;
+}
+
+/* Progress Bar */
+.onboarding-progress {
+  margin-bottom: 24px;
+}
+
+.onboarding-progress-text {
+  font-size: 14px;
+  color: var(--color-text-secondary, #a0a0a0);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.onboarding-progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background: var(--color-bg-3, #2a2a2a);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.onboarding-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #01a4ef, #f44e24);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Step Container */
+.onboarding-step {
+  display: none;
+  animation: fadeIn 0.2s ease;
+}
+
+.onboarding-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Step 1: Welcome Screen */
+.onboarding-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.onboarding-logo svg {
+  width: 80px;
+  height: 72px;
+}
+
+.onboarding-welcome-title {
+  font-family: var(--font-heading, 'Source Serif 4', serif);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f0f0f0);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.onboarding-welcome-description {
+  font-size: 16px;
+  color: var(--color-text-secondary, #a0a0a0);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.onboarding-welcome-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Step 2: Profile Setup */
+.onboarding-heading {
+  font-family: var(--font-heading, 'Source Serif 4', serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f0f0f0);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.onboarding-form-group {
+  margin-bottom: 20px;
+}
+
+.onboarding-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f0f0f0);
+  margin-bottom: 8px;
+}
+
+.onboarding-form-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--color-text-primary, #f0f0f0);
+  background: var(--color-bg-3, #2a2a2a);
+  border: 1px solid var(--color-border, #3a3a3a);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.onboarding-form-input:focus {
+  outline: none;
+  border-color: var(--color-primary, #01a4ef);
+  box-shadow: 0 0 0 3px rgba(1, 164, 239, 0.1);
+}
+
+.onboarding-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.onboarding-skip-link {
+  font-size: 14px;
+  color: var(--color-text-secondary, #a0a0a0);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.onboarding-skip-link:hover {
+  color: var(--color-text-primary, #f0f0f0);
+  text-decoration: underline;
+}
+
+/* Step 3: Quick Start Cards */
+.onboarding-quick-start-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.onboarding-quick-start-card {
+  background: var(--color-bg-3, #2a2a2a);
+  border: 2px solid var(--color-border, #3a3a3a);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.onboarding-quick-start-card:hover {
+  border-color: var(--color-primary, #01a4ef);
+  background: var(--color-bg-2, #1a1a1a);
+  transform: translateY(-2px);
+}
+
+.onboarding-quick-start-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--color-primary, #01a4ef);
+}
+
+.onboarding-quick-start-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f0f0f0);
+  margin-bottom: 4px;
+}
+
+.onboarding-quick-start-description {
+  font-size: 13px;
+  color: var(--color-text-secondary, #a0a0a0);
+  line-height: 1.4;
+}
+
+/* Step 4: Feature Tour */
+.onboarding-tour-illustration {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.onboarding-tour-illustration svg {
+  width: 120px;
+  height: 120px;
+  opacity: 0.8;
+}
+
+.onboarding-tour-description {
+  font-size: 16px;
+  color: var(--color-text-secondary, #a0a0a0);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* Step 5: Success */
+.onboarding-success-icon {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 80px;
+  color: var(--color-success, #81b900);
+}
+
+.onboarding-success-title {
+  font-family: var(--font-heading, 'Source Serif 4', serif);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f0f0f0);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.onboarding-success-message {
+  font-size: 16px;
+  color: var(--color-text-secondary, #a0a0a0);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 767px) {
+  #onboardingModal .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  
+  #onboardingModal .modal-body {
+    padding: 24px 16px;
+  }
+  
+  .onboarding-welcome-title,
+  .onboarding-success-title {
+    font-size: 24px;
+  }
+  
+  .onboarding-heading {
+    font-size: 20px;
+  }
+  
+  .onboarding-quick-start-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .onboarding-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .onboarding-actions .btn {
+    width: 100%;
+  }
+  
+  .onboarding-skip-link {
+    margin-top: 16px;
+  }
+}
+
+/* =================================================================
+   FEATURE TOUR STYLES
+   Interactive tooltips with spotlight highlighting
+   ================================================================= */
+
+/* Tour Overlay (darkens background) */
+.tour-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9998;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Tour Spotlight (highlights target element) */
+.tour-spotlight {
+  position: absolute;
+  border: 3px solid var(--color-primary, #01a4ef);
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75),
+              0 0 20px rgba(1, 164, 239, 0.6);
+  z-index: 9999;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* Tour Tooltip */
+.tour-tooltip {
+  position: absolute;
+  background: var(--color-bg-2, #1a1a1a);
+  border: 1px solid var(--color-primary, #01a4ef);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 320px;
+  z-index: 10000;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+}
+
+.tour-tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tour-tooltip-title {
+  font-family: var(--font-heading, 'Source Serif 4', serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f0f0f0);
+  margin: 0;
+}
+
+.tour-tooltip-progress {
+  font-size: 12px;
+  color: var(--color-text-secondary, #a0a0a0);
+  background: var(--color-bg-3, #2a2a2a);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.tour-tooltip-description {
+  font-size: 14px;
+  color: var(--color-text-secondary, #a0a0a0);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.tour-tooltip-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Tour Mobile Responsiveness */
+@media (max-width: 767px) {
+  .tour-tooltip {
+    max-width: calc(100% - 32px);
+    left: 16px !important;
+    right: 16px !important;
+    width: auto;
+  }
+  
+  .tour-tooltip-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .tour-tooltip-actions .btn {
+    width: 100%;
+  }
+}

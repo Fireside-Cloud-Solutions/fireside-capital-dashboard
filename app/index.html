@@ -26,6 +26,7 @@
   
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
+  <link rel="stylesheet" href="assets/css/onboarding.css" />
   
   <!-- Performance: Chart.js removed from head - will be lazy loaded when needed -->
   <style>
@@ -530,6 +531,138 @@
       </div>
     </div>
   </div>
+
+  <!-- Onboarding Wizard Modal -->
+  <div class="modal fade" id="onboardingModal" tabindex="-1" aria-labelledby="onboardingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          
+          <!-- Progress Bar (shown on steps 2-4) -->
+          <div class="onboarding-progress" id="onboardingProgress" style="display: none;">
+            <div class="onboarding-progress-text" id="onboardingProgressText">Step 1 of 4</div>
+            <div class="onboarding-progress-bar-container">
+              <div class="onboarding-progress-bar" id="onboardingProgressBar" style="width: 25%;" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
+          <!-- Step 1: Welcome Screen -->
+          <div class="onboarding-step active" id="onboardingStep1">
+            <div class="onboarding-logo">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="127 428 192 175" width="80" height="72" aria-label="Fireside Capital">
+                <polygon fill="#01a4ef" points="238.76 514.38 316.17 515.82 308.3 533.37 247.89 533.13 240.68 547.55 296.93 548.51 268.09 600.44 188.79 600.44 198.37 581.69 257.99 581.69 266.16 566.3 208.47 566.3 238.76 514.38"/>
+                <polygon fill="#f44e24" points="170.25 430 218.6 514.38 180.1 584.09 168.08 565.34 197.41 515.82 187.97 500.68 158.87 547.04 148.37 531.21 178.18 482.65 169.11 465.19 138.92 513.43 129.14 498.51 170.25 430"/>
+                <path fill="#81b900" d="M287.56,430H227.94l29.67,52.17H239.24L210.08,430H190.16l37,68h98.66ZM258,448.2h18.6l19.4,34H277Z"/>
+              </svg>
+            </div>
+            <h2 class="onboarding-welcome-title">Welcome to Fireside Capital!</h2>
+            <p class="onboarding-welcome-description">
+              Let's get your finances organized. Track your assets, manage bills, monitor investments, and achieve your financial goals—all in one place.
+            </p>
+            <div class="onboarding-welcome-actions">
+              <button type="button" class="btn btn-lg btn-primary" onclick="onboardingGetStarted()">Get Started</button>
+              <button type="button" class="btn btn-lg btn-outline-secondary" onclick="onboardingSkipWelcome()">Skip for now</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Profile Setup -->
+          <div class="onboarding-step" id="onboardingStep2">
+            <h3 class="onboarding-heading">Tell us about yourself</h3>
+            <div class="onboarding-form-group">
+              <label for="onboardingFirstName" class="onboarding-form-label">First Name <span class="text-muted">(optional)</span></label>
+              <input type="text" class="onboarding-form-input" id="onboardingFirstName" placeholder="Enter your first name">
+            </div>
+            <div class="onboarding-form-group">
+              <label for="onboardingLastName" class="onboarding-form-label">Last Name <span class="text-muted">(optional)</span></label>
+              <input type="text" class="onboarding-form-input" id="onboardingLastName" placeholder="Enter your last name">
+            </div>
+            <div class="onboarding-form-group">
+              <label for="onboardingEmergencyFund" class="onboarding-form-label">Emergency Fund Goal <span class="text-muted">(optional)</span></label>
+              <input type="number" class="onboarding-form-input" id="onboardingEmergencyFund" placeholder="10000" value="10000">
+            </div>
+            <div class="onboarding-actions">
+              <a href="#" class="onboarding-skip-link" onclick="onboardingSkipProfile(); return false;">Skip this step</a>
+              <button type="button" class="btn btn-primary" onclick="onboardingContinueProfile()">Continue</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Quick Start Options -->
+          <div class="onboarding-step" id="onboardingStep3">
+            <h3 class="onboarding-heading">What would you like to set up first?</h3>
+            <div class="onboarding-quick-start-grid">
+              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('connect-bank')">
+                <div class="onboarding-quick-start-icon">
+                  <i class="bi bi-bank2"></i>
+                </div>
+                <div class="onboarding-quick-start-title">Connect Bank Account</div>
+                <div class="onboarding-quick-start-description">Link your bank for automatic tracking</div>
+              </div>
+              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('add-asset')">
+                <div class="onboarding-quick-start-icon">
+                  <i class="bi bi-house-door"></i>
+                </div>
+                <div class="onboarding-quick-start-title">Add an Asset</div>
+                <div class="onboarding-quick-start-description">Real estate, vehicle, or other</div>
+              </div>
+              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('add-bill')">
+                <div class="onboarding-quick-start-icon">
+                  <i class="bi bi-receipt"></i>
+                </div>
+                <div class="onboarding-quick-start-title">Track a Bill</div>
+                <div class="onboarding-quick-start-description">Recurring expenses and payments</div>
+              </div>
+              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('add-income')">
+                <div class="onboarding-quick-start-icon">
+                  <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="onboarding-quick-start-title">Add Income</div>
+                <div class="onboarding-quick-start-description">Salary or other income source</div>
+              </div>
+            </div>
+            <div class="onboarding-actions">
+              <a href="#" class="onboarding-skip-link" onclick="onboardingSkipQuickStart(); return false;">I'll do this later</a>
+            </div>
+          </div>
+
+          <!-- Step 4: Feature Tour -->
+          <div class="onboarding-step" id="onboardingStep4">
+            <h3 class="onboarding-heading">Want a quick tour?</h3>
+            <div class="onboarding-tour-illustration">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="120" height="120">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+            </div>
+            <p class="onboarding-tour-description">
+              We'll highlight key features with a 2-minute interactive guide to help you get started.
+            </p>
+            <div class="onboarding-actions">
+              <button type="button" class="btn btn-outline-secondary" onclick="onboardingSkipTour()">Skip Tour</button>
+              <button type="button" class="btn btn-primary" onclick="onboardingStartTour()">Start Tour</button>
+            </div>
+          </div>
+
+          <!-- Step 5: Success -->
+          <div class="onboarding-step" id="onboardingStep5">
+            <div class="onboarding-success-icon">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h2 class="onboarding-success-title">You're all set!</h2>
+            <p class="onboarding-success-message">
+              Your dashboard is ready. You can always add more items from the menu or explore the different sections.
+            </p>
+            <div class="onboarding-actions" style="justify-content: center;">
+              <button type="button" class="btn btn-lg btn-primary" onclick="onboardingComplete()">Go to Dashboard</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Scripts -->
+  <script src="assets/js/onboarding.js"></script>
+  <script src="assets/js/tour.js"></script>
 </body>
 
 </html>

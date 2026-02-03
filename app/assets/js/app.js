@@ -694,6 +694,41 @@ async function logout() {
   }
 }
 
+// ===== ONBOARDING CHECK =====
+async function checkOnboardingStatus() {
+  if (!currentUser) return;
+  
+  // Only check onboarding on the dashboard (index.html)
+  const currentPage = window.location.pathname.split('/').pop();
+  if (currentPage !== 'index.html' && currentPage !== '') return;
+  
+  // Check if user has any data
+  const hasAssets = (window.assets || []).length > 0;
+  const hasBills = (window.bills || []).length > 0;
+  const hasIncome = (window.income || []).length > 0;
+  const hasInvestments = (window.investments || []).length > 0;
+  const hasDebts = (window.debts || []).length > 0;
+  
+  const hasData = hasAssets || hasBills || hasIncome || hasInvestments || hasDebts;
+  
+  // Check onboarding flag in settings
+  const settings = window.settings || {};
+  const onboardingDone = settings.onboarding_completed || false;
+  
+  // Show onboarding if user has no data and hasn't completed onboarding
+  if (!hasData && !onboardingDone) {
+    debugLog("ONBOARDING: Showing wizard for new user");
+    // Small delay to ensure DOM is fully ready
+    setTimeout(() => {
+      if (typeof showOnboardingWizard === 'function') {
+        showOnboardingWizard();
+      } else {
+        console.warn('showOnboardingWizard function not found');
+      }
+    }, 500);
+  }
+}
+
 // ===== CORE DATA & RENDER FUNCTIONS =====
 // --- THE DEBUGGING FUNCTION ---
 async function fetchAllDataFromSupabase(forceRefresh = false) {
@@ -3412,6 +3447,8 @@ function init() {
         initNotifications();
         loadSharedBillsData();
         loadFriendsPage();
+        // Check if onboarding should be shown
+        checkOnboardingStatus();
       });
 
     } else {
