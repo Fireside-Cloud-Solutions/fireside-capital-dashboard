@@ -25,13 +25,22 @@
   <link rel="stylesheet" href="assets/css/brand-polish.css" />
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   <style>
-    /* Critical inline: prevent layout shift on mobile auth elements */
+    /* Critical inline: prevent layout shift on mobile nav elements */
     @media (max-width: 991.98px) {
+      /* Hamburger: fixed position from first render to prevent snap */
+      .sidebar-toggle {
+        position: fixed !important;
+        top: max(12px, env(safe-area-inset-top)) !important;
+        left: 16px !important;
+        z-index: 1000 !important;
+      }
+      
+      /* Auth elements: fixed position from first render */
       #loggedInState, #loggedOutState {
         position: fixed !important;
-        top: 12px;
+        top: max(12px, env(safe-area-inset-top));
         right: 16px;
-        z-index: 500;
+        z-index: 1000;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;

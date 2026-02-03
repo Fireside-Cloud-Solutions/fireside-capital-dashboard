@@ -8,14 +8,14 @@
 
 | Agent | Label | Task | Status |
 |-------|-------|------|--------|
-| Builder | builder-mobile-layout-comprehensive-fix | Comprehensive mobile layout fix (safe-area-inset, uniform card widths, scroll lock) | 🔄 Running (est. 60 min) |
+| Builder | builder-mobile-fix-remaining-pages | Apply mobile fixes to all 9 remaining HTML pages (assets, bills, budget, debts, friends, income, investments, reports, settings) | 🔄 Running |
 | Builder | builder-fix-critical-audit-issues | Fix critical audit issues (welcome message bug, empty chart states, debug logging) | 🔄 Running |
 
 ## Recently Completed
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
-| Capital | (multiple mobile fixes) | Mobile nav and layout fixes (8 commits) | ⚠️ Partial: nav elements cut off at top, cards still varying widths, scroll lock buggy |
+| Builder | builder-mobile-layout-comprehensive-fix | Comprehensive mobile layout fix (dashboard page) | ✅ Complete (commit ec32197: safe-area-inset, uniform cards, scroll lock fixed on index.html) |
 | Builder | builder-mobile-critical-fixes | Phase 1 mobile fixes (charts, table scroll, buttons, sidebar, card width) | ✅ Complete (commits 70c2244 + 2c09607, all 5 critical issues fixed) |
 | Auditor | auditor-mobile-responsiveness | Mobile responsiveness audit (4 viewports, 5 pages) | ✅ Complete (8 critical issues, 12 medium, report: audits/mobile-responsiveness-audit-2026-02-02.md) |
 | Auditor | auditor-full-site-audit-feb1 | Full site audit (all 10 pages) | ✅ Complete (Grade B-, 3 critical issues, report: reports/audit-full-site-feb1-2026.md, commit 744e330) |
