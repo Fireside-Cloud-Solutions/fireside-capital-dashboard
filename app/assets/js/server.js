@@ -128,6 +128,74 @@ app.post('/api/scan-email-bills', emailLimiter, async (req, res) => {
   }
 });
 
+// ===== PLAID TRANSACTION SYNC ENDPOINT =====
+
+/**
+ * POST /api/transactions/sync
+ * Fetches recent transactions from Plaid and returns them for client-side storage.
+ * 
+ * Body: { accessToken: string, startDate?: string, endDate?: string }
+ * Returns: { transactions: Array, count: number, startDate: string, endDate: string }
+ */
+app.post('/api/transactions/sync', strictLimiter, async (req, res) => {
+  try {
+    const { accessToken, startDate, endDate } = req.body;
+    
+    if (!accessToken) {
+      return res.status(400).json({ error: 'Access token required' });
+    }
+    
+    // Default to last 30 days if no date range provided
+    const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const end = endDate || new Date().toISOString().split('T')[0];
+    
+    console.log(`[Transaction Sync] Fetching transactions from ${start} to ${end}...`);
+    
+    // Fetch transactions from Plaid
+    const response = await plaidClient.transactionsGet({
+      access_token: accessToken,
+      start_date: start,
+      end_date: end,
+      options: {
+        count: 250,
+        offset: 0,
+      },
+    });
+    
+    const transactions = response.data.transactions;
+    console.log(`[Transaction Sync] Retrieved ${transactions.length} transactions`);
+    
+    // Transform to our schema
+    const formatted = transactions.map(t => ({
+      plaid_transaction_id: t.transaction_id,
+      plaid_account_id: t.account_id,
+      date: t.date,
+      amount: -t.amount,  // Plaid uses negative for spending, we use positive for expenses
+      name: t.name,
+      merchant_name: t.merchant_name || t.name,
+      category: 'other',  // Will be AI-categorized on client side
+      pending: t.pending,
+      confidence: 0,
+      user_confirmed: false
+    }));
+    
+    res.json({ 
+      transactions: formatted,
+      count: formatted.length,
+      startDate: start,
+      endDate: end
+    });
+    
+  } catch (error) {
+    console.error('[Transaction Sync] Error:', error);
+    res.status(500).json({ 
+      error: 'Failed to sync transactions', 
+      details: error.message,
+      code: error.response?.data?.error_code || 'UNKNOWN_ERROR'
+    });
+  }
+});
+
 // ===== START SERVER =====
 
 app.listen(3000, () => console.log('Server running on port 3000'));
