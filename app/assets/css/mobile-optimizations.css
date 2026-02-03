@@ -36,6 +36,18 @@
     min-width: 600px; /* Force scroll for dense tables */
     margin-bottom: 0;
   }
+  
+  /* Budget table specific (wider columns) */
+  .budget-table {
+    min-width: 600px; /* Force horizontal scroll */
+    font-size: 0.85rem;
+  }
+  
+  .budget-table th,
+  .budget-table td {
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
 
   /* Ensure modals fit on screen */
   .modal-dialog {
@@ -105,6 +117,30 @@
     --bs-gutter-x: 0.75rem;
     --bs-gutter-y: 0.75rem;
   }
+  
+  /* Prevent awkward button text wrapping */
+  .btn {
+    font-size: 0.85rem;
+    padding: 10px 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Stack buttons vertically on very small screens for better UX */
+  .page-header-actions .btn {
+    width: 100%;
+    margin-bottom: 8px;
+    white-space: normal; /* Allow wrap on full-width buttons */
+    text-align: center;
+  }
+  
+  /* Ensure button groups stack properly */
+  .page-header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 /* =================================================================
@@ -142,7 +178,14 @@
   }
   
   .chart-wrapper {
+    position: relative;
     min-height: 200px !important;
+    background: transparent !important;
+  }
+  
+  .chart-wrapper canvas {
+    background: transparent !important;
+    max-width: 100%;
   }
   
   .chart-wrapper[style*="height: 300px"] {
@@ -412,6 +455,7 @@
   /* Stay above sidebar (z-modal=400) so it's clickable to close */
   .sidebar-toggle {
     z-index: 500 !important;
+    position: relative;
     width: 48px;
     height: 48px;
   }
@@ -429,7 +473,21 @@
 
   /* Push sidebar content below the hamburger button */
   .sidebar {
+    z-index: 400 !important;
     padding-top: 72px !important;
+  }
+  
+  /* Ensure proper z-index stacking:
+     Hamburger (500) > Overlay (450) > Sidebar (400) */
+  .sidebar-overlay {
+    z-index: 450 !important; /* Below hamburger, above sidebar */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
   }
 
   /* ---- Bell + Welcome OR Login + Sign Up: fixed top-right on ALL pages ---- */

@@ -215,6 +215,26 @@ async function safeCreateChart(ctx, config, chartName) {
     // Lazy load Chart.js if not already loaded
     await loadChartJs();
     
+    // Mobile-specific chart initialization
+    if (window.innerWidth < 768) {
+      // Apply mobile-friendly defaults
+      Chart.defaults.font.size = 11; // Smaller labels for mobile
+      Chart.defaults.responsive = true;
+      Chart.defaults.maintainAspectRatio = false;
+    }
+    
+    // Ensure canvas background is visible (not black)
+    const canvas = (typeof ctx === 'string') ? document.getElementById(ctx) : ctx;
+    if (canvas) {
+      canvas.style.backgroundColor = 'transparent';
+      
+      // Force canvas redraw to fix black box issue
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    
     return new Chart(ctx, config);
   } catch (err) {
     console.error(`Failed to render ${chartName || 'chart'}:`, err);
@@ -4406,6 +4426,26 @@ function initShareBillUI() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// Mobile chart re-initialization on resize (orientation change)
+let resizeTimeout;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(function() {
+    if (window.innerWidth < 768) {
+      // Re-apply mobile chart defaults on orientation change
+      Chart.defaults.font.size = 11;
+      Chart.defaults.responsive = true;
+      Chart.defaults.maintainAspectRatio = false;
+      
+      // Ensure all canvases have transparent background
+      const canvases = document.querySelectorAll('.chart-wrapper canvas');
+      canvases.forEach(canvas => {
+        canvas.style.backgroundColor = 'transparent';
+      });
+    }
+  }, 250); // Debounce 250ms
+});
 
 // ===== GLOBAL EXPORTS =====
 window.openAssetModal = openAssetModal;
