@@ -3,6 +3,13 @@
    Shown when user is not authenticated
    ================================================================= */
 
+/* Prevent scrolling when logged out */
+body:has(#loggedOutState:not(.d-none)) {
+  overflow: hidden !important;
+  height: 100vh;
+  max-height: 100vh;
+}
+
 .logged-out-cta {
   display: none; /* Hidden by default, shown by JS when logged out */
   max-width: 600px;
@@ -68,6 +75,33 @@
   min-width: 140px;
   font-weight: var(--weight-semibold);
   padding: 0.75rem 1.5rem;
+}
+
+/* Constrain logged-out state container */
+#loggedOutState {
+  position: static !important;
+}
+
+body:has(#loggedOutState:not(.d-none)) #loggedOutState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 100vh !important;
+  max-height: 100vh;
+  padding: 1rem;
+  overflow: hidden;
+  z-index: 999;
+}
+
+/* Ensure welcome card fits in viewport */
+body:has(#loggedOutState:not(.d-none)) .logged-out-cta {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 /* Mobile responsive */
