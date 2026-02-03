@@ -174,7 +174,7 @@
         <a href="friends.html"><i class="bi bi-people me-2"></i> Friends</a>
         <a href="budget.html"><i class="bi bi-calculator me-2"></i> Budget</a>
         <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
-        <a href="#" onclick="openPlaidLink()"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
+        <a href="#" onclick="openPlaidLink()" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
         <a href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a>
       </div>
     </div>
@@ -183,13 +183,15 @@
       <div class="page-header">
         <div class="page-header-actions">
           <h2>Bills</h2>
-          <div class="d-flex gap-2">
-            <button class="btn btn-secondary" id="scanEmailBillsBtn" aria-label="Scan email for bills">
-              <i class="bi bi-envelope-check"></i> Scan Email for Bills
-            </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal" aria-label="Add new bill">
-              <i class="bi bi-plus-circle"></i> Add Bill
-            </button>
+          <div id="pageActions" style="display: none;">
+            <div class="d-flex gap-2">
+              <button class="btn btn-secondary" id="scanEmailBillsBtn" aria-label="Scan email for bills">
+                <i class="bi bi-envelope-check"></i> Scan Email for Bills
+              </button>
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal" aria-label="Add new bill">
+                <i class="bi bi-plus-circle"></i> Add Bill
+              </button>
+            </div>
           </div>
         </div>
         <div>

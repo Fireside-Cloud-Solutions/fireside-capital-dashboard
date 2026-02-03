@@ -3081,9 +3081,9 @@ async function calculateAndDisplayTrends(currentValues) {
       );
     }
   } else {
-    // No historical data - show neutral indicator
+    // No historical trend data — show a dash instead of confusing "No data yet" alongside real values
     if (el('netWorthTrend')) {
-      el('netWorthTrend').innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">No data yet</span>';
+      el('netWorthTrend').innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
     }
   }
 }
@@ -3335,6 +3335,15 @@ function init() {
       // Show/hide logged-out CTA based on auth state
       toggleLoggedOutCTA(!currentUser);
     }
+    // Show/hide page action buttons (Add Investment, Add Asset, etc.) based on auth state
+    if (document.getElementById('pageActions')) {
+      document.getElementById('pageActions').style.display = currentUser ? '' : 'none';
+    }
+
+    // Hide/show action buttons (Add Asset, Add Investment, etc.) based on auth state
+    document.querySelectorAll('.auth-required').forEach(el => {
+      el.style.display = currentUser ? '' : 'none';
+    });
 
     if (currentUser) {
       const firstName = currentUser.user_metadata?.first_name?.trim() || currentUser.email;

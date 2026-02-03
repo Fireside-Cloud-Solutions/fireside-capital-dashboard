@@ -1,15 +1,15 @@
 /* =================================================================
-   Fireside Capital Dashboard — Logo-Native Brand System
+   Fireside Capital Dashboard - Logo-Native Brand System
    Built on Bootstrap 5 · Brand tokens from design-tokens.css
    Dark-first design system · v2.2 UX Polish Pass
-   
+
    Design Philosophy (Tri-Color Hierarchy):
    - Flame Orange (#f44e24): PRIMARY actions - 1 per page max
    - Sky Blue (#01a4ef): SECONDARY actions - 2 per page max
    - Neutral Gray: TERTIARY actions - unlimited
    - Lime Green (#81b900): SUCCESS states
    - Red outline: DESTRUCTIVE actions
-   
+
    UX Polish Applied (January 2025):
    ✓ Consistent 8px spacing grid throughout
    ✓ Smooth 150-200ms transitions on all interactive elements
@@ -21,7 +21,7 @@
    ✓ Improved readability (14px muted text with 0.7 opacity)
    ✓ 44px minimum touch targets (WCAG 2.5.5)
    ✓ 16px minimum body text (prevents iOS zoom)
-   
+
    Refinement Date: January 2025
    Status: Production Ready
    ================================================================= */
@@ -29,7 +29,7 @@
 @import url('./design-tokens.css');
 
 /* =================================================================
-   BASE STYLES — Dark Default
+   BASE STYLES - Dark Default
    ================================================================= */
 
 *, *::before, *::after {
@@ -104,24 +104,24 @@ h1, h2, h3, h4 {
 }
 
 /* Visual Hierarchy: Page titles prominent (32px) */
-h1 { 
-  font-size: var(--text-h1); 
-  letter-spacing: var(--tracking-tight); 
+h1 {
+  font-size: var(--text-h1);
+  letter-spacing: var(--tracking-tight);
 }
 
-h2 { 
+h2 {
   font-size: 32px; /* Prominent page titles */
-  letter-spacing: var(--tracking-snug); 
+  letter-spacing: var(--tracking-snug);
 }
 
 /* Section headings clear (24px) */
-h3 { 
+h3 {
   font-size: 24px; /* Clear section headings */
   margin-bottom: 12px;
 }
 
-h4 { 
-  font-size: 20px; 
+h4 {
+  font-size: 20px;
   margin-bottom: 12px;
 }
 
@@ -131,14 +131,14 @@ h5, h6 {
   color: var(--color-text-primary);
 }
 
-h5 { 
-  font-size: 18px; 
+h5 {
+  font-size: 18px;
   margin-bottom: 8px;
 }
 
-h6 { 
-  font-size: 16px; 
-  letter-spacing: var(--tracking-wide); 
+h6 {
+  font-size: 16px;
+  letter-spacing: var(--tracking-wide);
   margin-bottom: 8px;
 }
 
@@ -489,7 +489,7 @@ strong {
   line-height: 1.2;
 }
 
-/* Card accent colors — Logo-Native palette */
+/* Card accent colors - Logo-Native palette */
 .card-investments::before { background: var(--gradient-ember); }
 .card-debts::before { background-color: var(--color-error); }
 .card-assets::before { background-color: var(--color-secondary); }
@@ -549,7 +549,7 @@ strong {
 }
 
 /* =================================================================
-   PROGRESS BARS — Brand Colors
+   PROGRESS BARS - Brand Colors
    ================================================================= */
 
 .progress-bar.bg-dashboard-green {
@@ -707,7 +707,7 @@ strong {
   background-color: rgba(var(--color-bg-3-rgb), 0.3);
 }
 
-/* Currency values in tables — monospace alignment */
+/* Currency values in tables - monospace alignment */
 .table td.text-end,
 .table td .currency-value {
   font-family: var(--font-mono);
@@ -808,7 +808,7 @@ strong {
 }
 
 /* =================================================================
-   BUTTONS — Bootstrap Overrides (UX Polish: Consistent styling, smooth transitions)
+   BUTTONS - Bootstrap Overrides (UX Polish: Consistent styling, smooth transitions)
    ================================================================= */
 
 .btn {
@@ -895,7 +895,7 @@ strong {
   transform: translateY(-1px);
 }
 
-/* Outline Primary — Orange outline (alternative primary style) */
+/* Outline Primary - Orange outline (alternative primary style) */
 .btn-outline-primary {
   color: var(--color-primary);
   border-color: var(--color-primary);
@@ -910,7 +910,7 @@ strong {
   box-shadow: var(--shadow-glow-sm);
 }
 
-/* Secondary — Neutral surface */
+/* Secondary - Neutral surface */
 .btn-secondary {
   background-color: var(--color-bg-3);
   border-color: var(--color-border-default);
@@ -924,7 +924,7 @@ strong {
   color: var(--color-primary);
 }
 
-/* Danger — Red outline only (destructive actions) */
+/* Danger - Red outline only (destructive actions) */
 .btn-danger {
   background-color: transparent;
   border-color: var(--color-danger);
@@ -938,7 +938,7 @@ strong {
   box-shadow: 0 0 12px rgba(var(--color-danger-rgb), 0.3);
 }
 
-/* Success — Lime Green (positive confirmations) */
+/* Success - Lime Green (positive confirmations) */
 .btn-success {
   background-color: var(--color-success);
   border-color: var(--color-success);
@@ -976,13 +976,13 @@ strong {
   border-radius: var(--radius-md);
 }
 
-/* Close button — visible on dark */
+/* Close button - visible on dark */
 .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 /* =================================================================
-   FORMS — Bootstrap Overrides (UX Polish: Clear focus states, smooth transitions)
+   FORMS - Bootstrap Overrides (UX Polish: Clear focus states, smooth transitions)
    ================================================================= */
 
 .form-label {
@@ -1187,7 +1187,7 @@ strong {
   margin: 4px 0;
 }
 
-/* Fix Welcome dropdown wrapping — see CRITICAL FIX block below */
+/* Fix Welcome dropdown wrapping - see CRITICAL FIX block below */
 
 /* =================================================================
    BADGES (UX Polish: Consistent styling)
@@ -1397,7 +1397,7 @@ strong {
 }
 
 /* =================================================================
-   RESPONSIVE — Tablet (1024px)
+   RESPONSIVE - Tablet (1024px)
    ================================================================= */
 
 @media (max-width: 1199.98px) {
@@ -1407,7 +1407,7 @@ strong {
 }
 
 /* =================================================================
-   RESPONSIVE — Mobile/Tablet sidebar collapse (991px)
+   RESPONSIVE - Mobile/Tablet sidebar collapse (991px)
    ================================================================= */
 
 @media (max-width: 991.98px) {
@@ -1453,7 +1453,7 @@ strong {
 }
 
 /* =================================================================
-   RESPONSIVE — Small mobile (576px)
+   RESPONSIVE - Small mobile (576px)
    ================================================================= */
 
 @media (max-width: 575.98px) {
@@ -1468,7 +1468,7 @@ strong {
     font-size: var(--text-h4);
   }
 
-  /* Tables — Ensure horizontal scroll works */
+  /* Tables - Ensure horizontal scroll works */
   .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -1485,7 +1485,7 @@ strong {
     white-space: nowrap; /* Prevent text wrapping that breaks layout */
   }
 
-  /* Enhanced touch targets — Minimum 44px for mobile */
+  /* Enhanced touch targets - Minimum 44px for mobile */
   .btn {
     min-height: 44px;
     padding: var(--space-2-5) var(--space-4);
@@ -1520,7 +1520,7 @@ strong {
     margin-bottom: var(--space-2);
   }
 
-  /* Sidebar links — Easier tapping */
+  /* Sidebar links - Easier tapping */
   .sidebar a {
     padding: var(--space-3-5) var(--space-5);
     min-height: 48px;
@@ -1541,7 +1541,7 @@ strong {
     width: 100%;
   }
 
-  /* Form inputs — Touch-friendly sizing */
+  /* Form inputs - Touch-friendly sizing */
   .form-control,
   .form-select {
     min-height: 44px;
@@ -1575,7 +1575,7 @@ strong {
     font-size: var(--text-h5);
   }
 
-  /* Modals — Full width on mobile */
+  /* Modals - Full width on mobile */
   .modal-dialog {
     margin: var(--space-2);
   }
@@ -1589,7 +1589,7 @@ strong {
     padding: var(--space-4);
   }
 
-  /* Notification dropdown — Full width on mobile */
+  /* Notification dropdown - Full width on mobile */
   .dropdown-menu {
     max-width: calc(100vw - 2rem) !important;
   }
@@ -1598,7 +1598,7 @@ strong {
     width: calc(100vw - 2rem) !important;
   }
 
-  /* Table action buttons — Stack vertically if needed */
+  /* Table action buttons - Stack vertically if needed */
   .table .btn-group {
     display: flex;
     flex-direction: column;
@@ -1609,7 +1609,7 @@ strong {
     width: 100%;
   }
 
-  /* Chart containers — Ensure responsiveness */
+  /* Chart containers - Ensure responsiveness */
   canvas {
     max-width: 100% !important;
     height: auto !important;
@@ -1628,7 +1628,7 @@ strong {
 }
 
 /* =================================================================
-   RESPONSIVE — Very small mobile (320px - 375px)
+   RESPONSIVE - Very small mobile (320px - 375px)
    ================================================================= */
 
 @media (max-width: 375px) {
@@ -1692,7 +1692,7 @@ strong {
 }
 
 /* =================================================================
-   RESPONSIVE — Extra small mobile (360px and below)
+   RESPONSIVE - Extra small mobile (360px and below)
    ================================================================= */
 
 @media (max-width: 359.98px) {
@@ -1728,7 +1728,7 @@ strong {
 }
 
 /* =================================================================
-   SCROLLBAR — Custom neutral styling
+   SCROLLBAR - Custom neutral styling
    ================================================================= */
 
 ::-webkit-scrollbar {
@@ -1750,7 +1750,7 @@ strong {
 }
 
 /* =================================================================
-   AMBIENT GLOW — Subtle brand warmth on main content
+   AMBIENT GLOW - Subtle brand warmth on main content
    ================================================================= */
 
 .main-content::before {
@@ -1780,7 +1780,7 @@ strong {
 
 
 /* =================================================================
-   LIGHT MODE — Dashboard Readability Fixes
+   LIGHT MODE - Dashboard Readability Fixes
    Critical overrides for stat values and display text
    ================================================================= */
 
@@ -1798,7 +1798,7 @@ strong {
 
 
 /* =================================================================
-   DARK MODE EXPLICIT — Matches base (for data-theme='dark')
+   DARK MODE EXPLICIT - Matches base (for data-theme='dark')
    ================================================================= */
 
 body[data-theme='dark'] {
@@ -1928,7 +1928,7 @@ body[data-theme='dark'] .table-card {
 }
 
 /* =================================================================
-   ACTION BUTTONS IN TABLES — Compact pill style
+   ACTION BUTTONS IN TABLES - Compact pill style
    ================================================================= */
 
 .table .btn-sm {
@@ -1942,7 +1942,7 @@ body[data-theme='dark'] .table-card {
 }
 
 /* =================================================================
-   ANIMATION — Card entrance (staggered)
+   ANIMATION - Card entrance (staggered)
    ================================================================= */
 
 @keyframes fadeInUpCard {
@@ -2013,7 +2013,7 @@ body[data-theme='dark'] #amortTable tbody td {
 }
 
 /* =================================================================
-   EMAIL BILL INTEGRATION — Pending Bills Review
+   EMAIL BILL INTEGRATION - Pending Bills Review
    ================================================================= */
 
 /* Pending bill card styling */
@@ -2104,7 +2104,7 @@ body[data-theme='dark'] .pending-bill-card.selected {
 }
 
 /* =================================================================
-   QUICK WIN #1: Fix Loading States — Skeleton Loader
+   QUICK WIN #1: Fix Loading States - Skeleton Loader
    ================================================================= */
 
 .skeleton {
@@ -2154,7 +2154,7 @@ main {
 }
 
 /* =================================================================
-   EMPTY STATE COMPONENT — Modern, Brand-Aligned
+   EMPTY STATE COMPONENT - Modern, Brand-Aligned
    ================================================================= */
 
 .empty-state {
@@ -2241,7 +2241,7 @@ main {
 }
 
 /* =================================================================
-   STATS CARDS — Modern Dashboard Statistics
+   STATS CARDS - Modern Dashboard Statistics
    ================================================================= */
 
 .stats-cards-container {
@@ -2328,6 +2328,8 @@ main {
   color: var(--color-text-primary);
   margin-bottom: var(--space-2);
   line-height: 1;
+  white-space: nowrap; /* CRITICAL: Prevent number wrapping */
+  overflow: visible; /* CRITICAL: Never truncate financial values */
 }
 
 .stat-trend {
@@ -2360,10 +2362,43 @@ main {
 }
 
 
+/* Mid-breakpoint responsive stats cards - prevent number truncation */
+@media (max-width: 1400px) {
+  .stat-value {
+    font-size: 2.25rem; /* Slightly smaller but still readable */
+  }
+  
+  .stat-card {
+    padding: var(--space-5); /* Reduce padding to give more room for numbers */
+  }
+}
+
+@media (max-width: 1200px) {
+  .stat-value {
+    font-size: 2rem; /* Larger than before to prevent truncation */
+  }
+  
+  .stat-card {
+    padding: var(--space-4); /* Further reduce padding */
+  }
+}
+
+/* Critical fix for 1000-1200px range where truncation was reported */
+@media (min-width: 992px) and (max-width: 1199px) {
+  /* At LG breakpoint with sidebar open, give more room */
+  .stat-value {
+    font-size: 1.875rem; /* 30px - balanced size */
+  }
+  
+  .stat-card {
+    padding: var(--space-4); /* Compact padding */
+  }
+}
+
 /* Mobile responsive stats cards */
 @media (max-width: 768px) {
   .stat-value {
-    font-size: 2rem;
+    font-size: 2rem; /* Mobile gets larger font since full width */
   }
   
   .stat-card {
@@ -2397,7 +2432,7 @@ main {
   white-space: nowrap !important;
 }
 
-/* Hide Bootstrap's auto-generated caret — we use a manual one */
+/* Hide Bootstrap's auto-generated caret - we use a manual one */
 #userDropdown::after {
   display: none !important;
 }

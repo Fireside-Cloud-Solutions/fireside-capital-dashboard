@@ -174,7 +174,7 @@
                 <a href="friends.html"><i class="bi bi-people me-2"></i> Friends</a>
                 <a href="budget.html" class="active"><i class="bi bi-calculator me-2"></i> Budget</a>
                 <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
-                <a href="#" onclick="openPlaidLink()"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
+                <a href="#" onclick="openPlaidLink()" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
                 <a href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a>
             </div>
             <div class="theme-toggle">
@@ -189,18 +189,20 @@
             <div class="page-header">
                 <div class="page-header-actions flex-wrap">
                   <h2>Budget</h2>
-                  <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button>
-                    <h4 id="currentMonth" class="mb-0" style="white-space: nowrap;">Loading...</h4>
-                    <button class="btn btn-outline-secondary btn-sm" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
+                  <div id="pageActions" style="display: none;">
+                    <div class="d-flex align-items-center gap-2">
+                      <button class="btn btn-outline-secondary btn-sm" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button>
+                      <h4 id="currentMonth" class="mb-0" style="white-space: nowrap;">Loading...</h4>
+                      <button class="btn btn-outline-secondary btn-sm" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="generateBudgetBtn" aria-label="Generate budget automatically">
+                        <i class="bi bi-magic"></i> Generate Budget
+                    </button>
+                    <span id="generateBudgetStatus"></span>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal" aria-label="Add budget item">
+                        <i class="bi bi-plus-circle"></i> Add Item
+                    </button>
                   </div>
-                  <button class="btn btn-secondary btn-sm" id="generateBudgetBtn" aria-label="Generate budget automatically">
-                      <i class="bi bi-magic"></i> Generate Budget
-                  </button>
-                  <span id="generateBudgetStatus"></span>
-                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal" aria-label="Add budget item">
-                      <i class="bi bi-plus-circle"></i> Add Item
-                  </button>
                 </div>
                 <div>
                   <div id="loggedOutState">
