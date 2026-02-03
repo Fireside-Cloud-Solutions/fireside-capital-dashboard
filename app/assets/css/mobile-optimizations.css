@@ -691,14 +691,23 @@ body.sidebar-open {
   }
 
   /* CRITICAL FIX: Welcome dropdown button text wrapping */
-  /* The global * { max-width: 100%; } constrains the button width, causing text wrap */
-  /* Target #userDropdown directly — button does NOT have .dropdown-toggle class */
+  /* ROOT CAUSE: The global * { max-width: 100%; } in styles.css constrains EVERY ancestor
+     in the chain: #loggedInState > inner-flex-div > .dropdown > #userDropdown.
+     Even if the button has max-width:none, its parent .dropdown div is still capped,
+     which squeezes the button and forces text wrap. Fix: override the entire chain. */
+  #loggedInState,
+  #loggedInState > *,
+  #loggedInState .d-flex,
+  #loggedInState .dropdown,
   #userDropdown,
-  #loggedInState .dropdown > .btn,
-  #loggedInState .dropdown-toggle {
+  #loggedInState .dropdown > .btn {
+    max-width: none !important;
+  }
+  
+  #userDropdown,
+  #loggedInState .dropdown > .btn {
     white-space: nowrap !important;
-    max-width: none !important; /* Override global * { max-width: 100% } */
-    flex-shrink: 0 !important; /* Prevent flex container from shrinking the button */
+    flex-shrink: 0 !important;
     overflow: visible !important;
   }
 

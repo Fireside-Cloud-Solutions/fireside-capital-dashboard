@@ -127,11 +127,18 @@
       }
       
       /* CRITICAL FIX: Welcome dropdown button text wrapping */
-      /* Target #userDropdown directly — button does NOT have .dropdown-toggle class */
+      /* Override max-width:100% on ENTIRE ancestor chain, not just the button */
+      #loggedInState,
+      #loggedInState > *,
+      #loggedInState .d-flex,
+      #loggedInState .dropdown,
+      #userDropdown,
+      #loggedInState .dropdown > .btn {
+        max-width: none !important;
+      }
       #userDropdown,
       #loggedInState .dropdown > .btn {
         white-space: nowrap !important;
-        max-width: none !important;
         flex-shrink: 0 !important;
         overflow: visible !important;
       }
