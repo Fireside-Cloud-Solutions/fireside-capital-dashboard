@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fireside Capital - Transactions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/design-tokens.css" />
+  <link rel="stylesheet" href="assets/css/main.css?v=20260203" />
+  
+  <link rel="stylesheet" href="assets/css/components.css?v=20260203" />
+  <link rel="stylesheet" href="assets/css/responsive.css?v=20260203" />
+  
+  <link rel="stylesheet" href="assets/css/accessibility.css" />
+  <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
+  <style>
+    /* Critical inline CSS: prevent auth flash and layout shift on page load */
+    @media (max-width: 991.98px) {
+      /* Hamburger: fixed position to prevent snap */
+      .sidebar-toggle {
+        position: fixed !important;
+        top: max(12px, env(safe-area-inset-top)) !important;
+        left: 16px !important;
+        z-index: 1000 !important;
+        width: 48px;
+        height: 48px;
+        background: #1a1a1a !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 0.5rem !important;
+      }
+      
+      /* Auth state containers: fixed position, hidden until auth resolves */
+      #loggedInState, #loggedOutState {
+        position: fixed !important;
+        top: max(12px, env(safe-area-inset-top)) !important;
+        right: 16px;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      /* Fade in when auth resolves */
+      body.auth-resolved #loggedInState:not(.d-none),
+      body.auth-resolved #loggedOutState:not(.d-none) {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.15s ease;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="d-flex">
+    <div class="sidebar" id="sidebar">
+      <div>
+        <div class="sidebar-brand">
+          <h4>
+            <svg class="sidebar-logo" xmlns="http://www.w3.org/2000/svg" viewBox="127 428 192 175" width="28" height="26" aria-label="Fireside">
+              <polygon fill="#01a4ef" points="238.76 514.38 316.17 515.82 308.3 533.37 247.89 533.13 240.68 547.55 296.93 548.51 268.09 600.44 188.79 600.44 198.37 581.69 257.99 581.69 266.16 566.3 208.47 566.3 238.76 514.38"/>
+              <polygon fill="#f44e24" points="170.25 430 218.6 514.38 180.1 584.09 168.08 565.34 197.41 515.82 187.97 500.68 158.87 547.04 148.37 531.21 178.18 482.65 169.11 465.19 138.92 513.43 129.14 498.51 170.25 430"/>
+              <path fill="#81b900" d="M287.56,430H227.94l29.67,52.17H239.24L210.08,430H190.16l37,68h98.66ZM258,448.2h18.6l19.4,34H277Z"/>
+            </svg>
+            Fireside Capital
+          </h4>
+        </div>
+        <a href="index.html"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="assets.html"><i class="bi bi-house-door me-2"></i> Assets</a>
+        <a href="investments.html"><i class="bi bi-piggy-bank me-2"></i> Investments</a>
+        <a href="debts.html"><i class="bi bi-credit-card me-2"></i> Debts</a>
+        <a href="bills.html"><i class="bi bi-receipt me-2"></i> Bills</a>
+        <a href="income.html"><i class="bi bi-cash-stack me-2"></i> Income</a>
+        <a href="transactions.html" class="active"><i class="bi bi-arrow-left-right me-2"></i> Transactions</a>
+        <a href="friends.html"><i class="bi bi-people me-2"></i> Friends</a>
+        <a href="budget.html"><i class="bi bi-calculator me-2"></i> Budget</a>
+        <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
+        <a href="#" onclick="openPlaidLink()" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
+        <a href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a>
+      </div>
+    </div>
+
+    <main class="main-content flex-grow-1" id="main-content">
+      <div class="page-header">
+        <div class="page-header-actions">
+          <h2>Transactions</h2>
+        </div>
+        <div>
+          <div id="loggedOutState">
+            <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+              <i class="bi bi-box-arrow-in-right"></i> Login
+            </button>
+            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#signupModal">
+              <i class="bi bi-person-plus"></i> Sign Up
+            </button>
+          </div>
+          <div id="loggedInState" class="d-none">
+            <div class="d-flex align-items-center gap-3">
+              <div class="dropdown" id="notificationDropdown">
+                <button class="btn btn-outline-secondary btn-icon position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBell">
+                  <i class="bi bi-bell"></i>
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">0</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="width: 360px; max-height: 400px; overflow-y: auto;" id="notificationList">
+                  <li class="dropdown-header d-flex justify-content-between align-items-center">
+                    <strong>Notifications</strong>
+                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>
+                </ul>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="welcome-prefix">Welcome,</span> <span id="username">User</span> <span class="dropdown-caret">&#9662;</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="#">Account Settings</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" id="logoutButton">Logout</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dataContainer" style="visibility: hidden;">
+
+        <!-- Sync Button -->
+        <div class="mb-4">
+          <button id="syncTransactionsBtn" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat me-2"></i> Sync from Bank
+          </button>
+          <small class="text-muted ms-2">Last synced: <span id="lastSyncTime">Never</span></small>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Filters</h5>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="categoryFilter" class="form-label">Category</label>
+                <select id="categoryFilter" class="form-select">
+                  <option value="">All Categories</option>
+                  <option value="Bills & Utilities">Bills & Utilities</option>
+                  <option value="Groceries">Groceries</option>
+                  <option value="Dining & Entertainment">Dining & Entertainment</option>
+                  <option value="Transportation">Transportation</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Income">Income</option>
+                  <option value="Transfer">Transfer</option>
+                  <option value="Other">Other</option>
+                  <option value="Uncategorized">Uncategorized</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="startDate" class="form-label">From</label>
+                <input type="date" id="startDate" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label for="endDate" class="form-label">To</label>
+                <input type="date" id="endDate" class="form-control">
+              </div>
+            </div>
+            <div class="mt-3">
+              <button id="applyFiltersBtn" class="btn btn-secondary">Apply Filters</button>
+              <button id="clearFiltersBtn" class="btn btn-outline-secondary ms-2">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Recent Transactions</h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody">
+                  <!-- Populated by transactions.js -->
+                </tbody>
+              </table>
+            </div>
+            <div id="loadingSpinner" class="text-center d-none">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <div id="emptyState" class="text-center text-muted d-none">
+              <p>No transactions found. Click "Sync from Bank" to import.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Shared Modals: Login -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm">
+            <div id="loginAlert" class="alert d-none" role="alert"></div>
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" name="loginEmail" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" name="loginPassword" id="loginPassword" required>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button type="submit" class="btn btn-primary" id="loginSubmitBtn">Login</button>
+              <a href="#" id="forgotPasswordLink" class="text-decoration-none small">Forgot Password?</a>
+            </div>
+          </form>
+          <div id="forgotPasswordForm" class="d-none mt-3">
+            <hr>
+            <p class="fw-semibold mb-2">Reset Password</p>
+            <div id="forgotAlert" class="alert d-none" role="alert"></div>
+            <div class="mb-3">
+              <label for="forgotEmail" class="form-label">Enter your email address</label>
+              <input type="email" class="form-control" id="forgotEmail">
+            </div>
+            <button type="button" id="forgotPasswordBtn" class="btn btn-outline-primary btn-sm">Send Reset Link</button>
+            <a href="#" id="backToLoginLink" class="ms-2 small text-decoration-none">Back to Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Modals: Signup -->
+  <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="signupForm">
+            <div id="signupAlert" class="alert d-none" role="alert"></div>
+            <div class="mb-3">
+              <label for="signupFirstName" class="form-label">First Name</label>
+              <input type="text" class="form-control" name="signupFirstName" id="signupFirstName" required>
+            </div>
+            <div class="mb-3">
+              <label for="signupLastName" class="form-label">Last Name</label>
+              <input type="text" class="form-control" name="signupLastName" id="signupLastName" required>
+            </div>
+            <div class="mb-3">
+              <label for="signupEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" name="signupEmail" id="signupEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="signupPassword" class="form-label">Password (min 6 characters)</label>
+              <input type="password" class="form-control" name="signupPassword" id="signupPassword" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="signupSubmitBtn">Sign Up</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Password Modal -->
+  <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resetPasswordModalLabel">Set New Password</h5>
+        </div>
+        <div class="modal-body">
+          <form id="resetPasswordForm">
+            <div id="resetPasswordAlert" class="alert d-none" role="alert"></div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
+              <input type="password" class="form-control" id="newPassword" minlength="6" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="resetPasswordBtn">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script src="assets/js/rate-limiter.js"></script>
+  <script src="assets/js/rate-limit-db.js"></script>
+  <script src="assets/js/session-security.js"></script>
+  <script src="assets/js/polish-utilities.js"></script>
+  <script src="assets/js/csrf.js"></script>
+  <script src="assets/js/security-utils.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/notification-enhancements.js"></script>
+  <script src="assets/js/security-patch.js"></script>
+  <script src="assets/js/app-polish-enhancements.js"></script>
+  <script src="assets/js/plaid.js"></script>
+  <script src="assets/js/categorizer.js"></script>
+  <script src="assets/js/transactions.js"></script>
+  <script>
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load transactions on page load
+      await loadTransactions();
+      
+      // Sync button
+      document.getElementById('syncTransactionsBtn').addEventListener('click', async (e) => {
+        e.target.disabled = true;
+        e.target.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Syncing...';
+        try {
+          await syncTransactions();
+          await loadTransactions(); // Reload after sync
+          document.getElementById('lastSyncTime').textContent = new Date().toLocaleString();
+        } catch (err) {
+          console.error('Sync failed:', err);
+          showToast('Sync failed: ' + err.message, 'error');
+        } finally {
+          e.target.disabled = false;
+          e.target.innerHTML = '<i class="bi bi-arrow-repeat me-2"></i> Sync from Bank';
+        }
+      });
+      
+      // Apply filters
+      document.getElementById('applyFiltersBtn').addEventListener('click', async () => {
+        const filters = {
+          category: document.getElementById('categoryFilter').value || null,
+          startDate: document.getElementById('startDate').value || null,
+          endDate: document.getElementById('endDate').value || null
+        };
+        await loadTransactions(filters);
+      });
+      
+      // Clear filters
+      document.getElementById('clearFiltersBtn').addEventListener('click', async () => {
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        await loadTransactions();
+      });
+    });
+  </script>
+</body>
+</html>
