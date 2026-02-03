@@ -1,4 +1,5 @@
 // ===== DEBUG UTILITY =====
+// Debug mode disabled in production
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
 
