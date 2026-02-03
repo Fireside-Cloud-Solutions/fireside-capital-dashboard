@@ -268,23 +268,6 @@
     white-space: normal !important;
   }
   
-  /* Welcome dropdown on extra small screens — let button size to fit content.
-     Previously had max-width: 160px which caused text wrapping. */
-  #userDropdown {
-    max-width: none !important;
-    white-space: nowrap !important;
-  }
-  
-  /* Truncate long usernames but keep "Welcome, Name" on one line */
-  #username {
-    max-width: 80px;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: bottom;
-  }
-  
   /* FIX: Bills stats cards - improve readability */
   .bills-stats .stat-card {
     min-height: 100px;
@@ -783,21 +766,6 @@ body.sidebar-open {
     transition: opacity 0.15s ease;
   }
 
-  /* Match button heights in the top bar */
-  #loggedOutState .btn,
-  #loggedInState .btn {
-    height: 48px;
-    padding: 0 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    line-height: 1;
-    box-sizing: border-box;
-    margin: 0;
-    white-space: nowrap;
-  }
-
   /* Fix icon centering in buttons on mobile */
   /* Mobile .btn padding override was breaking .btn-icon centering */
   .btn.btn-icon {
@@ -805,44 +773,6 @@ body.sidebar-open {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-  }
-
-  /* CRITICAL FIX: Welcome dropdown button text wrapping */
-  /* ROOT CAUSE: The global * { max-width: 100%; } in styles.css constrains EVERY ancestor
-     in the chain: #loggedInState > inner-flex-div > .dropdown > #userDropdown.
-     Even if the button has max-width:none, its parent .dropdown div is still capped,
-     which squeezes the button and forces text wrap. Fix: override the entire chain. */
-  #loggedInState,
-  #loggedInState > *,
-  #loggedInState .d-flex,
-  #loggedInState .dropdown,
-  #userDropdown,
-  #loggedInState .dropdown > .btn {
-    max-width: none !important;
-  }
-  
-  #userDropdown,
-  #loggedInState .dropdown > .btn {
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-    overflow: visible !important;
-  }
-
-  /* The spans inside the welcome button also need nowrap */
-  #userDropdown *,
-  #loggedInState .dropdown > .btn * {
-    white-space: nowrap !important;
-    max-width: none !important;
-  }
-
-  /* Ensure welcome button children stay on same Y-axis */
-  #userDropdown {
-    align-items: center !important;
-    gap: 4px;
-  }
-  #userDropdown > * {
-    display: inline !important;
-    vertical-align: baseline !important;
   }
 
   /* User dropdown menu: ensure it opens visibly on mobile */

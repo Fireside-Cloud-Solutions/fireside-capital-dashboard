@@ -2410,8 +2410,19 @@ main {
 }
 
 /* =================================================================
-   CRITICAL FIX: Welcome dropdown alignment (Build 2026-02-01-17:21)
+   CRITICAL FIX: Welcome dropdown alignment (Consolidated 2026-02-03)
+   All welcome button CSS lives here. No duplicates in other files.
    ================================================================= */
+
+/* Ensure parent containers don't constrain the button */
+#loggedInState,
+#loggedInState > *,
+#loggedInState .d-flex,
+#loggedInState .dropdown {
+  max-width: none !important;
+}
+
+/* Welcome button: always stays on one line at all breakpoints */
 #userDropdown {
   white-space: nowrap !important;
   min-width: auto !important;
@@ -2427,6 +2438,7 @@ main {
   vertical-align: middle !important;
   overflow: visible !important;
   text-overflow: unset !important;
+  flex-shrink: 0 !important;
 }
 
 /* All spans inside welcome button: inherit size, stay inline */
@@ -2449,4 +2461,16 @@ main {
   vertical-align: middle !important;
   margin-left: 2px !important;
   opacity: 0.8;
+}
+
+/* On very small screens, truncate username (not "Welcome,") */
+@media (max-width: 479.98px) {
+  #username {
+    max-width: 80px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
 }

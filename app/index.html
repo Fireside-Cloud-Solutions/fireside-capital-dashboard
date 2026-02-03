@@ -29,9 +29,9 @@
   
   <!-- Performance: Chart.js removed from head - will be lazy loaded when needed -->
   <style>
-    /* Critical inline: prevent layout shift on mobile nav elements */
+    /* Critical inline CSS: prevent auth flash and layout shift on page load */
     @media (max-width: 991.98px) {
-      /* Hamburger: fixed position from first render to prevent snap */
+      /* Hamburger: fixed position to prevent snap */
       .sidebar-toggle {
         position: fixed !important;
         top: max(12px, env(safe-area-inset-top)) !important;
@@ -39,129 +39,28 @@
         z-index: 1000 !important;
         width: 48px;
         height: 48px;
-        box-sizing: border-box;
-        /* ADDED: All visual properties to prevent snap when external CSS loads */
         background: #1a1a1a !important;
         border: 1px solid #2a2a2a !important;
         border-radius: 0.5rem !important;
-        display: inline-flex !important; /* FIXED: Match auth buttons' inline-flex for proper vertical alignment */
-        align-items: center;
-        justify-content: center;
-        padding: 0 !important;
-        margin: 0 !important;
-        vertical-align: top !important; /* FIXED: Ensure consistent baseline alignment */
       }
       
-      /* Hamburger icon */
-      .sidebar-toggle i {
-        font-size: 1.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        line-height: 1;
-      }
-      
-      /* Auth elements: fixed position from first render */
+      /* Auth state containers: fixed position, hidden until auth resolves */
       #loggedInState, #loggedOutState {
         position: fixed !important;
         top: max(12px, env(safe-area-inset-top)) !important;
         right: 16px;
         z-index: 1000;
-        margin: 0 !important;
         opacity: 0;
         visibility: hidden;
-        pointer-events: none;
       }
       
-      /* When visible (not .d-none): apply flex layout */
-      #loggedInState:not(.d-none),
-      #loggedOutState:not(.d-none) {
-        display: flex !important;
-        align-items: center;
-        gap: 8px;
-      }
-      
-      /* Override d-none: keep element in fixed layout tree to prevent position glitch */
-      #loggedInState.d-none, #loggedOutState.d-none {
-        display: block !important;
-        visibility: hidden;
-      }
-      
+      /* Fade in when auth resolves */
       body.auth-resolved #loggedInState:not(.d-none),
       body.auth-resolved #loggedOutState:not(.d-none) {
         opacity: 1;
         visibility: visible;
-        pointer-events: auto;
         transition: opacity 0.15s ease;
       }
-      
-      /* Match button heights in the top bar */
-      #loggedOutState .btn,
-      #loggedInState .btn {
-        height: 48px !important;
-        min-height: 48px !important;
-        max-height: 48px !important;
-        padding: 0 12px !important;
-        display: inline-flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 13px !important;
-        line-height: 1 !important;
-        box-sizing: border-box !important;
-        margin: 0 !important;
-        white-space: nowrap !important;
-      }
-      
-            /* Prevent text wrapping inside buttons */
-      #loggedOutState .btn *,
-      #loggedInState .btn * {
-        white-space: nowrap !important;
-      }
-      
-      /* CRITICAL FIX: Welcome dropdown button text wrapping */
-      /* Override max-width:100% on ENTIRE ancestor chain, not just the button */
-      #loggedInState,
-      #loggedInState > *,
-      #loggedInState .d-flex,
-      #loggedInState .dropdown,
-      #userDropdown,
-      #loggedInState .dropdown > .btn {
-        max-width: none !important;
-      }
-      #userDropdown,
-      #loggedInState .dropdown > .btn {
-        white-space: nowrap !important;
-        flex-shrink: 0 !important;
-        overflow: visible !important;
-      }
-      #userDropdown *,
-      #loggedInState .dropdown > .btn * {
-        white-space: nowrap !important;
-        max-width: none !important;
-      }
-      /* User dropdown menu: visible on mobile */
-      #loggedInState .dropdown-menu {
-        position: fixed !important;
-        top: calc(max(12px, env(safe-area-inset-top)) + 56px) !important;
-        right: 16px !important;
-        left: auto !important;
-        z-index: 1001 !important;
-        min-width: 200px;
-      }
-      
-      /* Bell icon button */
-      #loggedInState .btn.btn-icon {
-        width: 48px !important;
-        min-width: 48px !important;
-        max-width: 48px !important;
-        padding: 0 !important;
-        justify-content: center !important;
-      }
-
     }
   </style>
 </head>
