@@ -127,20 +127,27 @@
       }
       
       /* CRITICAL FIX: Welcome dropdown button text wrapping */
-      /* The global * { max-width: 100%; } was constraining the button width */
-      #loggedInState .dropdown-toggle {
+      /* Target #userDropdown directly — button does NOT have .dropdown-toggle class */
+      #userDropdown,
+      #loggedInState .dropdown > .btn {
         white-space: nowrap !important;
-        max-width: none !important; /* Override global max-width constraint */
-        flex-shrink: 0 !important; /* Prevent flex container from shrinking the button */
+        max-width: none !important;
+        flex-shrink: 0 !important;
+        overflow: visible !important;
       }
-      
-      /* On very narrow screens, truncate the name instead of wrapping */
-      @media (max-width: 374.98px) {
-        #loggedInState .dropdown-toggle {
-          max-width: calc(100vw - 48px - 48px - 32px - 16px) !important; /* viewport - hamburger - bell - gaps - margin */
-          overflow: hidden !important;
-          text-overflow: ellipsis !important;
-        }
+      #userDropdown *,
+      #loggedInState .dropdown > .btn * {
+        white-space: nowrap !important;
+        max-width: none !important;
+      }
+      /* User dropdown menu: visible on mobile */
+      #loggedInState .dropdown-menu {
+        position: fixed !important;
+        top: calc(max(12px, env(safe-area-inset-top)) + 56px) !important;
+        right: 16px !important;
+        left: auto !important;
+        z-index: 1001 !important;
+        min-width: 200px;
       }
       
       /* Bell icon button */

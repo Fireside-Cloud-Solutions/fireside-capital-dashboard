@@ -640,22 +640,53 @@ async function updatePassword(newPassword) {
 }
 
 async function logout() {
-  if (sessionSecurity) {
-    sessionSecurity.onLogout();
+  try {
+    if (sessionSecurity) {
+      sessionSecurity.onLogout();
+    }
+  } catch (e) {
+    console.warn('[Logout] sessionSecurity.onLogout failed:', e);
   }
   
-  // Clear all session data
-  clearCache();
+  try {
+    // Clear all session data
+    clearCache();
+  } catch (e) {
+    console.warn('[Logout] clearCache failed:', e);
+  }
   
   // Clear CSRF token on logout
-  if (typeof CSRF !== 'undefined') {
-    CSRF.clearToken();
+  try {
+    if (typeof CSRF !== 'undefined') {
+      CSRF.clearToken();
+    }
+  } catch (e) {
+    console.warn('[Logout] CSRF.clearToken failed:', e);
   }
   
-  // Sign out from Supabase (revokes tokens server-side)
-  await sb.auth.signOut();
+  try {
+    // Sign out from Supabase (revokes tokens server-side)
+    await sb.auth.signOut();
+  } catch (e) {
+    console.error('[Logout] sb.auth.signOut failed:', e);
+  }
   
-  // Redirect to home page
+  // Always force UI update even if signOut had issues
+  currentUser = null;
+  document.getElementById('loggedInState')?.classList.add('d-none');
+  document.getElementById('loggedOutState')?.classList.remove('d-none');
+  if (document.getElementById('dataContainer')) {
+    document.getElementById('dataContainer').style.visibility = 'hidden';
+    toggleLoggedOutCTA(true);
+  }
+  if (document.getElementById('pageActions')) {
+    document.getElementById('pageActions').style.display = 'none';
+  }
+  document.querySelectorAll('.auth-required').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  // Redirect to home page if not already there
   if (window.location.pathname !== '/index.html' && window.location.pathname !== '/') {
     window.location.href = 'index.html';
   }
