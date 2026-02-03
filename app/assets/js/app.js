@@ -3408,12 +3408,16 @@ function setupSidebarToggle() {
     sidebar.classList.add('show');
     if (overlay) overlay.classList.add('show');
     toggle.innerHTML = '<i class="bi bi-x-lg"></i>';
+    // Prevent body scrolling when sidebar is open
+    document.body.style.overflow = 'hidden';
   };
 
   const closeSidebar = () => {
     sidebar.classList.remove('show');
     if (overlay) overlay.classList.remove('show');
     toggle.innerHTML = '<i class="bi bi-list"></i>';
+    // Restore body scrolling when sidebar is closed
+    document.body.style.overflow = '';
   };
 
   toggle.addEventListener('click', () => {
