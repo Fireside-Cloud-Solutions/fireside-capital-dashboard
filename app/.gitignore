@@ -4,3 +4,7 @@ node_modules/
 # Gmail OAuth token (contains sensitive credentials)
 .gmail-token.json
 integrations/gmail/.gmail-token.json
+
+# Test files (dev only, not for production)
+test-*.html
+*-demo.html
