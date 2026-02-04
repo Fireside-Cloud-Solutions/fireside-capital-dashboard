@@ -1059,6 +1059,21 @@ body.sidebar-open {
   }
 }
 
+/* =================================================================
+   TABLE COLUMN VISIBILITY — Responsive Column Management
+   FC-072 Fix: Hide non-critical columns on narrow viewports
+   ================================================================= */
+
+/* Investments table: Hide Starting Balance + Monthly Contribution on medium screens */
+@media (max-width: 1399.98px) {
+  #investmentTableBody tr td:nth-child(3),
+  #investmentTableBody tr td:nth-child(4),
+  table thead tr th:nth-child(3),
+  table thead tr th:nth-child(4) {
+    display: none;
+  }
+}
+
 /* Extra small devices - additional fixes */
 @media (max-width: 374.98px) {
   /* Ensure very long names don't break layout */
