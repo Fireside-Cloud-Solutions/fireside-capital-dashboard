@@ -13,13 +13,12 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| (none) | — | — | — | — |
+| Implement FC-036: Manual transaction entry | Capital (Lead Dev) | 2026-02-04 12:14 PM | #qa | Spawned Builder sub-agent |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
 | # | Task | Priority | Source | Notes |
 |---|------|----------|--------|-------|
-| 1 | Implement FC-036: Manual transaction entry | MEDIUM | #qa | 4-6 hour feature - delegate to Builder |
 | 2 | Decide FC-042: Friends section icon colors | LOW | #ui-ux | Design decision: keep or remove? |
 
 **NOTE:** Tasks "Implement design token system" and "Add skeleton loaders" removed — ALREADY IMPLEMENTED (design-tokens.css and skeleton CSS in components.css)

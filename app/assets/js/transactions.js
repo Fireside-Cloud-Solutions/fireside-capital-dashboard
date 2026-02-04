@@ -123,11 +123,11 @@ async function syncTransactions() {
 }
 
 // Render transactions table
-async function renderTransactionsTable() {
+async function renderTransactionsTable(filters = {}) {
   const tbody = document.getElementById('transactionsTableBody');
   if (!tbody) return;
   
-  const transactions = await loadTransactions({ limit: 100 });
+  const transactions = await loadTransactions({ ...filters, limit: 100 });
   
   if (transactions.length === 0) {
     tbody.innerHTML = `
@@ -202,4 +202,91 @@ function formatCurrency(amount) {
     style: 'currency',
     currency: 'USD'
   }).format(amount);
+}
+
+// Add manual transaction
+async function addManualTransaction() {
+  const submitBtn = document.getElementById('addTransactionSubmitBtn');
+  const alertDiv = document.getElementById('addTransactionAlert');
+  
+  try {
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
+    
+    // Get form values
+    const date = document.getElementById('transactionDate').value;
+    const description = document.getElementById('transactionDescription').value.trim();
+    const amount = parseFloat(document.getElementById('transactionAmount').value);
+    const type = document.getElementById('transactionType').value;
+    const category = document.getElementById('transactionCategory').value;
+    const account = document.getElementById('transactionAccount').value.trim() || 'Manual Entry';
+    
+    // Validate
+    if (!date || !description || !amount || !type || !category) {
+      throw new Error('Please fill in all required fields');
+    }
+    
+    if (amount <= 0) {
+      throw new Error('Amount must be greater than 0');
+    }
+    
+    // Get current user
+    const user = await sb.auth.getUser();
+    if (!user.data.user) {
+      throw new Error('You must be logged in to add transactions');
+    }
+    
+    // Prepare transaction data
+    // Note: Plaid convention is expense = positive, income = negative
+    const transactionAmount = type === 'expense' ? amount : -amount;
+    
+    const transaction = {
+      user_id: user.data.user.id,
+      date: date,
+      merchant_name: description,
+      amount: transactionAmount,
+      category: category,
+      source: 'manual',
+      confidence_level: 1.0,
+      user_confirmed: true,
+      account_name: account,
+      pending: false,
+      name: description
+    };
+    
+    // Insert into Supabase
+    const { data, error } = await sb
+      .from('transactions')
+      .insert([transaction])
+      .select();
+    
+    if (error) throw error;
+    
+    // Show success message
+    showToast(`Transaction added successfully!`, 'success');
+    
+    // Reset form
+    document.getElementById('addTransactionForm').reset();
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
+    modal.hide();
+    
+    // Reload transactions
+    await renderTransactionsTable();
+    
+  } catch (error) {
+    console.error('Add transaction error:', error);
+    
+    // Show error in alert
+    alertDiv.className = 'alert alert-danger';
+    alertDiv.textContent = error.message || 'Failed to add transaction';
+    alertDiv.classList.remove('d-none');
+    
+  } finally {
+    // Re-enable submit button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Add Transaction';
+  }
 }
