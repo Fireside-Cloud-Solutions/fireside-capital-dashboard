@@ -1,33 +1,29 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-04 22:55 EST
+**Last Updated:** 2026-02-04 08:30 EST
 
 ---
 
-## 🎉 SPRINT QA COMPLETE — GRADE A ✅
+## 🎉 SPRINT QA — GRADE A- (User Review Batch In Progress)
 
-**Systematic QA audit complete:** All 11 HTML pages, 8 CSS files reviewed. ALL issues resolved.
+**Latest Build:** dd4d460 (fix: Chart.js CDN restored)  
+**QA Grade:** **A-** (1 critical fixed, 1 critical found)  
+**Deployment Status:** ⚠️ **1 Critical Issue** (budget month navigation not implemented)
 
-**Build:** f0591eb (fix: transactions page empty state consistency)  
-**QA Grade:** **A** (up from B+)  
-**Deployment Status:** ✅ **PRODUCTION READY** — No blockers, no known bugs
+**Latest QA Report:** `reports/QA-SPRINT-2026-02-04-MORNING.md`  
+**Latest Session Log:** `memory/2026-02-04-sprint-qa-morning.md`
 
-**Latest QA Report:** `reports/QA-SPRINT-REPORT-2026-02-03-2200.md`  
-**Latest Session Log:** `memory/2026-02-03-sprint-qa.md`
+**Recent Commits (Feb 4):**
+- `dd4d460` - fix(critical): FC-030 - Restore Chart.js CDN library (all dashboard charts were broken)
+- `62fcd36` - fix(ui): FC-029 - Welcome button height now matches notification bell (44px)
+- `e7a42cb` - docs: Update sprint QA status - Grade A achieved
 
-**Recent Commits (Feb 3):**
-- `f0591eb` - fix(ux): transactions page empty state consistency (ISSUE-UX-CONSISTENCY-001)
-- `3a7d3f4` - docs: FC-027 marked as resolved (desktop touch targets fixed)
-- `b46c813` - fix: desktop touch targets now meet WCAG 2.5.5 (44px minimum) - FC-027
-- `f46497f` - fix(ui): correct button hierarchy on transactions page (ISSUE-UI007)
-- `a62f265` - 🐛 Fix UI/UX audit issues (modal width, empty states, dark mode, CSS consistency)
-
-**QA Summary:**
-- ✅ Button hierarchy enforced (max 1 primary orange per view)
-- ✅ Touch targets: All buttons meet WCAG 2.5.5 (44px minimum)
-- ✅ Empty states: All 8 pages use consistent pattern
-- ✅ Safe-area-inset on all 11 pages (iOS notch support)
-- ✅ Console statements: Production-safe (only error/warn/debug)
+**QA Summary (User Review Batch FC-029 through FC-037):**
+- ✅ FC-029: Welcome button height fixed (44px)
+- ✅ FC-030: Chart.js restored — all 8 dashboard charts now functional
+- ⚠️ FC-037: Budget month navigation missing (needs 4-6h implementation)
+- 🔍 FC-034: Bills filter buttons + badge contrast issues (P2)
+- 🔲 FC-031, FC-032, FC-033, FC-036: Not checked yet (P2 issues)
 - ✅ CSS architecture: No conflicts, clean organization
 - ✅ Accessibility: 98 aria-labels, semantic HTML
 
@@ -43,6 +39,7 @@
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | sprint-qa | Sprint QA — User review batch (FC-029 through FC-037) | ✅ Session complete — 1 critical fixed (FC-030), 1 critical found (FC-037) |
 | Capital | sprint-research-pwa | Sprint Research — PWA implementation guide (manifest, service worker, offline mode) | ✅ Complete — 24KB guide with production code (reports/PWA-RESEARCH-IMPLEMENTATION-GUIDE.md) |
 | Capital | sprint-dev | Sprint Dev Check — Fixed mobile UX for bill filter buttons (responsive flex layout) | ✅ Complete — commit 953130f, deployed |
 | Builder | sprint-qa | Sprint QA Audit — Systematic review of all 11 HTML, 8 CSS, 23 JS files | ✅ Complete — 2 bugs fixed, deployed (memory/2026-02-03.md) |
