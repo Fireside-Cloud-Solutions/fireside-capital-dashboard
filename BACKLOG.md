@@ -79,7 +79,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-024 | Chore | P3 | M | Backlog | Magic numbers in CSS — replace with CSS custom properties |
 | FC-025 | Chore | P2 | M | Done | Database enum normalization — standardize type/frequency field casing |
 | FC-026 | Feature | P1 | XL | Backlog | Data import system — YNAB budget import + spreadsheet uploads with column mapping |
-| FC-027 | Bug | P2 | XS | Backlog | Desktop touch targets below 44px WCAG 2.5.5 minimum (page header, time filters, table buttons) — see reports/ISSUE-A11Y-BUTTONS.md |
+| FC-027 | Bug | P2 | XS | Done | Desktop touch targets below 44px WCAG 2.5.5 minimum (page header, time filters, table buttons) — see reports/ISSUE-A11Y-BUTTONS.md |
 | FC-028 | Bug | P3 | XS | Backlog | Transactions page empty state doesn't match .empty-state component pattern — see reports/ISSUE-UX-CONSISTENCY-001.md |
 
 ### EPIC-002: Mobile Application

@@ -7,7 +7,6 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| FC-027: Fix desktop touch targets (44px WCAG) | Capital (Lead Dev) | 2026-02-03 10:00 PM | #qa | P2 bug - 3 CSS changes |
 | Bills page UI/UX audit | Architect | 2026-02-03 8:02 PM | #ui-ux | 6/11 pages done |
 | CSS architecture research | Researcher | 2026-02-03 7:56 PM | #research | Delivered — moving to dark theme |
 | QA full audit | Builder | 2026-02-03 8:05 PM | #qa | 11/11 HTML reviewed |
@@ -26,6 +25,7 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix FC-027: Desktop touch targets (44px WCAG 2.5.5) | Capital (Lead Dev) | 2026-02-03 10:00 PM | b46c813 |
 | Fix ISSUE-UI007: Button hierarchy on transactions page | Capital (Lead Dev) | 2026-02-03 9:22 PM | f46497f |
 | Fix .btn-secondary CSS conflict | Capital | 2026-02-03 8:08 PM | da4b117 |
 | Fix backtick-n escape sequences | Builder | 2026-02-03 8:05 PM | 4724ba5 |
