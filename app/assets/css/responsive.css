@@ -131,8 +131,13 @@
   }
 
   .table {
-    min-width: 600px; /* Force scroll for dense tables */
+    min-width: 500px; /* Force scroll for dense tables (reduced from 600px for debts page) */
     margin-bottom: 0;
+  }
+  
+  /* Hide low-priority columns on mobile (FC-033 fix) */
+  .table .hide-mobile {
+    display: none !important;
   }
   
   /* Budget table specific (wider columns) */

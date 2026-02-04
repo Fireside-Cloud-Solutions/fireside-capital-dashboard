@@ -7,18 +7,19 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| FC-037: Budget page issues investigation | Lead Dev (Capital) | 2026-02-04 8:20 AM | #qa | Verifying which sub-issues are real bugs |
 | Bills page UI/UX audit | Architect | 2026-02-03 8:02 PM | #ui-ux | 6/11 pages done |
 | CSS architecture research | Researcher | 2026-02-03 7:56 PM | #research | Delivered — moving to dark theme |
 | QA full audit | Builder | 2026-02-03 8:05 PM | #qa | 11/11 HTML reviewed |
+| Fix FC-033: Debts table layout | Lead Dev (Capital) | 2026-02-04 9:03 AM | #qa | Implementing Option B: hide Term/Next Due on mobile |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
 | # | Task | Priority | Source | Notes |
 |---|------|----------|--------|-------|
-| 1 | Bootstrap dark theme research | MEDIUM | Researcher backlog | Next research topic |
-| 2 | PWA research | LOW | Researcher backlog | Progressive web app setup |
-| 3 | Performance optimization | LOW | Researcher backlog | Lighthouse audit |
+| 2 | Implement FC-036: Manual transaction entry | MEDIUM | #qa | 4-6 hour feature - delegate to Builder |
+| 3 | Bootstrap dark theme research | MEDIUM | Researcher backlog | Next research topic |
+| 4 | PWA research | LOW | Researcher backlog | Progressive web app setup |
+| 5 | Performance optimization | LOW | Researcher backlog | Lighthouse audit |
 
 **NOTE:** Tasks "Implement design token system" and "Add skeleton loaders" removed — ALREADY IMPLEMENTED (design-tokens.css and skeleton CSS in components.css)
 
@@ -26,6 +27,8 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix FC-034: Bills filter button styling consistency | Lead Dev (Capital) | 2026-02-04 8:42 AM | ef148bc |
+| Fix FC-037: Budget page duplicate bills (ID deduplication) | Lead Dev (Capital) | 2026-02-04 8:25 AM | 16bfd2e |
 | Fix FC-030: Dashboard charts blank white squares | Lead Dev (Capital) | 2026-02-04 8:00 AM | a979728 |
 | Fix FC-029: Welcome button height matches notification bell | Lead Dev (Capital) | 2026-02-04 7:45 AM | 62fcd36 |
 | Fix ISSUE-UX-CONSISTENCY-001: Transactions page empty state | Capital (QA Bot) | 2026-02-03 10:09 PM | f0591eb |

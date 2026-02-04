@@ -1128,8 +1128,8 @@ function renderDebts() {
   tbody.innerHTML = debts.map(d => `
       <tr>
           <td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.type)}</td><td>${formatCurrency(d.amount)}</td><td>${escapeHtml(d.interestRate)}%</td>
-          <td>${escapeHtml(d.term || '-')} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
-          <td>${d.nextDueDate ? escapeHtml(formatDate(d.nextDueDate)) : '-'}</td>
+          <td class="hide-mobile">${escapeHtml(d.term || '-')} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
+          <td class="hide-mobile">${d.nextDueDate ? escapeHtml(formatDate(d.nextDueDate)) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openDebtModal('${escapeAttribute(d.id)}')" aria-label="Edit ${escapeAttribute(d.name)}"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${escapeAttribute(d.id)}', '${escapeAttribute(d.name)}')" aria-label="Delete ${escapeAttribute(d.name)}"><i class="bi bi-trash"></i></button>
