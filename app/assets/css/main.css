@@ -1009,20 +1009,6 @@ strong {
   box-shadow: var(--shadow-glow-sm);
 }
 
-/* Secondary - Neutral surface */
-.btn-secondary {
-  background-color: var(--color-bg-3);
-  border-color: var(--color-border-default);
-  color: var(--color-text-primary);
-}
-
-.btn-secondary:hover,
-.btn-secondary:focus {
-  background-color: var(--color-bg-3);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
 /* Danger - Red outline only (destructive actions) */
 .btn-danger {
   background-color: transparent;
