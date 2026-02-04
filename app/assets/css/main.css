@@ -223,9 +223,9 @@ strong {
 /* Consistent height for ALL buttons in the page header area */
 .page-header .btn,
 .page-header-actions .btn {
-  height: 40px;
-  min-height: 40px;
-  max-height: 40px;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
   padding-top: 0;
   padding-bottom: 0;
   display: inline-flex;
@@ -706,7 +706,7 @@ strong {
   border-radius: 0;
   font-size: 12px;
   padding: 6px 12px;
-  min-height: 32px;
+  min-height: 44px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -2136,6 +2136,15 @@ body[data-theme='dark'] .form-check-label {
 body[data-theme='dark'] .table-card {
   background-color: var(--color-bg-2);
   border-color: var(--color-border-subtle);
+}
+
+/* =================================================================
+   SMALL BUTTONS - Base desktop styling
+   ================================================================= */
+
+.btn-sm {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
 }
 
 /* =================================================================
