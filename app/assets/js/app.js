@@ -4119,8 +4119,10 @@ async function loadFriendsPage() {
   
   // Show skeleton loaders while data is loading
   const pendingContainer = document.getElementById('pendingRequestsContainer');
+  const pendingSection = document.getElementById('pendingRequestsSection');
   const friendsContainer = document.getElementById('myFriendsContainer');
   const outgoingContainer = document.getElementById('outgoingRequestsContainer');
+  const outgoingSection = document.getElementById('outgoingRequestsSection');
   
   const skeletonHTML = `
     <div class="col-xl-4 col-md-6 col-12">
@@ -4150,8 +4152,6 @@ async function loadFriendsPage() {
     .eq('addressee_id', currentUser.id)
     .eq('status', 'pending');
   
-  const pendingContainer = document.getElementById('pendingRequestsContainer');
-  const pendingSection = document.getElementById('pendingRequestsSection');
   if (pendingContainer) {
     if (pendingIncoming && pendingIncoming.length > 0) {
       pendingSection.classList.remove('d-none');
@@ -4188,7 +4188,6 @@ async function loadFriendsPage() {
     .eq('status', 'accepted')
     .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
   
-  const friendsContainer = document.getElementById('myFriendsContainer');
   if (friendsContainer) {
     const friends = (myConnections || []).map(conn => ({
       connectionId: conn.id,
@@ -4244,8 +4243,6 @@ async function loadFriendsPage() {
     .eq('requester_id', currentUser.id)
     .eq('status', 'pending');
   
-  const outgoingContainer = document.getElementById('outgoingRequestsContainer');
-  const outgoingSection = document.getElementById('outgoingRequestsSection');
   if (outgoingContainer) {
     if (outgoing && outgoing.length > 0) {
       outgoingSection.classList.remove('d-none');

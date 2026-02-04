@@ -13,7 +13,7 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| Implement FC-040: Friends page loading states | Lead Dev (Capital) | 2026-02-04 10:28 AM | #ui-ux | Adding skeleton loaders |
+| (none) | — | — | — | — |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
@@ -28,6 +28,7 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Implement FC-040: Friends page loading states | Lead Dev (Capital) | 2026-02-04 10:28 AM | 5cb93b3 |
 | Fix FC-041: Friends empty state CTAs | Lead Dev (Capital) | 2026-02-04 9:58 AM | 8948bda |
 | Fix FC-039: Friends search button style (already done) | QA Bot | 2026-02-04 9:53 AM | b1e7f62 |
 | UI/UX audit: friends.html (Grade B+, 4 issues found) | Architect | 2026-02-04 9:23 AM | — |
