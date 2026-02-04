@@ -115,7 +115,7 @@
                   <i class="bi bi-bell"></i>
                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notificationBadge">0</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" class="dropdown-menu-wide" id="notificationList">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-wide" id="notificationList">
                   <li class="dropdown-header d-flex justify-content-between align-items-center">
                     <strong>Notifications</strong>
                     <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
@@ -391,7 +391,7 @@
             </div>
             <div id="financingFields" class="d-none">
               <hr class="my-3">
-              <h6 class="mb-3" class="icon-primary"><i class="bi bi-bank me-1"></i> Loan Details</h6>
+              <h6 class="mb-3 icon-primary"><i class="bi bi-bank me-1"></i> Loan Details</h6>
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="billInterestRate" class="form-label">Interest Rate (APR %)</label>
@@ -435,11 +435,11 @@
                 </div>
               </div>
               <div id="loanCalcPreview" class="mt-3 d-none">
-                <div class="card" class="card-bg-info">
+                <div class="card card-bg-info">
                   <div class="card-body py-2 px-3">
                     <small class="text-color-tertiary">Calculated Monthly Payment: </small>
                     <strong id="calcMonthlyPayment" class="icon-primary">—</strong>
-                    <small class="ms-3" class="text-color-tertiary">Total Interest: </small>
+                    <small class="ms-3 text-color-tertiary">Total Interest: </small>
                     <strong id="calcTotalInterest" class="icon-secondary">—</strong>
                   </div>
                 </div>
@@ -592,7 +592,7 @@
             </div>
             <div id="fixedAmountError" class="text-danger small d-none">Amount exceeds the bill total.</div>
           </div>
-          <div class="card p-3 mt-3" class="card-bg-info">
+          <div class="card p-3 mt-3 card-bg-info">
             <div class="d-flex justify-content-between">
               <span class="text-color-secondary">Your portion:</span>
               <strong id="sharePreviewOwner" class="icon-primary">$0.00</strong>
@@ -636,6 +636,7 @@
   </div>
 </body>
 </html>
+
 
 
 
