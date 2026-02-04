@@ -13,15 +13,14 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| (none) | — | — | — | — |
+| Implement FC-040: Friends page loading states | Lead Dev (Capital) | 2026-02-04 10:28 AM | #ui-ux | Adding skeleton loaders |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
 | # | Task | Priority | Source | Notes |
 |---|------|----------|--------|-------|
 | 1 | Implement FC-036: Manual transaction entry | MEDIUM | #qa | 4-6 hour feature - delegate to Builder |
-| 2 | Implement FC-040: Friends page loading states | MEDIUM | #ui-ux | Add skeleton loaders (~2 hours) |
-| 3 | Decide FC-042: Friends section icon colors | LOW | #ui-ux | Design decision: keep or remove? |
+| 2 | Decide FC-042: Friends section icon colors | LOW | #ui-ux | Design decision: keep or remove? |
 
 **NOTE:** Tasks "Implement design token system" and "Add skeleton loaders" removed — ALREADY IMPLEMENTED (design-tokens.css and skeleton CSS in components.css)
 

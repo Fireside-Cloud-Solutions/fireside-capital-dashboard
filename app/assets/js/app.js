@@ -4117,6 +4117,32 @@ async function removeFriend(connectionId, friendName) {
 async function loadFriendsPage() {
   if (!currentUser || !document.getElementById('friendSearchInput')) return;
   
+  // Show skeleton loaders while data is loading
+  const pendingContainer = document.getElementById('pendingRequestsContainer');
+  const friendsContainer = document.getElementById('myFriendsContainer');
+  const outgoingContainer = document.getElementById('outgoingRequestsContainer');
+  
+  const skeletonHTML = `
+    <div class="col-xl-4 col-md-6 col-12">
+      <div class="card">
+        <div class="card-body p-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3 flex-grow-1">
+            <div class="skeleton-loader rounded-circle" style="width: 40px; height: 40px;"></div>
+            <div style="flex-grow: 1;">
+              <div class="skeleton-loader mb-2" style="height: 16px; max-width: 60%;"></div>
+              <div class="skeleton-loader" style="height: 12px; max-width: 40%;"></div>
+            </div>
+          </div>
+          <div class="skeleton-loader" style="width: 70px; height: 32px; border-radius: 4px;"></div>
+        </div>
+      </div>
+    </div>
+  `.repeat(3);
+  
+  if (pendingContainer) pendingContainer.innerHTML = skeletonHTML;
+  if (friendsContainer) friendsContainer.innerHTML = skeletonHTML;
+  if (outgoingContainer) outgoingContainer.innerHTML = skeletonHTML;
+  
   // Load pending requests (incoming)
   const { data: pendingIncoming } = await sb
     .from('connections')
