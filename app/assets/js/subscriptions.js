@@ -246,6 +246,22 @@ function filterBillsToSubscriptions() {
     showSubsBtn.classList.add('active');
   }
   
+  // Handle empty state when no subscriptions
+  if (subscriptions.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center py-5">
+          <div class="text-muted">
+            <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+            <p class="mt-3 mb-0">No subscriptions detected</p>
+            <small>Add monthly recurring bills to track subscriptions</small>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
   // Re-render table with only subscriptions
   tableBody.innerHTML = subscriptions.map(b => {
     const shareInfo = getShareInfoForBill(b.id);

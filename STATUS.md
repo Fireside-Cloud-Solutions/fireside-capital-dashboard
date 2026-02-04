@@ -1,6 +1,6 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-03 20:35 EST
+**Last Updated:** 2026-02-03 20:22 EST
 
 ---
 
@@ -26,6 +26,7 @@ Comprehensive QA audit complete. All HTML/CSS/JS files reviewed. Two production 
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | sprint-dev | Sprint Dev Check — Fixed mobile UX for bill filter buttons (responsive flex layout) | ✅ Complete — commit 953130f, deployed |
 | Builder | sprint-qa | Sprint QA Audit — Systematic review of all 11 HTML, 8 CSS, 23 JS files | ✅ Complete — 2 bugs fixed, deployed (memory/2026-02-03.md) |
 | Builder | sprint-qa-evening | QA Sprint Evening Session — 100% page coverage, all critical bugs resolved | ✅ Complete — DEPLOY APPROVED (report: reports/QA-SPRINT-2026-02-03-EVENING.md) |
 | Builder | builder-capital-categorization | TRANS-001 Phase 4b: Refactor to Capital AI categorization (removed external API) | ✅ Complete (commit 5a6976f) |

@@ -1144,13 +1144,6 @@ strong {
   color: var(--color-text-primary);
 }
 
-.form-label {
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-body-sm);
-  margin-bottom: var(--space-1-5);
-}
-
 .form-check-label {
   color: var(--color-text-secondary);
 }
@@ -3243,12 +3236,6 @@ body[data-theme='light'] .btn:hover {
 .form-control:focus,
 .form-select:focus {
   box-shadow: 0 0 0 3px rgba(1, 164, 239, 0.1);
-}
-
-.form-label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
 }
 
 /* Input groups */
