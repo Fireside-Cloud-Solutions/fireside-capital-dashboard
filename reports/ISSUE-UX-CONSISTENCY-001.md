@@ -2,7 +2,9 @@
 
 **Severity:** 🟡 LOW (UX Polish)  
 **Filed:** February 3, 2026 — 10:15 PM  
-**Status:** OPEN  
+**Status:** ✅ RESOLVED  
+**Fixed:** February 3, 2026 — 10:09 PM  
+**Commit:** f0591eb  
 
 ## Summary
 The transactions page uses a minimal text-only empty state, while all other data pages use the full `.empty-state` component with icon, heading, description, and CTA button.

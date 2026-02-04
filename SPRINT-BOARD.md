@@ -25,6 +25,7 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix ISSUE-UX-CONSISTENCY-001: Transactions page empty state | Capital (QA Bot) | 2026-02-03 10:09 PM | f0591eb |
 | Fix FC-027: Desktop touch targets (44px WCAG 2.5.5) | Capital (Lead Dev) | 2026-02-03 10:00 PM | b46c813 |
 | Fix ISSUE-UI007: Button hierarchy on transactions page | Capital (Lead Dev) | 2026-02-03 9:22 PM | f46497f |
 | Fix .btn-secondary CSS conflict | Capital | 2026-02-03 8:08 PM | da4b117 |
