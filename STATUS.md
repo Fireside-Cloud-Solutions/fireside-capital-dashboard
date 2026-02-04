@@ -1,12 +1,12 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-04 08:58 EST
+**Last Updated:** 2026-02-04 09:06 EST
 
 ---
 
-## 🎉 SPRINT QA COMPLETE — BUILD ef148bc
+## 🎉 SPRINT DEV CHECK — BUILD 1c9c308
 
-**Latest Build:** ef148bc (fix: bills filter button consistency)  
+**Latest Build:** 1c9c308 (fix: FC-033 debts table responsive layout)  
 **QA Grade:** **A** (All P1 issues fixed, systematic audit complete, 0 new bugs)  
 **Deployment Status:** ✅ **Production Ready**
 
@@ -16,6 +16,7 @@
 - Cron 8:45 AM: `reports/QA-SPRINT-2026-02-04-CRON-845AM.md` ⬅ **LATEST**
 
 **Recent Commits (Feb 4):**
+- `1c9c308` - Fix FC-033: Hide Term and Next Due columns on mobile for better debts table layout
 - `ef148bc` - Fix FC-034: Bills page filter button consistency (btn-outline-secondary)
 - `16bfd2e` - fix(budget): FC-037 - Deduplicate budget items by ID to prevent duplicate bills rendering
 - `a979728` - Fix FC-030: Chart.js conflict causing blank charts - detect pre-loaded Chart.js
@@ -25,9 +26,9 @@
 **QA Summary (User Review Batch FC-029 through FC-037):**
 - ✅ FC-029: Welcome button height fixed (44px) — VERIFIED
 - ✅ FC-030: Chart.js restored — all 8 dashboard charts now functional — VERIFIED
+- ✅ FC-033: Debts table name truncation — FIXED (commit 1c9c308, hide Term/Next Due on mobile)
 - ✅ FC-034: Bills filter buttons inconsistent — FIXED (commit ef148bc)
 - ✅ FC-037: Budget duplicate bills fixed (Set-based deduplication) — CODE VERIFIED
-- 🐛 FC-033: Debts table name truncation (8 columns too many) — QUEUED (needs responsive strategy decision)
 - 🐛 FC-036: No manual "Add Transaction" button — QUEUED (4-6 hour feature, delegate to Builder)
 - ✅ CSS architecture: No conflicts, clean organization
 - ✅ Accessibility: 98 aria-labels, semantic HTML
