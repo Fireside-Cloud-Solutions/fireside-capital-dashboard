@@ -177,12 +177,17 @@
               <input type="text" class="form-control" id="incomeName" required placeholder="e.g., Salary, Freelance, Side Hustle">
             </div>
             <div class="mb-3">
-              <label for="incomeType" class="form-label">Type</label>
+              <label for="incomeType" class="form-label">Type <span class="text-danger">*</span></label>
               <select class="form-select" id="incomeType" required>
                 <option value="">Choose...</option>
-                <option>W2</option>
-                <option>1099</option>
-                <option>Other</option>
+                <option value="salary">Salary (W2)</option>
+                <option value="hourly">Hourly Wages</option>
+                <option value="commission">Commission</option>
+                <option value="bonus">Bonus</option>
+                <option value="freelance">Freelance (1099)</option>
+                <option value="rental">Rental Income</option>
+                <option value="investment">Investment Income</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div class="mb-3">
@@ -194,12 +199,15 @@
               <input type="date" class="form-control" id="incomeNextDueDate">
             </div>
             <div class="mb-3">
-              <label for="incomeFrequency" class="form-label">Frequency</label>
+              <label for="incomeFrequency" class="form-label">Frequency <span class="text-danger">*</span></label>
               <select class="form-select" id="incomeFrequency" required>
                 <option value="">Choose...</option>
-                <option>Bi-Weekly</option>
-                <option>Monthly</option>
-                <option>Annually</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-Weekly (Every 2 Weeks)</option>
+                <option value="semi-monthly">Semi-Monthly (Twice a Month)</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annually">Annually</option>
               </select>
             </div>
           </div>

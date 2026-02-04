@@ -13,7 +13,7 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| (none) | — | — | — | — |
+| Fix FC-051: Income form enum mismatch (CRITICAL) | Lead Dev (Capital) | 2026-02-04 11:11 AM | #ui-ux | Blocks all income creation |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 

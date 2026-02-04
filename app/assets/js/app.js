@@ -1990,6 +1990,34 @@ async function deleteBillConfirmed() {
 }
 
 // --- INCOME ---
+// Income type display names
+function getIncomeTypeDisplayName(type) {
+  const typeMap = {
+    'salary': 'Salary (W2)',
+    'hourly': 'Hourly',
+    'commission': 'Commission',
+    'bonus': 'Bonus',
+    'freelance': 'Freelance (1099)',
+    'rental': 'Rental',
+    'investment': 'Investment',
+    'other': 'Other'
+  };
+  return typeMap[type] || type;
+}
+
+// Income frequency display names
+function getIncomeFrequencyDisplayName(freq) {
+  const freqMap = {
+    'weekly': 'Weekly',
+    'bi-weekly': 'Bi-Weekly',
+    'semi-monthly': 'Semi-Monthly',
+    'monthly': 'Monthly',
+    'quarterly': 'Quarterly',
+    'annually': 'Annually'
+  };
+  return freqMap[freq] || freq;
+}
+
 function renderIncome() {
   const tbody = document.getElementById('incomeTableBody');
   if (!tbody) return;
@@ -2003,8 +2031,11 @@ function renderIncome() {
   
   tbody.innerHTML = income.map(i => `
       <tr>
-          <td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.type)}</td><td>${formatCurrency(i.amount)}</td>
-          <td>${escapeHtml(i.frequency)}</td><td>${i.nextDueDate ? escapeHtml(formatDate(i.nextDueDate)) : '-'}</td>
+          <td>${escapeHtml(i.name)}</td>
+          <td>${escapeHtml(getIncomeTypeDisplayName(i.type))}</td>
+          <td>${formatCurrency(i.amount)}</td>
+          <td>${escapeHtml(getIncomeFrequencyDisplayName(i.frequency))}</td>
+          <td>${i.nextDueDate ? escapeHtml(formatDate(i.nextDueDate)) : '-'}</td>
           <td>
               <button class="btn btn-sm btn-outline-primary" onclick="openIncomeModal('${escapeAttribute(i.id)}')" aria-label="Edit ${escapeAttribute(i.name)}"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${escapeAttribute(i.id)}', '${escapeAttribute(i.name)}')" aria-label="Delete ${escapeAttribute(i.name)}"><i class="bi bi-trash"></i></button>
@@ -2018,8 +2049,11 @@ function openIncomeModal(id = null) {
   if (id) {
       const i = window.income.find(x => x.id == id); // FIX: Changed === to ==
       if (i) {
-          f.incomeName.value = escapeHtml(i.name || ''); f.incomeType.value = escapeHtml(i.type || ''); f.incomeAmount.value = i.amount;
-          f.incomeFrequency.value = i.frequency; f.incomeNextDueDate.value = i.nextDueDate;
+          f.incomeName.value = escapeHtml(i.name || '');
+          f.incomeType.value = i.type || ''; // Raw value for select dropdown
+          f.incomeAmount.value = i.amount;
+          f.incomeFrequency.value = i.frequency || ''; // Raw value for select dropdown
+          f.incomeNextDueDate.value = i.nextDueDate;
       }
   }
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
