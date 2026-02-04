@@ -107,7 +107,7 @@ function generateEmptyStateHTML(type) {
       </div>
       <h3 class="empty-state-title">${config.title}</h3>
       <p class="empty-state-text">${config.text}</p>
-      <button class="btn btn-primary" onclick="handleEmptyStateAction('${type}')">
+      <button class="btn btn-secondary" onclick="handleEmptyStateAction('${type}')">
         ${config.cta}
       </button>
     </div>

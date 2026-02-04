@@ -42,6 +42,7 @@
 
 | Agent | Label | Task | Result |
 |-------|-------|------|--------|
+| Capital | sprint-research-css-architecture | Sprint Research — CSS Architecture (BEM + CUBE CSS, 13KB guide with migration plan) | ✅ Complete — docs/research/01-css-architecture.md |
 | Capital | sprint-research-performance | Sprint Research — Performance Optimization (29KB guide: 8 techniques, 60% improvement) | ✅ Complete — ALL 6 research topics done (reports/SPRINT-RESEARCH-PERFORMANCE-OPTIMIZATION-2026-02-04.md) |
 | Capital | sprint-research | Sprint Research — Bootstrap dark theme (28KB guide with Chart.js integration, WCAG validation) | ✅ Complete — Production-ready code (reports/SPRINT-RESEARCH-BOOTSTRAP-DARK-THEME-2026-02-04.md) |
 | Capital | sprint-qa | Sprint QA — User review batch (FC-029 through FC-037) | ✅ Session complete — 1 critical fixed (FC-030), 1 critical found (FC-037) |

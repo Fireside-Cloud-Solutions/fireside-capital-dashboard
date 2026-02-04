@@ -9,15 +9,19 @@
 |------|-----------|---------|---------|-------|
 | (none) | — | — | — | — |
 
+## 🔴 IN PROGRESS (claimed — do not duplicate)
+
+| Task | Claimed By | Started | Channel | Notes |
+|------|-----------|---------|---------|-------|
+| (none) | — | — | — | — |
+
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
 | # | Task | Priority | Source | Notes |
 |---|------|----------|--------|-------|
 | 1 | Implement FC-036: Manual transaction entry | MEDIUM | #qa | 4-6 hour feature - delegate to Builder |
-| 2 | Fix FC-039: Friends search button style | MEDIUM | #ui-ux | Change btn-primary to btn-secondary (5 min fix) |
-| 3 | Implement FC-040: Friends page loading states | MEDIUM | #ui-ux | Add skeleton loaders (~2 hours) |
-| 4 | Fix FC-041: Friends empty state CTAs | LOW | #ui-ux | Use empty-states.js utility (~1 hour) |
-| 5 | Decide FC-042: Friends section icon colors | LOW | #ui-ux | Design decision: keep or remove? |
+| 2 | Implement FC-040: Friends page loading states | MEDIUM | #ui-ux | Add skeleton loaders (~2 hours) |
+| 3 | Decide FC-042: Friends section icon colors | LOW | #ui-ux | Design decision: keep or remove? |
 
 **NOTE:** Tasks "Implement design token system" and "Add skeleton loaders" removed — ALREADY IMPLEMENTED (design-tokens.css and skeleton CSS in components.css)
 
@@ -25,6 +29,8 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix FC-041: Friends empty state CTAs | Lead Dev (Capital) | 2026-02-04 9:58 AM | 8948bda |
+| Fix FC-039: Friends search button style (already done) | QA Bot | 2026-02-04 9:53 AM | b1e7f62 |
 | UI/UX audit: friends.html (Grade B+, 4 issues found) | Architect | 2026-02-04 9:23 AM | — |
 | Fix FC-038: Friends auth button styling consistency | Builder (QA) | 2026-02-04 9:25 AM | TBD |
 | Fix FC-033: Debts table layout (hide Term/Next Due on mobile) | Lead Dev (Capital) | 2026-02-04 9:05 AM | 1c9c308 |
