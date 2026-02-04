@@ -1552,15 +1552,19 @@ function renderFinancingCards() {
       <div class="col-xl-4 col-md-6 col-12">
         <div class="card h-100">
           <div class="card-body p-4 d-flex flex-column">
-            <div class="financing-card-header d-flex justify-content-between align-items-start" style="margin-bottom: 12px;">
-              <div style="flex: 1; min-width: 0;">
-                <h5 class="mb-1" title="${escapeAttribute(b.name)}" style="color: var(--color-text-primary); font-size: var(--text-h5); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(b.name)}</h5>
-                <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
+            <div class="financing-card-header" style="margin-bottom: 12px;">
+              <!-- Name and action buttons on same line -->
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0" title="${escapeAttribute(b.name)}" style="color: var(--color-text-primary); font-size: var(--text-h5); line-height: 1.3; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(b.name)}</h5>
+                <div class="d-flex gap-2" style="flex-shrink: 0; margin-left: 12px;">
+                  <button class="btn btn-sm btn-outline-secondary" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
+                  <button class="btn btn-sm btn-outline-secondary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
+                </div>
               </div>
-              <div class="text-end" style="flex-shrink: 0; margin-left: 8px;">
-                <button class="btn btn-sm btn-outline-info" onclick="openShareBillModal('${escapeAttribute(b.id)}')" aria-label="Share ${escapeAttribute(b.name)}"><i class="bi bi-share"></i></button>
-                <button class="btn btn-sm btn-outline-primary" onclick="openBillModal('${escapeAttribute(b.id)}')" aria-label="Edit ${escapeAttribute(b.name)}"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBill('${escapeAttribute(b.id)}', '${escapeAttribute(b.name)}')" aria-label="Delete ${escapeAttribute(b.name)}"><i class="bi bi-trash"></i></button>
+              <!-- Badges on separate line below name -->
+              <div class="d-flex gap-2 flex-wrap">
+                <span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span>${aprBadge}
               </div>
             </div>
             <div class="mb-3">
