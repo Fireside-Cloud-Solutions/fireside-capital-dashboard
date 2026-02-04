@@ -193,14 +193,15 @@
               <input type="text" class="form-control" id="debtName" required placeholder="e.g., Student Loan, Credit Card">
             </div>
             <div class="mb-3">
-              <label for="debtType" class="form-label">Type</label>
+              <label for="debtType" class="form-label">Type <span class="text-danger">*</span></label>
               <select class="form-select" id="debtType" required>
                 <option value="">Choose...</option>
-                <option>Credit Card</option>
-                <option>Mortgage</option>
-                <option>Student Loan</option>
-                <option>Auto Loan</option>
-                <option>Other</option>
+                <option value="credit-card">Credit Card</option>
+                <option value="mortgage">Mortgage</option>
+                <option value="student-loan">Student Loan</option>
+                <option value="auto-loan">Auto Loan</option>
+                <option value="personal-loan">Personal Loan</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div class="mb-3">

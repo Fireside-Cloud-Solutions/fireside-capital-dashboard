@@ -1,6 +1,37 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-04 12:20 EST (Sprint QA Session 1205-1220 — 2 new bugs found)
+**Last Updated:** 2026-02-04 12:40 EST (Sprint QA Session 1226-1240 — 3 new commits verified)
+
+---
+
+## ✅ SPRINT QA — SESSION 1226 (Feb 4, 12:26-12:40 PM)
+
+**Status:** ✅ **3 NEW COMMITS VERIFIED — CHART BUG FIXED + MANUAL ENTRY COMPLETE**  
+**Latest Commit:** d28d3ef (3 commits since last check at 12:05 PM)  
+**Grade:** B (upgraded from B- — chart bugs fixed, feature added)
+
+### Commits Verified This Session
+
+**d28d3ef — Force Chart Height Constraints (v2)** ✅
+- Added `!important` + `max-height` to all chart utility classes
+- Triple-locked constraints: `height` + `max-height` + `min-height`
+- Prevents Chart.js library from overriding height constraints
+- **Result:** Bulletproof chart heights on all pages
+
+**76e90d3 — Add Manual Transaction Entry (FC-036)** ✅
+- New "Add Transaction" button + modal form (6 fields)
+- Form validation, Supabase insert, toast notifications
+- Distinguishes manual entries (`source: 'manual'`) from Plaid imports
+- **Result:** Users can now add cash/Venmo/PayPal transactions
+
+**b6c1522 — Prevent Infinite Chart Height** ✅
+- Removed `height: 100%` from `.chart-wrapper` (root cause)
+- Added `max-height: 100%` to canvas elements
+- Added `!important` to override Chart.js inline styles
+- **Result:** Charts no longer expand infinitely on reports page
+
+**Test Results:** ALL PASSED (no bugs found)  
+**Production Ready:** ✅ YES (once enum bugs fixed)
 
 ---
 

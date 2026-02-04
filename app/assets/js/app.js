@@ -900,6 +900,16 @@ function renderReportsSummary() {
 // ===== FULL CRUD OPERATIONS =====
 
 // --- ASSETS ---
+// Helper: Asset type display names (FC-053 fix)
+function getAssetTypeDisplayName(type) {
+  const typeMap = {
+    'real-estate': 'Real Estate',
+    'vehicle': 'Vehicle',
+    'other': 'Other'
+  };
+  return typeMap[type] || type;
+}
+
 function renderAssets() {
   const tbody = document.getElementById('assetTableBody');
   if (!tbody) return;
@@ -913,7 +923,7 @@ function renderAssets() {
   
   tbody.innerHTML = assets.map(a => `
       <tr>
-          <td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.type)}</td><td>${formatCurrency(a.value)}</td>
+          <td>${escapeHtml(a.name)}</td><td>${escapeHtml(getAssetTypeDisplayName(a.type))}</td><td>${formatCurrency(a.value)}</td>
           <td>${formatCurrency(a.loan)}</td><td>${formatCurrency(Math.max(getRaw(a.value) - getRaw(a.loan), 0))}</td>
           <td>${a.nextDueDate ? formatDate(a.nextDueDate) : '-'}</td>
           <td>
@@ -1132,6 +1142,19 @@ async function deleteInvestmentConfirmed(id) {
 }
 
 // --- DEBTS ---
+// Helper: Debt type display names (FC-050 fix)
+function getDebtTypeDisplayName(type) {
+  const typeMap = {
+    'credit-card': 'Credit Card',
+    'mortgage': 'Mortgage',
+    'student-loan': 'Student Loan',
+    'auto-loan': 'Auto Loan',
+    'personal-loan': 'Personal Loan',
+    'other': 'Other'
+  };
+  return typeMap[type] || type;
+}
+
 function renderDebts() {
   const tbody = document.getElementById('debtTableBody');
   if (!tbody) return;
@@ -1145,7 +1168,7 @@ function renderDebts() {
   
   tbody.innerHTML = debts.map(d => `
       <tr>
-          <td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.type)}</td><td>${formatCurrency(d.amount)}</td><td>${escapeHtml(d.interestRate)}%</td>
+          <td>${escapeHtml(d.name)}</td><td>${escapeHtml(getDebtTypeDisplayName(d.type))}</td><td>${formatCurrency(d.amount)}</td><td>${escapeHtml(d.interestRate)}%</td>
           <td class="hide-mobile">${escapeHtml(d.term || '-')} months</td><td>${formatCurrency(d.monthlyPayment)}</td>
           <td class="hide-mobile">${d.nextDueDate ? escapeHtml(formatDate(d.nextDueDate)) : '-'}</td>
           <td>

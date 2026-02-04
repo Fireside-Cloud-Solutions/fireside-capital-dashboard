@@ -9,12 +9,6 @@
 |------|-----------|---------|---------|-------|
 | (none) | — | — | — | — |
 
-## 🔴 IN PROGRESS (claimed — do not duplicate)
-
-| Task | Claimed By | Started | Channel | Notes |
-|------|-----------|---------|---------|-------|
-| Implement FC-036: Manual transaction entry | Capital (Lead Dev) | 2026-02-04 12:14 PM | #qa | Spawned Builder sub-agent |
-
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
 | # | Task | Priority | Source | Notes |
@@ -27,6 +21,8 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix FC-048: Investments type enum mismatch (CRITICAL) | Lead Dev (Capital) | 2026-02-04 12:50 PM | 4dc99d6 |
+| Implement FC-036: Manual transaction entry | Builder (Capital) | 2026-02-04 12:16 PM | 76e90d3 |
 | Fix FC-051: Income form enum mismatch (CRITICAL) | Lead Dev (Capital) | 2026-02-04 11:13 AM | a24f31f |
 | Implement FC-040: Friends page loading states | Lead Dev (Capital) | 2026-02-04 10:28 AM | 5cb93b3 |
 | Fix FC-041: Friends empty state CTAs | Lead Dev (Capital) | 2026-02-04 9:58 AM | 8948bda |
