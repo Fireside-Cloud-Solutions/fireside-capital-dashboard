@@ -2511,8 +2511,14 @@ async function loadAndRenderBudget() {
   }
 
   // Filter out paid-off financing items from the budget display
-  const budgetItems = [...(window.bills || []), ...sharedBillsForDisplay, ...(window.debts || [])].filter(item => {
-      if (!item) return false;
+  // FIX FC-037: Deduplicate bills by ID (shared bills may also exist in window.bills)
+  const allItems = [...(window.bills || []), ...sharedBillsForDisplay, ...(window.debts || [])];
+  const seenIds = new Set();
+  const budgetItems = allItems.filter(item => {
+      if (!item || !item.id) return false;
+      // Skip duplicates (same ID already processed)
+      if (seenIds.has(item.id)) return false;
+      seenIds.add(item.id);
       // Skip paid-off or cancelled bills (check DB status field if it exists)
       const dbStatus = (item.status || '').toLowerCase();
       if (dbStatus === 'paid_off' || dbStatus === 'cancelled') return false;

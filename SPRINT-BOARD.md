@@ -7,7 +7,7 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| FC-030: Dashboard charts blank white squares | Lead Dev (Capital) | 2026-02-04 7:45 AM | #qa | P1 Critical — debug Chart.js |
+| FC-037: Budget page issues investigation | Lead Dev (Capital) | 2026-02-04 8:20 AM | #qa | Verifying which sub-issues are real bugs |
 | Bills page UI/UX audit | Architect | 2026-02-03 8:02 PM | #ui-ux | 6/11 pages done |
 | CSS architecture research | Researcher | 2026-02-03 7:56 PM | #research | Delivered — moving to dark theme |
 | QA full audit | Builder | 2026-02-03 8:05 PM | #qa | 11/11 HTML reviewed |
@@ -26,6 +26,7 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix FC-030: Dashboard charts blank white squares | Lead Dev (Capital) | 2026-02-04 8:00 AM | a979728 |
 | Fix FC-029: Welcome button height matches notification bell | Lead Dev (Capital) | 2026-02-04 7:45 AM | 62fcd36 |
 | Fix ISSUE-UX-CONSISTENCY-001: Transactions page empty state | Capital (QA Bot) | 2026-02-03 10:09 PM | f0591eb |
 | Fix FC-027: Desktop touch targets (44px WCAG 2.5.5) | Capital (Lead Dev) | 2026-02-03 10:00 PM | b46c813 |
