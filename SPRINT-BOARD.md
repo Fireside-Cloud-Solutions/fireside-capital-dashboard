@@ -7,19 +7,17 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| Bills page UI/UX audit | Architect | 2026-02-03 8:02 PM | #ui-ux | 6/11 pages done |
-| CSS architecture research | Researcher | 2026-02-03 7:56 PM | #research | Delivered — moving to dark theme |
-| QA full audit | Builder | 2026-02-03 8:05 PM | #qa | 11/11 HTML reviewed |
+| (none) | — | — | — | — |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
 | # | Task | Priority | Source | Notes |
 |---|------|----------|--------|-------|
 | 1 | Implement FC-036: Manual transaction entry | MEDIUM | #qa | 4-6 hour feature - delegate to Builder |
-| 2 | Fix friends.html UI issues (7 issues from audit) | MEDIUM | #ui-ux | Loading states, empty state CTAs, mobile auth buttons |
-| 3 | Bootstrap dark theme research | LOW | Researcher backlog | ✅ COMPLETE (reports posted) |
-| 4 | PWA research | LOW | Researcher backlog | ✅ COMPLETE (reports posted) |
-| 5 | Performance optimization | LOW | Researcher backlog | ✅ COMPLETE (reports posted) |
+| 2 | Fix FC-039: Friends search button style | MEDIUM | #ui-ux | Change btn-primary to btn-secondary (5 min fix) |
+| 3 | Implement FC-040: Friends page loading states | MEDIUM | #ui-ux | Add skeleton loaders (~2 hours) |
+| 4 | Fix FC-041: Friends empty state CTAs | LOW | #ui-ux | Use empty-states.js utility (~1 hour) |
+| 5 | Decide FC-042: Friends section icon colors | LOW | #ui-ux | Design decision: keep or remove? |
 
 **NOTE:** Tasks "Implement design token system" and "Add skeleton loaders" removed — ALREADY IMPLEMENTED (design-tokens.css and skeleton CSS in components.css)
 
@@ -27,6 +25,8 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| UI/UX audit: friends.html (Grade B+, 4 issues found) | Architect | 2026-02-04 9:23 AM | — |
+| Fix FC-038: Friends auth button styling consistency | Builder (QA) | 2026-02-04 9:25 AM | TBD |
 | Fix FC-033: Debts table layout (hide Term/Next Due on mobile) | Lead Dev (Capital) | 2026-02-04 9:05 AM | 1c9c308 |
 | Fix FC-034: Bills filter button styling consistency | Lead Dev (Capital) | 2026-02-04 8:42 AM | ef148bc |
 | Fix FC-037: Budget page duplicate bills (ID deduplication) | Lead Dev (Capital) | 2026-02-04 8:25 AM | 16bfd2e |
