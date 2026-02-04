@@ -56,6 +56,13 @@ const chartLoadCallbacks = [];
 
 function loadChartJs() {
   return new Promise((resolve, reject) => {
+    // Check if Chart.js is already loaded (e.g., via <script> tag in HTML)
+    if (typeof window.Chart !== 'undefined') {
+      chartJsLoaded = true;
+      resolve();
+      return;
+    }
+    
     if (chartJsLoaded) {
       resolve();
       return;
