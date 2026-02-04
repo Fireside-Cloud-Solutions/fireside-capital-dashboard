@@ -315,3 +315,37 @@
     display: none !important;
   }
 }
+
+/* =================================================================
+   ICON SIZING UTILITIES
+   FIX: Delete icons too small (Issue #1)
+   ================================================================= */
+
+/* Standard icon sizing for buttons */
+.btn .bi-trash,
+.btn .bi-pencil,
+.btn .bi-share,
+.btn .bi {
+  font-size: 1.25rem; /* 20px - More visible */
+}
+
+/* Icon-only buttons need larger icons */
+.btn-icon-only .bi {
+  font-size: 1.5rem; /* 24px - Highly accessible */
+}
+
+/* Action icons in cards/tables */
+.action-icon .bi {
+  font-size: 1.25rem; /* 20px */
+}
+
+/* Mobile: Keep icons accessible on touch devices */
+@media (max-width: 575.98px) {
+  .btn .bi {
+    font-size: 1.375rem; /* 22px - Even more touch-friendly */
+  }
+  
+  .btn-icon-only .bi {
+    font-size: 1.625rem; /* 26px */
+  }
+}
