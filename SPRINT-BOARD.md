@@ -7,7 +7,7 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| (none) | — | — | — | — |
+| FC-057: Standardize chart heights (lg/md only) | Lead Dev (Capital) | 2026-02-04 2:13 PM | #ui-ux | P2/XS - Visual consistency |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
@@ -21,6 +21,7 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Fix FC-071: Touch target sizing on Add Asset button | Lead Dev (Capital) | 2026-02-04 1:35 PM | e995fcf |
 | Fix FC-048: Investments type enum mismatch (CRITICAL) | Lead Dev (Capital) | 2026-02-04 12:50 PM | 4dc99d6 |
 | Implement FC-036: Manual transaction entry | Builder (Capital) | 2026-02-04 12:16 PM | 76e90d3 |
 | Fix FC-051: Income form enum mismatch (CRITICAL) | Lead Dev (Capital) | 2026-02-04 11:13 AM | a24f31f |
