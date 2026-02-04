@@ -685,6 +685,14 @@ strong {
   overflow: hidden;
 }
 
+/* CRITICAL FIX: Force chart wrappers with height classes to respect max-height */
+.chart-wrapper.chart-height-sm,
+.chart-wrapper.chart-height-md,
+.chart-wrapper.chart-height-lg {
+  max-height: inherit !important;
+  overflow: hidden !important;
+}
+
 .chart-wrapper canvas {
   width: 100% !important;
   height: 100% !important;

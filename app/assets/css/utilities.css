@@ -40,23 +40,32 @@
 
 /* =================================================================
    CHART WRAPPER HEIGHT UTILITIES
+   CRITICAL FIX: Added max-height to prevent infinite expansion
    ================================================================= */
 
 .chart-height-sm {
-  height: 260px;
+  height: 260px !important;
+  max-height: 260px !important;
+  min-height: 260px !important;
 }
 
 .chart-height-md {
-  height: 300px;
+  height: 300px !important;
+  max-height: 300px !important;
+  min-height: 300px !important;
 }
 
 .chart-height-lg {
-  height: 350px;
+  height: 350px !important;
+  max-height: 350px !important;
+  min-height: 350px !important;
 }
 
 /* Special chart wrapper with flex centering */
 .chart-wrapper-centered {
-  height: 260px;
+  height: 260px !important;
+  max-height: 260px !important;
+  min-height: 260px !important;
   display: flex;
   align-items: center;
   justify-content: center;
