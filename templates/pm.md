@@ -43,6 +43,7 @@ As a [user type], I want [goal], so that [benefit].
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
+- [ ] **Verified on live site** (all features must be tested at https://nice-cliff-05b13880f.2.azurestaticapps.net)
 
 ### Technical Notes
 [Implementation hints, dependencies, risks]

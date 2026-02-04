@@ -50,46 +50,13 @@ window.debugBillsCalculation = function() {
 };
 
 // ===== PERFORMANCE: LAZY LOAD CHART.JS =====
-let chartJsLoaded = false;
-let chartJsLoading = false;
-const chartLoadCallbacks = [];
+// Uses LazyLoader utility for consistent lazy loading across app
+// Chart.js (270 KB) only loads on pages with charts (dashboard, reports)
+// See assets/js/lazy-loader.js for implementation
 
-function loadChartJs() {
-  return new Promise((resolve, reject) => {
-    // Check if Chart.js is already loaded (e.g., via <script> tag in HTML)
-    if (typeof window.Chart !== 'undefined') {
-      chartJsLoaded = true;
-      resolve();
-      return;
-    }
-    
-    if (chartJsLoaded) {
-      resolve();
-      return;
-    }
-    
-    chartLoadCallbacks.push(resolve);
-    
-    if (chartJsLoading) {
-      return; // Already loading, just wait for callback
-    }
-    
-    chartJsLoading = true;
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-    script.onload = () => {
-      chartJsLoaded = true;
-      chartJsLoading = false;
-      chartLoadCallbacks.forEach(cb => cb());
-      chartLoadCallbacks.length = 0;
-    };
-    script.onerror = () => {
-      chartJsLoading = false;
-      console.error('Failed to load Chart.js');
-      reject(new Error('Failed to load Chart.js'));
-    };
-    document.head.appendChild(script);
-  });
+async function loadChartJs() {
+  // Delegate to LazyLoader utility
+  return await window.LazyLoader.loadCharts();
 }
 
 // ===== PERFORMANCE: DATA CACHING =====

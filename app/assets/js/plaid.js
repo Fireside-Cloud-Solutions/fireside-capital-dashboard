@@ -90,8 +90,8 @@ function exchangePublicToken(publicToken) {
   });
 }
 
-// Open Plaid Link
-function openPlaidLink() {
+// Open Plaid Link (lazy-loads Plaid Link library first)
+async function openPlaidLink() {
   // Rate limiting
   if (window.rateLimiters && !window.rateLimiters.plaid.allow('openPlaidLink')) {
     const remainingMs = window.rateLimiters.plaid.getRemainingTime('openPlaidLink');
@@ -100,10 +100,31 @@ function openPlaidLink() {
     return;
   }
 
-  if (plaidLinkHandler) {
-    plaidLinkHandler.open();
-  } else {
-    console.error('Plaid Link handler not initialized');
+  try {
+    // Lazy load Plaid Link library (95 KB) only when user clicks "Connect Bank"
+    await window.LazyLoader.loadPlaid();
+    
+    // Initialize handler if not already done
+    if (!plaidLinkHandler && typeof Plaid !== 'undefined') {
+      // Fetch link token and create handler
+      const response = await fetch('/create_link_token');
+      const data = await response.json();
+      if (data.link_token) {
+        createPlaidLinkHandler(data.link_token);
+      } else {
+        throw new Error('Failed to fetch link token');
+      }
+    }
+    
+    // Open Plaid Link UI
+    if (plaidLinkHandler) {
+      plaidLinkHandler.open();
+    } else {
+      throw new Error('Plaid Link handler not initialized');
+    }
+  } catch (error) {
+    console.error('[Plaid] Error opening Plaid Link:', error);
+    alert('Unable to connect bank account. Please try again later.');
   }
 }
 
