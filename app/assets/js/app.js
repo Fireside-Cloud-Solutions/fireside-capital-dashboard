@@ -1418,7 +1418,7 @@ function renderBills() {
   tbody.innerHTML = activeBills.map(b => {
       // Shared-with-me bills: show "Shared by X" badge, read-only actions
       if (b.isSharedWithMe) {
-        const sharedByBadge = `<span class="badge bg-info ms-1" title="Shared by ${escapeAttribute(b.sharedByName)}"><i class="bi bi-link-45deg me-1"></i>${escapeHtml(b.splitLabel)}</span>`;
+        const sharedByBadge = `<span class="badge bg-secondary ms-1" title="Shared by ${escapeAttribute(b.sharedByName)}"><i class="bi bi-people-fill me-1"></i>${escapeHtml(b.splitLabel)}</span>`;
         return `
         <tr>
             <td>${escapeHtml(b.name)} ${sharedByBadge}
@@ -1437,7 +1437,7 @@ function renderBills() {
       }
       // Owned bills: original rendering with edit/delete/share buttons
       const shareInfo = getShareInfoForBill(b.id);
-      const sharedBadge = shareInfo ? `<span class="badge bg-info ms-1" title="Shared with ${escapeAttribute(shareInfo.shared_user?.display_name || 'someone')}"><i class="bi bi-link-45deg me-1"></i>${escapeHtml(shareInfo.status === 'accepted' ? 'Shared' : 'Pending')}</span>` : '';
+      const sharedBadge = shareInfo ? `<span class="badge bg-secondary ms-1" title="Shared with ${escapeAttribute(shareInfo.shared_user?.display_name || 'someone')}"><i class="bi bi-people-fill me-1"></i>${escapeHtml(shareInfo.status === 'accepted' ? 'Shared' : 'Pending')}</span>` : '';
       return `
       <tr>
           <td>${escapeHtml(b.name)} ${sharedBadge}</td><td><span class="badge ${getCategoryBadgeClass(b.type)}">${escapeHtml(b.type)}</span></td><td>${formatCurrency(b.amount)}${shareInfo && shareInfo.status === 'accepted' ? `<small class="d-block" style="color: var(--color-text-tertiary);">Your share: ${formatCurrency(shareInfo.owner_amount)}</small>` : ''}</td>
