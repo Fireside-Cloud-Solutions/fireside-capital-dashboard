@@ -1010,6 +1010,21 @@ async function deleteAssetConfirmed() {
 }
 
 // --- INVESTMENTS ---
+// Helper function to convert investment type enum values to display names
+function getInvestmentTypeDisplayName(type) {
+  const typeMap = {
+    '401k': '401(k)',
+    'ira': 'Traditional IRA',
+    'roth-ira': 'Roth IRA',
+    'brokerage': 'Brokerage',
+    'savings': 'Savings',
+    'cd': 'CD',
+    'crypto': 'Crypto',
+    'other': 'Other'
+  };
+  return typeMap[type] || type;
+}
+
 function renderInvestments() {
   const tbody = document.getElementById('investmentTableBody');
   if (!tbody) return;
@@ -1023,7 +1038,7 @@ function renderInvestments() {
   
   tbody.innerHTML = investments.map(inv => `
       <tr>
-          <td>${escapeHtml(inv.name)}</td><td>${escapeHtml(inv.type)}</td><td>${formatCurrency(inv.startingBalance)}</td>
+          <td>${escapeHtml(inv.name)}</td><td>${escapeHtml(getInvestmentTypeDisplayName(inv.type))}</td><td>${formatCurrency(inv.startingBalance)}</td>
           <td>${formatCurrency(inv.monthlyContribution)}</td><td>${escapeHtml(inv.annualReturn ? inv.annualReturn + '%' : '-')}</td>
           <td>${inv.nextContributionDate ? escapeHtml(formatDate(inv.nextContributionDate)) : '-'}</td><td>${formatCurrency(inv.value)}</td>
           <td>
@@ -1039,9 +1054,12 @@ function openInvestmentModal(id = null) {
   if (id) {
       const inv = window.investments.find(i => i.id == id); // FIX: Changed === to ==
       if(inv) {
-          f.investmentName.value = escapeHtml(inv.name || ''); f.investmentType.value = escapeHtml(inv.type || ''); f.investmentValue.value = inv.value;
+          f.investmentName.value = escapeHtml(inv.name || ''); 
+          f.investmentType.value = inv.type || ''; // Don't escape enum values
+          f.investmentValue.value = inv.value;
           f.startingBalance.value = inv.startingBalance || '';
-          f.monthlyContribution.value = inv.monthlyContribution; f.annualReturn.value = inv.annualReturn;
+          f.monthlyContribution.value = inv.monthlyContribution; 
+          f.annualReturn.value = inv.annualReturn;
           f.nextContributionDate.value = inv.nextContributionDate;
       }
   }

@@ -179,14 +179,17 @@
               <input type="text" class="form-control" id="investmentName" required placeholder="e.g., 401(k), Roth IRA, Brokerage">
             </div>
             <div class="mb-3">
-              <label for="investmentType" class="form-label">Type</label>
+              <label for="investmentType" class="form-label">Type <span class="text-danger">*</span></label>
               <select class="form-select" id="investmentType" required>
                 <option value="">Choose...</option>
-                <option>Stock</option>
-                <option>Crypto</option>
-                <option>401(k)</option>
-                <option>Real Estate</option>
-                <option>Other</option>
+                <option value="401k">401(k)</option>
+                <option value="ira">Traditional IRA</option>
+                <option value="roth-ira">Roth IRA</option>
+                <option value="brokerage">Brokerage Account</option>
+                <option value="savings">High-Yield Savings</option>
+                <option value="cd">Certificate of Deposit (CD)</option>
+                <option value="crypto">Cryptocurrency</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div class="mb-3">
