@@ -7,7 +7,7 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
-| FC-056: Add skeleton loaders to Dashboard (9 charts + 6 stat cards) | Lead Dev (Capital) | 2026-02-04 3:20 PM | #qa | P2 - Improve perceived performance |
+| (none) | — | — | — | — |
 
 ## 🟡 QUEUED (priority order — next agent picks top item)
 
@@ -21,6 +21,7 @@
 
 | Task | Done By | Completed | Commit |
 |------|---------|-----------|--------|
+| Implement FC-056: Skeleton loaders for Dashboard (6 stat cards + 9 charts) | Lead Dev (Capital) | 2026-02-04 3:30 PM | 4845557 |
 | Fix FC-072: Investments Actions column not visible | Lead Dev (Capital) | 2026-02-04 2:50 PM | 17385b3 |
 | Fix FC-057: Standardize chart heights to lg/md only | Lead Dev (Capital) | 2026-02-04 2:13 PM | e0a41b0 |
 | Fix FC-071: Touch target sizing on Add Asset button | Lead Dev (Capital) | 2026-02-04 1:35 PM | e995fcf |
