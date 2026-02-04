@@ -220,7 +220,20 @@ async function safeCreateChart(ctx, config, chartName) {
       }
     }
     
-    return new Chart(ctx, config);
+    const chart = new Chart(ctx, config);
+    
+    // Remove loading state from parent chart-card once chart is rendered
+    if (canvas) {
+      const chartCard = canvas.closest('.chart-card');
+      if (chartCard && chartCard.classList.contains('loading')) {
+        // Small delay to ensure chart is fully rendered
+        setTimeout(() => {
+          chartCard.classList.remove('loading');
+        }, 100);
+      }
+    }
+    
+    return chart;
   } catch (err) {
     console.error(`Failed to render ${chartName || 'chart'}:`, err);
     const el = (typeof ctx === 'string') ? document.getElementById(ctx) : ctx;
@@ -827,9 +840,23 @@ async function renderAll() {
       }
   }
 
-  // If we are on the reports page, render the net worth chart (without writing snapshots)
+  // If we are on the reports page, render all charts
   if (document.getElementById('reportNetWorth') && document.getElementById('netWorthTimelineChart')) {
       await renderNetWorthChart();
+      
+      // Render additional charts moved from dashboard
+      if (typeof generateMonthlyCashFlowChart === 'function') {
+        generateMonthlyCashFlowChart();
+      }
+      if (typeof renderSpendingCategoriesChart === 'function') {
+        renderSpendingCategoriesChart();
+      }
+      if (typeof renderSavingsRateChart === 'function') {
+        renderSavingsRateChart();
+      }
+      if (typeof renderInvestmentGrowthChart === 'function') {
+        renderInvestmentGrowthChart();
+      }
   }
 
   // Pre-populate settings inputs
@@ -3194,6 +3221,7 @@ async function calculateAndDisplayTrends(currentValues) {
         getRaw(lastMonthSnapshot.net_worth),
         false
       );
+      el('netWorthTrend').classList.remove('d-none');
     }
     
     // Assets trend (if exists)
@@ -3204,6 +3232,7 @@ async function calculateAndDisplayTrends(currentValues) {
         getRaw(lastMonthSnapshot.total_assets),
         false
       );
+      assetsTrendEl.classList.remove('d-none');
     }
     
     // Investments trend (if exists)
@@ -3214,6 +3243,7 @@ async function calculateAndDisplayTrends(currentValues) {
         getRaw(lastMonthSnapshot.total_investments),
         false
       );
+      investmentsTrendEl.classList.remove('d-none');
     }
     
     // Debts trend (decrease is good)
@@ -3224,6 +3254,7 @@ async function calculateAndDisplayTrends(currentValues) {
         getRaw(lastMonthSnapshot.total_debts),
         true
       );
+      debtsTrendEl.classList.remove('d-none');
     }
   } else {
     // No historical trend data — show a dash for all trend elements
@@ -3233,6 +3264,7 @@ async function calculateAndDisplayTrends(currentValues) {
       const element = el(elementId);
       if (element) {
         element.innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+        element.classList.remove('d-none');
       }
     });
   }
@@ -3317,25 +3349,68 @@ async function updateDashboardCards() {
     // Update stat card values
     const el = (id) => document.getElementById(id);
     
-    if (el('netWorthValue')) el('netWorthValue').textContent = formatCurrency(netWorth);
-    if (el('totalAssetsValue')) el('totalAssetsValue').textContent = formatCurrency(totalAssets);
-    if (el('monthlyBillsValue')) el('monthlyBillsValue').textContent = formatCurrency(monthlyBills);
-    if (el('totalDebtsValue')) el('totalDebtsValue').textContent = formatCurrency(totalDebts);
-    if (el('totalInvestmentsValue')) el('totalInvestmentsValue').textContent = formatCurrency(totalInvestments);
-    if (el('monthlyIncomeValue')) el('monthlyIncomeValue').textContent = formatCurrency(monthlyIncome);
+    if (el('netWorthValue')) {
+      el('netWorthValue').textContent = formatCurrency(netWorth);
+      el('netWorthValue').classList.remove('d-none');
+      const card = el('netWorthValue').closest('.stat-card');
+      if (card) card.classList.remove('loading');
+    }
+    if (el('totalAssetsValue')) {
+      el('totalAssetsValue').textContent = formatCurrency(totalAssets);
+      el('totalAssetsValue').classList.remove('d-none');
+      const card = el('totalAssetsValue').closest('.stat-card');
+      if (card) card.classList.remove('loading');
+    }
+    if (el('monthlyBillsValue')) {
+      el('monthlyBillsValue').textContent = formatCurrency(monthlyBills);
+      el('monthlyBillsValue').classList.remove('d-none');
+      const card = el('monthlyBillsValue').closest('.stat-card');
+      if (card) card.classList.remove('loading');
+    }
+    if (el('totalDebtsValue')) {
+      el('totalDebtsValue').textContent = formatCurrency(totalDebts);
+      el('totalDebtsValue').classList.remove('d-none');
+      const card = el('totalDebtsValue').closest('.stat-card');
+      if (card) card.classList.remove('loading');
+    }
+    if (el('totalInvestmentsValue')) {
+      el('totalInvestmentsValue').textContent = formatCurrency(totalInvestments);
+      el('totalInvestmentsValue').classList.remove('d-none');
+      const card = el('totalInvestmentsValue').closest('.stat-card');
+      if (card) card.classList.remove('loading');
+    }
+    if (el('monthlyIncomeValue')) {
+      el('monthlyIncomeValue').textContent = formatCurrency(monthlyIncome);
+      el('monthlyIncomeValue').classList.remove('d-none');
+      const card = el('monthlyIncomeValue').closest('.stat-card');
+      if (card) card.classList.remove('loading');
+    }
 
     // Update counts
-    if (el('assetCount')) el('assetCount').textContent = `${assets.length} asset${assets.length !== 1 ? 's' : ''}`;
+    if (el('assetCount')) {
+      el('assetCount').textContent = `${assets.length} asset${assets.length !== 1 ? 's' : ''}`;
+      el('assetCount').classList.remove('d-none');
+    }
     if (el('billCount')) {
       const activeBills = bills.filter(b => {
         const info = getBillFinancingInfo(b);
         return !(info.isFinancing && info.status === 'paid_off');
       });
       el('billCount').textContent = `${activeBills.length} bill${activeBills.length !== 1 ? 's' : ''}`;
+      el('billCount').classList.remove('d-none');
     }
-    if (el('debtCount')) el('debtCount').textContent = `${debts.length} debt${debts.length !== 1 ? 's' : ''}`;
-    if (el('investmentCount')) el('investmentCount').textContent = `${investments.length} investment${investments.length !== 1 ? 's' : ''}`;
-    if (el('incomeCount')) el('incomeCount').textContent = `${income.length} source${income.length !== 1 ? 's' : ''}`;
+    if (el('debtCount')) {
+      el('debtCount').textContent = `${debts.length} debt${debts.length !== 1 ? 's' : ''}`;
+      el('debtCount').classList.remove('d-none');
+    }
+    if (el('investmentCount')) {
+      el('investmentCount').textContent = `${investments.length} investment${investments.length !== 1 ? 's' : ''}`;
+      el('investmentCount').classList.remove('d-none');
+    }
+    if (el('incomeCount')) {
+      el('incomeCount').textContent = `${income.length} source${income.length !== 1 ? 's' : ''}`;
+      el('incomeCount').classList.remove('d-none');
+    }
 
     // Calculate month-over-month trends from snapshots
     await calculateAndDisplayTrends({

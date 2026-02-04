@@ -152,7 +152,7 @@
           <div class="row g-4">
             <!-- Net Worth Card -->
             <div class="col-12 col-md-6 col-lg-6 col-xl-4">
-              <div class="stat-card">
+              <div class="stat-card loading">
                 <div class="stat-card-header">
                   <span class="stat-label">Net Worth</span>
                   <div class="stat-icon">
@@ -161,8 +161,12 @@
                     </svg>
                   </div>
                 </div>
-                <div class="stat-value" id="netWorthValue">$0.00</div>
-                <div class="stat-trend" id="netWorthTrend">
+                <div class="stat-card-skeleton">
+                  <div class="skeleton-loader skeleton-value"></div>
+                  <div class="skeleton-loader skeleton-trend"></div>
+                </div>
+                <div class="stat-value d-none" id="netWorthValue">$0.00</div>
+                <div class="stat-trend d-none" id="netWorthTrend">
                   <span class="trend-indicator">—</span>
                 </div>
               </div>
@@ -170,7 +174,7 @@
 
             <!-- Total Assets Card -->
             <div class="col-12 col-md-6 col-lg-6 col-xl-4">
-              <div class="stat-card">
+              <div class="stat-card loading">
                 <div class="stat-card-header">
                   <span class="stat-label">Total Assets</span>
                   <div class="stat-icon stat-icon-blue">
@@ -179,17 +183,22 @@
                     </svg>
                   </div>
                 </div>
-                <div class="stat-value" id="totalAssetsValue">$0.00</div>
-                <div class="stat-trend" id="assetsTrend">
+                <div class="stat-card-skeleton">
+                  <div class="skeleton-loader skeleton-value"></div>
+                  <div class="skeleton-loader skeleton-trend"></div>
+                  <div class="skeleton-loader skeleton-meta"></div>
+                </div>
+                <div class="stat-value d-none" id="totalAssetsValue">$0.00</div>
+                <div class="stat-trend d-none" id="assetsTrend">
                   <span class="trend-indicator">—</span>
                 </div>
-                <div class="stat-meta" id="assetCount">0 assets</div>
+                <div class="stat-meta d-none" id="assetCount">0 assets</div>
               </div>
             </div>
 
             <!-- Monthly Bills Card -->
             <div class="col-12 col-md-6 col-lg-6 col-xl-4">
-              <div class="stat-card">
+              <div class="stat-card loading">
                 <div class="stat-card-header">
                   <span class="stat-label">Monthly Bills</span>
                   <div class="stat-icon stat-icon-orange">
@@ -198,14 +207,18 @@
                     </svg>
                   </div>
                 </div>
-                <div class="stat-value" id="monthlyBillsValue">$0.00</div>
-                <div class="stat-meta" id="billCount">0 bills</div>
+                <div class="stat-card-skeleton">
+                  <div class="skeleton-loader skeleton-value"></div>
+                  <div class="skeleton-loader skeleton-meta"></div>
+                </div>
+                <div class="stat-value d-none" id="monthlyBillsValue">$0.00</div>
+                <div class="stat-meta d-none" id="billCount">0 bills</div>
               </div>
             </div>
 
             <!-- Total Debts Card -->
             <div class="col-12 col-md-6 col-lg-6 col-xl-4">
-              <div class="stat-card">
+              <div class="stat-card loading">
                 <div class="stat-card-header">
                   <span class="stat-label">Total Debts</span>
                   <div class="stat-icon stat-icon-red">
@@ -214,17 +227,22 @@
                     </svg>
                   </div>
                 </div>
-                <div class="stat-value" id="totalDebtsValue">$0.00</div>
-                <div class="stat-trend" id="debtsTrend">
+                <div class="stat-card-skeleton">
+                  <div class="skeleton-loader skeleton-value"></div>
+                  <div class="skeleton-loader skeleton-trend"></div>
+                  <div class="skeleton-loader skeleton-meta"></div>
+                </div>
+                <div class="stat-value d-none" id="totalDebtsValue">$0.00</div>
+                <div class="stat-trend d-none" id="debtsTrend">
                   <span class="trend-indicator">—</span>
                 </div>
-                <div class="stat-meta" id="debtCount">0 debts</div>
+                <div class="stat-meta d-none" id="debtCount">0 debts</div>
               </div>
             </div>
 
             <!-- Total Investments Card -->
             <div class="col-12 col-md-6 col-lg-6 col-xl-4">
-              <div class="stat-card">
+              <div class="stat-card loading">
                 <div class="stat-card-header">
                   <span class="stat-label">Investments</span>
                   <div class="stat-icon stat-icon-blue">
@@ -233,17 +251,22 @@
                     </svg>
                   </div>
                 </div>
-                <div class="stat-value" id="totalInvestmentsValue">$0.00</div>
-                <div class="stat-trend" id="investmentsTrend">
+                <div class="stat-card-skeleton">
+                  <div class="skeleton-loader skeleton-value"></div>
+                  <div class="skeleton-loader skeleton-trend"></div>
+                  <div class="skeleton-loader skeleton-meta"></div>
+                </div>
+                <div class="stat-value d-none" id="totalInvestmentsValue">$0.00</div>
+                <div class="stat-trend d-none" id="investmentsTrend">
                   <span class="trend-indicator">—</span>
                 </div>
-                <div class="stat-meta" id="investmentCount">0 investments</div>
+                <div class="stat-meta d-none" id="investmentCount">0 investments</div>
               </div>
             </div>
 
             <!-- Monthly Income Card -->
             <div class="col-12 col-md-6 col-lg-6 col-xl-4">
-              <div class="stat-card">
+              <div class="stat-card loading">
                 <div class="stat-card-header">
                   <span class="stat-label">Monthly Income</span>
                   <div class="stat-icon">
@@ -252,8 +275,12 @@
                     </svg>
                   </div>
                 </div>
-                <div class="stat-value" id="monthlyIncomeValue">$0.00</div>
-                <div class="stat-meta" id="incomeCount">0 sources</div>
+                <div class="stat-card-skeleton">
+                  <div class="skeleton-loader skeleton-value"></div>
+                  <div class="skeleton-loader skeleton-meta"></div>
+                </div>
+                <div class="stat-value d-none" id="monthlyIncomeValue">$0.00</div>
+                <div class="stat-meta d-none" id="incomeCount">0 sources</div>
               </div>
             </div>
           </div>
@@ -297,17 +324,19 @@
             </div>
           </div>
           <div class="col-xl-5 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Net Worth Over Time</h5>
               <div class="chart-wrapper chart-height-lg">
+                <div class="chart-skeleton chart-height-lg"></div>
                 <canvas id="netWorthTimelineChart"></canvas>
               </div>
             </div>
           </div>
           <div class="col-xl-4 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Monthly Cash Flow</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="cashFlowChart"></canvas>
               </div>
             </div>
@@ -317,40 +346,45 @@
         <!-- Row 3: Analytics Charts -->
         <div class="row g-3 g-xl-4 mb-4">
           <div class="col-xl-4 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Monthly Net Worth Change</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="netWorthDeltaChart"></canvas>
               </div>
             </div>
           </div>
           <div class="col-xl-4 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Top Spending Categories</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="spendingCategoriesChart"></canvas>
               </div>
             </div>
           </div>
           <div class="col-xl-4 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Emergency Fund Progress</h5>
               <div class="chart-wrapper chart-wrapper-centered" id="emergencyFundChartWrapper">
+                <div class="chart-skeleton chart-height-md"></div>
               </div>
             </div>
           </div>
           <div class="col-xl-6 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Savings Rate Over Time</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="savingsRateChart"></canvas>
               </div>
             </div>
           </div>
           <div class="col-xl-6 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Investment Growth Over Time</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="investmentGrowthChart"></canvas>
               </div>
             </div>
@@ -360,17 +394,19 @@
         <!-- Row 4: New Visualization Charts -->
         <div class="row g-3 g-xl-4 mb-4">
           <div class="col-xl-6 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Asset Allocation</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="assetAllocationChart"></canvas>
               </div>
             </div>
           </div>
           <div class="col-xl-6 col-lg-6 col-md-12 col-12">
-            <div class="chart-card">
+            <div class="chart-card loading">
               <h5>Debt-to-Income Ratio</h5>
               <div class="chart-wrapper chart-height-md">
+                <div class="chart-skeleton chart-height-md"></div>
                 <canvas id="dtiGaugeChart"></canvas>
               </div>
             </div>

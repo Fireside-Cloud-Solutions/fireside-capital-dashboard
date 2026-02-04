@@ -82,17 +82,18 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-027 | Bug | P2 | XS | Done | Desktop touch targets below 44px WCAG 2.5.5 minimum (page header, time filters, table buttons) — see reports/ISSUE-A11Y-BUTTONS.md |
 | FC-028 | Bug | P3 | XS | Backlog | Transactions page empty state doesn't match .empty-state component pattern — see reports/ISSUE-UX-CONSISTENCY-001.md |
 | FC-039 | Bug | P2 | XS | Done | Friends page search button using btn-primary instead of btn-secondary — see reports/FC-043-button-hierarchy-violations.md |
-| FC-040 | Feature | P2 | M | Backlog | Friends page missing loading states (skeleton loaders) — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
-| FC-041 | Feature | P3 | S | Backlog | Friends page empty states don't use empty-states.js utility — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
+| FC-040 | Feature | P2 | M | Done | Friends page missing loading states (skeleton loaders) — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
+| FC-041 | Feature | P3 | S | Done | Friends page empty states don't use empty-states.js utility — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
 | FC-042 | Chore | P3 | XS | Backlog | Friends page section icon colors inconsistent (design decision) — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
 | FC-043 | Bug | P2 | XS | Done | Button hierarchy violations across 6 pages (assets, bills, debts, income, investments, budget) — Add buttons using btn-primary instead of btn-secondary — see reports/FC-043-button-hierarchy-violations.md |
 | FC-056 | Feature | P2 | M | Backlog | Missing skeleton loaders on Dashboard (9 charts + 6 stat cards) — poor perceived performance |
-| FC-057 | Bug | P2 | XS | Backlog | Inconsistent chart heights — standardize to 2 sizes (lg/md) for visual consistency |
+| FC-057 | Bug | P2 | XS | Done | Inconsistent chart heights — standardize to 2 sizes (lg/md) for visual consistency |
 | FC-058 | Feature | P3 | S | Backlog | Subscriptions widget loading state — replace generic spinner with skeleton cards |
 | FC-060 | Chore | P3 | XS | Backlog | Stat card SVG icons missing explicit width/height attributes |
 | FC-061 | Feature | P2 | S | Backlog | Dashboard empty state for new users — show onboarding CTA instead of blank charts |
 | FC-062 | Bug | P3 | XS | Backlog | Upcoming transactions widget needs max-height on mobile |
 | FC-063 | Feature | P3 | S | Backlog | Chart lazy loading indicator — subtle "Loading charts..." text for slow connections |
+| FC-072 | Bug | P3 | XS | Done | Investments page missing ACTIONS column — no edit/delete buttons for investment accounts |
 
 ### EPIC-002: Mobile Application
 

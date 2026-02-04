@@ -1134,6 +1134,108 @@ body[data-theme="light"] .card.loading::after {
 .skeleton-row td:nth-child(5) .skeleton-loader { max-width: 40%; }
 
 /* =================================================================
+   SKELETON LOADERS (STAT CARDS & CHARTS)
+   ================================================================= */
+
+/* Stat Card Skeleton */
+.stat-card-skeleton .skeleton-loader {
+  margin-bottom: 12px;
+}
+
+.stat-card-skeleton .skeleton-label {
+  height: 14px;
+  width: 40%;
+  margin-bottom: 16px;
+}
+
+.stat-card-skeleton .skeleton-value {
+  height: 32px;
+  width: 60%;
+  margin-bottom: 8px;
+}
+
+.stat-card-skeleton .skeleton-trend {
+  height: 12px;
+  width: 30%;
+  margin-bottom: 8px;
+}
+
+.stat-card-skeleton .skeleton-meta {
+  height: 12px;
+  width: 25%;
+}
+
+/* Chart Skeleton */
+.chart-skeleton {
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-2) 25%,
+    var(--color-bg-3) 50%,
+    var(--color-bg-2) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: 8px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Height variants for different chart sizes */
+.chart-skeleton.chart-height-lg {
+  height: 400px;
+}
+
+.chart-skeleton.chart-height-md {
+  height: 300px;
+}
+
+/* Add subtle grid lines to chart skeletons */
+.chart-skeleton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 19%, var(--color-bg-1) 19%, var(--color-bg-1) 20%),
+    repeating-linear-gradient(90deg, transparent, transparent 19%, var(--color-bg-1) 19%, var(--color-bg-1) 20%);
+  opacity: 0.3;
+}
+
+/* Hide actual canvas while skeleton is showing */
+.loading .chart-wrapper canvas {
+  display: none;
+}
+
+/* Hide skeleton when not loading */
+.stat-card:not(.loading) .stat-card-skeleton,
+.chart-card:not(.loading) .chart-skeleton {
+  display: none;
+}
+
+/* Show real content when not loading */
+.stat-card:not(.loading) .stat-value,
+.stat-card:not(.loading) .stat-trend,
+.stat-card:not(.loading) .stat-meta {
+  display: block !important;
+}
+
+/* Smooth fade-in when loading completes */
+.stat-card, .chart-card {
+  transition: opacity 0.3s ease;
+}
+
+.stat-card.loading, .chart-card.loading {
+  opacity: 0.8;
+}
+
+.stat-card:not(.loading), .chart-card:not(.loading) {
+  opacity: 1;
+}
+
+/* =================================================================
    SPINNER CUSTOMIZATION
    ================================================================= */
 
