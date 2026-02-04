@@ -209,8 +209,13 @@
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-            <div id="emptyState" class="text-center text-muted d-none">
-              <p>No transactions found. Click "Sync from Bank" to import.</p>
+            <div id="emptyState" class="empty-state text-center d-none">
+              <i class="bi bi-credit-card empty-state-icon"></i>
+              <h3>No Transactions Yet</h3>
+              <p>Connect your bank account with Plaid to automatically import and categorize transactions.</p>
+              <button class="btn btn-primary" id="connectBankFromEmpty">
+                <i class="bi bi-bank"></i> Sync from Bank
+              </button>
             </div>
           </div>
         </div>
@@ -422,6 +427,12 @@
         document.getElementById('endDate').value = '';
         await loadTransactions();
       });
+      
+      // Wire up empty state "Sync from Bank" button
+      const connectBankFromEmpty = document.getElementById('connectBankFromEmpty');
+      if (connectBankFromEmpty) {
+        connectBankFromEmpty.addEventListener('click', openPlaidLink);
+      }
     });
   </script>
 </body>
