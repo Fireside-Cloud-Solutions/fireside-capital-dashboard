@@ -1,25 +1,45 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-04 10:42 EST (Sprint QA active - FC-045 fixed)
+**Last Updated:** 2026-02-04 10:58 EST (Sprint QA active - 2 bugs fixed, continuing audit)
 
 ---
 
-## 🚨 SPRINT QA — CRITICAL BUG FIXED (Feb 4, 10:36-10:42 AM)
+## 🚨 SPRINT QA — SESSION 1036-1058 (Feb 4, 10:36-10:58 AM)
 
-**Latest Build:** 2ae98a1 (fix: FC-045 - Variable redeclarations in skeleton loader)  
-**Status:** ✅ **CRITICAL BUG FIXED**  
-**Fix Time:** 5 minutes from detection
+**Latest Build:** 8689461 (fix: FC-046 - Dashboard Sign Up button consistency)  
+**Status:** ✅ **2 BUGS FIXED, AUDIT CONTINUING**  
+**Pages Audited:** friends.html, index.html, assets.html, bills.html, budget.html (5/11)
 
-### FC-045: JavaScript Syntax Errors (CRITICAL)
-- **Found:** 2026-02-04 10:36 AM (14 minutes after breaking commit)
-- **Fixed:** 2026-02-04 10:42 AM
+### Bugs Found & Fixed This Session
+
+#### FC-045: JavaScript Syntax Errors (CRITICAL 🔴)
+- **Found:** 10:36 AM (6 minutes after breaking commit 5cb93b3)
+- **Fixed:** 10:42 AM (6 minutes from detection)
 - **Issue:** Friends page completely broken due to variable redeclarations in `loadFriendsPage()`
 - **Impact:** 100% of users — page would not load, stuck in blank/loading state
-- **Cause:** Skeleton loader implementation (commit 5cb93b3) declared `pendingContainer`, `friendsContainer`, and `outgoingContainer` twice
+- **Cause:** Skeleton loader implementation declared `pendingContainer`, `friendsContainer`, `outgoingContainer` twice
 - **Fix:** Consolidated all variable declarations at function start, removed 3 redeclarations
+- **Commit:** 2ae98a1
 - **Report:** `reports/FC-045-skeleton-loader-variable-redeclaration.md`
 
-**Sprint QA Working:** Caught and fixed critical production bug within 6 minutes. ✅
+#### FC-046: Dashboard Sign Up Button Inconsistency (MEDIUM 🟡)
+- **Found:** 10:50 AM
+- **Fixed:** 10:52 AM
+- **Issue:** Dashboard used btn-primary for Sign Up button while 10 other pages used btn-secondary
+- **Impact:** Visual inconsistency across pages
+- **Fix:** Changed Sign Up button from btn-primary to btn-secondary on index.html line 114
+- **Commit:** 8689461
+- **Report:** `reports/FC-046-dashboard-signup-button-inconsistency.md`
+
+### Audit Progress
+- ✅ **friends.html** — FC-045 fixed, skeleton loaders working
+- ✅ **index.html** — FC-046 fixed, button hierarchy consistent
+- ✅ **assets.html** — No issues found
+- ✅ **bills.html** — No issues found
+- ✅ **budget.html** — No issues found
+- ⏳ **investments.html, debts.html, income.html, reports.html, settings.html, transactions.html** — Pending
+
+**Sprint QA Performance:** 2 bugs found and fixed within 22 minutes. ✅
 
 ---
 
