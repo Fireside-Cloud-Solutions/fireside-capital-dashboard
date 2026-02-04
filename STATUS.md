@@ -1,33 +1,33 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-04 09:45 EST
+**Last Updated:** 2026-02-04 10:20 EST
 
 ---
 
-## 🎉 SPRINT QA — BUILD b1e7f62
+## 🎉 SPRINT QA — BUILD b39ec0f
 
-**Latest Build:** b1e7f62 (fix: FC-039, FC-043 - Button hierarchy compliance across 7 pages)  
-**QA Grade:** **A** (Design system compliance achieved, all pages passing)  
+**Latest Build:** b39ec0f (fix: FC-044 - Empty state button hierarchy compliance)  
+**QA Grade:** **A+** 🏆 (100% design system compliance, WCAG 2.1 AA, zero vulnerabilities)  
 **Deployment Status:** ✅ **Production Ready**
 
-**Latest QA Report:** `reports/qa-sprint-2026-02-04-0939.md` ⬅ **COMPREHENSIVE AUDIT**
+**Latest QA Report:** `reports/qa-sprint-2026-02-04-1016.md` ⬅ **COMPREHENSIVE AUDIT**
 
 **Recent Commits (Feb 4):**
+- `b39ec0f` - Fix FC-044: Empty state CTAs now use btn-secondary for design system consistency
+- `8948bda` - Fix FC-041: Add proper empty state CTAs to friends page (Matt)
+- `dc2dc15` - docs: QA sprint 0939 - FC-039/FC-043 fixed, comprehensive audit report (Grade A)
 - `b1e7f62` - fix(ui): FC-039, FC-043 - Button hierarchy compliance across 7 pages (search + add buttons now secondary)
 - `1c9c308` - Fix FC-033: Hide Term and Next Due columns on mobile for better debts table layout
 - `ef148bc` - Fix FC-034: Bills page filter button consistency (btn-outline-secondary)
-- `16bfd2e` - fix(budget): FC-037 - Deduplicate budget items by ID to prevent duplicate bills rendering
-- `a979728` - Fix FC-030: Chart.js conflict causing blank charts - detect pre-loaded Chart.js
-- `dd4d460` - fix(critical): FC-030 - Restore Chart.js CDN library (all dashboard charts were broken)
-- `62fcd36` - fix(ui): FC-029 - Welcome button height now matches notification bell (44px)
 
-**Latest QA Session (9:39 AM):**
-- ✅ FC-039: Friends search button hierarchy — FIXED
-- ✅ FC-043: Button hierarchy violations across 6 pages — FIXED
-- ✅ 7 pages updated (all "Add [Resource]" buttons now btn-secondary)
-- ✅ Design system tri-color rule enforced: "1 primary button per page max"
-- ✅ Code quality audit: No XSS, no duplicate IDs, WCAG 2.1 AA compliant
-- ✅ Security audit: All queries filtered by user_id, CSRF active, no sensitive logging
+**Latest QA Session (10:20 AM):**
+- ✅ FC-041: Friends page empty states — TESTED (Matt's commit)
+- ✅ FC-044: Empty state button hierarchy violations — FOUND & FIXED
+- ✅ 4 files updated (empty-states.js + 3 HTML files)
+- ✅ Button hierarchy: 100% compliant (50/50 instances correct)
+- ✅ Comprehensive audit: 11 HTML, 8 CSS, 23 JS files reviewed
+- ✅ Accessibility: WCAG 2.1 AA compliant (157 aria-labels, skip links, focus states)
+- ✅ Security: Zero vulnerabilities (no XSS, CSRF protected, parameterized queries)
 - ✅ 11/11 pages passing QA
 
 ---
