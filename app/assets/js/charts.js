@@ -697,8 +697,13 @@ async function renderSpendingCategoriesChart() {
           position: 'right',
           labels: {
             color: theme.text,
-            padding: 15,
-            font: { size: 12 },
+            font: {
+              size: 14,     // Increased from 12 for better readability
+              weight: '500' // Bolder text for better contrast
+            },
+            padding: 20,      // More spacing between legend items
+            boxWidth: 20,     // Larger color boxes
+            boxHeight: 20,
             generateLabels: (chart) => {
               const data = chart.data;
               if (data.labels.length && data.datasets.length) {
