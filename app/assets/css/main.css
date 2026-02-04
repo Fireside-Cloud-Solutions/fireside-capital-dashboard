@@ -2640,18 +2640,17 @@ main {
 }
 
 /* Welcome button: always stays on one line, vertically centered text.
-   Uses symmetric padding instead of fixed height to ensure perfect centering. */
+   Matches notification bell height (44px) for visual consistency. */
 #userDropdown {
   display: inline-flex;
   align-items: center !important;
   justify-content: center !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  padding: 10px 16px !important;
+  min-height: 44px !important;
+  height: 44px;
+  padding: 0 16px !important;
   line-height: 1;
   white-space: nowrap;
-  font-size: 13px !important;
+  font-size: 14px !important;
   box-sizing: border-box;
   overflow: visible !important;
   text-overflow: unset !important;

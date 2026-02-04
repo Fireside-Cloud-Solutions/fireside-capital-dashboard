@@ -7,6 +7,7 @@
 
 | Task | Claimed By | Started | Channel | Notes |
 |------|-----------|---------|---------|-------|
+| FC-029: Welcome button styling | Lead Dev (Capital) | 2026-02-04 7:40 AM | #qa | P1 Critical — all pages |
 | Bills page UI/UX audit | Architect | 2026-02-03 8:02 PM | #ui-ux | 6/11 pages done |
 | CSS architecture research | Researcher | 2026-02-03 7:56 PM | #research | Delivered — moving to dark theme |
 | QA full audit | Builder | 2026-02-03 8:05 PM | #qa | 11/11 HTML reviewed |
