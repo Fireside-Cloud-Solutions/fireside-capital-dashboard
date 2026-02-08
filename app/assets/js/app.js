@@ -190,6 +190,9 @@ function dedupeSnapshotsByDate(snaps) {
 }
 
 // ===== CHART ERROR BOUNDARY (SUG-05) =====
+// Global chart instance registry to prevent canvas reuse errors
+window.chartInstances = window.chartInstances || {};
+
 async function safeCreateChart(ctx, config, chartName) {
   try {
     if (!ctx) {
@@ -218,9 +221,22 @@ async function safeCreateChart(ctx, config, chartName) {
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
+      
+      // FC-077 Fix: Destroy existing chart instance before creating new one
+      const canvasId = canvas.id;
+      if (canvasId && window.chartInstances[canvasId]) {
+        console.log(`Destroying existing chart instance for: ${canvasId}`);
+        window.chartInstances[canvasId].destroy();
+        delete window.chartInstances[canvasId];
+      }
     }
     
     const chart = new Chart(ctx, config);
+    
+    // Store chart instance for cleanup on next render
+    if (canvas && canvas.id) {
+      window.chartInstances[canvas.id] = chart;
+    }
     
     // Remove loading state from parent chart-card once chart is rendered
     if (canvas) {

@@ -5,7 +5,7 @@
 **Severity:** 🔴 CRITICAL  
 **Priority:** P0 (Production Blocker)  
 **Status:** OPEN  
-**Affects:** Dashboard page (index.html)
+**Affects:** Dashboard page (index.html), Reports page (reports.html)
 
 ---
 
@@ -17,8 +17,9 @@
 
 ## Impact
 
-**User Impact:** Dashboard is mostly broken for new users  
-**Affected Charts:** 6/9 (67% failure rate)
+**User Impact:** Dashboard + Reports pages mostly broken for new users  
+**Affected Pages:** 2 (Dashboard, Reports)  
+**Affected Charts:** 6/9 on Dashboard (67% failure rate), 5/5 on Reports (100% failure rate)
 - ❌ Net Worth Over Time
 - ❌ Monthly Net Worth Change
 - ❌ Top Spending Categories
@@ -35,14 +36,23 @@
 
 ## Steps to Reproduce
 
+**Dashboard:**
 1. Open https://nice-cliff-05b13880f.2.azurestaticapps.net/
 2. Close welcome modal ("Skip for now")
 3. Close onboarding complete modal ("Go to Dashboard")
 4. Observe dashboard charts
 5. Open browser console
 
-**Expected:** All charts render with data or empty states  
+**Expected:** All 9 charts render with data or empty states  
 **Actual:** 6 charts show "Chart could not be loaded" error messages
+
+**Reports Page:**
+1. Open https://nice-cliff-05b13880f.2.azurestaticapps.net/reports.html
+2. Observe page (no modals)
+3. Open browser console
+
+**Expected:** All 5 charts render with data or empty states  
+**Actual:** All 5 charts show empty/broken rendering
 
 ---
 
@@ -77,7 +87,9 @@ Same error pattern for chart IDs: 0, 1, 2, 3, 4, 5
 
 ## Evidence
 
-**Screenshot:** MEDIA:C:\Users\chuba\.clawdbot\media\browser\d6417bc7-5668-4614-b159-4a348823343c.jpg  
+**Screenshots:**  
+- Dashboard: MEDIA:C:\Users\chuba\.clawdbot\media\browser\d6417bc7-5668-4614-b159-4a348823343c.jpg  
+- Reports: MEDIA:C:\Users\chuba\.clawdbot\media\browser\9e3138c9-3225-4c40-8ab9-c2e07fb645d2.jpg  
 **Git Commit:** 9845b9b (FC-056 skeleton loaders - most recent)  
 **Browser:** Chrome 131  
 **OS:** Windows 11
