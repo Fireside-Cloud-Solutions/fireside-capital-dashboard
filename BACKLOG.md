@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-03 (Data import feature added)
+**Last Updated:** 2026-02-08 (Testing strategy tasks added: FC-073 through FC-076)
 
 ---
 
@@ -94,6 +94,10 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-062 | Bug | P3 | XS | Backlog | Upcoming transactions widget needs max-height on mobile |
 | FC-063 | Feature | P3 | S | Backlog | Chart lazy loading indicator — subtle "Loading charts..." text for slow connections |
 | FC-072 | Bug | P3 | XS | Done | Investments page missing ACTIONS column — no edit/delete buttons for investment accounts |
+| FC-073 | Chore | P2 | M | Backlog | **Unit Testing Setup (Phase 1)** — Jest + 120+ tests for calculations, security, utilities (4-5h) — see docs/research/07-testing-strategies.md |
+| FC-074 | Chore | P3 | M | Backlog | **Integration Testing Setup (Phase 2)** — pgTAP database tests for schema, RLS, constraints (3-4h) — see docs/research/07-testing-strategies.md |
+| FC-075 | Chore | P3 | L | Backlog | **E2E Testing Setup (Phase 3)** — Playwright tests for 15 user flows + visual regression (5-6h) — see docs/research/07-testing-strategies.md |
+| FC-076 | Chore | P3 | XS | Backlog | **CI/CD Testing Pipeline** — GitHub Actions workflow for automated tests on every commit (1h) — see docs/research/07-testing-strategies.md |
 
 ### EPIC-002: Mobile Application
 

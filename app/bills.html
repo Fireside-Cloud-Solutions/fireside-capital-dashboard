@@ -84,7 +84,7 @@
         <a href="friends.html"><i class="bi bi-people me-2"></i> Friends</a>
         <a href="budget.html"><i class="bi bi-calculator me-2"></i> Budget</a>
         <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
-        <a href="#" onclick="openPlaidLink()" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
+        <a href="#" data-action="open-plaid-link" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
         <a href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a>
       </div>
     </div>
@@ -123,7 +123,7 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-wide" id="notificationList">
                   <li class="dropdown-header d-flex justify-content-between align-items-center">
                     <strong>Notifications</strong>
-                    <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
+                    <button class="btn btn-sm btn-link text-decoration-none p-0" id="markAllReadBtn" aria-label="Mark all notifications as read">Mark all read</button>
                   </li>
                   <li><hr class="dropdown-divider"></li>
                   <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>
@@ -194,10 +194,10 @@
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-3">
           <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Recurring Bills</h4>
           <div class="d-flex flex-column flex-sm-row gap-2" role="group" aria-label="Bill filters">
-            <button type="button" class="btn btn-sm btn-outline-secondary active" id="showAllBillsBtn" onclick="showAllBills()">
+            <button type="button" class="btn btn-sm btn-outline-secondary active" id="showAllBillsBtn">
               All Bills
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" id="showSubscriptionsBtn" onclick="filterBillsToSubscriptions()">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="showSubscriptionsBtn">
               <i class="bi bi-credit-card-2-front me-1"></i>Subscriptions Only
             </button>
           </div>
@@ -486,7 +486,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteBillConfirmed()">Delete</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBillBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -529,6 +529,7 @@
   <script src="assets/js/security-utils.js"></script>
   <script src="assets/js/empty-states.js"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/event-handlers.js"></script>
   <script src="assets/js/security-patch.js"></script>
   <script src="assets/js/app-polish-enhancements.js"></script>
   <script src="assets/js/notification-enhancements.js"></script>

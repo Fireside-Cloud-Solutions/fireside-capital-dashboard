@@ -100,7 +100,7 @@
         <a href="friends.html"><i class="bi bi-people me-2"></i> Friends</a>
         <a href="budget.html"><i class="bi bi-calculator me-2"></i> Budget</a>
         <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
-        <a href="#" onclick="openPlaidLink()" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
+        <a href="#" data-action="open-plaid-link" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
         <a href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a>
       </div>
     </div>
@@ -125,7 +125,7 @@
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-wide" id="notificationList">
                 <li class="dropdown-header d-flex justify-content-between align-items-center">
                   <strong>Notifications</strong>
-                  <button class="btn btn-sm btn-link text-decoration-none p-0" onclick="markAllNotificationsRead()" aria-label="Mark all notifications as read">Mark all read</button>
+                  <button class="btn btn-sm btn-link text-decoration-none p-0" id="markAllReadBtn" aria-label="Mark all notifications as read">Mark all read</button>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li class="px-3 py-2 text-muted text-center" id="noNotifications">No notifications</li>
@@ -437,6 +437,7 @@
   <script src="assets/js/csrf.js" defer></script>
   <script src="assets/js/security-utils.js" defer></script>
   <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/event-handlers.js" defer></script>
   <script src="assets/js/notification-enhancements.js" defer></script>
   <script src="assets/js/security-patch.js" defer></script>
   <script src="assets/js/app-polish-enhancements.js" defer></script>
@@ -528,7 +529,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteAssetConfirmed()">Delete</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteAssetBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -546,7 +547,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteDebtConfirmed()">Delete</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteDebtBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -564,7 +565,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteBillConfirmed()">Delete</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBillBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -582,7 +583,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteIncomeConfirmed()">Delete</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteIncomeBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -640,8 +641,8 @@
               Let's get your finances organized. Track your assets, manage bills, monitor investments, and achieve your financial goals—all in one place.
             </p>
             <div class="onboarding-welcome-actions">
-              <button type="button" class="btn btn-lg btn-primary" onclick="onboardingGetStarted()">Get Started</button>
-              <button type="button" class="btn btn-lg btn-outline-secondary" onclick="onboardingSkipWelcome()">Skip for now</button>
+              <button type="button" class="btn btn-lg btn-primary" id="onboardingGetStartedBtn">Get Started</button>
+              <button type="button" class="btn btn-lg btn-outline-secondary" id="onboardingSkipWelcomeBtn">Skip for now</button>
             </div>
           </div>
 
@@ -661,8 +662,8 @@
               <input type="number" class="onboarding-form-input" id="onboardingEmergencyFund" placeholder="10000" value="10000">
             </div>
             <div class="onboarding-actions">
-              <a href="#" class="onboarding-skip-link" onclick="onboardingSkipProfile(); return false;">Skip this step</a>
-              <button type="button" class="btn btn-primary" onclick="onboardingContinueProfile()">Continue</button>
+              <a href="#" class="onboarding-skip-link" id="onboardingSkipProfileLink">Skip this step</a>
+              <button type="button" class="btn btn-primary" id="onboardingContinueProfileBtn">Continue</button>
             </div>
           </div>
 
@@ -670,28 +671,28 @@
           <div class="onboarding-step" id="onboardingStep3">
             <h3 class="onboarding-heading">What would you like to set up first?</h3>
             <div class="onboarding-quick-start-grid">
-              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('connect-bank')">
+              <div class="onboarding-quick-start-card" data-onboarding-action="connect-bank">
                 <div class="onboarding-quick-start-icon">
                   <i class="bi bi-bank2"></i>
                 </div>
                 <div class="onboarding-quick-start-title">Connect Bank Account</div>
                 <div class="onboarding-quick-start-description">Link your bank for automatic tracking</div>
               </div>
-              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('add-asset')">
+              <div class="onboarding-quick-start-card" data-onboarding-action="add-asset">
                 <div class="onboarding-quick-start-icon">
                   <i class="bi bi-house-door"></i>
                 </div>
                 <div class="onboarding-quick-start-title">Add an Asset</div>
                 <div class="onboarding-quick-start-description">Real estate, vehicle, or other</div>
               </div>
-              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('add-bill')">
+              <div class="onboarding-quick-start-card" data-onboarding-action="add-bill">
                 <div class="onboarding-quick-start-icon">
                   <i class="bi bi-receipt"></i>
                 </div>
                 <div class="onboarding-quick-start-title">Track a Bill</div>
                 <div class="onboarding-quick-start-description">Recurring expenses and payments</div>
               </div>
-              <div class="onboarding-quick-start-card" onclick="onboardingQuickStartAction('add-income')">
+              <div class="onboarding-quick-start-card" data-onboarding-action="add-income">
                 <div class="onboarding-quick-start-icon">
                   <i class="bi bi-cash-stack"></i>
                 </div>
@@ -700,7 +701,7 @@
               </div>
             </div>
             <div class="onboarding-actions">
-              <a href="#" class="onboarding-skip-link" onclick="onboardingSkipQuickStart(); return false;">I'll do this later</a>
+              <a href="#" class="onboarding-skip-link" id="onboardingSkipQuickStartLink">I'll do this later</a>
             </div>
           </div>
 
@@ -716,8 +717,8 @@
               We'll highlight key features with a 2-minute interactive guide to help you get started.
             </p>
             <div class="onboarding-actions">
-              <button type="button" class="btn btn-outline-secondary" onclick="onboardingSkipTour()">Skip Tour</button>
-              <button type="button" class="btn btn-primary" onclick="onboardingStartTour()">Start Tour</button>
+              <button type="button" class="btn btn-outline-secondary" id="onboardingSkipTourBtn">Skip Tour</button>
+              <button type="button" class="btn btn-primary" id="onboardingStartTourBtn">Start Tour</button>
             </div>
           </div>
 
@@ -731,7 +732,7 @@
               Your dashboard is ready. You can always add more items from the menu or explore the different sections.
             </p>
             <div class="onboarding-actions button-group-centered">
-              <button type="button" class="btn btn-lg btn-primary" onclick="onboardingComplete()">Go to Dashboard</button>
+              <button type="button" class="btn btn-lg btn-primary" id="onboardingCompleteBtn">Go to Dashboard</button>
             </div>
           </div>
 
