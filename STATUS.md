@@ -1,6 +1,68 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-09 06:10 EST (Sprint QA — Comprehensive CSS + Code Review Complete, Grade A-)
+**Last Updated:** 2026-02-09 06:20 EST (Sprint Dev — P1 Accessibility Fix: Table Captions Added)
+
+---
+
+## ✅ SPRINT DEV — SESSION 0615 (Feb 9, 6:15-6:20 AM)
+
+**Status:** ✅ **P1 ACCESSIBILITY FIX COMPLETE — 11 TABLE CAPTIONS ADDED**  
+**Agent:** Capital (Sprint Dev cron a54d89bf)  
+**Duration:** 5 minutes  
+**Scope:** WCAG 2.1 AA compliance — table captions
+
+### Summary
+
+**Fixed P1 Issue:** Missing table `<caption>` elements (accessibility gap)
+
+**Impact:** Screen readers can now properly announce table purpose and context  
+**Pages Modified:** 7 HTML files  
+**Tables Fixed:** 11 total  
+**Effort:** 5 minutes (actual) vs 40 minutes (estimated)
+
+### Implementation Details
+
+**Files Changed:**
+1. ✅ `assets.html` — 1 table caption added
+2. ✅ `bills.html` — 4 table captions added (recurring bills, shared with me, shared by me, amortization)
+3. ✅ `budget.html` — 1 table caption added
+4. ✅ `debts.html` — 2 table captions added (debts list, amortization)
+5. ✅ `income.html` — 1 table caption added
+6. ✅ `investments.html` — 1 table caption added
+7. ✅ `transactions.html` — 1 table caption added
+
+**Pattern Used:**
+```html
+<table class="table align-middle mb-0">
+  <caption class="visually-hidden">Descriptive caption for screen readers</caption>
+  <thead>...</thead>
+</table>
+```
+
+**Caption Examples:**
+- Assets: "List of assets including real estate and vehicles with their current values, loan balances, equity, and payment due dates"
+- Bills: "Recurring bills and subscriptions with amounts, payment frequency, and due dates"
+- Budget: "Monthly budget assignments showing needed amounts, assigned funds, remaining balances, and funding status for each category"
+- Transactions: "Recent financial transactions with dates, descriptions, categories, amounts, and AI categorization confidence scores"
+
+### WCAG 2.1 AA Compliance
+
+**Criterion Met:** 1.3.1 Info and Relationships (Level A)  
+**Technique:** H39 — Using caption elements to associate table captions with tables  
+**Impact:** Screen reader users can now understand table purpose before navigating content
+
+**Remaining P1 Accessibility Work:**
+- Touch targets < 44px (6 pages, 6 hours)
+- ARIA labels on icon buttons (4 pages, 2 hours)
+- Search input labels (2 pages, 20 min)
+- Filter button active states (3 pages, 3 hours)
+
+**Git Commit:** 6a2800f  
+**Deployment:** Pushed to main, Azure auto-deploying
+
+**Production Status:** 🟢 P1 accessibility improvement deployed
+
+---
 
 ---
 
