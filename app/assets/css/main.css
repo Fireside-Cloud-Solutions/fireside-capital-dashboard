@@ -2156,6 +2156,8 @@ body[data-theme='dark'] .table-card {
    ================================================================= */
 
 .table .btn-sm {
+  min-height: 44px !important; /* WCAG 2.5.5 Target Size */
+  min-width: 44px !important;
   padding: var(--space-1) var(--space-2-5);
   font-size: var(--text-caption);
   border-radius: var(--radius-sm);
