@@ -246,9 +246,11 @@ function filterBillsToSubscriptions() {
   const showSubsBtn = document.getElementById('showSubscriptionsBtn');
   if (showAllBtn) {
     showAllBtn.classList.remove('active');
+    showAllBtn.setAttribute('aria-pressed', 'false');
   }
   if (showSubsBtn) {
     showSubsBtn.classList.add('active');
+    showSubsBtn.setAttribute('aria-pressed', 'true');
   }
   
   // Handle empty state when no subscriptions
@@ -305,9 +307,11 @@ function showAllBills() {
   const showSubsBtn = document.getElementById('showSubscriptionsBtn');
   if (showAllBtn) {
     showAllBtn.classList.add('active');
+    showAllBtn.setAttribute('aria-pressed', 'true');
   }
   if (showSubsBtn) {
     showSubsBtn.classList.remove('active');
+    showSubsBtn.setAttribute('aria-pressed', 'false');
   }
   
   if (typeof renderBills === 'function') {
