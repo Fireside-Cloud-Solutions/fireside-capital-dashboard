@@ -3461,7 +3461,19 @@ function renderUpcomingPayments() {
       const d = new Date(item.nextDueDate + 'T00:00:00');
       return d >= today && d <= nextWeek;
   }).sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
-  c.innerHTML = upcoming.length ? upcoming.map(item => {
+  // Empty state
+  if (upcoming.length === 0) {
+    if (typeof generateEmptyStateHTML === 'function') {
+      c.innerHTML = generateEmptyStateHTML('upcomingPayments');
+    } else {
+      // Fallback if empty-states.js not loaded
+      c.innerHTML = '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
+    }
+    return;
+  }
+  
+  // Render upcoming payments list
+  c.innerHTML = upcoming.map(item => {
     // BUG FIX: Use owner_amount for shared bills in upcoming payments
     let displayAmount = item.amount;
     if (item.isSharedWithMe) {
@@ -3475,7 +3487,7 @@ function renderUpcomingPayments() {
     }
     const sharedTag = item.isSharedWithMe ? `<small class="d-block text-muted">from ${escapeHtml(item.sharedByName)}</small>` : '';
     return `<div class="d-flex justify-content-between border-bottom py-2"><div><strong>${escapeHtml(item.name)}</strong><span class="badge ${getCategoryBadgeClass(item.type)} rounded-pill ms-2">${escapeHtml(item.type || item.category || 'Bill')}</span>${sharedTag}</div><div class="text-end"><div class="text-danger fw-bold">-${formatCurrency(displayAmount)}</div><small class="text-muted">${formatDate(item.nextDueDate)}</small></div></div>`;
-  }).join('') : '<p class="text-muted fst-italic">No upcoming payments this week.</p>';
+  }).join('');
 }
 async function renderNetWorthChart() {
   const ctx = document.getElementById('netWorthTimelineChart');

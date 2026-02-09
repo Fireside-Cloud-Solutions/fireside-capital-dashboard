@@ -158,12 +158,17 @@ async function loadSubscriptionWidget() {
     
     // Empty state
     if (subs.length === 0) {
-      listEl.innerHTML = `
-        <p class="text-muted text-center py-3">
-          <i class="bi bi-info-circle me-2"></i>
-          No subscriptions detected yet. Add monthly bills to track them here.
-        </p>
-      `;
+      if (typeof generateEmptyStateHTML === 'function') {
+        listEl.innerHTML = generateEmptyStateHTML('subscriptions');
+      } else {
+        // Fallback if empty-states.js not loaded
+        listEl.innerHTML = `
+          <p class="text-muted text-center py-3">
+            <i class="bi bi-info-circle me-2"></i>
+            No subscriptions detected yet. Add monthly bills to track them here.
+          </p>
+        `;
+      }
       return;
     }
     
