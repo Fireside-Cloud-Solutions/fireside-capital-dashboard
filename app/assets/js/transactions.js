@@ -125,21 +125,23 @@ async function syncTransactions() {
 // Render transactions table
 async function renderTransactionsTable(filters = {}) {
   const tbody = document.getElementById('transactionsTableBody');
+  const emptyState = document.getElementById('emptyState');
+  const transactionsCard = document.querySelector('.card:has(#transactionsTableBody)');
+  
   if (!tbody) return;
   
   const transactions = await loadTransactions({ ...filters, limit: 100 });
   
+  // Toggle empty state vs table visibility
   if (transactions.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="text-center py-5">
-          <i class="bi bi-inbox" style="font-size: 3rem; color: var(--color-text-tertiary);"></i>
-          <p class="mt-3 text-muted">No transactions yet. Sync from your bank to get started.</p>
-        </td>
-      </tr>
-    `;
+    if (transactionsCard) transactionsCard.style.display = 'none';
+    if (emptyState) emptyState.classList.remove('d-none');
     return;
   }
+  
+  // Show table, hide empty state
+  if (transactionsCard) transactionsCard.style.display = '';
+  if (emptyState) emptyState.classList.add('d-none');
   
   tbody.innerHTML = transactions.map(t => `
     <tr>

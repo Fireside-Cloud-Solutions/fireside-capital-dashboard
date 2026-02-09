@@ -67,7 +67,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-012 | Feature | P3 | M | Backlog | Dark mode polish and theme consistency |
 | FC-013 | Chore | P2 | S | Done | Workspace cleanup — organize 80+ root files |
 | FC-014 | Bug | P0 | L | Done | !important abuse — 301 instances causing CSS maintainability crisis |
-| FC-077 | Bug | P0 | S | Backlog | **Chart.js canvas reuse error — Dashboard + Reports pages broken** (6/9 and 5/5 charts fail with "Canvas already in use" errors) — Fix safeCreateChart() to destroy before recreate — see reports/FC-077-chart-canvas-reuse-error.md |
+| FC-077 | Bug | P0 | S | Done | **Chart.js canvas reuse error — Dashboard + Reports pages broken** (6/9 and 5/5 charts fail with "Canvas already in use" errors) — Fix safeCreateChart() to destroy before recreate — see reports/FC-077-chart-canvas-reuse-error.md |
 | FC-015 | Bug | P0 | S | Done | Welcome button text not vertically centered on ultrawide monitors |
 | FC-016 | Bug | P1 | L | Done | CSS file loading order conflicts causing style override battles |
 | FC-017 | Bug | P1 | M | Done | Responsive breakpoint inconsistencies — custom breakpoints don't align with Bootstrap |

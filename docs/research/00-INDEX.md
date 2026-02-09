@@ -317,6 +317,128 @@ const summaryEmbed = {
 
 ---
 
+---
+
+## Phase 2: Automation & Integration (Continued)
+
+### 8. OpenAI API Integration Patterns
+**Topic:** Smart transaction categorization, budget insights, natural language queries  
+**Output:** 16KB implementation guide with production examples  
+**Location:** `reports/SPRINT-RESEARCH-OPENAI-API-INTEGRATION-2026-02-09.md`  
+**Key Takeaways:**
+- GPT-3.5 Turbo sufficient for categorization ($0.00008/call)
+- Few-shot learning achieves 90%+ accuracy without fine-tuning
+- Batch API reduces costs by 50% for non-urgent tasks
+- Must proxy via Azure Function (never expose API key)
+
+**Actionable Code Example:**
+```javascript
+// Smart transaction categorization
+async function categorizeTransaction(transaction, userHistory = []) {
+  const prompt = `Categorize this transaction into ONE of these categories:
+Groceries, Dining, Transportation, Housing, Utilities, Healthcare, Entertainment, Shopping, Income, Other
+
+Transaction:
+- Name: ${transaction.name}
+- Amount: $${transaction.amount}
+- Merchant: ${transaction.merchant_name || 'Unknown'}
+
+Based on your previous categorizations:
+${userHistory.slice(-5).map(h => `- "${h.name}" ($${h.amount}) → ${h.category}`).join('\n')}`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are a financial assistant. Return ONLY the category name.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.1,
+      max_tokens: 10
+    })
+  });
+  
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+```
+
+**Recommended Implementations:**
+1. Create Azure Function proxy: `api/categorize` (never expose API key client-side)
+2. Implement merchant caching to reduce costs by 60-70%
+3. Add confidence scoring + human-in-the-loop for low-confidence categorizations
+4. Phase 1: Categorization (12 hours)
+5. Phase 2: Budget insights (8 hours)
+6. Phase 3: Natural language queries (10 hours)
+
+**Estimated Monthly Cost:** $1-5 for typical usage (100-500 transactions/month)
+
+---
+
+### 9. Azure Functions + Serverless Architecture
+**Topic:** Serverless backend for OpenAI proxy, scheduled jobs, webhooks  
+**Output:** 24KB implementation guide with production examples  
+**Location:** `reports/SPRINT-RESEARCH-AZURE-FUNCTIONS-SERVERLESS-2026-02-09.md`  
+**Key Takeaways:**
+- Consumption Plan: $0.20 per million executions (~$0.01/month for 1 user)
+- Cold starts: 1-3 seconds (acceptable for non-critical APIs)
+- Built-in Application Insights monitoring (no setup)
+- Timer triggers for automated workflows (CRON syntax)
+
+**Actionable Code Example:**
+```javascript
+// Azure Function: OpenAI API Proxy
+module.exports = async function (context, req) {
+  const { transaction, userId } = req.body;
+  
+  // Rate limiting
+  const rateLimitOk = await checkRateLimit(userId);
+  if (!rateLimitOk) {
+    context.res = { status: 429, body: { error: 'Rate limit exceeded' } };
+    return;
+  }
+  
+  // Check merchant cache
+  const cached = await supabase
+    .from('merchant_cache')
+    .select('category')
+    .eq('merchant_name', transaction.merchant_name)
+    .single();
+    
+  if (cached.data) {
+    context.res = { status: 200, body: { category: cached.data.category, confidence: 100 } };
+    return;
+  }
+  
+  // Call OpenAI (API key stored server-side)
+  const category = await categorizeWithOpenAI(transaction);
+  
+  // Cache result
+  await supabase.from('merchant_cache').upsert({
+    merchant_name: transaction.merchant_name,
+    category
+  });
+  
+  context.res = { status: 200, body: { category, confidence: 85 } };
+};
+```
+
+**Recommended Implementations:**
+1. Create Function App: `fireside-capital-api` (Consumption Plan, Node.js 20)
+2. Implement `/api/categorize` (OpenAI proxy) — 6 hours
+3. Implement `/scheduled/daily-snapshot` (net worth tracking) — 4 hours
+4. Implement `/scheduled/weekly-report` (Discord summaries) — 6 hours
+5. Implement `/webhooks/plaid` (transaction notifications) — 4 hours
+
+**Estimated Cost:** ~$0.01/month (well within free tier of 400,000 GB-s + 1M executions)
+
+---
+
 **Compiled by:** Capital (Orchestrator)  
-**Date:** February 4, 2026  
-**Status:** Phase 1 Complete + Phase 2 Started (7/∞ topics)
+**Date:** February 9, 2026  
+**Status:** Phase 1 Complete, Phase 2 In Progress (9/∞ topics)

@@ -2,9 +2,10 @@
 
 **Date:** 2026-02-08 04:20 AM EST  
 **Discovered By:** Capital (Sprint QA cron)  
+**Fixed:** 2026-02-08 04:36 AM EST (Commit a029745)  
 **Severity:** 🔴 CRITICAL  
 **Priority:** P0 (Production Blocker)  
-**Status:** OPEN  
+**Status:** ✅ FIXED (Code reviewed, awaiting live site verification)  
 **Affects:** Dashboard page (index.html), Reports page (reports.html)
 
 ---
@@ -186,4 +187,40 @@ After fix:
 
 ---
 
-**Action:** Spawn Builder sub-agent to fix immediately (P0 blocker)
+## Fix Applied
+
+**Commit:** a029745 (2026-02-08 04:36 AM)  
+**Author:** Matt (chubacher@firesidecloudsolutions.com)  
+**Implementation:** Option 1 (Enhance safeCreateChart)
+
+**Changes Made:**
+```javascript
+// Global chart instance registry added (app.js line 193)
+window.chartInstances = window.chartInstances || {};
+
+// FC-077 Fix in safeCreateChart (app.js lines 227-236)
+const canvasId = canvas.id;
+if (canvasId && window.chartInstances[canvasId]) {
+  console.log(`Destroying existing chart instance for: ${canvasId}`);
+  window.chartInstances[canvasId].destroy();
+  delete window.chartInstances[canvasId];
+}
+
+// Store new instance after creation (app.js lines 240-242)
+if (canvas && canvas.id) {
+  window.chartInstances[canvas.id] = chart;
+}
+```
+
+**Code Review:** ✅ PASS  
+- Implements recommended Option 1 from bug report
+- Proper destroy before create pattern
+- Global registry maintained correctly
+- No memory leaks (old instances deleted)
+
+**Live Site Verification:** ⏳ PENDING (requires browser test)  
+**Next Step:** Test on https://nice-cliff-05b13880f.2.azurestaticapps.net/ to verify all charts render correctly
+
+---
+
+**Action:** ✅ FIXED - Code complete, needs live site verification
