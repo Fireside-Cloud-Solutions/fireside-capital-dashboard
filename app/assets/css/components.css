@@ -1296,6 +1296,52 @@ body[data-theme="light"] .card.loading::after {
 }
 
 /* =================================================================
+   INLINE TABLE EMPTY STATES
+   ================================================================= */
+
+.empty-state-inline {
+  padding: 48px 24px;
+}
+
+.empty-state-icon-inline {
+  opacity: 0.2;
+  color: var(--color-text-tertiary);
+  margin: 0 auto;
+  display: block;
+}
+
+.empty-state-inline h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 16px 0 8px 0;
+}
+
+.empty-state-inline p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+.empty-state-inline .btn {
+  min-width: 160px;
+}
+
+@media (max-width: 575.98px) {
+  .empty-state-inline {
+    padding: 32px 16px;
+  }
+  
+  .empty-state-inline .d-flex {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .empty-state-inline .btn {
+    width: 100%;
+  }
+}
+
+/* =================================================================
    TABLE LOADING STATES
    ================================================================= */
 
