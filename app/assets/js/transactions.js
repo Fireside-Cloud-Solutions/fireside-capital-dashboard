@@ -292,3 +292,16 @@ async function addManualTransaction() {
     submitBtn.innerHTML = 'Add Transaction';
   }
 }
+
+// Auto-initialize on page load when transactions.html is present
+if (document.getElementById('transactionsTableBody')) {
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      console.log('[Transactions] Initializing page...');
+      await renderTransactionsTable();
+      console.log('[Transactions] Page initialized successfully');
+    } catch (error) {
+      console.error('[Transactions] Initialization failed:', error);
+    }
+  });
+}
