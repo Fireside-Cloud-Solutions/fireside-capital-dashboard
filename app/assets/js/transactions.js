@@ -126,7 +126,7 @@ async function syncTransactions() {
 async function renderTransactionsTable(filters = {}) {
   const tbody = document.getElementById('transactionsTableBody');
   const emptyState = document.getElementById('emptyState');
-  const transactionsCard = document.querySelector('.card:has(#transactionsTableBody)');
+  const tableWrapper = document.querySelector('.table-responsive');
   
   if (!tbody) return;
   
@@ -134,13 +134,13 @@ async function renderTransactionsTable(filters = {}) {
   
   // Toggle empty state vs table visibility
   if (transactions.length === 0) {
-    if (transactionsCard) transactionsCard.style.display = 'none';
+    if (tableWrapper) tableWrapper.classList.add('d-none');
     if (emptyState) emptyState.classList.remove('d-none');
     return;
   }
   
   // Show table, hide empty state
-  if (transactionsCard) transactionsCard.style.display = '';
+  if (tableWrapper) tableWrapper.classList.remove('d-none');
   if (emptyState) emptyState.classList.add('d-none');
   
   tbody.innerHTML = transactions.map(t => `
