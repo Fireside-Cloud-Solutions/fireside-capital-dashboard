@@ -105,7 +105,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | ID | Type | Priority | Size | Status | Title |
 |----|------|----------|------|--------|-------|
 | MOB-001 | Spike | P2 | M | Done | iOS app strategy & architecture (IOS_APP_STRATEGY.md) |
-| MOB-002 | Feature | P2 | XL | Backlog | React Native + Expo project scaffold |
+| MOB-002 | Feature | P2 | XL | Backlog | React Native + Expo project scaffold — see reports/SPRINT-RESEARCH-REACT-NATIVE-EXPO-ARCHITECTURE-2026-02-09.md |
 | MOB-003 | Feature | P2 | XL | Backlog | Core screens — Dashboard, Assets, Bills, Budget |
 | MOB-004 | Feature | P3 | L | Backlog | Biometric auth (Face ID / Touch ID) |
 | MOB-005 | Feature | P3 | L | Backlog | Push notifications for payment reminders |

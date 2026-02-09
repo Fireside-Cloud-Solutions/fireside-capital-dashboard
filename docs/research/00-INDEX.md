@@ -439,6 +439,43 @@ module.exports = async function (context, req) {
 
 ---
 
+### 10. React Native + Expo Architecture
+**Topic:** Mobile app architecture for Fireside Capital iOS/Android app  
+**Output:** 28KB production-ready implementation guide with code examples  
+**Location:** `reports/SPRINT-RESEARCH-REACT-NATIVE-EXPO-ARCHITECTURE-2026-02-09.md`  
+**Key Takeaways:**
+- Expo Managed Workflow: Fast iteration, OTA updates, 5-6 week timeline to TestFlight
+- Expo Router: File-based navigation (like Next.js for React Native)
+- Supabase SDK: Zero backend code, automatic session persistence via expo-sqlite
+- React Query: Automatic caching reduces API calls by 60-70%
+
+**Actionable Code Example:**
+```typescript
+// Supabase client setup with session persistence
+import 'expo-sqlite/localStorage/install';
+import { createClient } from '@supabase/supabase-js';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: localStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
+```
+
+**Recommended Implementations:**
+1. Create mobile app scaffold using `npx create-expo-app` (2-3 hours)
+2. Set up Expo Router with tab navigation (1 hour)
+3. Implement authentication flow with Supabase (4 hours)
+4. Build Dashboard screen with charts (8 hours)
+
+**Timeline:** 5-6 weeks to TestFlight beta  
+**Blockers:** Apple Developer account required ($99/year)
+
+---
+
 **Compiled by:** Capital (Orchestrator)  
 **Date:** February 9, 2026  
-**Status:** Phase 1 Complete, Phase 2 In Progress (9/∞ topics)
+**Status:** Phase 1 Complete (6/6), Phase 2 In Progress (10/∞ topics)
