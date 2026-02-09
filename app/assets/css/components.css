@@ -275,23 +275,23 @@
 }
 
 .notification-category.bill {
-  background-color: rgba(244, 78, 36, 0.1);
-  color: #f44e24;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .notification-category.budget {
-  background-color: rgba(255, 193, 7, 0.1);
-  color: #ffc107;
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .notification-category.investment {
-  background-color: rgba(129, 185, 0, 0.1);
-  color: #81b900;
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
 }
 
 .notification-category.system {
-  background-color: rgba(1, 164, 239, 0.1);
-  color: #01a4ef;
+  background-color: var(--color-secondary-light);
+  color: var(--color-secondary);
 }
 
 /* ===== DROPDOWN FOOTER (for "View All" link) ===== */
