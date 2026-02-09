@@ -294,8 +294,9 @@ async function addManualTransaction() {
 }
 
 // Auto-initialize on page load when transactions.html is present
-if (document.getElementById('transactionsTableBody')) {
-  document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check for transactions page elements after DOM is ready (fixes race condition)
+  if (document.getElementById('transactionsTableBody')) {
     try {
       console.log('[Transactions] Initializing page...');
       await renderTransactionsTable();
@@ -303,5 +304,5 @@ if (document.getElementById('transactionsTableBody')) {
     } catch (error) {
       console.error('[Transactions] Initialization failed:', error);
     }
-  });
-}
+  }
+});
