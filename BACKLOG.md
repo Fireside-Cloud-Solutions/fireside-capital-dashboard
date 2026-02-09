@@ -81,7 +81,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-025 | Chore | P2 | M | Done | Database enum normalization — standardize type/frequency field casing |
 | FC-026 | Feature | P1 | XL | Backlog | Data import system — YNAB budget import + spreadsheet uploads with column mapping |
 | FC-027 | Bug | P2 | XS | Done | Desktop touch targets below 44px WCAG 2.5.5 minimum (page header, time filters, table buttons) — see reports/ISSUE-A11Y-BUTTONS.md |
-| FC-028 | Bug | P3 | XS | Backlog | Transactions page empty state doesn't match .empty-state component pattern — see reports/ISSUE-UX-CONSISTENCY-001.md |
+| FC-028 | Bug | P3 | XS | Done | Transactions page empty state doesn't match .empty-state component pattern — see reports/ISSUE-UX-CONSISTENCY-001.md |
 | FC-039 | Bug | P2 | XS | Done | Friends page search button using btn-primary instead of btn-secondary — see reports/FC-043-button-hierarchy-violations.md |
 | FC-040 | Feature | P2 | M | Done | Friends page missing loading states (skeleton loaders) — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
 | FC-041 | Feature | P3 | S | Done | Friends page empty states don't use empty-states.js utility — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
