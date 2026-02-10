@@ -953,7 +953,7 @@ function openAssetModal(id = null) {
       if (asset) { // Add a check to ensure the asset was found
           f.assetName.value = escapeHtml(asset.name || '');
           f.assetType.value = escapeHtml(asset.type || '');
-          if (asset.type === 'realEstate') {
+          if (asset.type === 'real-estate') {
               document.querySelector('.real-estate-fields').classList.remove('d-none');
               f.propertyValue.value = asset.value; f.loanAmount.value = asset.loan; f.realEstateNextDueDate.value = asset.nextDueDate;
           } else if (asset.type === 'vehicle') {
@@ -965,12 +965,20 @@ function openAssetModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveAsset() {
+  // Set loading state
+  if (typeof setButtonLoading === 'function') {
+    setButtonLoading('saveAssetBtn', true);
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
       CSRF.requireValidToken();
     }
   } catch (err) {
+    if (typeof setButtonLoading === 'function') {
+      setButtonLoading('saveAssetBtn', false);
+    }
     alert(err.message);
     return;
   }
@@ -981,18 +989,28 @@ async function saveAsset() {
     const f = document.getElementById('assetForm');
     const type = f.assetType.value;
     const record = { name: f.assetName.value, type, user_id: currentUser.id };
-    if (type === 'realEstate') {
+    if (type === 'real-estate') {
         record.value = getRaw(f.propertyValue.value); record.loan = getRaw(f.loanAmount.value); record.nextDueDate = f.realEstateNextDueDate.value || null;
     } else if (type === 'vehicle') {
         record.value = getRaw(f.vehicleValue.value); record.loan = getRaw(f.vehicleLoanBalance.value); record.nextDueDate = f.vehicleNextDueDate.value || null;
     }
     const { error } = editAssetId ? await sb.from('assets').update(record).eq('id', editAssetId).eq('user_id', currentUser.id) : await sb.from('assets').insert(record);
-    if (error) return alert(error.message);
+    if (error) {
+      if (typeof setButtonLoading === 'function') {
+        setButtonLoading('saveAssetBtn', false);
+      }
+      return alert(error.message);
+    }
     bootstrap.Modal.getInstance(f.closest('.modal')).hide();
     clearCache(); // Performance: Clear cache on data mutation
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
+  
+  // Reset loading state
+  if (typeof setButtonLoading === 'function') {
+    setButtonLoading('saveAssetBtn', false);
+  }
   
   if (allowed === null) return; // Rate limited
 }
