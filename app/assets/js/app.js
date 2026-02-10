@@ -1086,12 +1086,20 @@ function openInvestmentModal(id = null) {
   bootstrap.Modal.getOrCreateInstance(f.closest('.modal')).show();
 }
 async function saveInvestment() {
+  // Set loading state
+  if (typeof setButtonLoading === 'function') {
+    setButtonLoading('saveInvestmentBtn', true);
+  }
+
   // CSRF Protection
   try {
     if (typeof CSRF !== 'undefined') {
       CSRF.requireValidToken();
     }
   } catch (err) {
+    if (typeof setButtonLoading === 'function') {
+      setButtonLoading('saveInvestmentBtn', false);
+    }
     alert(err.message);
     return;
   }
@@ -1109,13 +1117,23 @@ async function saveInvestment() {
     const { error } = editInvestmentId ? await sb.from('investments').update(record).eq('id', editInvestmentId).eq('user_id', currentUser.id) : await sb.from('investments').insert(record);
 
     editInvestmentId = null;
-    if (error) return alert(error.message);
+    if (error) {
+      if (typeof setButtonLoading === 'function') {
+        setButtonLoading('saveInvestmentBtn', false);
+      }
+      return alert(error.message);
+    }
 
     bootstrap.Modal.getInstance(f.closest('.modal')).hide();
     clearCache(); // Performance: Clear cache on data mutation
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
+  
+  // Reset loading state
+  if (typeof setButtonLoading === 'function') {
+    setButtonLoading('saveInvestmentBtn', false);
+  }
   
   if (allowed === null) return; // Rate limited
 }
