@@ -50,8 +50,38 @@ function filterDataByTimeRange(data, labels, range) {
   };
 }
 
-// Create time range filter buttons
-function createTimeRangeFilter(chartId, onRangeChange) {
+// ===================================================================
+// CHART.JS PERFORMANCE OPTIMIZATIONS (SPRINT-DEV 0615)
+// ===================================================================
+
+// Check if data decimation should be enabled (100+ data points)
+function shouldEnableDecimation(dataLength) {
+  return dataLength > 100;
+}
+
+// Get responsive legend position based on viewport
+function getResponsiveLegendPosition() {
+  return window.innerWidth < 768 ? 'bottom' : 'right';
+}
+
+// Update chart data without animation for instant time range changes
+function updateChartData(chart, newData, newLabels, projectionData = null) {
+  if (!chart) return;
+  
+  chart.data.labels = newLabels;
+  chart.data.datasets[0].data = newData;
+  
+  // Update projection dataset if exists
+  if (projectionData && chart.data.datasets.length > 1) {
+    chart.data.datasets[1].data = projectionData;
+  }
+  
+  // Update WITHOUT animation for instant response
+  chart.update('none');
+}
+
+// Create time range filter buttons (optimized for instant updates)
+function createTimeRangeFilter(chartId, onRangeChange, updateMode = 'full') {
   const currentRange = getTimeRange(chartId);
   
   const container = document.createElement('div');
@@ -215,11 +245,19 @@ async function renderNetWorthChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      parsing: false, // Performance: disable parsing for faster rendering
+      normalized: true, // Performance: data is pre-sorted
       interaction: {
         mode: 'index',
         intersect: false
       },
       plugins: {
+        decimation: {
+          enabled: shouldEnableDecimation(filtered.data.length),
+          algorithm: 'lttb', // Largest-Triangle-Three-Buckets (best for time series)
+          samples: 50, // Max data points to render
+          threshold: 100 // Only enable if dataset has 100+ points
+        },
         legend: {
           labels: { color: theme.text }
         },
@@ -694,16 +732,16 @@ async function renderSpendingCategoriesChart() {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'right',
+          position: getResponsiveLegendPosition(), // Responsive: bottom on mobile, right on desktop
           labels: {
             color: theme.text,
             font: {
-              size: 14,     // Increased from 12 for better readability
+              size: window.innerWidth < 768 ? 11 : 14, // Smaller on mobile
               weight: '500' // Bolder text for better contrast
             },
-            padding: 20,      // More spacing between legend items
-            boxWidth: 20,     // Larger color boxes
-            boxHeight: 20,
+            padding: window.innerWidth < 768 ? 10 : 20, // Less padding on mobile
+            boxWidth: window.innerWidth < 768 ? 15 : 20, // Smaller boxes on mobile
+            boxHeight: window.innerWidth < 768 ? 15 : 20,
             generateLabels: (chart) => {
               const data = chart.data;
               if (data.labels.length && data.datasets.length) {
