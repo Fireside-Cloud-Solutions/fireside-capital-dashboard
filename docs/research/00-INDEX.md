@@ -476,6 +476,48 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 ---
 
+---
+
+### 11. Database Optimization (PostgreSQL/Supabase)
+**Topic:** CHECK constraints, RLS patterns, indexing strategies, migration best practices  
+**Output:** 27KB production-ready implementation guide  
+**Location:** `docs/research/11-database-optimization.md`  
+**Key Takeaways:**
+- **Constraint migration already written:** `migrations/003_add_data_validation_constraints.sql` (26 constraints, production-ready)
+- 11 recommended indexes for 60-80% performance improvement
+- RLS optimization patterns for 20-30% faster policy evaluation
+- Migration testing with pgTAP automated validation
+
+**Actionable Code Example:**
+```sql
+-- Deploy existing constraint migration
+-- File: migrations/003_add_data_validation_constraints.sql
+
+-- Amount validation
+ALTER TABLE bills ADD CONSTRAINT bills_amount_positive CHECK (amount > 0);
+ALTER TABLE debts ADD CONSTRAINT debts_interest_rate_reasonable CHECK (interest_rate >= 0 AND interest_rate <= 100);
+ALTER TABLE investments ADD CONSTRAINT investments_annual_return_reasonable CHECK (annual_return >= -100 AND annual_return <= 1000);
+
+-- Date validation
+ALTER TABLE bills ADD CONSTRAINT bills_created_at_not_future CHECK (created_at <= NOW());
+
+-- Enum validation
+ALTER TABLE bills ADD CONSTRAINT bills_frequency_valid CHECK (
+  frequency IN ('daily', 'weekly', 'bi-weekly', 'monthly', 'quarterly', 'semi-annual', 'annual', 'one-time')
+);
+```
+
+**Recommended Implementations:**
+1. **Phase 1:** Deploy database constraints (4 hours) — Migration already written, ready to deploy
+2. **Phase 2:** Add 11 performance indexes (2 hours) — 60-80% faster queries
+3. **Phase 3:** Optimize RLS policies (3 hours) — Combine redundant policies
+4. **Phase 4:** Add migration testing (2 hours) — Automated validation with pgTAP
+
+**Total Implementation Time:** ~11 hours  
+**Expected Impact:** 60-80% faster queries, 100% data integrity enforcement
+
+---
+
 **Compiled by:** Capital (Orchestrator)  
-**Date:** February 9, 2026  
-**Status:** Phase 1 Complete (6/6), Phase 2 In Progress (10/∞ topics)
+**Date:** February 10, 2026  
+**Status:** Phase 1 Complete (6/6), Phase 2 Complete (5/5), Phase 3 Started (1 topic)
