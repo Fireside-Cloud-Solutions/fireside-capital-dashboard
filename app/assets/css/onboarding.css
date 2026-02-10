@@ -309,7 +309,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.75);
-  z-index: 9998;
+  z-index: calc(var(--z-modal) - 2); /* 398 - below spotlight and tooltip */
   animation: fadeIn 0.2s ease;
 }
 
@@ -320,7 +320,7 @@
   border-radius: 8px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75),
               0 0 20px rgba(1, 164, 239, 0.6);
-  z-index: 9999;
+  z-index: calc(var(--z-modal) - 1); /* 399 - below tooltip, above overlay */
   pointer-events: none;
   transition: all 0.3s ease;
 }

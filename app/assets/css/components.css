@@ -547,7 +547,7 @@ body[data-theme='light'] .dropdown-footer a:hover {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 9999;
+  z-index: var(--z-toast); /* 600 */
   background: var(--color-bg-2);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
@@ -1020,7 +1020,7 @@ body[data-theme="dark"] .toast-action-btn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-max); /* 9999 - highest priority for loading states */
   opacity: 0;
   transition: opacity 150ms ease;
 }

@@ -95,7 +95,7 @@ body:has(#loggedOutState:not(.d-none)) #loggedOutState {
   max-height: 100vh;
   padding: 1rem;
   overflow: hidden;
-  z-index: 999;
+  z-index: var(--z-toast); /* 600 - system message above modals */
 }
 
 /* Ensure welcome card fits in viewport */

@@ -2736,7 +2736,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal); /* 400 - above content within container */
   backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-in-out;
 }
@@ -3261,7 +3261,7 @@ body[data-theme='light'] .btn:hover {
 }
 
 .input-group .form-control:focus {
-  z-index: 3;
+  z-index: 3; /* Bootstrap input group focus layering - intentional low value */
 }
 
 /* =================================================================

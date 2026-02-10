@@ -677,7 +677,7 @@ body.sidebar-open {
     position: fixed !important;
     top: max(12px, env(safe-area-inset-top)) !important;
     left: 16px !important;
-    z-index: 1000; /* Above sidebar so X button is always clickable */
+    z-index: var(--z-modal); /* 400 - above sidebar so X button is always clickable */
     width: 48px;
     height: 48px;
     background: var(--color-bg-2);
@@ -705,16 +705,16 @@ body.sidebar-open {
 
   /* Push sidebar content below the hamburger button */
   .sidebar {
-    z-index: 900; /* ABOVE overlay so menu items are clickable */
+    z-index: calc(var(--z-modal) - 10); /* 390 - above overlay, below hamburger, so menu items are clickable */
     padding-top: 72px !important;
     width: 85% !important; /* Use 85% width on mobile for better UX */
     max-width: 320px !important; /* Cap at 320px on larger phones */
   }
   
   /* Ensure proper z-index stacking:
-     Hamburger/X (1000) > Sidebar (900) > Overlay (450) > Main content (1) */
+     Hamburger/X (400) > Sidebar (390) > Overlay (300) > Main content (1) */
   .sidebar-overlay {
-    z-index: 450; /* Below sidebar, above main content */
+    z-index: var(--z-overlay); /* 300 - below sidebar, above main content */
     position: fixed;
     top: 0;
     left: 0;
@@ -731,7 +731,7 @@ body.sidebar-open {
     position: fixed !important;
     top: max(12px, env(safe-area-inset-top)) !important;
     right: 16px;
-    z-index: 1000; /* Same as hamburger for alignment */
+    z-index: var(--z-modal); /* 400 - same layer as hamburger for alignment */
     margin: 0 !important;
   }
   
@@ -785,7 +785,7 @@ body.sidebar-open {
     top: calc(max(12px, env(safe-area-inset-top)) + 56px) !important; /* Below the welcome button */
     right: 16px !important;
     left: auto !important;
-    z-index: 1001;
+    z-index: var(--z-popover); /* 500 - above modals, below toasts */
     min-width: 200px;
   }
 
@@ -826,7 +826,7 @@ body.sidebar-open {
     max-height: none !important;
     overflow-y: auto !important;
     border-radius: 0;
-    z-index: 499;
+    z-index: calc(var(--z-popover) - 1); /* 499 - just below popover layer for mobile takeover */
     background-color: var(--color-bg-1) !important;
     margin: 0 !important;
     transform: none !important;
