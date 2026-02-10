@@ -31,7 +31,7 @@ async function checkDatabaseRateLimit(operation) {
   
   try {
     // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await sb.auth.getUser();
     
     if (userError || !user) {
       console.error('Rate limit check: User not authenticated', userError);
@@ -39,7 +39,7 @@ async function checkDatabaseRateLimit(operation) {
     }
     
     // Call database function
-    const { data, error } = await supabase.rpc('check_rate_limit', {
+    const { data, error } = await sb.rpc('check_rate_limit', {
       p_user_id: user.id,
       p_operation: operation,
       p_max_requests: config.max,

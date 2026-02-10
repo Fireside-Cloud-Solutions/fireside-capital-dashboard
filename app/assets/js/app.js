@@ -3623,7 +3623,7 @@ function initializeAssetForm() {
   assetTypeDropdown.addEventListener("change", function () {
       const type = this.value;
       document.querySelectorAll(".asset-fields").forEach(el => el.classList.add("d-none"));
-      if (type === "realEstate") { document.querySelector(".real-estate-fields").classList.remove("d-none"); }
+      if (type === "real-estate") { document.querySelector(".real-estate-fields").classList.remove("d-none"); }
       else if (type === "vehicle") { document.querySelector(".vehicle-fields").classList.remove("d-none"); }
   });
 }
