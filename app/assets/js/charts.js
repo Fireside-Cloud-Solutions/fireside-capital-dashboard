@@ -245,8 +245,9 @@ async function renderNetWorthChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      parsing: false, // Performance: disable parsing for faster rendering
-      normalized: true, // Performance: data is pre-sorted
+      // Only enable performance flags when no projection data (null values break parsing:false)
+      parsing: projectionData.length === 0 ? false : true,
+      normalized: projectionData.length === 0 ? true : false,
       interaction: {
         mode: 'index',
         intersect: false
