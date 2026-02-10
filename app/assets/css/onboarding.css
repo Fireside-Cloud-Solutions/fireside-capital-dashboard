@@ -333,7 +333,7 @@
   border-radius: 12px;
   padding: 20px;
   max-width: 320px;
-  z-index: 10000;
+  z-index: var(--z-modal);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.2s ease;
 }

@@ -2715,7 +2715,7 @@ main {
   padding: 8px 16px;
   text-decoration: none;
   font-weight: 600;
-  z-index: 100000;
+  z-index: var(--z-max);
   border-radius: 0 0 4px 0;
 }
 

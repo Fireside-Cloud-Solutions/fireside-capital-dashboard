@@ -648,7 +648,7 @@ body[data-theme='light'] #notificationList::-webkit-scrollbar-thumb:hover {
 
 .toast-container {
   position: fixed;
-  z-index: 10000;
+  z-index: var(--z-modal);
   pointer-events: none;
   display: flex;
   flex-direction: column;
