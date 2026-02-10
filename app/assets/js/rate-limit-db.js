@@ -29,6 +29,13 @@ async function checkDatabaseRateLimit(operation) {
     return true; // Allow if no config
   }
   
+  // Safety check: ensure Supabase client is initialized
+  const sb = window.sb;
+  if (!sb) {
+    console.error('Rate limit check: Supabase client not initialized');
+    return true; // Allow operation but log error
+  }
+  
   try {
     // Get current user
     const { data: { user }, error: userError } = await sb.auth.getUser();

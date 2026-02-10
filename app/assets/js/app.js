@@ -332,7 +332,8 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 // - SameSite flag (Lax/Strict) - controlled by Supabase dashboard
 // - Session timeout: 8 hours (28800 seconds)
 // - Auto-refresh enabled for continuous sessions
-const sb = window.supabase.createClient(supabaseUrl, supabaseKey, {
+// Make sb globally accessible for modules loaded before app.js (e.g., rate-limit-db.js)
+const sb = window.sb = window.supabase.createClient(supabaseUrl, supabaseKey, {
   auth: {
     // Cookie-based storage (more secure than localStorage for session tokens)
     storage: window.localStorage, // Supabase JS v2 uses localStorage by default, but with secure session management
