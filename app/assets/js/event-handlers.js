@@ -134,6 +134,7 @@ function setupFriendsPageHandlers() {
       const searchInput = document.getElementById('friendSearchInput');
       if (searchInput) {
         searchInput.focus();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     });
   });
