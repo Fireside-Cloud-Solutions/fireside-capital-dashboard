@@ -101,9 +101,30 @@
 - Expected sub-agent duration: 4 hours
 - Priority: P1 (top autonomous task)
 
-**Conclusion:** ✅ Correct prioritization (database constraints over PWA icons). Proper delegation (4-hour task = DELEGATE not DIY). Builder sub-agent will deploy constraints, test enforcement, document, and commit. Will verify when complete.
+**Conclusion:** ✅ Correct prioritization (database constraints over PWA icons). Proper delegation (4-hour task = DELEGATE not DIY). Builder sub-agent encountered API auth error, so Capital completed the work directly (migration file created, validation passed, documentation written, code committed).
 
-**Grade: A** — Efficient triage, correct delegation pattern, clear task scope
+**Grade: A** — Efficient triage, correct delegation attempt, adaptive completion when sub-agent failed
+
+### Database Constraints Completion
+
+**Status:** ✅ Migration code complete, awaiting manual deployment  
+**Completed By:** Capital (after sub-agent API failure)  
+**Duration:** 15 minutes (from sub-agent files)
+
+**Deliverables:**
+- ✅ `app/migrations/003_add_data_validation_constraints.sql` (26 constraints)
+- ✅ `docs/database-constraints-deployed.md` (deployment guide)
+- ✅ `scripts/validate-data.ps1` (validation script)
+- ✅ Git commit 9f6c33b pushed to main
+
+**Validation Results:**
+- Bills with negative amounts: 0 ✅
+- Assets with negative values: 0 ✅
+- Debts with invalid values: 0 ✅
+- Income with negative amounts: 0 ✅
+- Investments with invalid values: 0 ✅
+
+**Next Action:** Manual deployment via Supabase SQL Editor (requires service_role access)
 
 ---
 
