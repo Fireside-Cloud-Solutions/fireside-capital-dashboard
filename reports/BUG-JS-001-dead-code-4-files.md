@@ -20,31 +20,27 @@ Four JavaScript files exist in `app/assets/js/` but are never linked or used:
 
 ---
 
-## 🔴 P0: server.js in Web-Accessible Folder
+## ✅ RESOLVED: server.js Moved Out of Web-Accessible Folder
 
-**File:** `app/assets/js/server.js` (180 lines)  
-**Issue:** Node.js backend server file in client-side assets folder  
-**Risk:** Exposed in web-accessible directory (though not executable by browser)
+**File:** `server.js` (180 lines)  
+**Issue:** Node.js backend server file was in client-side assets folder  
+**Status:** ✅ **FIXED** in commit `316cdd5` (Feb 11, 2026)
 
-**What It Is:**
+**What It Was:**
 - Express.js server for Plaid Link token generation
-- Should live in project root or `server/` directory
-- NOT a client-side file
+- Was in `app/assets/js/server.js` (web-accessible) ❌
+- Should live in project root (not web-accessible) ✅
 
-**Current Location:** `app/assets/js/server.js` ❌  
-**Correct Location:** `C:\Users\chuba\fireside-capital\server\server.js` ✅
+**Previous Location:** `app/assets/js/server.js` ❌  
+**Current Location:** `C:\Users\chuba\fireside-capital\server.js` ✅
 
-**Fix:** Move file out of `app/` directory  
-**Effort:** 5 minutes  
-**Command:**
-```powershell
-# Move server.js to project root
-Move-Item app/assets/js/server.js server/server.js
-
-# Update any references in documentation
+**Fix Applied:**
+```bash
+# Commit 316cdd5 moved file to project root
+git mv app/assets/js/server.js server.js
 ```
 
-**Priority:** **P0** — Security best practice (shouldn't be in web root)
+**Result:** ✅ Security best practice resolved — file no longer in web root
 
 ---
 
@@ -149,10 +145,7 @@ showSuccessToast('Asset saved successfully!');
 
 **Priority Order:**
 
-1. **IMMEDIATE (P0):** Move server.js out of web-accessible folder (5 min)
-   ```powershell
-   Move-Item app/assets/js/server.js server/server.js
-   ```
+1. ~~**IMMEDIATE (P0):** Move server.js out of web-accessible folder~~ ✅ **DONE** (commit 316cdd5)
 
 2. **DECISION REQUIRED (P2):** Toast notifications
    - **Option A:** Refactor to use toast system (10-12 hours) ← Better UX
