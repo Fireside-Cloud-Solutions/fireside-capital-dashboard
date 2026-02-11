@@ -99,6 +99,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-074 | Chore | P3 | M | Backlog | **Integration Testing Setup (Phase 2)** — pgTAP database tests for schema, RLS, constraints (3-4h) — see docs/research/07-testing-strategies.md |
 | FC-075 | Chore | P3 | L | Backlog | **E2E Testing Setup (Phase 3)** — Playwright tests for 15 user flows + visual regression (5-6h) — see docs/research/07-testing-strategies.md |
 | FC-076 | Chore | P3 | XS | Backlog | **CI/CD Testing Pipeline** — GitHub Actions workflow for automated tests on every commit (1h) — see docs/research/07-testing-strategies.md |
+| FC-078 | Chore | P2 | L | Ready | **Refactor CSS to ITCSS + BEM Architecture** — Implement structured CSS with design tokens for scalability, dark theme prep, maintainability (8-10h) — see reports/css-architecture-research-2026-02-11.md |
 
 ### EPIC-002: Mobile Application
 
