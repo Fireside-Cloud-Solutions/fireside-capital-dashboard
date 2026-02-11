@@ -1,624 +1,354 @@
-# CSS Architecture Research — Fireside Capital Dashboard
-**Research Date:** February 9, 2026  
-**Researcher:** Capital (AI Orchestrator)  
-**Target:** Fireside Capital Personal Finance Dashboard  
-**Status:** ✅ Complete
+# CSS Architecture Research — February 10, 2026
+
+## Recommendation: ITCSS + BEMIT Naming
+
+After researching CSS architecture methodologies, I recommend **ITCSS (Inverted Triangle CSS)** with **BEMIT naming conventions** for the Fireside Capital dashboard.
 
 ---
 
-## 📋 Executive Summary
+## Why ITCSS?
 
-**Current State:** The Fireside Capital dashboard has a **solid foundation** with a well-structured CSS architecture based on design tokens, component modularization, and responsive design. The system uses a logo-native brand palette with a dark-first approach.
-
-**Grade:** B+ (Strong foundation, room for optimization)
-
-**Key Findings:**
-- ✅ Excellent design token system (design-tokens.css)
-- ✅ Modular CSS files (8 separate stylesheets)
-- ✅ Consistent 8px spacing grid
-- ✅ Dark theme with light mode support
-- ⚠️ Some redundancy in component styles
-- ⚠️ Opportunities for CSS custom property optimization
-- ⚠️ Could benefit from utility class expansion
+- **Manages specificity naturally** — Styles flow from generic to specific, preventing specificity wars
+- **Highly flexible** — Only use the layers you need (no boilerplate overhead)
+- **Battle-tested** — 78% satisfaction rating (State of CSS 2020)
+- **Works with existing tools** — Compatible with Bootstrap, preprocessors, vanilla CSS
+- **Perfect for financial dashboards** — Excels at organizing complex component libraries
 
 ---
 
-## 🏗️ Current Architecture
+## ITCSS Layers (Inverted Triangle)
 
-### File Structure
+1. **Settings** — Variables (colors, fonts, breakpoints)
+2. **Tools** — Mixins and functions
+3. **Generic** — Resets, normalize, box-sizing
+4. **Elements** — Base HTML element styles (h1, a, p)
+5. **Objects** — Unstyled design patterns (layouts, grids)
+6. **Components** — Specific UI components (cards, buttons, charts)
+7. **Utilities** — Helper classes (spacing, hide, text-center)
+
+Specificity increases as you go down the triangle. Generic styles at the top, specific overrides at the bottom.
+
+---
+
+## BEMIT Naming Convention
+
+Combine BEM (Block Element Modifier) with namespace prefixes:
+
+- **c-** = Component (`.c-card`, `.c-button`, `.c-dashboard-card`)
+- **o-** = Object (`.o-layout`, `.o-media`, `.o-container`)
+- **u-** = Utility (`.u-mt-2`, `.u-hide`, `.u-text-center`)
+- **t-** = Theme (`.t-dark`, `.t-light`)
+- **is-** / **has-** = State (`.is-active`, `.has-error`, `.is-loading`)
+
+### BEM Structure:
+```css
+.block { }
+.block__element { }
+.block--modifier { }
+.block__element--modifier { }
+```
+
+### BEMIT Example:
+```css
+.c-dashboard-card { }                      /* component */
+.c-dashboard-card__header { }              /* element */
+.c-dashboard-card__title { }               /* element */
+.c-dashboard-card--highlight { }           /* modifier */
+.c-dashboard-card.is-loading { }           /* state */
+```
+
+---
+
+## Recommended File Structure
+
 ```
 app/assets/css/
-├── design-tokens.css      # Design system variables (colors, spacing, typography)
-├── main.css               # Core styles + Bootstrap overrides (3600+ lines)
-├── components.css         # Notifications, toasts, loading states
-├── utilities.css          # Utility classes
-├── responsive.css         # Responsive overrides
-├── accessibility.css      # A11y enhancements
-├── onboarding.css         # Onboarding flow styles
-└── logged-out-cta.css     # Marketing page styles
+├── 1-settings/
+│   ├── _colors.css
+│   ├── _typography.css
+│   └── _breakpoints.css
+├── 2-tools/
+│   └── _mixins.css
+├── 3-generic/
+│   ├── _reset.css
+│   └── _box-sizing.css
+├── 4-elements/
+│   ├── _headings.css
+│   ├── _links.css
+│   └── _forms.css
+├── 5-objects/
+│   ├── _o-container.css
+│   ├── _o-layout.css
+│   └── _o-grid.css
+├── 6-components/
+│   ├── _c-dashboard-card.css
+│   ├── _c-chart-container.css
+│   ├── _c-transaction-list.css
+│   ├── _c-bill-reminder.css
+│   ├── _c-net-worth-display.css
+│   ├── _c-asset-summary.css
+│   ├── _c-debt-tracker.css
+│   └── ...
+├── 7-utilities/
+│   ├── _u-spacing.css
+│   ├── _u-visibility.css
+│   └── _u-text.css
+└── main.css (imports all in order)
 ```
 
-### Token System (design-tokens.css)
-**Strengths:**
-- Comprehensive color system with semantic naming
-- 4px-based spacing scale (--space-1 through --space-32)
-- Typography scales for mobile + desktop
-- Transition timing functions
-- Z-index scale
-- Shadow system with brand glow effects
-
-**Example:**
+### main.css imports in ITCSS order:
 ```css
-:root {
-  --color-primary: #f44e24;        /* Flame Orange */
-  --color-secondary: #01a4ef;      /* Sky Blue */
-  --color-accent: #81b900;         /* Lime Green */
-  --space-md: 1rem;                /* 16px */
-  --transition-normal: 200ms;
-}
+/* Settings */
+@import '1-settings/_colors.css';
+@import '1-settings/_typography.css';
+@import '1-settings/_breakpoints.css';
+
+/* Tools */
+@import '2-tools/_mixins.css';
+
+/* Generic */
+@import '3-generic/_reset.css';
+@import '3-generic/_box-sizing.css';
+
+/* Elements */
+@import '4-elements/_headings.css';
+@import '4-elements/_links.css';
+@import '4-elements/_forms.css';
+
+/* Objects */
+@import '5-objects/_o-container.css';
+@import '5-objects/_o-layout.css';
+@import '5-objects/_o-grid.css';
+
+/* Components */
+@import '6-components/_c-dashboard-card.css';
+@import '6-components/_c-chart-container.css';
+/* ... */
+
+/* Utilities */
+@import '7-utilities/_u-spacing.css';
+@import '7-utilities/_u-visibility.css';
+@import '7-utilities/_u-text.css';
 ```
 
 ---
 
-## 🎨 Brand System Analysis
+## Key Principles
 
-### Logo-Native Color Hierarchy
-The design system follows a **tri-color action hierarchy**:
-
-1. **PRIMARY** (Flame Orange #f44e24) → High-impact CTAs (1 per page max)
-2. **SECONDARY** (Sky Blue #01a4ef) → Medium-impact actions (2 per page max)
-3. **TERTIARY** (Neutral Gray) → Utility actions (unlimited)
-4. **SUCCESS** (Lime Green #81b900) → Success states
-5. **DANGER** (Red outline) → Destructive actions
-
-**Assessment:** ✅ Clear hierarchy, well-documented, consistently applied
+1. **One file per component** — Easy to find and maintain
+2. **Limit nesting to 2 levels** — Avoid overqualified selectors
+3. **Separate spacing from components** — Use utility classes for margins
+4. **Don't overuse objects** — When in doubt, make it a component
+5. **Keep components independent** — No external margins on components
+6. **No styles in first 2 layers** — Settings and Tools generate no CSS output
+7. **Use namespaces religiously** — Makes code self-documenting
 
 ---
 
-## 📊 CSS Statistics
+## Example: Dashboard Card Component
 
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| **Total Stylesheets** | 8 files | ✅ Good modularization |
-| **main.css Size** | ~3,600 lines | ⚠️ Could be split further |
-| **Custom Properties** | 100+ | ✅ Extensive token usage |
-| **Responsive Breakpoints** | 5 (2xl, xl, lg, md, sm) | ✅ Comprehensive |
-| **Browser Prefixes** | Minimal | ✅ Modern CSS only |
-
----
-
-## 🔍 Deep Dive: Component Patterns
-
-### 1. Card Components
-**Current Implementation:**
 ```css
-.card {
-  background: var(--color-bg-2);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: box-shadow 200ms, transform 200ms, border-color 200ms;
-}
+/* 6-components/_c-dashboard-card.css */
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-```
-
-**Assessment:** ✅ Smooth micro-interactions, consistent spacing  
-**UX Note:** The 2px hover lift is subtle and professional
-
-### 2. Button System
-**Implementation:**
-```css
-.btn {
+.c-dashboard-card {
+  background: var(--card-bg);
   border-radius: 8px;
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 44px; /* WCAG touch target */
-  padding: 12px 20px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.btn-primary {
-  background: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(244, 78, 36, 0.25);
+.c-dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.btn-primary:hover {
-  background: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(244, 78, 36, 0.35);
-}
-```
-
-**Assessment:** ✅ Excellent hover states, accessible touch targets  
-**Performance:** Uses GPU-accelerated transforms (translateY)
-
-### 3. Form Inputs
-**Implementation:**
-```css
-.form-control {
-  background-color: var(--color-bg-3);
-  border: 2px solid var(--color-border-default);
-  font-size: 16px; /* Prevents iOS zoom */
-  min-height: 44px;
+.c-dashboard-card__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.form-control:focus {
-  border-color: var(--color-secondary);
-  box-shadow: 0 0 0 4px rgba(1, 164, 239, 0.15);
-}
-```
-
-**Assessment:** ✅ Clear focus states, mobile-optimized, accessible
-
----
-
-## 🚀 Recommendations
-
-### HIGH PRIORITY (Implement Now)
-
-#### 1. **Split main.css into Logical Modules**
-**Current:** 3,600 lines in one file  
-**Proposed Structure:**
-```
-css/
-├── base/
-│   ├── typography.css
-│   ├── layout.css
-│   └── reset.css
-├── components/
-│   ├── buttons.css
-│   ├── cards.css
-│   ├── forms.css
-│   ├── tables.css
-│   └── modals.css
-├── pages/
-│   ├── dashboard.css
-│   ├── reports.css
-│   └── settings.css
-└── vendors/
-    └── bootstrap-overrides.css
-```
-
-**Benefits:**
-- Easier maintenance
-- Faster development (find styles quickly)
-- Better code splitting for production
-
-**Implementation Example:**
-```css
-/* components/buttons.css */
-.btn {
-  border-radius: var(--radius-md);
-  transition: var(--transition-all);
-  min-height: 44px;
-  padding: var(--space-3) var(--space-5);
-  font-weight: var(--weight-semibold);
+.c-dashboard-card__icon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
 }
 
-.btn-primary {
-  background: var(--color-primary);
-  color: white;
-  box-shadow: var(--shadow-glow-sm);
+.c-dashboard-card__body {
+  /* card content area */
 }
 
-.btn-primary:hover {
-  background: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow-md);
+.c-dashboard-card__footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Modifiers */
+.c-dashboard-card--highlight {
+  border-left: 4px solid var(--primary-color);
+}
+
+.c-dashboard-card--warning {
+  border-left: 4px solid var(--warning-color);
+}
+
+.c-dashboard-card--error {
+  border-left: 4px solid var(--danger-color);
+}
+
+.c-dashboard-card--compact {
+  padding: 1rem;
+}
+
+/* States */
+.c-dashboard-card.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
 }
 ```
 
----
-
-#### 2. **Expand Utility Class System**
-**Current:** Limited utility classes  
-**Proposed:** Add comprehensive spacing/layout utilities
-
-**Example Implementation:**
-```css
-/* utilities/spacing.css */
-/* Margin utilities (8px grid) */
-.m-0 { margin: 0 !important; }
-.m-1 { margin: var(--space-1) !important; }  /* 4px */
-.m-2 { margin: var(--space-2) !important; }  /* 8px */
-.m-3 { margin: var(--space-3) !important; }  /* 12px */
-.m-4 { margin: var(--space-4) !important; }  /* 16px */
-.m-5 { margin: var(--space-5) !important; }  /* 20px */
-.m-6 { margin: var(--space-6) !important; }  /* 24px */
-.m-8 { margin: var(--space-8) !important; }  /* 32px */
-
-/* Directional margins */
-.mt-0 { margin-top: 0 !important; }
-.mt-1 { margin-top: var(--space-1) !important; }
-.mt-2 { margin-top: var(--space-2) !important; }
-.mt-3 { margin-top: var(--space-3) !important; }
-.mt-4 { margin-top: var(--space-4) !important; }
-/* ... continue for mr, mb, ml, mx, my ... */
-
-/* Padding utilities (8px grid) */
-.p-0 { padding: 0 !important; }
-.p-1 { padding: var(--space-1) !important; }
-.p-2 { padding: var(--space-2) !important; }
-.p-3 { padding: var(--space-3) !important; }
-.p-4 { padding: var(--space-4) !important; }
-.p-5 { padding: var(--space-5) !important; }
-.p-6 { padding: var(--space-6) !important; }
-.p-8 { padding: var(--space-8) !important; }
-
-/* Directional padding */
-.pt-0 { padding-top: 0 !important; }
-.pt-1 { padding-top: var(--space-1) !important; }
-.pt-2 { padding-top: var(--space-2) !important; }
-/* ... continue for pr, pb, pl, px, py ... */
-
-/* Flexbox utilities */
-.d-flex { display: flex !important; }
-.flex-column { flex-direction: column !important; }
-.flex-row { flex-direction: row !important; }
-.align-items-center { align-items: center !important; }
-.align-items-start { align-items: flex-start !important; }
-.align-items-end { align-items: flex-end !important; }
-.justify-content-center { justify-content: center !important; }
-.justify-content-between { justify-content: space-between !important; }
-.justify-content-end { justify-content: flex-end !important; }
-.gap-1 { gap: var(--space-1) !important; }
-.gap-2 { gap: var(--space-2) !important; }
-.gap-3 { gap: var(--space-3) !important; }
-.gap-4 { gap: var(--space-4) !important; }
-.gap-6 { gap: var(--space-6) !important; }
-
-/* Text utilities */
-.text-left { text-align: left !important; }
-.text-center { text-align: center !important; }
-.text-right { text-align: right !important; }
-.fw-normal { font-weight: var(--weight-regular) !important; }
-.fw-medium { font-weight: var(--weight-medium) !important; }
-.fw-semibold { font-weight: var(--weight-semibold) !important; }
-.fw-bold { font-weight: var(--weight-bold) !important; }
-```
-
-**Why This Helps:**
-- Reduces custom CSS for one-off layouts
-- Speeds up prototyping
-- Consistent spacing across the app
-- Reduces file size (reuse > repetition)
-
----
-
-#### 3. **Add CSS Container Queries (Modern Responsive)**
-**Current:** Media queries only (viewport-based)  
-**Proposed:** Container queries for component-level responsiveness
-
-**Example:**
-```css
-/* Enable container queries on card wrappers */
-.card-grid {
-  container-type: inline-size;
-  container-name: card-grid;
-}
-
-.dashboard-card {
-  background: var(--color-bg-2);
-  padding: var(--space-6);
-  border-radius: var(--radius-lg);
-}
-
-/* Responsive based on CONTAINER width, not viewport */
-@container card-grid (max-width: 400px) {
-  .dashboard-card {
-    padding: var(--space-4);
-  }
-  
-  .dashboard-card p {
-    font-size: 1.5rem;
-  }
-}
-
-@container card-grid (max-width: 300px) {
-  .dashboard-card h5 {
-    font-size: 12px;
-  }
-  
-  .dashboard-card p {
-    font-size: 1.25rem;
-  }
-}
-```
-
-**Benefits:**
-- Cards adapt to THEIR space, not the viewport
-- Better reusability across different layouts
-- Simpler responsive logic
-
----
-
-### MEDIUM PRIORITY
-
-#### 4. **Implement Critical CSS Extraction**
-**Goal:** Load only essential CSS for above-the-fold content first
-
-**Implementation:**
+### HTML Usage:
 ```html
-<!-- index.html -->
-<head>
-  <!-- Inline critical CSS (design tokens + base styles) -->
-  <style>
-    /* design-tokens.css inlined here */
-  </style>
-  
-  <!-- Defer non-critical CSS -->
-  <link rel="preload" href="assets/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css"></noscript>
-</head>
+<div class="c-dashboard-card c-dashboard-card--highlight u-mb-3">
+  <div class="c-dashboard-card__header">
+    <h3 class="c-dashboard-card__title">Net Worth</h3>
+    <span class="c-dashboard-card__icon">💰</span>
+  </div>
+  <div class="c-dashboard-card__body">
+    <p class="c-dashboard-card__value">$125,430</p>
+    <p class="c-dashboard-card__change u-text-success">+$2,340 this month</p>
+  </div>
+</div>
 ```
-
-**Expected Performance Gain:** 20-30% faster First Contentful Paint (FCP)
 
 ---
 
-#### 5. **Add CSS Logical Properties**
-**Current:** Physical directions (left, right, top, bottom)  
-**Proposed:** Logical properties for better i18n support
+## Example: Spacing Utilities
 
-**Example:**
 ```css
-/* OLD */
-.sidebar {
-  padding-left: 20px;
-  margin-right: 16px;
-  border-left: 3px solid var(--color-primary);
-}
+/* 7-utilities/_u-spacing.css */
 
-/* NEW (supports RTL languages automatically) */
-.sidebar {
-  padding-inline-start: 20px;
-  margin-inline-end: 16px;
-  border-inline-start: 3px solid var(--color-primary);
-}
+/* Margin utilities */
+.u-m-0 { margin: 0 !important; }
+.u-m-1 { margin: 0.25rem !important; }
+.u-m-2 { margin: 0.5rem !important; }
+.u-m-3 { margin: 1rem !important; }
+.u-m-4 { margin: 1.5rem !important; }
+.u-m-5 { margin: 3rem !important; }
+
+/* Margin top */
+.u-mt-0 { margin-top: 0 !important; }
+.u-mt-1 { margin-top: 0.25rem !important; }
+.u-mt-2 { margin-top: 0.5rem !important; }
+.u-mt-3 { margin-top: 1rem !important; }
+.u-mt-4 { margin-top: 1.5rem !important; }
+.u-mt-5 { margin-top: 3rem !important; }
+
+/* Margin bottom */
+.u-mb-0 { margin-bottom: 0 !important; }
+.u-mb-1 { margin-bottom: 0.25rem !important; }
+.u-mb-2 { margin-bottom: 0.5rem !important; }
+.u-mb-3 { margin-bottom: 1rem !important; }
+.u-mb-4 { margin-bottom: 1.5rem !important; }
+.u-mb-5 { margin-bottom: 3rem !important; }
+
+/* ... similar for ml, mr, mx, my, p, pt, pb, pl, pr, px, py */
 ```
 
-**Benefits:**
-- Automatic RTL support (future internationalization)
-- More semantic CSS
-- Easier maintenance
+**Why !important on utilities?** Because utilities are intentionally high-specificity overrides that should always win. They're the last layer in ITCSS.
 
 ---
 
-### LOW PRIORITY (Future Enhancements)
+## Integration with Bootstrap
 
-#### 6. **Explore CSS Nesting (Native)**
-**Current:** Flat selectors  
-**Proposed:** Native CSS nesting (now supported in all modern browsers)
+Current setup uses Bootstrap 5. Here's how ITCSS fits:
 
-**Example:**
+1. **Keep Bootstrap as the Generic layer** — Use Bootstrap's reset, grid system, base styles
+2. **Override Bootstrap variables in Settings layer** — Customize colors, spacing, typography
+3. **Build custom components in Components layer** — Don't rely on Bootstrap components like `.card`, `.btn` — create `.c-dashboard-card`, `.c-primary-button` instead
+4. **Use Bootstrap utilities sparingly** — Prefer custom utilities with BEMIT naming for consistency
+5. **Let ITCSS take over specificity management** — Bootstrap's specificity can be tamed by ITCSS ordering
+
+### Example: Customizing Bootstrap
 ```css
-/* OLD */
-.btn { ... }
-.btn:hover { ... }
-.btn:focus { ... }
-.btn.btn-primary { ... }
-.btn.btn-primary:hover { ... }
-
-/* NEW (native CSS nesting) */
-.btn {
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-5);
-  transition: var(--transition-all);
+/* 1-settings/_colors.css */
+:root {
+  --bs-primary: #01a4ef;  /* Override Bootstrap primary */
+  --bs-success: #81b900;
+  --bs-danger: #f44e24;
   
-  &:hover {
-    transform: translateY(-2px);
-  }
-  
-  &:focus {
-    outline: var(--focus-ring);
-  }
-  
-  &.btn-primary {
-    background: var(--color-primary);
-    color: white;
-    
-    &:hover {
-      background: var(--color-primary-hover);
-    }
-  }
+  /* Custom variables */
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --border-color: #e5e5e5;
 }
 ```
 
-**Benefits:**
-- Easier to read/maintain
-- Better scoping
-- Mirrors SCSS syntax (familiar to developers)
+---
+
+## Benefits for Fireside Capital
+
+1. **Scalability** — Easy to add new financial components (budgets, investments, debts)
+2. **Maintainability** — Clear structure for finding and updating styles
+3. **Team collaboration** — Namespaces make it obvious where styles belong
+4. **Specificity control** — No more `!important` hacks (except in utilities where intended)
+5. **Performance** — Easier to audit unused CSS and tree-shake
+6. **Consistency** — Naming conventions enforce design system compliance
+7. **Documentation** — Code becomes self-documenting with BEMIT
 
 ---
 
-## 🎯 Implementation Roadmap
+## Migration Strategy
 
-| Task | Priority | Effort | Impact | Recommended Sprint |
-|------|----------|--------|--------|-------------------|
-| Split main.css into modules | HIGH | 4 hours | High | Sprint 1 |
-| Expand utility classes | HIGH | 2 hours | High | Sprint 1 |
-| Add container queries | HIGH | 3 hours | Medium | Sprint 2 |
-| Critical CSS extraction | MEDIUM | 6 hours | High | Sprint 2 |
-| Logical properties migration | MEDIUM | 4 hours | Low | Sprint 3 |
-| CSS nesting refactor | LOW | 8 hours | Medium | Sprint 4 |
+### Phase 1: Setup (1-2 hours)
+1. Create ITCSS folder structure in `app/assets/css/`
+2. Create `main.css` with layer imports
+3. Move existing color/font variables to `1-settings/`
 
----
+### Phase 2: Extract Components (3-4 hours)
+1. Identify existing components (dashboard cards, charts, transaction lists)
+2. Extract each component to separate file in `6-components/`
+3. Refactor class names to use BEMIT conventions
+4. Remove external margins, replace with utility classes
 
-## 📦 Deliverable: Utility Class Generator Script
+### Phase 3: Build Utilities (1-2 hours)
+1. Create spacing utilities (`7-utilities/_u-spacing.css`)
+2. Create visibility utilities (`7-utilities/_u-visibility.css`)
+3. Create text utilities (`7-utilities/_u-text.css`)
 
-**File:** `scripts/generate-utilities.js`
+### Phase 4: Migrate Pages (2-3 hours per page)
+1. Update HTML to use new class names
+2. Test each page thoroughly
+3. Remove old CSS once verified
+4. Migrate one page at a time (start with dashboard)
 
-```javascript
-#!/usr/bin/env node
-/**
- * Generate comprehensive utility classes for Fireside Capital
- * Run: node scripts/generate-utilities.js
- * Output: assets/css/utilities-generated.css
- */
-
-const fs = require('fs');
-const path = require('path');
-
-// Spacing scale (from design-tokens.css)
-const spacingScale = {
-  0: '0',
-  px: '1px',
-  1: '0.25rem',   // 4px
-  2: '0.5rem',    // 8px
-  3: '0.75rem',   // 12px
-  4: '1rem',      // 16px
-  5: '1.25rem',   // 20px
-  6: '1.5rem',    // 24px
-  8: '2rem',      // 32px
-  10: '2.5rem',   // 40px
-  12: '3rem',     // 48px
-  16: '4rem',     // 64px
-  20: '5rem',     // 80px
-  24: '6rem',     // 96px
-};
-
-const directions = {
-  t: 'top',
-  r: 'right',
-  b: 'bottom',
-  l: 'left',
-  x: ['left', 'right'],
-  y: ['top', 'bottom'],
-};
-
-let css = `/* =================================================================
-   AUTO-GENERATED UTILITY CLASSES
-   Generated: ${new Date().toISOString()}
-   DO NOT EDIT MANUALLY — Run: node scripts/generate-utilities.js
-   ================================================================= */\n\n`;
-
-// Generate margin utilities
-css += `/* === MARGIN UTILITIES === */\n`;
-Object.entries(spacingScale).forEach(([key, value]) => {
-  css += `.m-${key} { margin: ${value} !important; }\n`;
-  
-  Object.entries(directions).forEach(([dirKey, dirValue]) => {
-    if (Array.isArray(dirValue)) {
-      dirValue.forEach(side => {
-        css += `.m${dirKey}-${key} { margin-${side}: ${value} !important; }\n`;
-      });
-    } else {
-      css += `.m${dirKey}-${key} { margin-${dirValue}: ${value} !important; }\n`;
-    }
-  });
-});
-
-css += `\n/* === PADDING UTILITIES === */\n`;
-Object.entries(spacingScale).forEach(([key, value]) => {
-  css += `.p-${key} { padding: ${value} !important; }\n`;
-  
-  Object.entries(directions).forEach(([dirKey, dirValue]) => {
-    if (Array.isArray(dirValue)) {
-      dirValue.forEach(side => {
-        css += `.p${dirKey}-${key} { padding-${side}: ${value} !important; }\n`;
-      });
-    } else {
-      css += `.p${dirKey}-${key} { padding-${dirValue}: ${value} !important; }\n`;
-    }
-  });
-});
-
-css += `\n/* === GAP UTILITIES === */\n`;
-Object.entries(spacingScale).forEach(([key, value]) => {
-  css += `.gap-${key} { gap: ${value} !important; }\n`;
-});
-
-css += `\n/* === FLEXBOX UTILITIES === */\n`;
-css += `.d-flex { display: flex !important; }\n`;
-css += `.d-inline-flex { display: inline-flex !important; }\n`;
-css += `.flex-row { flex-direction: row !important; }\n`;
-css += `.flex-column { flex-direction: column !important; }\n`;
-css += `.align-items-start { align-items: flex-start !important; }\n`;
-css += `.align-items-center { align-items: center !important; }\n`;
-css += `.align-items-end { align-items: flex-end !important; }\n`;
-css += `.justify-content-start { justify-content: flex-start !important; }\n`;
-css += `.justify-content-center { justify-content: center !important; }\n`;
-css += `.justify-content-end { justify-content: flex-end !important; }\n`;
-css += `.justify-content-between { justify-content: space-between !important; }\n`;
-css += `.flex-wrap { flex-wrap: wrap !important; }\n`;
-css += `.flex-nowrap { flex-wrap: nowrap !important; }\n`;
-
-css += `\n/* === TEXT UTILITIES === */\n`;
-css += `.text-left { text-align: left !important; }\n`;
-css += `.text-center { text-align: center !important; }\n`;
-css += `.text-right { text-align: right !important; }\n`;
-css += `.fw-regular { font-weight: var(--weight-regular) !important; }\n`;
-css += `.fw-medium { font-weight: var(--weight-medium) !important; }\n`;
-css += `.fw-semibold { font-weight: var(--weight-semibold) !important; }\n`;
-css += `.fw-bold { font-weight: var(--weight-bold) !important; }\n`;
-
-// Write to file
-const outputPath = path.join(__dirname, '../app/assets/css/utilities-generated.css');
-fs.writeFileSync(outputPath, css, 'utf8');
-console.log(`✅ Generated utilities: ${outputPath}`);
-console.log(`📊 File size: ${(css.length / 1024).toFixed(2)} KB`);
-```
-
-**Usage:**
-```bash
-cd C:\Users\chuba\fireside-capital
-node scripts/generate-utilities.js
-```
-
-Then add to `index.html`:
-```html
-<link rel="stylesheet" href="assets/css/utilities-generated.css">
-```
+**Total estimated effort:** 2-3 days
 
 ---
 
-## 🧪 Testing Recommendations
+## Resources
 
-### Visual Regression Testing
-**Tool:** Percy.io or Chromatic  
-**Test Cases:**
-- Button states (default, hover, active, disabled)
-- Card hover animations
-- Form focus states
-- Responsive breakpoints (mobile, tablet, desktop)
-- Dark/light theme switching
-
-### Performance Testing
-**Metrics to Track:**
-- CSS bundle size (target: < 100KB gzipped)
-- First Contentful Paint (FCP) — target: < 1.5s
-- Largest Contentful Paint (LCP) — target: < 2.5s
-- Cumulative Layout Shift (CLS) — target: < 0.1
-
-**Tools:**
-- Lighthouse CI (automated)
-- WebPageTest
-- Chrome DevTools Coverage tab
+- **ITCSS Guide:** https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture
+- **BEMIT Naming:** https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/
+- **CSS Guidelines:** https://cssguidelin.es/
+- **BEM Methodology:** https://en.bem.info/methodology/
+- **BEM Cheat Sheet:** https://9elements.com/bem-cheat-sheet/
 
 ---
 
-## 📚 References
+## Next Steps
 
-- [CSS Container Queries (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Container_Queries)
-- [CSS Logical Properties (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties)
-- [CSS Nesting (W3C)](https://www.w3.org/TR/css-nesting-1/)
-- [Critical CSS Extraction (web.dev)](https://web.dev/extract-critical-css/)
-- [WCAG 2.5.5 Touch Target Size](https://www.w3.org/WAI/WCAG21/Understanding/target-size.html)
-
----
-
-## ✅ Next Steps
-
-1. **Review findings** with the team
-2. **Prioritize** implementation tasks based on impact/effort
-3. **Create Azure DevOps work items** for each HIGH priority task
-4. **Assign** to Builder agent for implementation
-5. **Schedule** QA review with Auditor agent after implementation
+1. ✅ **Research complete** — Document saved
+2. ⬜ **Create ITCSS folder structure**
+3. ⬜ **Build spacing utility system**
+4. ⬜ **Migrate first component** (dashboard card)
+5. ⬜ **Update component library documentation**
 
 ---
 
-**Research Status:** ✅ Complete  
-**Recommended Review Date:** February 16, 2026  
-**Next Research Topic:** Financial Dashboard UI Patterns
+**Research completed:** February 10, 2026  
+**Researcher:** Capital (Fireside Capital AI)  
+**Status:** Ready for implementation
