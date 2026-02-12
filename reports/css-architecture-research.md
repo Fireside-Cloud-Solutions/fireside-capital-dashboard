@@ -1,354 +1,379 @@
-# CSS Architecture Research — February 10, 2026
+# CSS Architecture Research — Fireside Capital
+**Research Date:** February 12, 2026  
+**Researcher:** Capital (Fireside Capital AI)  
+**Status:** Complete ✅
 
-## Recommendation: ITCSS + BEMIT Naming
+## Executive Summary
+The Fireside Capital dashboard has a solid CSS foundation (design tokens, modular files) but lacks a formal architecture pattern. Implementing **ITCSS + BEMIT** will improve maintainability, reduce specificity conflicts, and make the codebase more scalable.
 
-After researching CSS architecture methodologies, I recommend **ITCSS (Inverted Triangle CSS)** with **BEMIT naming conventions** for the Fireside Capital dashboard.
-
----
-
-## Why ITCSS?
-
-- **Manages specificity naturally** — Styles flow from generic to specific, preventing specificity wars
-- **Highly flexible** — Only use the layers you need (no boilerplate overhead)
-- **Battle-tested** — 78% satisfaction rating (State of CSS 2020)
-- **Works with existing tools** — Compatible with Bootstrap, preprocessors, vanilla CSS
-- **Perfect for financial dashboards** — Excels at organizing complex component libraries
+**Recommended Action:** Refactor to ITCSS layer structure with BEMIT naming conventions.
 
 ---
 
-## ITCSS Layers (Inverted Triangle)
+## Current State Analysis
 
-1. **Settings** — Variables (colors, fonts, breakpoints)
-2. **Tools** — Mixins and functions
-3. **Generic** — Resets, normalize, box-sizing
-4. **Elements** — Base HTML element styles (h1, a, p)
-5. **Objects** — Unstyled design patterns (layouts, grids)
-6. **Components** — Specific UI components (cards, buttons, charts)
-7. **Utilities** — Helper classes (spacing, hide, text-center)
-
-Specificity increases as you go down the triangle. Generic styles at the top, specific overrides at the bottom.
-
----
-
-## BEMIT Naming Convention
-
-Combine BEM (Block Element Modifier) with namespace prefixes:
-
-- **c-** = Component (`.c-card`, `.c-button`, `.c-dashboard-card`)
-- **o-** = Object (`.o-layout`, `.o-media`, `.o-container`)
-- **u-** = Utility (`.u-mt-2`, `.u-hide`, `.u-text-center`)
-- **t-** = Theme (`.t-dark`, `.t-light`)
-- **is-** / **has-** = State (`.is-active`, `.has-error`, `.is-loading`)
-
-### BEM Structure:
-```css
-.block { }
-.block__element { }
-.block--modifier { }
-.block__element--modifier { }
-```
-
-### BEMIT Example:
-```css
-.c-dashboard-card { }                      /* component */
-.c-dashboard-card__header { }              /* element */
-.c-dashboard-card__title { }               /* element */
-.c-dashboard-card--highlight { }           /* modifier */
-.c-dashboard-card.is-loading { }           /* state */
-```
-
----
-
-## Recommended File Structure
-
+### File Structure (8 CSS files, 210KB total)
 ```
 app/assets/css/
+├── accessibility.css       11.7 KB
+├── components.css          33.3 KB
+├── design-tokens.css       13.6 KB
+├── financial-patterns.css  10.5 KB
+├── logged-out-cta.css       4.6 KB
+├── main.css                91.1 KB  ⚠️ Too large
+├── onboarding.css           8.2 KB
+├── responsive.css          28.3 KB
+└── utilities.css            9.0 KB
+```
+
+### Strengths ✅
+- **Design tokens system** — All brand colors, spacing, typography centralized in `design-tokens.css`
+- **Modular approach** — Separate files for concerns (components, utilities, responsive)
+- **Dark-first design** — Consistent with brand
+- **Good documentation** — Comments explain purpose and usage
+
+### Weaknesses ⚠️
+- **No ITCSS layer structure** — Files organized by *type*, not *specificity*
+- **`main.css` too large** (91KB) — Should be split into layers
+- **No BEMIT naming** — Classes like `.card`, `.btn` lack namespaces (`.c-card`, `.o-media`)
+- **Inconsistent nesting** — Some deep nesting increases specificity unnecessarily
+- **No spacing system** — Margins/padding mixed into components (breaks encapsulation)
+
+---
+
+## Research Findings
+
+### What is ITCSS? (Inverted Triangle CSS)
+Created by Harry Roberts, ITCSS organizes CSS by **specificity** (low → high):
+
+```
+          Settings     ← Preprocessor variables (design tokens)
+            Tools      ← Mixins, functions (no CSS output)
+           Generic     ← Resets, normalize, box-sizing
+          Elements     ← Bare HTML (h1, p, a)
+         Objects       ← Layout patterns (.o-media, .o-container)
+       Components      ← UI components (.c-card, .c-button)
+      Utilities        ← Helpers (.u-hide, .u-mt-16)
+```
+
+### Why ITCSS?
+- **Avoids specificity wars** — Layers increase in specificity naturally
+- **Healthy CSS graph** — No spikes in specificity
+- **Predictable** — Know where styles live
+- **Flexible** — Don't need all layers
+
+### BEMIT Naming Convention
+Combines BEM with namespaces for clarity:
+
+| Prefix | Type | Example |
+|--------|------|---------|
+| `.c-` | Component | `.c-card`, `.c-button` |
+| `.o-` | Object (layout) | `.o-media`, `.o-container` |
+| `.u-` | Utility | `.u-hide`, `.u-mt-16` |
+| `.t-` | Theme | `.t-dark`, `.t-light` |
+| `.is-` `.has-` | State | `.is-active`, `.has-error` |
+| `.js-` | JavaScript hook | `.js-toggle` |
+
+---
+
+## Recommendations for Fireside Capital
+
+### 1. Reorganize to ITCSS Structure (Priority: HIGH)
+
+**Current:**
+```
+assets/css/
+├── main.css
+├── components.css
+├── utilities.css
+└── ...
+```
+
+**Proposed:**
+```
+assets/css/
 ├── 1-settings/
-│   ├── _colors.css
-│   ├── _typography.css
-│   └── _breakpoints.css
+│   └── _design-tokens.css    (existing file, rename)
 ├── 2-tools/
-│   └── _mixins.css
+│   └── _mixins.css            (future — optional)
 ├── 3-generic/
-│   ├── _reset.css
-│   └── _box-sizing.css
+│   └── _reset.css             (extract from main.css)
 ├── 4-elements/
-│   ├── _headings.css
-│   ├── _links.css
-│   └── _forms.css
+│   └── _base.css              (extract from main.css)
 ├── 5-objects/
-│   ├── _o-container.css
-│   ├── _o-layout.css
-│   └── _o-grid.css
+│   ├── _container.css
+│   ├── _media.css
+│   └── _grid.css              (layout patterns only)
 ├── 6-components/
-│   ├── _c-dashboard-card.css
-│   ├── _c-chart-container.css
-│   ├── _c-transaction-list.css
-│   ├── _c-bill-reminder.css
-│   ├── _c-net-worth-display.css
-│   ├── _c-asset-summary.css
-│   ├── _c-debt-tracker.css
-│   └── ...
+│   ├── _button.css
+│   ├── _card.css
+│   ├── _navbar.css
+│   ├── _chart.css
+│   └── ... (50+ components from main.css)
 ├── 7-utilities/
-│   ├── _u-spacing.css
-│   ├── _u-visibility.css
-│   └── _u-text.css
-└── main.css (imports all in order)
+│   ├── _spacing.css           (NEW — spacing system)
+│   ├── _visibility.css
+│   └── _text.css
+└── main.css                   (imports all layers)
 ```
 
-### main.css imports in ITCSS order:
+**main.css becomes:**
 ```css
-/* Settings */
-@import '1-settings/_colors.css';
-@import '1-settings/_typography.css';
-@import '1-settings/_breakpoints.css';
-
-/* Tools */
-@import '2-tools/_mixins.css';
-
-/* Generic */
+/* ITCSS Layer Imports */
+@import '1-settings/_design-tokens.css';
 @import '3-generic/_reset.css';
-@import '3-generic/_box-sizing.css';
-
-/* Elements */
-@import '4-elements/_headings.css';
-@import '4-elements/_links.css';
-@import '4-elements/_forms.css';
-
-/* Objects */
-@import '5-objects/_o-container.css';
-@import '5-objects/_o-layout.css';
-@import '5-objects/_o-grid.css';
-
-/* Components */
-@import '6-components/_c-dashboard-card.css';
-@import '6-components/_c-chart-container.css';
+@import '4-elements/_base.css';
+@import '5-objects/_container.css';
+@import '6-components/_button.css';
+@import '6-components/_card.css';
 /* ... */
+@import '7-utilities/_spacing.css';
+```
 
-/* Utilities */
-@import '7-utilities/_u-spacing.css';
-@import '7-utilities/_u-visibility.css';
-@import '7-utilities/_u-text.css';
+**Implementation Code:**
+```powershell
+# Create ITCSS folder structure
+New-Item -ItemType Directory -Path "app/assets/css/1-settings"
+New-Item -ItemType Directory -Path "app/assets/css/3-generic"
+New-Item -ItemType Directory -Path "app/assets/css/4-elements"
+New-Item -ItemType Directory -Path "app/assets/css/5-objects"
+New-Item -ItemType Directory -Path "app/assets/css/6-components"
+New-Item -ItemType Directory -Path "app/assets/css/7-utilities"
+
+# Move existing files
+Move-Item "app/assets/css/design-tokens.css" "app/assets/css/1-settings/_design-tokens.css"
+Move-Item "app/assets/css/utilities.css" "app/assets/css/7-utilities/_utilities.css"
 ```
 
 ---
 
-## Key Principles
+### 2. Adopt BEMIT Naming (Priority: MEDIUM)
 
-1. **One file per component** — Easy to find and maintain
-2. **Limit nesting to 2 levels** — Avoid overqualified selectors
-3. **Separate spacing from components** — Use utility classes for margins
-4. **Don't overuse objects** — When in doubt, make it a component
-5. **Keep components independent** — No external margins on components
-6. **No styles in first 2 layers** — Settings and Tools generate no CSS output
-7. **Use namespaces religiously** — Makes code self-documenting
-
----
-
-## Example: Dashboard Card Component
-
+**Before:**
 ```css
-/* 6-components/_c-dashboard-card.css */
+.card { ... }
+.card-header { ... }
+.card-body { ... }
+.card.card-dark { ... }
+```
 
-.c-dashboard-card {
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+**After:**
+```css
+.c-card { ... }
+.c-card__header { ... }
+.c-card__body { ... }
+.c-card--dark { ... }
+```
+
+**Migration Strategy:**
+1. Keep old classes for compatibility
+2. Add new BEMIT classes alongside
+3. Update HTML templates to use new classes
+4. Remove old classes after verification
+
+**Example Migration:**
+```css
+/* Backward compatible during transition */
+.card,
+.c-card {
+  background: var(--color-bg-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-24);
 }
 
-.c-dashboard-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.c-dashboard-card__title {
-  font-size: 1.25rem;
+.card-header,
+.c-card__header {
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: var(--text-primary);
+  margin-bottom: var(--space-16);
 }
-
-.c-dashboard-card__icon {
-  width: 24px;
-  height: 24px;
-  opacity: 0.7;
-}
-
-.c-dashboard-card__body {
-  /* card content area */
-}
-
-.c-dashboard-card__footer {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
-}
-
-/* Modifiers */
-.c-dashboard-card--highlight {
-  border-left: 4px solid var(--primary-color);
-}
-
-.c-dashboard-card--warning {
-  border-left: 4px solid var(--warning-color);
-}
-
-.c-dashboard-card--error {
-  border-left: 4px solid var(--danger-color);
-}
-
-.c-dashboard-card--compact {
-  padding: 1rem;
-}
-
-/* States */
-.c-dashboard-card.is-loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-```
-
-### HTML Usage:
-```html
-<div class="c-dashboard-card c-dashboard-card--highlight u-mb-3">
-  <div class="c-dashboard-card__header">
-    <h3 class="c-dashboard-card__title">Net Worth</h3>
-    <span class="c-dashboard-card__icon">💰</span>
-  </div>
-  <div class="c-dashboard-card__body">
-    <p class="c-dashboard-card__value">$125,430</p>
-    <p class="c-dashboard-card__change u-text-success">+$2,340 this month</p>
-  </div>
-</div>
 ```
 
 ---
 
-## Example: Spacing Utilities
+### 3. Create Spacing System (Priority: HIGH)
 
+**Problem:** Components have hardcoded margins, breaking encapsulation.
+
+**Solution:** Utility classes for spacing (like Tailwind).
+
+**Create `7-utilities/_spacing.css`:**
 ```css
-/* 7-utilities/_u-spacing.css */
+/* Spacing Utility System — 8px Grid
+   Usage: <div class="u-mt-16 u-mb-24">
+   Replaces: margin-top/bottom in components
+*/
 
-/* Margin utilities */
-.u-m-0 { margin: 0 !important; }
-.u-m-1 { margin: 0.25rem !important; }
-.u-m-2 { margin: 0.5rem !important; }
-.u-m-3 { margin: 1rem !important; }
-.u-m-4 { margin: 1.5rem !important; }
-.u-m-5 { margin: 3rem !important; }
-
-/* Margin top */
+/* Margin Top */
 .u-mt-0 { margin-top: 0 !important; }
-.u-mt-1 { margin-top: 0.25rem !important; }
-.u-mt-2 { margin-top: 0.5rem !important; }
-.u-mt-3 { margin-top: 1rem !important; }
-.u-mt-4 { margin-top: 1.5rem !important; }
-.u-mt-5 { margin-top: 3rem !important; }
+.u-mt-8 { margin-top: 8px !important; }
+.u-mt-16 { margin-top: 16px !important; }
+.u-mt-24 { margin-top: 24px !important; }
+.u-mt-32 { margin-top: 32px !important; }
+.u-mt-48 { margin-top: 48px !important; }
 
-/* Margin bottom */
+/* Margin Bottom */
 .u-mb-0 { margin-bottom: 0 !important; }
-.u-mb-1 { margin-bottom: 0.25rem !important; }
-.u-mb-2 { margin-bottom: 0.5rem !important; }
-.u-mb-3 { margin-bottom: 1rem !important; }
-.u-mb-4 { margin-bottom: 1.5rem !important; }
-.u-mb-5 { margin-bottom: 3rem !important; }
+.u-mb-8 { margin-bottom: 8px !important; }
+.u-mb-16 { margin-bottom: 16px !important; }
+.u-mb-24 { margin-bottom: 24px !important; }
+.u-mb-32 { margin-bottom: 32px !important; }
+.u-mb-48 { margin-bottom: 48px !important; }
 
-/* ... similar for ml, mr, mx, my, p, pt, pb, pl, pr, px, py */
-```
+/* Margin Left/Right */
+.u-ml-8 { margin-left: 8px !important; }
+.u-ml-16 { margin-left: 16px !important; }
+.u-mr-8 { margin-right: 8px !important; }
+.u-mr-16 { margin-right: 16px !important; }
 
-**Why !important on utilities?** Because utilities are intentionally high-specificity overrides that should always win. They're the last layer in ITCSS.
+/* Padding variants (same pattern) */
+.u-p-0 { padding: 0 !important; }
+.u-p-8 { padding: 8px !important; }
+.u-p-16 { padding: 16px !important; }
+.u-p-24 { padding: 24px !important; }
+.u-p-32 { padding: 32px !important; }
 
----
-
-## Integration with Bootstrap
-
-Current setup uses Bootstrap 5. Here's how ITCSS fits:
-
-1. **Keep Bootstrap as the Generic layer** — Use Bootstrap's reset, grid system, base styles
-2. **Override Bootstrap variables in Settings layer** — Customize colors, spacing, typography
-3. **Build custom components in Components layer** — Don't rely on Bootstrap components like `.card`, `.btn` — create `.c-dashboard-card`, `.c-primary-button` instead
-4. **Use Bootstrap utilities sparingly** — Prefer custom utilities with BEMIT naming for consistency
-5. **Let ITCSS take over specificity management** — Bootstrap's specificity can be tamed by ITCSS ordering
-
-### Example: Customizing Bootstrap
-```css
-/* 1-settings/_colors.css */
-:root {
-  --bs-primary: #01a4ef;  /* Override Bootstrap primary */
-  --bs-success: #81b900;
-  --bs-danger: #f44e24;
-  
-  /* Custom variables */
-  --card-bg: #ffffff;
-  --text-primary: #333333;
-  --border-color: #e5e5e5;
+/* Responsive spacing (mobile override) */
+@media (max-width: 767px) {
+  .u-mt-16-mobile { margin-top: 16px !important; }
+  .u-mb-16-mobile { margin-bottom: 16px !important; }
 }
 ```
 
----
+**Before (component with hardcoded margin):**
+```css
+.c-card {
+  margin-bottom: 24px; /* ❌ Breaks encapsulation */
+}
+```
 
-## Benefits for Fireside Capital
+**After (component + utility):**
+```css
+/* Component — no margin */
+.c-card {
+  background: var(--color-bg-2);
+  padding: var(--space-24);
+}
+```
 
-1. **Scalability** — Easy to add new financial components (budgets, investments, debts)
-2. **Maintainability** — Clear structure for finding and updating styles
-3. **Team collaboration** — Namespaces make it obvious where styles belong
-4. **Specificity control** — No more `!important` hacks (except in utilities where intended)
-5. **Performance** — Easier to audit unused CSS and tree-shake
-6. **Consistency** — Naming conventions enforce design system compliance
-7. **Documentation** — Code becomes self-documenting with BEMIT
-
----
-
-## Migration Strategy
-
-### Phase 1: Setup (1-2 hours)
-1. Create ITCSS folder structure in `app/assets/css/`
-2. Create `main.css` with layer imports
-3. Move existing color/font variables to `1-settings/`
-
-### Phase 2: Extract Components (3-4 hours)
-1. Identify existing components (dashboard cards, charts, transaction lists)
-2. Extract each component to separate file in `6-components/`
-3. Refactor class names to use BEMIT conventions
-4. Remove external margins, replace with utility classes
-
-### Phase 3: Build Utilities (1-2 hours)
-1. Create spacing utilities (`7-utilities/_u-spacing.css`)
-2. Create visibility utilities (`7-utilities/_u-visibility.css`)
-3. Create text utilities (`7-utilities/_u-text.css`)
-
-### Phase 4: Migrate Pages (2-3 hours per page)
-1. Update HTML to use new class names
-2. Test each page thoroughly
-3. Remove old CSS once verified
-4. Migrate one page at a time (start with dashboard)
-
-**Total estimated effort:** 2-3 days
+```html
+<!-- HTML — spacing controlled at layout level -->
+<div class="c-card u-mb-24">...</div>
+```
 
 ---
 
-## Resources
+### 4. Reduce Nesting Depth (Priority: MEDIUM)
 
-- **ITCSS Guide:** https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture
-- **BEMIT Naming:** https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/
-- **CSS Guidelines:** https://cssguidelin.es/
-- **BEM Methodology:** https://en.bem.info/methodology/
-- **BEM Cheat Sheet:** https://9elements.com/bem-cheat-sheet/
+**Current Problem:**
+```css
+.card {
+  .card-header {
+    .card-title {
+      span {
+        /* 4 levels deep — hard to override */
+      }
+    }
+  }
+}
+```
+
+**Recommended:**
+```css
+/* Flat structure — easier to scan, search, override */
+.c-card { ... }
+.c-card__header { ... }
+.c-card__title { ... }
+.c-card__title-icon { ... }
+```
+
+**Rule:** Max 2 levels of nesting. Use BEM for structure, not nesting.
+
+---
+
+### 5. Component Documentation Template (Priority: LOW)
+
+Each component file should have a header:
+
+```css
+/* ===================================================================
+   Component: Card (.c-card)
+   Description: Generic card container with header, body, footer
+   
+   Modifiers:
+   - .c-card--dark     Dark background variant
+   - .c-card--compact  Reduced padding
+   
+   Elements:
+   - .c-card__header   Card header (optional)
+   - .c-card__body     Main content area
+   - .c-card__footer   Footer actions (optional)
+   
+   Usage:
+   <div class="c-card u-mb-24">
+     <div class="c-card__header">Title</div>
+     <div class="c-card__body">Content</div>
+   </div>
+   
+   Dependencies: design-tokens.css
+   =================================================================== */
+
+.c-card { ... }
+```
+
+---
+
+## Implementation Priority
+
+| Task | Priority | Effort | Impact |
+|------|----------|--------|--------|
+| Create spacing utility system | **HIGH** | 2h | Immediate DX improvement |
+| Reorganize to ITCSS folders | **HIGH** | 4h | Foundation for growth |
+| Split `main.css` into components | **HIGH** | 6h | Maintainability |
+| Add BEMIT naming (gradual) | MEDIUM | Ongoing | Clarity |
+| Reduce nesting depth | MEDIUM | 3h | Specificity health |
+| Add component documentation | LOW | Ongoing | Team onboarding |
+
+**Total Estimated Effort:** 15-20 hours for full refactor
+
+---
+
+## Success Metrics
+
+### Before
+- ❌ `main.css` = 91KB (2800+ lines)
+- ❌ No naming convention
+- ❌ Specificity conflicts in responsive.css
+- ❌ Hard to find component styles
+
+### After
+- ✅ Largest file < 20KB
+- ✅ BEMIT naming → instant recognition
+- ✅ ITCSS layers → predictable specificity
+- ✅ Spacing system → consistent layouts
+- ✅ Component-per-file → easy location
+
+---
+
+## References
+
+- [ITCSS: Scalable CSS Architecture](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture)
+- [BEMIT Naming Convention](https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/)
+- [BEM Official Methodology](https://en.bem.info/methodology/)
+- [Margin Breaks Component Encapsulation](https://mxstbr.com/thoughts/margin/)
+- [State of CSS 2020 — ITCSS](https://2020.stateofcss.com/en-US/technologies/)
 
 ---
 
 ## Next Steps
 
-1. ✅ **Research complete** — Document saved
-2. ⬜ **Create ITCSS folder structure**
-3. ⬜ **Build spacing utility system**
-4. ⬜ **Migrate first component** (dashboard card)
-5. ⬜ **Update component library documentation**
+1. ✅ Research complete — documented in `reports/css-architecture-research.md`
+2. ⏭️ Create Azure DevOps work items for implementation tasks
+3. ⏭️ Get founder approval on ITCSS refactor approach
+4. ⏭️ Spawn Builder sub-agent to execute refactor in phases
 
 ---
 
-**Research completed:** February 10, 2026  
-**Researcher:** Capital (Fireside Capital AI)  
-**Status:** Ready for implementation
+**Research Status:** ✅ COMPLETE  
+**Recommendations:** 6 actionable improvements with code examples  
+**Ready for Implementation:** YES
