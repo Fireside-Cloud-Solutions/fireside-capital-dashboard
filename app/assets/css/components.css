@@ -327,24 +327,22 @@
 
 /* ===== MOBILE OPTIMIZATIONS ===== */
 @media (max-width: 768px) {
-  /* Responsive dropdown width for tablets and mobile */
+  /* Responsive dropdown width for tablets and mobile - PRESERVED FROM P0 FIX */
   #notificationList,
   #notificationDropdown .dropdown-menu,
   .notification-dropdown-menu {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    min-width: 300px !important;
+    /* DO NOT override - P0 fix handles all viewports */
+    right: 16px;
+    left: auto;
   }
 }
 
 @media (max-width: 575.98px) {
-  /* Responsive dropdown width */
+  /* Responsive dropdown width - PRESERVED FROM P0 FIX */
   #notificationList,
   #notificationDropdown .dropdown-menu,
   .notification-dropdown-menu {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    min-width: 300px !important;
+    /* DO NOT override width/max-width/min-width - P0 fix handles all viewports */
     right: 16px;
     left: auto;
   }
