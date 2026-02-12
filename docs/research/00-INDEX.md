@@ -518,6 +518,50 @@ ALTER TABLE bills ADD CONSTRAINT bills_frequency_valid CHECK (
 
 ---
 
+### 12. Data Import System Architecture
+**Topic:** CSV/YNAB budget import with column mapping UI  
+**Output:** 33KB implementation guide with vanilla JS examples  
+**Location:** `docs/research/12-data-import-system.md`  
+**Key Takeaways:**
+- PapaParse for client-side CSV parsing (45KB, no dependencies)
+- Auto-detection algorithm matches CSV headers to app fields
+- YNAB export format: Date, Payee, Inflow/Outflow, Category, Memo
+- Batch processing (1000 rows/chunk) for large imports (10k+ transactions)
+- Duplicate detection: match on date+amount+merchant
+
+**Actionable Code Example:**
+```javascript
+// Auto-detection algorithm
+function autoDetectColumn(headerName) {
+  const normalized = headerName.toLowerCase().trim();
+  
+  const patterns = {
+    date: ['date', 'transaction date', 'posted'],
+    amount: ['amount', 'inflow', 'outflow', 'total'],
+    merchant_name: ['merchant', 'payee', 'vendor'],
+    category: ['category', 'type'],
+    notes: ['memo', 'note', 'comment']
+  };
+  
+  for (const [field, keywords] of Object.entries(patterns)) {
+    if (keywords.some(kw => normalized.includes(kw))) {
+      return field;
+    }
+  }
+  return null;
+}
+```
+
+**Recommended Implementations:**
+1. Phase 1: YNAB Import (4-5 hours) — Preset column mapping for YNAB CSV exports
+2. Phase 2: Generic CSV Upload (6-8 hours) — User-driven column mapping UI
+3. Phase 3: Spreadsheet Support (3-4 hours) — XLSX parsing with SheetJS
+
+**Total Implementation Time:** 13-17 hours  
+**Priority:** P1 (FC-026) — Reduces onboarding friction by 80%
+
+---
+
 **Compiled by:** Capital (Orchestrator)  
-**Date:** February 10, 2026  
-**Status:** Phase 1 Complete (6/6), Phase 2 Complete (5/5), Phase 3 Started (1 topic)
+**Date:** February 12, 2026  
+**Status:** Phase 1 Complete (6/6), Phase 2 Complete (5/5), Phase 3 In Progress (2/6 topics)
