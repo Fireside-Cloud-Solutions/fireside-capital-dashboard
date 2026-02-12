@@ -42,7 +42,7 @@ async function loadReportSummary(userId) {
       .from('snapshots')
       .select('*')
       .eq('user_id', userId)
-      .order('snapshot_date', { ascending: false })
+      .order('date', { ascending: false })
       .limit(1);
       
     if (error) {
