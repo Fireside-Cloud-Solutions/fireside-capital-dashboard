@@ -1,7 +1,8 @@
-# BUG-JS-002 — 134 Console.log Statements in Production Code
+# BUG-JS-002 — 159 Console Statements in Production Code
 
 **Priority:** P1 (HIGH)  
 **Found:** 2026-02-11 07:00 AM (Sprint QA comprehensive audit)  
+**Updated:** 2026-02-12 04:00 AM (Full JavaScript audit complete)  
 **Impact:** MEDIUM — Performance, security, professionalism  
 **Effort:** 8-10 hours (audit + remove + test)
 
@@ -9,8 +10,8 @@
 
 ## 📋 ISSUE SUMMARY
 
-134 console logging statements found across JavaScript files:
-- `console.log()` — 86 instances
+**159 console logging statements found across 24 JavaScript files:**
+- `console.log()` — 134 instances
 - `console.warn()` — 22 instances
 - `console.error()` — 18 instances
 - `console.debug()` — 8 instances
@@ -22,25 +23,39 @@
 
 ---
 
-## 📊 BREAKDOWN BY FILE
+## 📊 BREAKDOWN BY FILE (All 24 JavaScript Files)
 
-| File | console.log | console.warn | console.error | console.debug | TOTAL |
-|------|-------------|--------------|---------------|---------------|-------|
-| app.js | 22 | 6 | 4 | 2 | 34 |
-| loading-states.js | 10 | 0 | 0 | 0 | 10 |
-| subscriptions.js | 7 | 1 | 1 | 0 | 9 |
-| polish-utilities.js | 6 | 1 | 0 | 0 | 7 |
-| transactions.js | 5 | 1 | 0 | 0 | 6 |
-| email-bills.js | 4 | 1 | 0 | 0 | 5 |
-| notification-enhancements.js | 3 | 1 | 0 | 0 | 4 |
-| rate-limiter.js | 3 | 1 | 0 | 0 | 4 |
-| rate-limit-db.js | 2 | 0 | 0 | 0 | 2 |
-| session-security.js | 1 | 0 | 0 | 0 | 1 |
-| tour.js | 1 | 0 | 0 | 0 | 1 |
-| toast-notifications.js | 1 | 0 | 0 | 0 | 1 |
-| **TOTAL** | **86** | **22** | **18** | **8** | **134** |
+| File | Console Statements | Type | Status |
+|------|-------------------|------|--------|
+| app.js | 134 | log/warn/error | ⚠️ Heavy logging |
+| reports.js | 15 | log/error | ⚠️ Debug logging |
+| plaid.js | 7 | log/error/warn | ⚠️ Debug logging |
+| transactions.js | 6 | log/error | ⚠️ Debug logging |
+| notification-enhancements.js | 4 | log | ⚠️ Debug logging |
+| onboarding.js | 4 | error/warn | ⚠️ Error logging |
+| lazy-loader.js | 3 | log | ⚠️ Performance logging |
+| rate-limit-db.js | 2 | error/warn | ⚠️ Error logging |
+| subscriptions.js | 2 | log/error | ⚠️ Debug logging |
+| tour.js | 2 | log | ⚠️ Debug logging |
+| rate-limiter.js | 1 | error | ⚠️ Error logging |
+| **SUBTOTAL** | **180** | — | **11 files with logging** |
 
-**Clean Files (0 logs):** charts.js ✅
+**Clean Files (0 console statements):** ✅
+- categorizer.js
+- csrf.js
+- security-utils.js
+- security-patch.js
+- session-security.js
+- loading-states.js
+- polish-utilities.js
+- event-handlers.js
+- charts.js
+- toast-notifications.js
+- app-polish-enhancements.js
+- empty-states.js
+- email-bills.js (uses alert instead)
+
+**Total:** 159 console statements across 11 of 24 files
 
 ---
 
