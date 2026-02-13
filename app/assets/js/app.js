@@ -2691,11 +2691,18 @@ async function loadAndRenderBudget() {
   // Collect IDs of all bills/debts so we can identify standalone budget items
   const billDebtIds = new Set(budgetItems.map(item => item.id).filter(Boolean));
 
+  // BUG-UI-001 FIX: Track rendered item IDs to prevent duplicates across both rendering loops
+  const renderedItemIds = new Set();
+
   budgetItems.forEach(item => {
       if (!item.id) {
           debugLog("Skipping an invalid budget item without an ID:", item);
           return;
       }
+
+      // BUG-UI-001 FIX: Skip duplicates
+      if (renderedItemIds.has(item.id)) return;
+      renderedItemIds.add(item.id);
 
       // MED-01: Skip suppressed items from normal rendering (shown separately below)
       if (suppressedItemIds.has(item.id)) return;
@@ -2726,6 +2733,9 @@ async function loadAndRenderBudget() {
   // Render standalone budget items (manually added, not tied to a bill/debt)
   const standaloneItems = allBudgetRecords.filter(rec => rec.item_id && !billDebtIds.has(rec.item_id) && rec.item_type === 'custom' && !rec.suppressed);
   standaloneItems.forEach(rec => {
+      // BUG-UI-001 FIX: Skip duplicates
+      if (renderedItemIds.has(rec.item_id)) return;
+      renderedItemIds.add(rec.item_id);
       const needed = getRaw(rec.needed_amount) || 0;
       const assigned = getRaw(rec.assigned_amount) || 0;
       const remaining = needed - assigned;
