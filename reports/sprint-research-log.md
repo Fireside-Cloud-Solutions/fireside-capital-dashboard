@@ -15,9 +15,10 @@
 ### ✅ Completed
 4. **PWA** — Service worker, offline support, install prompts, background sync (2026-02-13)
 5. **Performance** — Core Web Vitals optimization, code splitting, image optimization (2026-02-13)
+6. **Bootstrap Dark Theme** — Light/dark mode toggle implementation, WCAG compliance (2026-02-13)
 
-### 🔜 Upcoming
-6. **Bootstrap Dark Theme** — Dark mode best practices, accessibility
+### 🏁 Research Sprint Complete
+All 6 research topics completed. Ready for implementation phase.
 
 ---
 
@@ -170,7 +171,31 @@
 
 ---
 
-**Next Update:** After Bootstrap Dark Theme research  
-**Research Hours Logged:** 5 hours  
-**Reports Generated:** 5 (128KB total)  
-**Tasks Created:** 39 (with full code examples)
+### Research 6: Bootstrap Dark Theme Toggle
+**Completed:** 6:11 AM EST (2026-02-13)  
+**Output:** `reports/BOOTSTRAP-DARK-MODE-IMPLEMENTATION-2026-02-13.md`
+
+**Key Findings:**
+- Bootstrap 5.3 has NATIVE dark mode support via `data-bs-theme` attribute
+- Fireside is currently dark-only — light mode needs color definitions
+- Implementation is simple: CSS custom properties + 15 lines of JS
+- Chart.js must read colors dynamically (not hardcoded)
+- FOUC prevention critical (inline script in `<head>`)
+
+**Deliverables:**
+- 6 Azure DevOps tasks (6-8 hours total)
+- Complete light mode color palette (WCAG AA compliant)
+- Theme controller script with localStorage persistence
+- Chart.js theme integration helper
+- FOUC prevention inline script
+- Accessibility audit checklist
+
+**Impact:** User preference support, WCAG compliance, broader appeal
+
+---
+
+**Research Sprint Status:** ✅ COMPLETE (All 6 topics)  
+**Research Hours Logged:** 6 hours  
+**Reports Generated:** 6 (157KB total)  
+**Tasks Created:** 45 (with full code examples)  
+**Next Action:** Prioritize implementation tasks with Matt
