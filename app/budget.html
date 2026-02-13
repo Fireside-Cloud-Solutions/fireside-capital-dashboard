@@ -113,7 +113,11 @@
                       <h4 id="currentMonth" class="mb-0 text-no-wrap">Loading...</h4>
                       <button class="btn btn-outline-secondary btn-sm" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
                     </div>
-                    <button class="btn btn-secondary btn-sm" id="generateBudgetBtn" aria-label="Generate budget automatically">
+                    <button class="btn btn-secondary btn-sm" id="generateBudgetBtn" 
+                            aria-label="Generate budget automatically"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            title="Auto-generate budget based on your bills and income">
                         <i class="bi bi-magic"></i> Generate Budget
                     </button>
                     <span id="generateBudgetStatus"></span>

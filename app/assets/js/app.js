@@ -3841,6 +3841,7 @@ if (document.getElementById('budgetAssignmentTable')) {
    initializeAssetForm();
    initializeBudgetPage();
    initShareBillUI();
+   initializeTooltips();
 
    // Friends page search
    document.getElementById('friendSearchBtn')?.addEventListener('click', () => {
@@ -4919,6 +4920,13 @@ async function declineBillShare(shareId) {
 // ===== ENHANCED BILL RENDERING (with share indicators) =====
 function getShareInfoForBill(billId) {
   return billSharesCache.find(s => s.bill_id === billId);
+}
+
+// ===== TOOLTIP INITIALIZATION =====
+function initializeTooltips() {
+  // Initialize all Bootstrap tooltips on the page
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 // Initialize share-related UI on bills page
