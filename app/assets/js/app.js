@@ -2325,24 +2325,26 @@ async function saveSettings() {
   if (!currentUser) return;
   const goal = getRaw(document.getElementById('emergencyFundGoal').value);
 
+  // Show loading state
+  const statusEl = document.getElementById('settingsStatus');
+  statusEl.innerHTML = '<span class="text-muted"><i class="spinner-border spinner-border-sm me-1"></i>Saving...</span>';
+  statusEl.className = "ms-3";
+
   const { error } = await sb
       .from('settings')
       .upsert({ user_id: currentUser.id, emergency_fund_goal: goal });
 
-  const statusEl = document.getElementById('settingsStatus');
   if (error) {
-      statusEl.textContent = "Error saving settings.";
-      statusEl.className = "ms-3 text-danger";
+      statusEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Save failed. Try again.</span>';
       console.error(error);
   } else {
-      statusEl.textContent = "Settings saved!";
-      statusEl.className = "ms-3 text-success";
+      statusEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Saved successfully!</span>';
       // Re-fetch settings data to update the app state
       clearCache(); // Performance: Clear cache on data mutation
 
       await fetchAllDataFromSupabase(true);
   }
-  setTimeout(() => { statusEl.textContent = ''; }, 3000);
+  setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
 }
 
 async function renderAdditionalCharts() {
