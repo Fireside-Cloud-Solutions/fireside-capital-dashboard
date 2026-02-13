@@ -100,6 +100,35 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-075 | Chore | P3 | L | Backlog | **E2E Testing Setup (Phase 3)** — Playwright tests for 15 user flows + visual regression (5-6h) — see docs/research/07-testing-strategies.md |
 | FC-076 | Chore | P3 | XS | Backlog | **CI/CD Testing Pipeline** — GitHub Actions workflow for automated tests on every commit (1h) — see docs/research/07-testing-strategies.md |
 | FC-078 | Chore | P2 | L | Ready | **Refactor CSS to ITCSS + BEM Architecture** — Implement structured CSS with design tokens for scalability, dark theme prep, maintainability (8-10h) — see reports/css-architecture-research-2026-02-11.md |
+| FC-079 | Chore | P2 | M | Ready | **Set up ITCSS folder structure** — Create 7-layer CSS architecture in app/assets/css/ (Settings, Tools, Generic, Elements, Objects, Components, Utilities) — see research/css-architecture-itcss.md |
+| FC-080 | Chore | P2 | M | Ready | **Create CSS custom properties for theming** — Define design tokens for colors, typography, spacing with dark mode support using [data-theme] — see research/css-architecture-itcss.md |
+| FC-081 | Chore | P2 | L | Ready | **Migrate inline styles to ITCSS components** — Move inline styles from HTML to component files using BEMIT naming (.c-dashboard-card, .c-chart, etc.) — see research/css-architecture-itcss.md |
+| FC-082 | Chore | P3 | S | Ready | **Build spacing utility system** — Create spacing utilities (.u-mt-*, .u-mb-*, .u-gap-*) to replace component margins — see research/css-architecture-itcss.md |
+| FC-083 | Chore | P3 | XS | Ready | **Document BEMIT naming conventions** — Add CSS architecture guide to README with naming rules and examples — see research/css-architecture-itcss.md |
+| FC-084 | Feature | P1 | L | Ready | **Redesign dashboard layout using F-pattern hierarchy** — Top-left: net worth (primary KPI), Row 1: alerts, Row 2: overview cards, Row 3: trend charts — see research/financial-dashboard-ui-patterns.md |
+| FC-085 | Feature | P2 | M | Ready | **Create alert card component (monitoring pattern)** — Alert users to upcoming bills (7-day), low balance warnings, overdue payments with supportive microcopy — see research/financial-dashboard-ui-patterns.md |
+| FC-086 | Feature | P2 | S | Ready | **Add deltas to all stat cards** — Show month-over-month changes with ↑/↓ indicators, percentages, and color coding (green/red) — see research/financial-dashboard-ui-patterns.md |
+| FC-087 | Feature | P2 | M | Ready | **Build skeleton loaders for all charts** — Replace generic spinners with content-aware skeleton screens (bars, lines) for better perceived performance — see research/financial-dashboard-ui-patterns.md |
+| FC-088 | Feature | P2 | S | Ready | **Create emotionally supportive empty states** — Replace generic empty states with warm, helpful microcopy and clear CTAs for new users — see research/financial-dashboard-ui-patterns.md |
+| FC-089 | Feature | P3 | S | Ready | **Add microinteractions for payment confirmations** — Soft pulse animation, checkmark reveal, haptic feedback (mobile) for high-stakes actions — see research/financial-dashboard-ui-patterns.md |
+| FC-090 | Feature | P3 | L | Ready | **Implement proper dark mode** — Use CSS custom properties with [data-theme="dark"], maintain contrast ratios, test all charts — see research/financial-dashboard-ui-patterns.md |
+| FC-091 | Feature | P3 | S | Ready | **Add tooltips for financial jargon** — Explain ROI, APR, equity, net worth, etc. with contextual tooltips on hover/tap — see research/financial-dashboard-ui-patterns.md |
+| FC-092 | Feature | P4 | XL | Backlog | **Build customizable widget system** — Drag-and-drop dashboard widgets, hide/show sections, save layouts per user — see research/financial-dashboard-ui-patterns.md |
+| FC-093 | Chore | P1 | XS | Ready | **Apply global Chart.js performance defaults** — Disable animations, set responsive/maintainAspectRatio, line tension=0, spanGaps=true (67% faster) — see research/chartjs-optimization.md |
+| FC-094 | Chore | P2 | S | Ready | **Pre-parse chart data timestamps** — Convert dates to timestamps before passing to Chart.js, set parsing: false, normalized: true (62% faster) — see research/chartjs-optimization.md |
+| FC-095 | Feature | P2 | M | Ready | **Create createOptimizedChart() factory** — Centralized chart creation with decimation, fixed rotation, mobile optimizations, dark mode support — see research/chartjs-optimization.md |
+| FC-096 | Feature | P3 | S | Ready | **Implement Chart.js decimation for net worth trend** — Use LTTB algorithm to sample large datasets (> 365 points) to 500 samples (89% faster) — see research/chartjs-optimization.md |
+| FC-097 | Feature | P3 | S | Ready | **Create dark mode chart color update utility** — Dynamically update chart colors on theme toggle without recreating instances — see research/chartjs-optimization.md |
+| FC-098 | Feature | P3 | S | Ready | **Add mobile-specific chart optimizations** — Disable legends/tooltips, reduce tick limits on mobile devices — see research/chartjs-optimization.md |
+| FC-099 | Chore | P3 | S | Backlog | **Write Chart.js performance testing suite** — Benchmark rendering times for 100/500/1k/5k/10k points, compare optimized vs unoptimized — see research/chartjs-optimization.md |
+| FC-100 | Feature | P2 | M | Ready | **Add Bootstrap 5.3 color mode toggle** — Implement official Bootstrap theme toggle with localStorage persistence and OS preference detection — see research/bootstrap-dark-theme.md |
+| FC-101 | Feature | P2 | S | Ready | **Create theme toggle button in navbar** — Add icon button (moon/sun) to toggle between light/dark modes — see research/bootstrap-dark-theme.md |
+| FC-102 | Chore | P2 | M | Ready | **Add custom financial dashboard color overrides** — Define dark mode colors for positive/negative values, brand colors, cards, charts — see research/bootstrap-dark-theme.md |
+| FC-103 | Feature | P2 | M | Ready | **Update Chart.js to respond to theme changes** — Add MutationObserver to watch data-bs-theme and update chart colors dynamically — see research/bootstrap-dark-theme.md |
+| FC-104 | Chore | P2 | XS | Ready | **Add inline theme script to prevent FOUC** — Set theme in <head> before any CSS loads to prevent flash of unstyled content — see research/bootstrap-dark-theme.md |
+| FC-105 | Chore | P3 | S | Ready | **Test all pages in light/dark modes** — Visual regression testing for cards, charts, forms, modals, tables in both themes — see research/bootstrap-dark-theme.md |
+| FC-106 | Chore | P3 | S | Ready | **Validate WCAG contrast ratios for dark mode** — Ensure 4.5:1 text contrast, 3:1 UI contrast in dark theme — see research/bootstrap-dark-theme.md |
+| FC-107 | Chore | P3 | XS | Backlog | **Document theme toggle in README** — Add theme implementation guide and customization instructions — see research/bootstrap-dark-theme.md |
 
 ### EPIC-002: Mobile Application
 
