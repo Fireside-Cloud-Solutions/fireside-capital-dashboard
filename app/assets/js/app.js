@@ -2325,6 +2325,14 @@ async function saveSettings() {
   if (!currentUser) return;
   const goal = getRaw(document.getElementById('emergencyFundGoal').value);
 
+  // Validate goal value
+  if (goal && (goal < 100 || goal > 1000000)) {
+    const statusEl = document.getElementById('settingsStatus');
+    statusEl.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Please enter a value between $100 and $1,000,000.</span>';
+    setTimeout(() => { statusEl.innerHTML = ''; }, 5000);
+    return;
+  }
+
   // Show loading state
   const statusEl = document.getElementById('settingsStatus');
   statusEl.innerHTML = '<span class="text-muted"><i class="spinner-border spinner-border-sm me-1"></i>Saving...</span>';
