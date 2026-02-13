@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-13 (PWA implementation tasks added: FC-108 through FC-117)
+**Last Updated:** 2026-02-13 (Performance optimization tasks added: FC-118 through FC-127)
 
 ---
 
@@ -139,6 +139,16 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-115 | Feature | P3 | XS | Ready | **Add app badging for upcoming bills** — Show count of upcoming bills on home screen icon (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
 | FC-116 | Feature | P3 | XS | Ready | **Implement Web Share API for reports** — Share financial reports via native share sheet (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
 | FC-117 | Feature | P3 | S | Ready | **Create custom PWA install prompt** — Branded install banner with custom UI (1h) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-118 | Chore | P1 | M | Ready | **Set up Webpack build system with code splitting** — Configure entry points, dynamic imports, TerserPlugin for minification + console removal (4-5h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-119 | Chore | P1 | XS | Ready | **Implement async/defer for non-critical scripts** — Apply async to third-party scripts, defer to non-critical first-party scripts (1-2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-120 | Chore | P1 | S | Ready | **Extract and inline critical CSS** — Use Critical tool to extract above-the-fold CSS, configure async CSS loading (2-3h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-121 | Chore | P1 | XS | Ready | **Configure Cache-Control headers in staticwebapp.config.json** — Set max-age=31536000 for static assets, max-age=3600 for HTML (1h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-122 | Feature | P1 | S | Ready | **Implement lazy loading for below-the-fold images and charts** — Add loading="lazy", Intersection Observer for charts (1-2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-123 | Feature | P1 | S | Ready | **Set up Core Web Vitals monitoring** — Install web-vitals library, Google Analytics 4 tracking, Lighthouse CI (2-3h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-124 | Feature | P2 | S | Ready | **Convert images to WebP/AVIF format** — Batch convert PNG/JPEG, update HTML with picture elements (2-3h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-125 | Feature | P2 | S | Ready | **Implement task yielding for long-running operations** — Add yieldToMainThread() utility, refactor data processing loops (2-3h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-126 | Chore | P2 | XS | Ready | **Refactor event listeners to use delegation** — Replace individual listeners with parent-level delegation (1-2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-127 | Chore | P2 | S | Ready | **Enable Azure CDN for global distribution** — Configure Azure CDN with caching rules (2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
 
 ### EPIC-002: Mobile Application
 
