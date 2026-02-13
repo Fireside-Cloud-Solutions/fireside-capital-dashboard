@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-08 (Testing strategy tasks added: FC-073 through FC-076)
+**Last Updated:** 2026-02-13 (PWA implementation tasks added: FC-108 through FC-117)
 
 ---
 
@@ -129,6 +129,16 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-105 | Chore | P3 | S | Ready | **Test all pages in light/dark modes** — Visual regression testing for cards, charts, forms, modals, tables in both themes — see research/bootstrap-dark-theme.md |
 | FC-106 | Chore | P3 | S | Ready | **Validate WCAG contrast ratios for dark mode** — Ensure 4.5:1 text contrast, 3:1 UI contrast in dark theme — see research/bootstrap-dark-theme.md |
 | FC-107 | Chore | P3 | XS | Backlog | **Document theme toggle in README** — Add theme implementation guide and customization instructions — see research/bootstrap-dark-theme.md |
+| FC-108 | Feature | P1 | M | Ready | **Implement Service Worker with hybrid caching** — Cache-first for static assets, network-first for API data, stale-while-revalidate for everything else (3-4h) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-109 | Feature | P1 | XS | Ready | **Create custom offline page** — Branded offline.html with retry/dashboard actions (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-110 | Chore | P1 | XS | Ready | **Register service worker in all HTML pages** — Add registration script to 11 pages (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-111 | Feature | P2 | S | Ready | **Enhance PWA manifest** — Add screenshots, shortcuts, share_target, file_handlers to manifest.json (1h) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-112 | Chore | P2 | XS | Ready | **Add iOS/Safari PWA meta tags** — Apple-specific meta tags for home screen install (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-113 | Chore | P2 | XS | Ready | **Generate iOS splash screens** — Use pwa-asset-generator for 12 splash screen sizes (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-114 | Feature | P3 | M | Ready | **Implement background sync for offline edits** — Queue financial data updates in IndexedDB when offline (2h) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-115 | Feature | P3 | XS | Ready | **Add app badging for upcoming bills** — Show count of upcoming bills on home screen icon (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-116 | Feature | P3 | XS | Ready | **Implement Web Share API for reports** — Share financial reports via native share sheet (30 min) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
+| FC-117 | Feature | P3 | S | Ready | **Create custom PWA install prompt** — Branded install banner with custom UI (1h) — see reports/PWA-IMPLEMENTATION-RESEARCH-2026-02-13.md |
 
 ### EPIC-002: Mobile Application
 
