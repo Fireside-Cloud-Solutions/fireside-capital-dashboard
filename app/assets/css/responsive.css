@@ -8,6 +8,30 @@
    GLOBAL MOBILE FIXES — Prevent horizontal overflow
    ================================================================= */
 
+/* Additional mobile fixes for smaller screens */
+@media (max-width: 575.98px) {
+  /* Page header actions: stack buttons vertically on small mobile */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .page-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .page-header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .page-header-actions .btn,
+  .page-header-actions .btn-group {
+    width: 100%;
+  }
+}
+
 @media (max-width: 767.98px) {
   /* Prevent body overflow */
   body {

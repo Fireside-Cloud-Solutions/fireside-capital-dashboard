@@ -114,7 +114,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-090 | Feature | P3 | L | Ready | **Implement proper dark mode** — Use CSS custom properties with [data-theme="dark"], maintain contrast ratios, test all charts — see research/financial-dashboard-ui-patterns.md |
 | FC-091 | Feature | P3 | S | Ready | **Add tooltips for financial jargon** — Explain ROI, APR, equity, net worth, etc. with contextual tooltips on hover/tap — see research/financial-dashboard-ui-patterns.md |
 | FC-092 | Feature | P4 | XL | Backlog | **Build customizable widget system** — Drag-and-drop dashboard widgets, hide/show sections, save layouts per user — see research/financial-dashboard-ui-patterns.md |
-| FC-093 | Chore | P1 | XS | Ready | **Apply global Chart.js performance defaults** — Disable animations, set responsive/maintainAspectRatio, line tension=0, spanGaps=true (67% faster) — see research/chartjs-optimization.md |
+| FC-093 | Chore | P1 | XS | Done | **Apply global Chart.js performance defaults** — Disable animations, set responsive/maintainAspectRatio, line tension=0, spanGaps=true (67% faster) — FIXED commit 93c361a (2026-02-14) — see research/chartjs-optimization.md |
 | FC-094 | Chore | P2 | S | Ready | **Pre-parse chart data timestamps** — Convert dates to timestamps before passing to Chart.js, set parsing: false, normalized: true (62% faster) — see research/chartjs-optimization.md |
 | FC-095 | Feature | P2 | M | Ready | **Create createOptimizedChart() factory** — Centralized chart creation with decimation, fixed rotation, mobile optimizations, dark mode support — see research/chartjs-optimization.md |
 | FC-096 | Feature | P3 | S | Ready | **Implement Chart.js decimation for net worth trend** — Use LTTB algorithm to sample large datasets (> 365 points) to 500 samples (89% faster) — see research/chartjs-optimization.md |
@@ -157,6 +157,12 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-133 | Chore | P3 | XS | Ready | **Document auto-categorize button hierarchy decision** — Clarify if btn-outline-secondary is correct or should be btn-secondary (30 min) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-134 | Bug | P2 | XS | Ready | **Fix Transactions filter mobile layout** — Test and add col-12 for mobile breakpoint (1h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-135 | Chore | P3 | XS | Ready | **Verify empty state CTA consistency** — Confirm "Sync from Bank" buttons trigger same action (30 min) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-136 | Bug | P1 | XS | Done | **Debts page button hierarchy violation** — "Add Debt" should be btn-primary (core action), not btn-secondary (5 min) — FIXED commit 8b2fddd (2026-02-14) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
+| FC-137 | Feature | P2 | S | Ready | **Add table skeleton loaders to Debts page** — Replace generic spinner with 5 shimmer placeholder rows for better perceived performance (2h) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
+| FC-138 | Feature | P2 | XS | Ready | **Add empty state HTML to Debts page** — Fallback markup with CTA for new users (30 min) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
+| FC-139 | Bug | P1 | XS | Done | **Income page button hierarchy violation** — "Add Income" should be btn-primary (core action), not btn-secondary (5 min) — FIXED commit 8b2fddd (2026-02-14) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
+| FC-140 | Feature | P2 | S | Ready | **Add table skeleton loaders to Income page** — Replace generic spinner with 5 shimmer placeholder rows (2h) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
+| FC-141 | Feature | P2 | XS | Ready | **Add empty state HTML to Income page** — Fallback markup with CTA for new users (30 min) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
 
 ### EPIC-002: Mobile Application
 

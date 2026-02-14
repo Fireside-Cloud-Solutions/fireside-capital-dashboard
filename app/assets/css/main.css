@@ -216,7 +216,7 @@ strong {
   display: flex;
   align-items: center;
   gap: 12px; /* 12px gap between action buttons */
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Prevent wrapping - mobile breakpoint handles stacking */
   max-width: 100%;
 }
 
