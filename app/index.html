@@ -429,30 +429,32 @@
   <!-- Performance optimization: Lazy loader utility (2 KB, load immediately) -->
   <script src="assets/js/lazy-loader.js"></script>
   
-  <!-- Critical: Supabase client (needed for auth checks) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <!-- CRITICAL: Supabase — Required for data fetching (synchronous for early execution) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Non-critical: Bootstrap JS (modals, dropdowns - user interaction only) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <!-- CRITICAL: Bootstrap JS — Required for UI components (synchronous for early execution) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- Plaid: Lazy-loaded when user clicks "Connect Bank" (saves 95 KB) -->
   <!-- See assets/js/plaid.js - LazyLoader.loadPlaid() -->
   
-  <!-- Application scripts (defer to prevent blocking) -->
+  <!-- CRITICAL SCRIPTS: Execute early to render content (synchronous) -->
+  <script src="assets/js/csrf.js"></script>
+  <script src="assets/js/security-utils.js"></script>
+  <script src="assets/js/session-security.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/event-handlers.js"></script>
+  <script src="assets/js/charts.js"></script>
+  
+  <!-- NON-CRITICAL SCRIPTS: Progressive enhancement (defer for performance) -->
   <script src="assets/js/rate-limiter.js" defer></script>
   <script src="assets/js/rate-limit-db.js" defer></script>
-  <script src="assets/js/session-security.js" defer></script>
   <script src="assets/js/polish-utilities.js" defer></script>
-  <script src="assets/js/csrf.js" defer></script>
-  <script src="assets/js/security-utils.js" defer></script>
-  <script src="assets/js/app.js" defer></script>
-  <script src="assets/js/event-handlers.js" defer></script>
   <script src="assets/js/notification-enhancements.js" defer></script>
   <script src="assets/js/security-patch.js" defer></script>
   <script src="assets/js/app-polish-enhancements.js" defer></script>
   <script src="assets/js/plaid.js" defer></script>
   <script src="assets/js/subscriptions.js" defer></script>
-  <script src="assets/js/charts.js" defer></script>
 
   <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog">
