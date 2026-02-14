@@ -1,6 +1,97 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-14 04:55 EST (Sprint Dev — Session 0435)
+**Last Updated:** 2026-02-14 04:51 EST (Sprint QA — Session 0440)
+
+---
+
+## ⚠️ SPRINT QA — SESSION 0440 (Feb 14, 4:40 AM) — BUG-PERF-003 DISCOVERED
+
+**Status:** ⚠️ **BUG-PERF-003: PERFORMANCE REGRESSION — SELECTIVE DEFER INEFFECTIVE**  
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)  
+**Duration:** 11 minutes  
+**Task:** Test BUG-PERF-002-REGRESSION fix, continue systematic QA audit
+
+### Summary
+
+**Mission:** Check git log, test new changes (BUG-PERF-002-REGRESSION fix), continue systematic page-by-page audit  
+**Result:** ⚠️ **BUG-PERF-003 discovered** — Selective `defer` fix did NOT achieve expected +5-8% improvement. Average performance 68% (vs expected 74-77%). Significant TBT regressions on some pages (Reports: 480ms, Dashboard: 210ms vs previous 10ms).
+
+### Performance Audit — ALL 11 PAGES (100% Coverage) ✅
+
+**Lighthouse CLI Results (Feb 14, 4:41-4:46 AM):**
+
+| Page | Perf | FCP | LCP | TBT | vs Baseline | Status |
+|------|------|-----|-----|-----|-------------|--------|
+| Investments | 72% | 4.4s | 4.7s | 50ms | +3% | ✅ Best |
+| Budget | 71% | 4.7s | 4.7s | 0ms | +2% | ✅ |
+| Assets | 71% | 4.7s | 4.7s | 0ms | +2% | ✅ |
+| Transactions | 70% | 4.8s | 4.9s | 0ms | +1% | ⚠️ |
+| Settings | 69% | 4.9s | 5.0s | 50ms | 0% | ⚠️ Baseline |
+| Income | 69% | 4.9s | 5.0s | 10ms | 0% | ⚠️ Baseline |
+| Dashboard | 68% | 4.1s | 5.0s | 210ms | -1% | ❌ Regression |
+| Bills | 68% | 4.9s | 5.2s | 110ms | -1% | ❌ Regression |
+| Friends | 64% | 5.1s | 5.4s | 210ms | -5% | ❌ |
+| Debts | 63% | 5.1s | 5.6s | 220ms | -6% | ❌ |
+| Reports | **58%** | 4.5s | 5.2s | **480ms** | **-11%** | ❌ **CRITICAL** |
+
+**AVERAGE: 68%** (vs expected 74-77%, target 90%)
+
+### Critical Findings
+
+1. **BUG-PERF-003: Variable Performance**
+   - Range: 58-72% (14% gap vs expected consistent 74-77%)
+   - Average: 68% (6-9% below expected)
+   - Reports page: 58% (**CRITICAL** — 11% below baseline)
+
+2. **Total Blocking Time (TBT) Regressions:**
+   - Dashboard: 10ms → 210ms (+200ms, 21x worse) ❌
+   - Reports: 480ms (2.4x over 200ms target) ❌
+   - Friends: 210ms ❌
+   - Debts: 220ms ❌
+   - Bills: 110ms ⚠️
+
+3. **Core Web Vitals — All Pages Fail:**
+   - LCP: 4.7-5.6s (target < 2.5s) ❌
+   - FCP: 4.1-5.1s (target < 1.8s) ❌
+
+### Root Cause
+
+**Selective `defer` has inconsistent impact:**
+- Helps some pages (Assets/Budget: 0ms TBT)
+- Hurts others (Reports: 480ms TBT, Dashboard: 210ms TBT)
+- Critical scripts still render-blocking (load in `<head>`)
+- Likely script execution order dependencies breaking
+
+### Production Status
+
+**Grade:** **A** (Downgraded from A+ due to BUG-PERF-003)
+
+**What's Working:**
+- ✅ All 11 pages functional (zero new bugs)
+- ✅ Security: CSRF, session monitoring
+- ✅ Accessibility: 95%
+- ✅ SEO: 100%
+
+**What's Broken (BUG-PERF-003):**
+- ❌ Performance: 58-72% (avg 68%) vs target 90%
+- ❌ TBT: 0-480ms (highly variable, some > 200ms target)
+- ❌ Reports: 58% performance, 480ms TBT (CRITICAL)
+- ❌ Dashboard: 210ms TBT (was 10ms before fix — 21x regression)
+
+### Recommendations
+
+**Immediate:**
+1. Investigate Reports page TBT (480ms — why 8x worse than best pages?)
+2. Test script execution order (is `defer` breaking dependencies?)
+3. Create Azure DevOps work item for BUG-PERF-003
+
+**Decision Required:**
+1. **Revert selective defer?** (30 min — eliminates TBT regressions)
+2. **Fix forward with FC-119?** (30 min — move scripts to end of `<body>`)
+3. **Comprehensive Webpack fix (FC-118)?** (4-5h — expected 69% → 80%)
+
+**Report:** `reports/BUG-PERF-003-REGRESSION-2026-02-14-0440.md`  
+**Status:** Awaiting founder decision on remediation
 
 ---
 
