@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-13 (Performance optimization tasks added: FC-118 through FC-127)
+**Last Updated:** 2026-02-14 07:15 EST (Sprint Dev: FC-128 fixed)
 
 ---
 
@@ -149,6 +149,14 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-125 | Feature | P2 | S | Ready | **Implement task yielding for long-running operations** — Add yieldToMainThread() utility, refactor data processing loops (2-3h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
 | FC-126 | Chore | P2 | XS | Ready | **Refactor event listeners to use delegation** — Replace individual listeners with parent-level delegation (1-2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
 | FC-127 | Chore | P2 | S | Ready | **Enable Azure CDN for global distribution** — Configure Azure CDN with caching rules (2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-128 | Bug | P2 | XS | Done | **Transactions page button hierarchy violation** — "Sync from Bank" should be btn-primary (core action), not btn-secondary (15 min) — FIXED commit aa9641d (2026-02-14) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-129 | Feature | P2 | S | Ready | **Add table skeleton loaders to Transactions page** — Replace generic spinner with 5 shimmer placeholder rows for better perceived performance (2h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-130 | Feature | P2 | S | Ready | **Implement transaction status column** — Add pending/cleared/failed badges using Plaid pending field (2h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-131 | Feature | P1 | M | Ready | **Add pagination to Transactions table** — Server-side pagination with page controls, limit selector, prevents DOM bloat with 500+ rows (4-5h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-132 | Feature | P3 | XS | Ready | **Add active filter indicator to Transactions** — Badge count + blue borders for active filters (1h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-133 | Chore | P3 | XS | Ready | **Document auto-categorize button hierarchy decision** — Clarify if btn-outline-secondary is correct or should be btn-secondary (30 min) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-134 | Bug | P2 | XS | Ready | **Fix Transactions filter mobile layout** — Test and add col-12 for mobile breakpoint (1h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-135 | Chore | P3 | XS | Ready | **Verify empty state CTA consistency** — Confirm "Sync from Bank" buttons trigger same action (30 min) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 
 ### EPIC-002: Mobile Application
 
