@@ -97,6 +97,9 @@ async function initializeReportCharts() {
       console.log('[Reports] Rendering Net Worth Timeline chart...');
       if (typeof window.renderNetWorthChart === 'function') {
         await window.renderNetWorthChart();
+        // Hide skeleton loader after chart renders
+        document.getElementById('netWorthSkeleton')?.classList.add('d-none');
+        console.log('[Reports] Net Worth skeleton hidden');
       } else {
         console.warn('[Reports] renderNetWorthChart function not found');
       }
@@ -106,6 +109,9 @@ async function initializeReportCharts() {
       console.log('[Reports] Rendering Monthly Cash Flow chart...');
       if (typeof window.generateMonthlyCashFlowChart === 'function') {
         await window.generateMonthlyCashFlowChart();
+        // Hide skeleton loader after chart renders
+        document.getElementById('monthlyCashFlowSkeleton')?.classList.add('d-none');
+        console.log('[Reports] Monthly Cash Flow skeleton hidden');
       } else {
         console.warn('[Reports] generateMonthlyCashFlowChart function not found');
       }
@@ -116,6 +122,11 @@ async function initializeReportCharts() {
       if (typeof window.renderAdditionalCharts === 'function') {
         // renderAdditionalCharts includes spendingCategories, savingsRate, and investmentGrowth
         await window.renderAdditionalCharts();
+        // Hide skeleton loaders for all additional charts after render
+        document.getElementById('spendingCategoriesSkeleton')?.classList.add('d-none');
+        document.getElementById('savingsRateSkeleton')?.classList.add('d-none');
+        document.getElementById('investmentGrowthSkeleton')?.classList.add('d-none');
+        console.log('[Reports] Additional chart skeletons hidden');
       } else {
         console.warn('[Reports] renderAdditionalCharts function not found');
       }
