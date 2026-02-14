@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node ../tests/math-validation.test.js",
     "test:manual": "echo \"See tests/manual-test-plan.md for manual testing instructions\"",
-    "build": "echo Skipping build"
+    "build": "npm run build:css",
+    "build:css": "purgecss --config purgecss.config.js",
+    "build:css:watch": "purgecss --config purgecss.config.js --watch"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,7 @@
     "plaid": "^36.0.0"
   },
   "devDependencies": {
+    "@fullhuman/purgecss": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "pg": "^8.18.0"
   }

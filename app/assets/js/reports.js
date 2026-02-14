@@ -59,8 +59,12 @@ async function loadReportSummary(userId) {
         formatCurrency(latest.total_assets || 0);
       document.getElementById('reportDebts').textContent = 
         formatCurrency(latest.total_debts || 0);
-      document.getElementById('reportNetWorth').textContent = 
-        formatCurrency(latest.net_worth || 0);
+      
+      // Net worth with dynamic color coding
+      const netWorthElement = document.getElementById('reportNetWorth');
+      const netWorthValue = latest.net_worth || 0;
+      netWorthElement.textContent = formatCurrency(netWorthValue);
+      netWorthElement.className = netWorthValue >= 0 ? 'text-success' : 'text-danger';
       
       console.log('[Reports] Summary cards updated successfully');
     } else {
