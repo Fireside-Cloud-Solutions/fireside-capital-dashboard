@@ -322,6 +322,27 @@
     </div>
   </div>
 
+  <!-- CRITICAL SCRIPTS: Synchronous for early execution -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script src="assets/js/csrf.js"></script>
+  <script src="assets/js/security-utils.js"></script>
+  <script src="assets/js/session-security.js"></script>
+  <script src="assets/js/empty-states.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/event-handlers.js"></script>
+  
+  <!-- NON-CRITICAL SCRIPTS: Defer for performance -->
+  <script src="assets/js/rate-limiter.js" defer></script>
+  <script src="assets/js/rate-limit-db.js" defer></script>
+  <script src="assets/js/polish-utilities.js" defer></script>
+  <script src="assets/js/security-patch.js" defer></script>
+  <script src="assets/js/app-polish-enhancements.js" defer></script>
+  <script src="assets/js/notification-enhancements.js" defer></script>
+  <script src="assets/js/loading-states.js" defer></script>
+  <script src="assets/js/plaid.js" defer></script>
+
   <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -345,29 +366,6 @@
       </div>
     </div>
   </div>
-
-  <!-- SCRIPTS: Moved to end of body for performance (FC-119) - HTML parses before JavaScript executes -->
-  
-  <!-- CRITICAL SCRIPTS: Synchronous for early execution -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
-  <script src="assets/js/csrf.js"></script>
-  <script src="assets/js/security-utils.js"></script>
-  <script src="assets/js/session-security.js"></script>
-  <script src="assets/js/empty-states.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/event-handlers.js"></script>
-  
-  <!-- NON-CRITICAL SCRIPTS: Defer for performance -->
-  <script src="assets/js/rate-limiter.js" defer></script>
-  <script src="assets/js/rate-limit-db.js" defer></script>
-  <script src="assets/js/polish-utilities.js" defer></script>
-  <script src="assets/js/security-patch.js" defer></script>
-  <script src="assets/js/app-polish-enhancements.js" defer></script>
-  <script src="assets/js/notification-enhancements.js" defer></script>
-  <script src="assets/js/loading-states.js" defer></script>
-  <script src="assets/js/plaid.js" defer></script>
 </body>
 </html>
 
