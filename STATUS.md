@@ -1,6 +1,144 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-14 04:55 EST (Sprint Dev — Session 0455 — FC-119 DEPLOYED)
+**Last Updated:** 2026-02-14 05:15 EST (Sprint Dev — Session 0515 — FC-119 REVERTED)
+
+---
+
+## 🚨 SPRINT DEV — SESSION 0515 (Feb 14, 5:15 AM) — FC-119 REGRESSION REVERTED
+
+**Status:** ❌ **FC-119 WAS A REGRESSION — REVERTED TO PRE-FC-119 STATE**  
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)  
+**Duration:** 30 minutes  
+**Task:** Verify FC-119 deployment, test performance
+
+### Summary
+
+**Mission:** Check Azure DevOps for work items, verify FC-119 deployment, test performance improvements  
+**Result:** ❌ **FC-119 REGRESSION DISCOVERED** — Performance decreased 4-5% instead of improving. **REVERTED** all changes (commit f932ff8).
+
+### Critical Finding
+
+**FC-119 (moving scripts to end of body) DECREASED performance by 4-5%:**
+
+| Page | Before (Session 0400) | After FC-119 (0515) | Change |
+|------|----------------------|---------------------|--------|
+| **Dashboard** | **69%** | **64%** | **-5%** ❌ |
+| **Assets** | **71%** | **67%** | **-4%** ❌ |
+
+**Root Cause:** Same as BUG-PERF-002 and BUG-PERF-002-REGRESSION — delaying JavaScript execution delays chart/table rendering (the main content), worsening LCP.
+
+### The Pattern: Three Failed Attempts
+
+This is the **THIRD** failed attempt to improve performance by delaying JavaScript:
+
+1. **BUG-PERF-002 (Session 0415):** Blanket defer → -3% to -5% performance ❌
+2. **BUG-PERF-002-REGRESSION (Session 0435):** Selective defer → Still negative ❌
+3. **FC-119 (Session 0455):** Move scripts to end of body → -4% to -5% performance ❌
+
+**Why All Three Failed:**
+
+Fireside Capital is a **JavaScript-first application** where the main content (charts, tables) IS rendered by JavaScript. Traditional "defer scripts" optimization assumes content is HTML with JavaScript enhancements. **Our content IS JavaScript.**
+
+Delaying JavaScript in ANY way:
+- ✅ Improves FCP (HTML parses faster)
+- ❌ Worsens LCP (charts render later)
+- ❌ **Net negative performance impact**
+
+### Revert Action Taken
+
+```bash
+git checkout 7831793 -- index.html assets.html bills.html budget.html debts.html income.html investments.html reports.html settings.html
+git commit -m "revert(perf): FC-119 REGRESSION - Moving scripts to end of body decreased performance 4-5%"
+git push origin main
+```
+
+**Commit:** f932ff8  
+**Reverted:** 9 HTML files to pre-FC-119 state  
+**Deployment:** Azure CI/CD triggered (ETA 5-10 min)  
+**Expected:** Performance restored to 68-71% baseline
+
+### Production Status
+
+**Grade:** **C** (Expected to return to C+ after revert deployment)
+
+**What's Broken:**
+- ❌ FC-119 regression discovered and reverted
+- ❌ Performance optimization blocked after 3 failed attempts
+- ❌ Traditional optimization techniques don't work for JS-first apps
+
+**What's Working:**
+- ✅ All 11 pages functional
+- ✅ Security, accessibility, SEO maintained
+- ✅ Regression caught and reverted quickly (30 min)
+
+**P0 Blockers:** 2 ❌
+- BUG-PERF-001: Reports page 58% (original issue)
+- **BUG-PERF-FC119-REGRESSION:** Need fundamentally different approach
+
+### Deliverables
+
+1. ✅ FC-119 performance verification (2 pages tested with Lighthouse CLI)
+2. ✅ Regression identified (Dashboard -5%, Assets -4%)
+3. ✅ FC-119 reverted (9 HTML files restored to commit 7831793)
+4. ✅ Git commit: f932ff8 (revert with detailed explanation)
+5. ✅ Pushed to GitHub (main branch)
+6. ✅ Comprehensive bug report: `reports/BUG-PERF-FC119-REGRESSION-2026-02-14-0515.md`
+7. ✅ Memory log: `memory/sprint-dev-2026-02-14-0515.md`
+8. ✅ STATUS.md updated (this entry)
+9. ⏳ Discord posts (#alerts, #dev) (next)
+
+### Recommendations
+
+**Anti-Loop Rule Applied:**
+
+Per AGENTS.md:
+> If a sub-agent fails to fix something TWICE:
+> 1. STOP spawning agents for that task
+> 2. Read the code yourself
+> 3. Either fix it directly or escalate to the founder with a specific diagnosis
+> 4. Never spawn a third agent for the same bug
+
+**Status:** THIRD failed attempt. **STOP trying to delay JavaScript execution.**
+
+**Next Actions:**
+
+**Option 1: Try Async Instead of Defer (30 min, low risk)**
+- Use `async` attribute (downloads without blocking, executes ASAP)
+- Different mechanism than defer (executes immediately when ready, not after DOM parsing)
+- May work because scripts execute faster
+- **Risk:** Script execution order not guaranteed
+
+**Option 2: Escalate to Founder (recommended)**
+- **Diagnosis:** Traditional performance optimization doesn't work for JavaScript-first apps
+- **Options for architecture change:**
+  - Pre-render skeleton loaders in HTML (2-3h)
+  - Webpack code splitting (4-5h)
+  - Server-side rendering / static generation (4-8h)
+- **Decision:** Which approach to pursue?
+
+**DO NOT:**
+- ❌ Try defer again (proven ineffective 3 times)
+- ❌ Try moving scripts again (just reverted)
+- ❌ Spawn another sub-agent for the same approach
+
+**Next Sprint Dev (5:25 PM Today — 12h 10min):**
+1. Await founder decision on approach (async vs architecture change)
+2. If async approved: Implement and test (30 min)
+3. If architecture change approved: Spawn Builder for implementation
+
+### Session Metrics
+
+- **Duration:** 30 minutes
+- **Lighthouse tests run:** 2 (Dashboard, Assets)
+- **Regression found:** 1 (FC-119 = -4% to -5%)
+- **Reverts performed:** 1 (9 HTML files)
+- **Git commits:** 1 (f932ff8)
+- **Bug reports created:** 1 (BUG-PERF-FC119-REGRESSION, 7KB)
+- **Files modified:** 11 (9 HTML reverts + 2 reports/memory)
+
+**Conclusion:** ❌ **FC-119 REGRESSION DISCOVERED AND REVERTED** — Performance testing revealed 4-5% decrease instead of expected improvement. Root cause: delaying JavaScript delays chart/table rendering (main content), worsening LCP. This is the THIRD failed attempt at delaying JavaScript execution (blanket defer, selective defer, move to end). **Traditional optimization doesn't work for JavaScript-first apps.** Per Anti-Loop Rule: **STOP trying the same approach.** Recommended: Try fundamentally different approach (async) OR escalate to founder for architecture change decision (pre-render skeletons, Webpack, SSR). Production downgraded from expected **C+** to **C** due to regression, awaiting revert deployment to restore **C+** baseline.
+
+**Awaiting:** Founder decision on next approach.
 
 ---
 
