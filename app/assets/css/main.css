@@ -426,7 +426,7 @@ strong {
 
 .card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-4px); /* FC-UIUX-007: Increased from -2px for better visual feedback */
   border-color: var(--color-border-default);
 }
 
@@ -889,7 +889,7 @@ strong {
 }
 
 .empty-state-icon {
-  font-size: 64px; /* 64px icon */
+  font-size: 80px; /* FC-UIUX-004: Increased from 64px for better visual impact */
   color: var(--color-text-tertiary);
   opacity: 0.5;
   margin-bottom: 16px;
@@ -2412,8 +2412,8 @@ main {
 }
 
 .empty-state-icon svg.icon {
-  width: 64px;
-  height: 64px;
+  width: 80px; /* FC-UIUX-004: Increased from 64px for better visual impact */
+  height: 80px; /* FC-UIUX-004: Increased from 64px for better visual impact */
   color: var(--color-secondary);
   stroke-width: 1.5;
 }
@@ -2461,8 +2461,8 @@ main {
   }
 
   .empty-state-icon svg.icon {
-    width: 52px;
-    height: 52px;
+    width: 64px; /* FC-UIUX-004: Increased from 52px (proportional to desktop increase) */
+    height: 64px; /* FC-UIUX-004: Increased from 52px (proportional to desktop increase) */
   }
 
   .empty-state-title {
@@ -2881,7 +2881,7 @@ main {
 
 .stat-card:hover,
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px); /* FC-UIUX-007: Increased from -2px for better visual feedback */
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
@@ -3102,7 +3102,7 @@ html {
 .chart-card:hover,
 .table-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  transform: translateY(-4px); /* FC-UIUX-007: Increased from -2px for better visual feedback */
 }
 
 /* Light mode card shadows */
