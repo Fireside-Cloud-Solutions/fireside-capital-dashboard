@@ -3681,7 +3681,12 @@ function init() {
     }
     // Show/hide page action buttons (Add Investment, Add Asset, etc.) based on auth state
     if (document.getElementById('pageActions')) {
-      document.getElementById('pageActions').style.display = currentUser ? '' : 'none';
+      const pageActions = document.getElementById('pageActions');
+      if (currentUser) {
+        pageActions.classList.remove('initially-hidden');
+      } else {
+        pageActions.style.display = 'none';
+      }
     }
 
     // Hide/show action buttons (Add Asset, Add Investment, etc.) based on auth state
