@@ -82,12 +82,12 @@ Continue UI/UX audit, review HTML/CSS across pages, verify previous recommendati
 
 ---
 
-### 🔧 FC-UIUX-009 (Chart Skeleton Grid Opacity) — NEEDS FIX
+### ✅ FC-UIUX-009 (Chart Skeleton Grid Opacity) — FIXED
 **Priority:** P3 LOW  
 **Issue:** Chart skeleton grid lines too prominent during loading  
 **Location:** `app/assets/css/components.css:1202`  
-**Current:** `opacity: 0.3;`  
-**Recommended:** `opacity: 0.15;`  
+**Changed:** `opacity: 0.3;` → `opacity: 0.15;`  
+**Commit:** fad8923 (2026-02-15 4:50 AM)  
 
 **Justification:**
 - Current opacity (0.3 = 30%) creates visual distraction during loading
