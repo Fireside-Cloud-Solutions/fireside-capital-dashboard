@@ -997,6 +997,49 @@ body.sidebar-open {
   .budget-controls .btn {
     width: 100%;
   }
+  
+  /* =================================================================
+     FC-UIUX-003: Table Horizontal Overflow Fix (P1 HIGH)
+     Ensures data tables scroll horizontally on small mobile screens
+     ================================================================= */
+  
+  /* Ensure table containers allow horizontal scrolling */
+  .table-card,
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
+  }
+  
+  /* Force tables to be wide enough to require scrolling */
+  .table {
+    min-width: 650px;
+    margin-bottom: 0;
+  }
+  
+  /* Ensure table wrapper doesn't clip scroll */
+  .table-card {
+    overflow: visible; /* Allow table-responsive child to scroll */
+  }
+  
+  /* Add subtle shadow to indicate scrollable content */
+  .table-responsive {
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 -1px 0 var(--color-border-subtle);
+  }
+  
+  /* Ensure table cells don't break on small screens */
+  .table td,
+  .table th {
+    white-space: nowrap;
+  }
+  
+  /* Currency and number columns */
+  .table td[class*="text-end"],
+  .table td.currency-value {
+    white-space: nowrap;
+  }
 }
 
 /* =================================================================
