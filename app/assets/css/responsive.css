@@ -701,7 +701,7 @@ body.sidebar-open {
     position: fixed !important;
     top: max(12px, env(safe-area-inset-top)) !important;
     left: 16px !important;
-    z-index: var(--z-modal); /* 400 - above sidebar so X button is always clickable */
+    z-index: var(--z-sticky); /* 200 - sticky element, below modals (400) */
     width: 48px;
     height: 48px;
     background: var(--color-bg-2);
