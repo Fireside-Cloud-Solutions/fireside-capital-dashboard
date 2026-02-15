@@ -15,15 +15,25 @@ const CATEGORIES = [
   'other'
 ];
 
-// Load all transactions for current user
+// Pagination state
+let currentPage = 1;
+let itemsPerPage = 50;
+let totalCount = 0;
+
+// Load all transactions for current user with pagination
 async function loadTransactions(options = {}) {
   try {
     const user = await sb.auth.getUser();
-    if (!user.data.user) return [];
+    if (!user.data.user) return { data: [], count: 0 };
     
+    const limit = options.limit || 50;
+    const page = options.page || 1;
+    const offset = (page - 1) * limit;
+    
+    // Build query
     let query = sb
       .from('transactions')
-      .select('*')
+      .select('*', { count: 'exact' }) // Get total count for pagination
       .eq('user_id', user.data.user.id)
       .order('date', { ascending: false });
     
@@ -40,19 +50,18 @@ async function loadTransactions(options = {}) {
       query = query.lte('date', options.endDate);
     }
     
-    if (options.limit) {
-      query = query.limit(options.limit);
-    }
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
     
-    const { data, error } = await query;
+    const { data, error, count } = await query;
     
     if (error) throw error;
     
-    return data || [];
+    return { data: data || [], count: count || 0 };
     
   } catch (error) {
     console.error('Load transactions error:', error);
-    return [];
+    return { data: [], count: 0 };
   }
 }
 
@@ -122,15 +131,55 @@ async function syncTransactions() {
   }
 }
 
+// Update pagination UI
+function updatePaginationUI() {
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  
+  document.getElementById('pageIndicator').textContent = 
+    `Page ${currentPage} of ${totalPages || 1}`;
+  
+  document.getElementById('prevPageBtn').disabled = currentPage === 1;
+  document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+  
+  // Show/hide pagination if only 1 page
+  const controls = document.getElementById('paginationControls');
+  if (totalPages <= 1) {
+    controls.classList.add('d-none');
+  } else {
+    controls.classList.remove('d-none');
+  }
+}
+
 // Render transactions table
 async function renderTransactionsTable(filters = {}) {
   const tbody = document.getElementById('transactionsTableBody');
+  const loadingSpinner = document.getElementById('loadingSpinner');
   const emptyState = document.getElementById('emptyState');
   const tableWrapper = document.querySelector('.table-responsive');
   
   if (!tbody) return;
   
-  const transactions = await loadTransactions({ ...filters, limit: 100 });
+  // Show loading
+  tbody.innerHTML = '';
+  if (loadingSpinner) loadingSpinner.classList.remove('d-none');
+  if (emptyState) emptyState.classList.add('d-none');
+  
+  // Get filters with pagination
+  const options = {
+    category: filters.category || '',
+    startDate: filters.startDate || '',
+    endDate: filters.endDate || '',
+    page: currentPage,
+    limit: itemsPerPage
+  };
+  
+  // Load paginated data
+  const result = await loadTransactions(options);
+  const transactions = result.data;
+  totalCount = result.count;
+  
+  // Hide loading
+  if (loadingSpinner) loadingSpinner.classList.add('d-none');
   
   // Toggle empty state vs table visibility
   if (transactions.length === 0) {
@@ -165,6 +214,9 @@ async function renderTransactionsTable(filters = {}) {
       </td>
     </tr>
   `).join('');
+  
+  // Update pagination UI
+  updatePaginationUI();
 }
 
 // Update transaction category
@@ -301,6 +353,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.log('[Transactions] Initializing page...');
       await renderTransactionsTable();
       console.log('[Transactions] Page initialized successfully');
+      
+      // Set up pagination event listeners
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      const itemsPerPageSelect = document.getElementById('itemsPerPage');
+      
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderTransactionsTable();
+          }
+        });
+      }
+      
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          const totalPages = Math.ceil(totalCount / itemsPerPage);
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTransactionsTable();
+          }
+        });
+      }
+      
+      if (itemsPerPageSelect) {
+        itemsPerPageSelect.addEventListener('change', (e) => {
+          itemsPerPage = parseInt(e.target.value);
+          currentPage = 1; // Reset to page 1
+          renderTransactionsTable();
+        });
+      }
+      
     } catch (error) {
       console.error('[Transactions] Initialization failed:', error);
     }

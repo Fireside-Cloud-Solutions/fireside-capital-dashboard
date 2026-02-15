@@ -217,6 +217,26 @@
                 </tbody>
               </table>
             </div>
+            <!-- Pagination Controls -->
+            <div id="paginationControls" class="d-flex justify-content-between align-items-center mt-3 d-none">
+              <div>
+                <label for="itemsPerPage" class="form-label me-2">Items per page:</label>
+                <select id="itemsPerPage" class="form-select form-select-sm d-inline-block w-auto">
+                  <option value="25">25</option>
+                  <option value="50" selected>50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm" disabled>
+                  <i class="bi bi-chevron-left"></i> Previous
+                </button>
+                <span id="pageIndicator" class="text-muted small">Page 1 of 1</span>
+                <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm" disabled>
+                  Next <i class="bi bi-chevron-right"></i>
+                </button>
+              </div>
+            </div>
             <div id="loadingSpinner" class="text-center d-none">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -518,6 +538,7 @@
       
       // Apply filters
       document.getElementById('applyFiltersBtn').addEventListener('click', async () => {
+        currentPage = 1; // Reset to page 1 when applying filters
         const filters = {
           category: document.getElementById('categoryFilter').value || null,
           startDate: document.getElementById('startDate').value || null,
@@ -528,6 +549,7 @@
       
       // Clear filters
       document.getElementById('clearFiltersBtn').addEventListener('click', async () => {
+        currentPage = 1; // Reset to page 1 when clearing filters
         document.getElementById('categoryFilter').value = '';
         document.getElementById('startDate').value = '';
         document.getElementById('endDate').value = '';
