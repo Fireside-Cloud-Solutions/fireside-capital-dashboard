@@ -1,6 +1,53 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-15 07:10 EST (Sprint UI/UX — Dashboard Audit Session 1 Complete)
+**Last Updated:** 2026-02-15 07:17 EST (Sprint Dev — 2 Bugs Fixed)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0717 (Feb 15, 7:17 AM) — 2 BUGS FIXED ✅
+
+**Status:** ✅ **BUG-TRANS-001 & BUG-TRANS-002 FIXED**  
+**Agent:** Capital (Lead Dev)  
+**Duration:** 15 minutes  
+**Task:** Check Azure DevOps + Discord for bugs, fix highest priority items
+
+### Summary
+
+**Mission:** Sprint dev check — identify and fix highest priority bugs from recent QA audits  
+**Result:** ✅ **2 PAGINATION BUGS FIXED** — Filter persistence + empty state controls
+
+### Bugs Fixed
+
+**BUG-TRANS-001** (P2, 15 min) ✅  
+*Filter state not persisted across page navigation*
+- **Problem:** When user applies category filter and clicks Next Page, filters are lost
+- **Root Cause:** Pagination event listeners didn't pass filters to `renderTransactionsTable()`
+- **Fix:** Added `activeFilters` module variable, updated all pagination listeners
+- **Files:** `transactions.js` (3 lines), `transactions.html` (2 lines)
+
+**BUG-TRANS-002** (P3, 5 min) ✅  
+*Pagination controls visible when filtered results empty*
+- **Problem:** When filter returns 0 results, pagination still shows "Page 1 of 1"
+- **Root Cause:** Early return in `renderTransactionsTable()` skipped `updatePaginationUI()`
+- **Fix:** Call `updatePaginationUI()` before early return
+- **Files:** `transactions.js` (1 line)
+
+### Deployment
+
+**Commit:** `1b4c5b8` — "Fix BUG-TRANS-001 & BUG-TRANS-002: pagination filter persistence + empty state controls"  
+**Pushed to:** `main` branch  
+**Deploy Status:** Azure Static Web Apps CI/CD in progress
+
+### Remaining Work
+
+**BUG-TRANS-003** (P2, 30 min) — Mobile pagination layout testing  
+- Needs testing on iPhone SE (375px) and Galaxy Fold (280px)
+- Pagination controls may need `flex-column` on mobile
+- Requires device testing OR founder manual check
+
+### Next Sprint Dev
+**When:** Sunday, Feb 15 @ 7:17 PM (12 hours)  
+**What:** Check for new bugs, continue fixing Ready items from backlog
 
 ---
 
