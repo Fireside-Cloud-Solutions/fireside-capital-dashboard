@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-14 07:15 EST (Sprint Dev: FC-128 fixed)
+**Last Updated:** 2026-02-15 07:01 EST (Sprint QA: FC-131 code review + 3 bugs added)
 
 ---
 
@@ -152,7 +152,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-128 | Bug | P2 | XS | Done | **Transactions page button hierarchy violation** — "Sync from Bank" should be btn-primary (core action), not btn-secondary (15 min) — FIXED commit aa9641d (2026-02-14) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-129 | Feature | P2 | S | Ready | **Add table skeleton loaders to Transactions page** — Replace generic spinner with 5 shimmer placeholder rows for better perceived performance (2h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-130 | Feature | P2 | S | Ready | **Implement transaction status column** — Add pending/cleared/failed badges using Plaid pending field (2h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
-| FC-131 | Feature | P1 | M | Ready | **Add pagination to Transactions table** — Server-side pagination with page controls, limit selector, prevents DOM bloat with 500+ rows (4-5h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
+| FC-131 | Feature | P1 | M | Done | **Add pagination to Transactions table** — Server-side pagination with page controls, limit selector, prevents DOM bloat with 500+ rows (4-5h) — FIXED commit 0d41744 (2026-02-15) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
 | FC-132 | Feature | P3 | XS | Ready | **Add active filter indicator to Transactions** — Badge count + blue borders for active filters (1h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-133 | Chore | P3 | XS | Ready | **Document auto-categorize button hierarchy decision** — Clarify if btn-outline-secondary is correct or should be btn-secondary (30 min) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-134 | Bug | P2 | XS | Ready | **Fix Transactions filter mobile layout** — Test and add col-12 for mobile breakpoint (1h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
@@ -163,6 +163,9 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-139 | Bug | P1 | XS | Done | **Income page button hierarchy violation** — "Add Income" should be btn-primary (core action), not btn-secondary (5 min) — FIXED commit 8b2fddd (2026-02-14) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
 | FC-140 | Feature | P2 | S | Ready | **Add table skeleton loaders to Income page** — Replace generic spinner with 5 shimmer placeholder rows (2h) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
 | FC-141 | Feature | P2 | XS | Ready | **Add empty state HTML to Income page** — Fallback markup with CTA for new users (30 min) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
+| BUG-TRANS-001 | Bug | P2 | XS | Ready | **Filter state not persisted across page navigation** — When user clicks Previous/Next on Transactions page, filters are lost. Users expect filters to persist. Store activeFilters in module scope and pass to renderTransactionsTable() (15 min) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
+| BUG-TRANS-002 | Bug | P3 | XS | Ready | **Pagination controls visible when filtered results are empty** — Early return in renderTransactionsTable() skips updatePaginationUI() call when table is empty. Call updatePaginationUI() before return to hide controls (5 min) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
+| BUG-TRANS-003 | Bug | P2 | XS | Ready | **Mobile pagination layout needs responsive testing** — Pagination controls use d-flex justify-content-between with no mobile breakpoints. Test on iPhone SE (375px) and Galaxy Fold (280px). May need flex-column on mobile or shorter label ("Per page:" vs "Items per page:") (30 min test + fix) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
 
 ### EPIC-002: Mobile Application
 

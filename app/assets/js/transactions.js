@@ -19,6 +19,7 @@ const CATEGORIES = [
 let currentPage = 1;
 let itemsPerPage = 50;
 let totalCount = 0;
+let activeFilters = {}; // Track active filters for pagination
 
 // Load all transactions for current user with pagination
 async function loadTransactions(options = {}) {
@@ -185,6 +186,7 @@ async function renderTransactionsTable(filters = {}) {
   if (transactions.length === 0) {
     if (tableWrapper) tableWrapper.classList.add('d-none');
     if (emptyState) emptyState.classList.remove('d-none');
+    updatePaginationUI(); // Hide pagination controls when table is empty
     return;
   }
   
@@ -363,7 +365,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         prevBtn.addEventListener('click', () => {
           if (currentPage > 1) {
             currentPage--;
-            renderTransactionsTable();
+            renderTransactionsTable(activeFilters);
           }
         });
       }
@@ -373,7 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const totalPages = Math.ceil(totalCount / itemsPerPage);
           if (currentPage < totalPages) {
             currentPage++;
-            renderTransactionsTable();
+            renderTransactionsTable(activeFilters);
           }
         });
       }
@@ -382,7 +384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         itemsPerPageSelect.addEventListener('change', (e) => {
           itemsPerPage = parseInt(e.target.value);
           currentPage = 1; // Reset to page 1
-          renderTransactionsTable();
+          renderTransactionsTable(activeFilters);
         });
       }
       

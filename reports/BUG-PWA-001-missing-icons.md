@@ -1,52 +1,114 @@
-# BUG-PWA-001: Missing PWA Icons (404 Errors)
+# BUG-PWA-001: Missing PWA Icons (404 Error)
 
-**Priority:** Medium  
-**Type:** Bug / PWA / Assets  
-**File:** `app/assets/img/icons/` (directory exists but empty)  
-**Found:** 2026-02-14 07:15 AM  
-**Status:** New
+**Priority:** P2 MEDIUM  
+**Type:** Bug  
+**Effort:** 1 hour  
+**Discovered:** 2026-02-15 06:40 AM (Sprint QA Session)  
+**Status:** NEW
 
-## Summary
-PWA manifest references icon files that don't exist, causing 404 errors in browser console and preventing app from being installable as a PWA.
+---
 
-## Console Errors
+## Problem
+
+PWA manifest references `icon-192x192.png` but the file doesn't exist, causing 404 errors on every page load.
+
+---
+
+## Evidence
+
+### Console Error
+
 ```
 Failed to load resource: the server responded with a status of 404 ()
 https://nice-cliff-05b13880f.2.azurestaticapps.net/assets/img/icons/icon-192x192.png
 ```
 
-## Missing Files
-1. `icon-192x192.png` — 192x192px PNG (minimum for PWA)
-2. `icon-512x512.png` — 512x512px PNG (required for maskable icons)
+### Browser Warning
+
+```
+Error while trying to use the following icon from the Manifest:
+https://nice-cliff-05b13880f.2.azurestaticapps.net/assets/img/icons/icon-192x192.png
+(Download error or resource isn't a valid image)
+```
+
+---
 
 ## Impact
-- **Functionality:** PWA cannot be installed on mobile/desktop
-- **Console Errors:** 404 errors on every page load
-- **User Experience:** No icon shown in browser tab/bookmark
-- **SEO/Performance:** Lighthouse score reduction
 
-## Current State
-- Directory exists: `app/assets/img/icons/`
-- README.md documents the requirement
-- manifest.json references the icons
-- Icons have not been created yet
+**User Impact:** MEDIUM
+- PWA installation may fail or show broken icon
+- Home screen icon missing on iOS/Android
+- Professional appearance affected
 
-## Recommendation
-1. Create base icon using Fireside Capital logo
-2. Generate 192x192 and 512x512 versions
-3. Follow design guidelines in README.md:
-   - Colors: Primary #01a4ef (blue), accent #f44e24 (orange)
-   - Background: Work on both light/dark
-   - Maskable: Safe zone (center 80%) for Android
-4. Use https://realfavicongenerator.net/ or design tools
+**Frequency:** Every page load (11 pages × 2 loads = 22 404 errors during audit)
 
-## Priority Justification
-Medium priority because:
-- Affects all pages (console errors)
-- Blocks PWA installability
-- But doesn't break core functionality
+---
+
+## Fix
+
+### Option 1: Generate Missing Icons
+
+Use `pwa-asset-generator` to create all required sizes:
+
+```powershell
+cd C:\Users\chuba\fireside-capital\app
+npx pwa-asset-generator .\assets\img\logo.png .\assets\img\icons\ --favicon --type png
+```
+
+**Required sizes (per manifest.json):**
+- 72x72
+- 96x96
+- 128x128
+- 144x144
+- 152x152
+- 192x192 ← **MISSING**
+- 384x384
+- 512x512
+
+### Option 2: Update Manifest
+
+Remove reference to 192x192 from manifest.json if not needed.
+
+**Recommended:** Option 1 (generate all icons) — proper PWA support.
+
+---
 
 ## Testing
-Verified on:
-- Reports page (404 in console log)
-- Expected on all pages since icons are loaded in manifest
+
+### Manual Test Plan
+
+1. Run `pwa-asset-generator`
+2. Verify `icon-192x192.png` exists in `app/assets/img/icons/`
+3. Reload page
+4. **EXPECTED:** No 404 errors in console
+5. **ACTUAL:** (test after fix)
+
+### Lighthouse PWA Audit
+
+Run Lighthouse and verify:
+- [ ] "Manifest includes a maskable icon" (PASS)
+- [ ] "No icon 404 errors" (PASS)
+
+---
+
+## Acceptance Criteria
+
+- [ ] Generate all missing PWA icon sizes
+- [ ] Verify all icons load without 404 errors
+- [ ] Test PWA installation on mobile device
+- [ ] Verify home screen icon displays correctly
+- [ ] Git commit icon files
+- [ ] Azure deployment includes new icons
+
+---
+
+## Related Issues
+
+- ⏳ FC-108 to FC-117: PWA Implementation (backlog)
+- This is a prerequisite for proper PWA support
+
+---
+
+**Report Created:** 2026-02-15 06:47 AM  
+**Agent:** Capital (QA Orchestrator)  
+**Session:** Sprint QA 013cc4e7

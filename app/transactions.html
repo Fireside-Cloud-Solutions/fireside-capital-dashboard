@@ -539,17 +539,18 @@
       // Apply filters
       document.getElementById('applyFiltersBtn').addEventListener('click', async () => {
         currentPage = 1; // Reset to page 1 when applying filters
-        const filters = {
+        activeFilters = {
           category: document.getElementById('categoryFilter').value || null,
           startDate: document.getElementById('startDate').value || null,
           endDate: document.getElementById('endDate').value || null
         };
-        await renderTransactionsTable(filters);
+        await renderTransactionsTable(activeFilters);
       });
       
       // Clear filters
       document.getElementById('clearFiltersBtn').addEventListener('click', async () => {
         currentPage = 1; // Reset to page 1 when clearing filters
+        activeFilters = {}; // Clear active filters
         document.getElementById('categoryFilter').value = '';
         document.getElementById('startDate').value = '';
         document.getElementById('endDate').value = '';
