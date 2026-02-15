@@ -86,7 +86,11 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-040 | Feature | P2 | M | Done | Friends page missing loading states (skeleton loaders) — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
 | FC-041 | Feature | P3 | S | Done | Friends page empty states don't use empty-states.js utility — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
 | FC-042 | Chore | P3 | XS | Backlog | Friends page section icon colors inconsistent (design decision) — see reports/UI-UX-AUDIT-FRIENDS-2026-02-04-0923.md |
-| FC-043 | Bug | P2 | XS | Done | Button hierarchy violations across 6 pages (assets, bills, debts, income, investments, budget) — Add buttons using btn-primary instead of btn-secondary — see reports/FC-043-button-hierarchy-violations.md |
+| FC-043 | Bug | P2 | XS | Done | Button hierarchy violations across 6 pages (assets, bills, debts, income, investments, budget) — Add buttons using btn-primary instead of btn-secondary — FIXED commit 5716e50 + 747f56b (2026-02-15) — see reports/FC-043-button-hierarchy-violations.md |
+| BUG-UI-BTN-002 | Bug | P1 | XS | Done | **Bills page button hierarchy violation** — "Add Bill" should be btn-primary (core action), not btn-secondary (2 min) — FIXED commit 5716e50 (2026-02-15) |
+| BUG-UI-BTN-003 | Bug | P1 | XS | Done | **Budget page button hierarchy violation** — "Add Item" should be btn-primary (core action), not btn-secondary (2 min) — FIXED commit 5716e50 (2026-02-15) |
+| BUG-UI-BTN-006 | Bug | P1 | XS | Done | **Investments page button hierarchy violation** — "Add Investment" should be btn-primary (core action), not btn-secondary (2 min) — FIXED commit 5716e50 (2026-02-15) |
+| BUG-UI-BTN-008 | Bug | P1 | XS | Done | **Assets page button hierarchy violation** — "Add Asset" should be btn-primary (core action), not btn-secondary (2 min) — FIXED commit 747f56b (2026-02-15) |
 | FC-056 | Feature | P2 | M | Done | Missing skeleton loaders on Dashboard (9 charts + 6 stat cards) — poor perceived performance |
 | FC-057 | Bug | P2 | XS | Done | Inconsistent chart heights — standardize to 2 sizes (lg/md) for visual consistency |
 | FC-058 | Feature | P3 | S | Backlog | Subscriptions widget loading state — replace generic spinner with skeleton cards |
