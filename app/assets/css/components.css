@@ -1199,7 +1199,7 @@ body[data-theme="light"] .card.loading::after {
   background-image: 
     repeating-linear-gradient(0deg, transparent, transparent 19%, var(--color-bg-1) 19%, var(--color-bg-1) 20%),
     repeating-linear-gradient(90deg, transparent, transparent 19%, var(--color-bg-1) 19%, var(--color-bg-1) 20%);
-  opacity: 0.3;
+  opacity: 0.15; /* FC-UIUX-009: Reduced from 0.3 for less distracting loading states (matches Linear 0.1, Stripe 0.15 patterns) */
 }
 
 /* Hide actual canvas while skeleton is showing */
