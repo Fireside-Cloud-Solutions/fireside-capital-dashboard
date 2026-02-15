@@ -75,6 +75,20 @@
         transition: opacity 0.15s ease;
       }
     }
+    
+    /* Very small screens (<360px): tighter spacing to prevent overlap */
+    @media (max-width: 359.98px) {
+      .sidebar-toggle {
+        top: max(8px, env(safe-area-inset-top)) !important;
+        left: 8px !important;
+        width: 40px !important;
+        height: 40px !important;
+      }
+      
+      #loggedInState, #loggedOutState {
+        right: 8px !important;
+      }
+    }
   </style>
 </head>
 
