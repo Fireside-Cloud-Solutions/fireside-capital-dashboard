@@ -2648,6 +2648,19 @@ async function loadAndRenderBudget() {
     const card = el.closest('.summary-card');
     if (card) card.classList.remove('loading');
   }
+  
+  // Initialize activityAmount (Spent) card - placeholder for transaction integration
+  if(document.getElementById('activityAmount')) {
+    const el = document.getElementById('activityAmount');
+    if (!el.classList.contains('d-none')) {
+      // Already initialized, skip
+    } else {
+      el.textContent = '$0.00'; // Placeholder until transaction tracking is implemented
+      el.classList.remove('d-none');
+      const card = el.closest('.summary-card');
+      if (card) card.classList.remove('loading');
+    }
+  }
 
   // MED-04: Income warning banner
   const tableCard = document.querySelector('.table-card');
