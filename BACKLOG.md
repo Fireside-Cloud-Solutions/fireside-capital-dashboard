@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-15 07:01 EST (Sprint QA: FC-131 code review + 3 bugs added)
+**Last Updated:** 2026-02-16 04:00 EST (Sprint QA: BUG-UI-CSS-001 fixed + 13 audit bugs added to backlog)
 
 ---
 
@@ -169,7 +169,20 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-141 | Feature | P2 | XS | Ready | **Add empty state HTML to Income page** — Fallback markup with CTA for new users (30 min) — see reports/UI-UX-AUDIT-DEBTS-INCOME-2026-02-14.md |
 | BUG-TRANS-001 | Bug | P2 | XS | Done | **Filter state not persisted across page navigation** — When user clicks Previous/Next on Transactions page, filters are lost. Users expect filters to persist. Store activeFilters in module scope and pass to renderTransactionsTable() (15 min) — FIXED commit 1b4c5b8 (2026-02-15) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
 | BUG-TRANS-002 | Bug | P3 | XS | Done | **Pagination controls visible when filtered results are empty** — Early return in renderTransactionsTable() skips updatePaginationUI() call when table is empty. Call updatePaginationUI() before return to hide controls (5 min) — FIXED commit 1b4c5b8 (2026-02-15) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
-| BUG-TRANS-003 | Bug | P2 | XS | Ready | **Mobile pagination layout needs responsive testing** — Pagination controls use d-flex justify-content-between with no mobile breakpoints. Test on iPhone SE (375px) and Galaxy Fold (280px). May need flex-column on mobile or shorter label ("Per page:" vs "Items per page:") (30 min test + fix) — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
+| BUG-TRANS-003 | Bug | P2 | XS | Done | **Mobile pagination layout needs responsive testing** — Pagination controls use d-flex justify-content-between with no mobile breakpoints. Test on iPhone SE (375px) and Galaxy Fold (280px). May need flex-column on mobile or shorter label ("Per page:" vs "Items per page:") (30 min test + fix) — FIXED commit c572f5b (2026-02-16) — Added flex-column flex-sm-row for responsive stacking, gap-2 spacing, centered on mobile — see reports/QA-SPRINT-0701-FC131-PAGINATION-2026-02-15.md |
+| BUG-UI-CSS-001 | Bug | P2 | XS | Done | **Inline critical CSS duplication** — 40+ lines of identical inline CSS in all 11 HTML pages violates DRY principle, maintenance nightmare. Extract to external critical.css file (20 min) — FIXED commit 505bd28 (2026-02-16) — see reports/BUG-UI-CSS-001-FIXED-2026-02-16.md |
+| BUG-UI-MODAL-001 | Bug | P2 | XS | Done | **Password reset modal traps users** — Static backdrop prevents closing modal, no Cancel button. Users stuck if error occurs (5 min) — FIXED commit 353219b (2026-02-15) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-NAV-001 | Bug | P0 | XS | Done | **Z-index conflict - mobile hamburger menu** — Hamburger menu uses z-index: 400 (modal level) instead of 200 (sticky level), breaks modal focus trap (5 min) — FIXED commit 3aeddcc (2026-02-15) — see reports/BUG-UI-NAV-001-COMPLETE-FIX-2026-02-15.md |
+| BUG-UI-LOAD-001 | Bug | P2 | S | Ready | **Bills page missing skeleton loaders** — No loading states for 3 summary cards, table, subscription widget. Poor perceived performance (30 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-LOAD-002 | Bug | P2 | S | Ready | **Budget page missing skeleton loaders** — No loading states for 4 summary cards, budget table. Poor perceived performance (30 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-LOAD-003 | Bug | P2 | S | Ready | **Debts page missing skeleton loaders** — No loading states for debts table, financing cards. Poor perceived performance (20 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-LOAD-004 | Bug | P2 | S | Ready | **Income page missing skeleton loaders** — No loading states for income table. Poor perceived performance (20 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-LOAD-005 | Bug | P2 | S | Ready | **Investments page missing skeleton loaders** — No loading states for investments table. Poor perceived performance (20 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-LOAD-006 | Bug | P2 | S | Ready | **Assets page missing skeleton loaders** — No loading states for assets table. Poor perceived performance (20 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-UI-TOOLTIP-001 | Bug | P3 | XS | Done | **Bootstrap tooltips not initialized** — FALSE POSITIVE from audit. Tooltips ARE initialized (app.js lines 4931-4934, called at line 3849). No fix needed. |
+| BUG-JS-001 | Bug | P2 | S | Ready | **Console cleanup** — 151 console.log statements need removal or build-time stripping for professional production code (2-3h) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-CSS-001 | Bug | P3 | L | Ready | **!important abuse** — 289 !important instances causing specificity battles. Large refactoring effort (8-12h) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
+| BUG-PERF-003 | Bug | P3 | S | Ready | **Excessive script tags** — 15-20 individual script tags slow page load. Bundle with Webpack (45 min) — see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
 
 ### EPIC-002: Mobile Application
 

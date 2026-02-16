@@ -141,21 +141,24 @@
         <!-- Summary Cards -->
         <div class="row g-3 g-xl-4 mb-4">
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="summary-card">
+            <div class="summary-card loading">
               <h6>Monthly Bills Total</h6>
-              <h4 id="billsTotal">$0.00</h4>
+              <div class="skeleton-loader skeleton-value" style="width: 120px; height: 32px;"></div>
+              <h4 id="billsTotal" class="d-none">$0.00</h4>
             </div>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="summary-card">
+            <div class="summary-card loading">
               <h6>Recurring</h6>
-              <h4 id="billsRecurringCount">0</h4>
+              <div class="skeleton-loader skeleton-value" style="width: 80px; height: 32px;"></div>
+              <h4 id="billsRecurringCount" class="d-none">0</h4>
             </div>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="summary-card">
+            <div class="summary-card loading">
               <h6>Shared With Me</h6>
-              <h4 id="billsSharedCount">0</h4>
+              <div class="skeleton-loader skeleton-value" style="width: 80px; height: 32px;"></div>
+              <h4 id="billsSharedCount" class="d-none">0</h4>
             </div>
           </div>
         </div>
@@ -192,6 +195,31 @@
                 </tr>
               </thead>
               <tbody id="billTableBody">
+                <!-- Skeleton rows -->
+                <tr class="skeleton-row">
+                  <td><div class="skeleton-loader skeleton-line" style="width: 140px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 90px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 120px;"></div></td>
+                </tr>
+                <tr class="skeleton-row">
+                  <td><div class="skeleton-loader skeleton-line" style="width: 160px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 110px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 90px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 110px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 120px;"></div></td>
+                </tr>
+                <tr class="skeleton-row">
+                  <td><div class="skeleton-loader skeleton-line" style="width: 150px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 90px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 95px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 120px;"></div></td>
+                </tr>
               </tbody>
             </table>
           </div>

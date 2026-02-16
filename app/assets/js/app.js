@@ -1608,10 +1608,28 @@ function renderBills() {
     console.log(`Total Monthly Bills: ${formatCurrency(totalBills)} (from ${activeBills.length} active bills)`);
   }
   
-  if (document.getElementById('billsTotal')) document.getElementById('billsTotal').textContent = formatCurrency(totalBills);
-  if (document.getElementById('billsRecurringCount')) document.getElementById('billsRecurringCount').textContent = recurringBills.length;
+  if (document.getElementById('billsTotal')) {
+    const el = document.getElementById('billsTotal');
+    el.textContent = formatCurrency(totalBills);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  if (document.getElementById('billsRecurringCount')) {
+    const el = document.getElementById('billsRecurringCount');
+    el.textContent = recurringBills.length;
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
   const sharedCount = (window.sharedBillsForDisplay || []).length;
-  if (document.getElementById('billsSharedCount')) document.getElementById('billsSharedCount').textContent = sharedCount;
+  if (document.getElementById('billsSharedCount')) {
+    const el = document.getElementById('billsSharedCount');
+    el.textContent = sharedCount;
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
 }
 // Render financing cards on the Debts page (moved from Bills page)
 function renderFinancingCards() {
@@ -2609,9 +2627,27 @@ async function loadAndRenderBudget() {
   const totalAssigned = Object.values(budgetAssignments).reduce((sum, amount) => sum + getRaw(amount), 0);
   const remainingToBudget = totalIncome - totalAssigned;
 
-  if(document.getElementById('expectedIncome')) document.getElementById('expectedIncome').textContent = formatCurrency(totalIncome);
-  if(document.getElementById('assignedAmount')) document.getElementById('assignedAmount').textContent = formatCurrency(totalAssigned);
-  if(document.getElementById('remainingToBudget')) document.getElementById('remainingToBudget').textContent = formatCurrency(remainingToBudget);
+  if(document.getElementById('expectedIncome')) {
+    const el = document.getElementById('expectedIncome');
+    el.textContent = formatCurrency(totalIncome);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  if(document.getElementById('assignedAmount')) {
+    const el = document.getElementById('assignedAmount');
+    el.textContent = formatCurrency(totalAssigned);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  if(document.getElementById('remainingToBudget')) {
+    const el = document.getElementById('remainingToBudget');
+    el.textContent = formatCurrency(remainingToBudget);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
 
   // MED-04: Income warning banner
   const tableCard = document.querySelector('.table-card');
