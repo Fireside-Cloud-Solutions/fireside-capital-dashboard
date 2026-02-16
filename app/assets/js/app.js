@@ -2341,9 +2341,19 @@ async function saveSettings() {
   }
 
   if (!currentUser) return;
-  const goal = getRaw(document.getElementById('emergencyFundGoal').value);
+  
+  const goalInput = document.getElementById('emergencyFundGoal');
+  const goal = getRaw(goalInput.value);
 
-  // Validate goal value
+  // Check if input has validation errors
+  if (goalInput.classList.contains('is-invalid')) {
+    const statusEl = document.getElementById('settingsStatus');
+    statusEl.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Please fix validation errors before saving.</span>';
+    setTimeout(() => { statusEl.innerHTML = ''; }, 5000);
+    return;
+  }
+
+  // Validate goal value (fallback if real-time validation didn't trigger)
   if (goal && (goal < 100 || goal > 1000000)) {
     const statusEl = document.getElementById('settingsStatus');
     statusEl.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Please enter a value between $100 and $1,000,000.</span>';
@@ -3864,6 +3874,35 @@ function init() {
   document.getElementById('saveIncomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveIncome(); });
   document.getElementById('saveBudgetItemBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBudgetItem(); });
   document.getElementById('saveSettingsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveSettings(); });
+  
+  // Real-time validation for Emergency Fund Goal input
+  document.getElementById('emergencyFundGoal')?.addEventListener('input', (e) => {
+    const input = e.target;
+    const value = parseFloat(input.value);
+    const feedback = document.getElementById('emergencyGoalFeedback');
+    
+    if (!input.value) {
+      // Empty is valid (optional field)
+      input.classList.remove('is-invalid', 'is-valid');
+      feedback.textContent = '';
+    } else if (isNaN(value)) {
+      input.classList.add('is-invalid');
+      input.classList.remove('is-valid');
+      feedback.textContent = 'Please enter a valid number';
+    } else if (value < 100) {
+      input.classList.add('is-invalid');
+      input.classList.remove('is-valid');
+      feedback.textContent = 'Minimum goal is $100';
+    } else if (value > 1000000) {
+      input.classList.add('is-invalid');
+      input.classList.remove('is-valid');
+      feedback.textContent = 'Maximum goal is $1,000,000';
+    } else {
+      input.classList.remove('is-invalid');
+      input.classList.add('is-valid');
+      feedback.textContent = '';
+    }
+  });
 
   // SUG-02: Wire up Export button on Reports page
   const exportBtn = document.querySelector('button .bi-download')?.closest('button');

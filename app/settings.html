@@ -122,11 +122,12 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <label for="emergencyFundGoal" class="form-label">Emergency Fund Goal</label>
-                                <div class="input-group">
+                                <div class="input-group has-validation">
                                     <span class="input-group-text">$</span>
-                                    <input type="number" class="form-control" id="emergencyFundGoal" placeholder="e.g., 15000" min="100" max="1000000" step="100">
+                                    <input type="number" class="form-control" id="emergencyFundGoal" placeholder="e.g., 15000" min="100" max="1000000" step="100" aria-describedby="emergencyGoalHelp emergencyGoalFeedback">
+                                    <div id="emergencyGoalFeedback" class="invalid-feedback"></div>
                                 </div>
-                                <small class="text-muted mt-1 d-block">How much you want saved for emergencies</small>
+                                <small id="emergencyGoalHelp" class="text-muted mt-1 d-block">Recommended: 3-6 months of expenses ($5,000 - $50,000 typical range)</small>
                             </div>
                         </div>
                         <div class="mt-4 d-flex align-items-center gap-3">
