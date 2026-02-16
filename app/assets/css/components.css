@@ -1506,3 +1506,13 @@ tbody.loading {
     border-top-color: transparent !important;
   }
 }
+
+/* =================================================================
+   CARD SECTION HEADINGS
+   ================================================================= */
+
+/* Card section heading with icon - no text-transform */
+.card-section-heading {
+  font-size: var(--text-h5);
+  text-transform: none;
+}

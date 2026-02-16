@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-16 07:10 EST (Sprint UI/UX: Settings page audit complete, 11 new issues added FC-UIUX-018 through FC-UIUX-028)
+**Last Updated:** 2026-02-16 07:36 EST (Sprint Research: CSS architecture + financial dashboard UI patterns complete, 11 new items added FC-161 through FC-171)
 
 ---
 
@@ -218,6 +218,17 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-UIUX-026 | Feature | P2 | XS | Ready | **Settings page missing empty state** — No empty state for new users with no goal set, should show educational context about 3-6 months rule (30 min) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
 | FC-UIUX-027 | Bug | P3 | XS | Ready | **Settings page inline style on section heading** — Section heading uses inline style attribute instead of CSS class, breaks separation of concerns (2 min) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
 | FC-UIUX-028 | Chore | P3 | XS | Ready | **Password reset modal placement** — Modal hardcoded in settings.html, should be global shared component triggered from any page (1h) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
+| FC-161 | Chore | P2 | S | Ready | **Separate spacing utilities from components** — Create utility classes for margin/spacing (.m-0, .mb-8, .mb-16, .mb-24, .mb-32) to prevent component margin conflicts (1h) — Sprint Research Task (Session 0736) — CSS Architecture Best Practices |
+| FC-162 | Chore | P3 | XS | Ready | **Add animation utilities layer** — Create animations.css with fadeIn, slideUp, transition helpers for better UI polish (30 min) — Sprint Research Task (Session 0736) — CSS Architecture Best Practices |
+| FC-163 | Chore | P3 | S | Ready | **Verify PurgeCSS in build pipeline** — Remove unused Bootstrap classes, estimated 30-40% CSS size reduction (1h) — Sprint Research Task (Session 0736) — CSS Architecture Best Practices |
+| FC-164 | Feature | P1 | L | Ready | **Add Operational Dashboard view** — Create operations.html with cash flow 30/60/90 forecast, bills due aging, budget vs actuals drill-down (8-12h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-165 | Feature | P2 | S | Ready | **Implement progressive disclosure pattern** — Show 4 key metrics upfront, collapsible "Show More" for secondary metrics to reduce information overload (2h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-166 | Feature | P2 | S | Ready | **Add contextual tooltips to all metrics** — Explain financial jargon (debt-to-income, savings rate) with info icons + tooltips (1h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-167 | Feature | P1 | S | Ready | **Add bullet charts for goal tracking** — Replace gauge charts with Stephen Few bullet charts for emergency fund, savings goals (2h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-168 | Feature | P2 | S | Ready | **Add "What Changed?" chart annotations** — Explain spikes/dips in trend charts with context labels (car repair, bonus paycheck) (1h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-169 | Feature | P1 | M | Ready | **Add contextual empty states with sample data toggle** — Educational empty states with "Preview with Sample Data" button for new users (3h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-170 | Feature | P2 | S | Ready | **Add keyboard navigation for charts** — Allow arrow keys to navigate data points with screen reader announcements (2h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-171 | Feature | P3 | S | Ready | **Add "Export to Excel" for all tables** — Financial users expect Excel exports, add XLSX export function (1h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
 
 ### EPIC-002: Mobile Application
 
