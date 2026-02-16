@@ -876,9 +876,22 @@ async function renderAll() {
       }
   }
 
-  // Pre-populate settings inputs
-  if (document.getElementById('emergencyFundGoal') && window.settings?.emergency_fund_goal) {
-      document.getElementById('emergencyFundGoal').value = window.settings.emergency_fund_goal;
+  // Pre-populate settings inputs and toggle empty state
+  const goalInput = document.getElementById('emergencyFundGoal');
+  const emptyState = document.getElementById('settingsEmptyState');
+  const settingsCard = document.getElementById('settingsCard');
+  
+  if (goalInput && emptyState && settingsCard) {
+    if (window.settings?.emergency_fund_goal) {
+      // User has a goal set - show form, hide empty state
+      goalInput.value = window.settings.emergency_fund_goal;
+      emptyState.classList.add('d-none');
+      settingsCard.classList.remove('d-none');
+    } else {
+      // New user with no goal - show empty state, hide form
+      emptyState.classList.remove('d-none');
+      settingsCard.classList.add('d-none');
+    }
   }
 
   // Populate reports summary cards
@@ -3874,6 +3887,19 @@ function init() {
   document.getElementById('saveIncomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveIncome(); });
   document.getElementById('saveBudgetItemBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBudgetItem(); });
   document.getElementById('saveSettingsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveSettings(); });
+  
+  // Wire up "Set Emergency Fund Goal" button in empty state
+  document.getElementById('showGoalFormBtn')?.addEventListener('click', () => {
+    const emptyState = document.getElementById('settingsEmptyState');
+    const settingsCard = document.getElementById('settingsCard');
+    const goalInput = document.getElementById('emergencyFundGoal');
+    
+    if (emptyState && settingsCard && goalInput) {
+      emptyState.classList.add('d-none');
+      settingsCard.classList.remove('d-none');
+      goalInput.focus();
+    }
+  });
   
   // Real-time validation for Emergency Fund Goal input
   document.getElementById('emergencyFundGoal')?.addEventListener('input', (e) => {

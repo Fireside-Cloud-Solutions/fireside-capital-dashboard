@@ -114,7 +114,20 @@
             </div>
 
             <div id="dataContainer" class="data-hidden">
-                <div class="card card-max-width-md">
+                <!-- Empty State for New Users -->
+                <div id="settingsEmptyState" class="empty-state d-none">
+                    <i class="bi bi-bullseye empty-state-icon"></i>
+                    <h5 class="empty-state-title">Set Your Financial Goals</h5>
+                    <p class="empty-state-description">
+                        Start by setting an emergency fund goal. Financial experts recommend 
+                        saving 3-6 months of living expenses for unexpected situations.
+                    </p>
+                    <button class="btn btn-primary" id="showGoalFormBtn">
+                        <i class="bi bi-plus-lg"></i> Set Emergency Fund Goal
+                    </button>
+                </div>
+                
+                <div class="card card-max-width-md" id="settingsCard">
                     <div class="card-body-padded">
                         <h5 class="mb-4 card-section-heading">
                           <i class="bi bi-bullseye me-2 icon-primary"></i>Financial Goals
