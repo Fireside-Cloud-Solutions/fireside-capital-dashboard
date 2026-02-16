@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-16 04:00 EST (Sprint QA: BUG-UI-CSS-001 fixed + 13 audit bugs added to backlog)
+**Last Updated:** 2026-02-16 07:10 EST (Sprint UI/UX: Settings page audit complete, 11 new issues added FC-UIUX-018 through FC-UIUX-028)
 
 ---
 
@@ -153,6 +153,12 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-125 | Feature | P2 | S | Ready | **Implement task yielding for long-running operations** — Add yieldToMainThread() utility, refactor data processing loops (2-3h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
 | FC-126 | Chore | P2 | XS | Ready | **Refactor event listeners to use delegation** — Replace individual listeners with parent-level delegation (1-2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
 | FC-127 | Chore | P2 | S | Ready | **Enable Azure CDN for global distribution** — Configure Azure CDN with caching rules (2h) — see reports/PERFORMANCE-OPTIMIZATION-RESEARCH-2026-02-13.md |
+| FC-155 | Chore | P3 | XS | Ready | **Run baseline Lighthouse audit** — Document current performance scores for all 11 pages, establish performance budget baseline (1h) — Sprint Research Task (Session 0715) |
+| FC-156 | Chore | P2 | XS | Ready | **Add preconnect to Supabase origin** — Add rel="preconnect" and dns-prefetch for Supabase API to all 11 HTML pages, 100-300ms faster API requests (30 min) — Sprint Research Task (Session 0715) |
+| FC-157 | Chore | P2 | XS | Ready | **Implement font preloading** — Preload Source Serif 4 + Inter WOFF2 fonts with font-display:swap for faster FCP (30 min) — Sprint Research Task (Session 0715) |
+| FC-158 | Chore | P3 | XS | Ready | **Refactor event listeners to delegation** — Replace individual button listeners with parent-level delegation on tables, 90% reduction in memory usage (1-2h) — Sprint Research Task (Session 0715) |
+| FC-159 | Feature | P3 | S | Ready | **Add performance budgets to Webpack** — Set maxAssetSize (200KB) and maxEntrypointSize (300KB), fail builds that exceed limits (1h) — Sprint Research Task (Session 0715) |
+| FC-160 | Chore | P3 | S | Ready | **Set up Lighthouse CI performance gates** — GitHub Actions workflow to block PRs that degrade performance below 90 score (2-3h) — Sprint Research Task (Session 0715) |
 | FC-128 | Bug | P2 | XS | Done | **Transactions page button hierarchy violation** — "Sync from Bank" should be btn-primary (core action), not btn-secondary (15 min) — FIXED commit aa9641d (2026-02-14) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-129 | Feature | P2 | S | Ready | **Add table skeleton loaders to Transactions page** — Replace generic spinner with 5 shimmer placeholder rows for better perceived performance (2h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
 | FC-130 | Feature | P2 | S | Ready | **Implement transaction status column** — Add pending/cleared/failed badges using Plaid pending field (2h) — see reports/UI-UX-AUDIT-TRANSACTIONS-2026-02-14.md |
@@ -196,11 +202,22 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-152 | Feature | P2 | S | Ready | **Bootstrap Dark Theme Core Implementation** — Add theme-toggle.js with localStorage persistence, theme toggle dropdown to navbar, dark-theme.css with financial-specific overrides, test WCAG 2.1 AA contrast compliance (2h) — Sprint Research Task (Session 0631) |
 | FC-153 | Feature | P2 | XS | Ready | **Chart.js Dark Mode Integration** — Add chart-themes.js with light/dark configs, update all chart creation to listen for themechange event, test chart readability in both modes (1h) — Sprint Research Task (Session 0631) |
 | FC-154 | Chore | P3 | XS | Ready | **Dark Mode Documentation** — Document theme toggle usage in README, add color palette reference to DESIGN.md, document Chart.js theme API (30 min) — Sprint Research Task (Session 0631) |
-| FC-UIUX-013 | Bug | P2 | XS | Ready | **Dashboard missing page header wrapper** — index.html lacks `.page-header` structure, causing inconsistent spacing vs other pages (15 min) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
-| FC-UIUX-014 | Bug | P2 | XS | Ready | **Inconsistent button placement** — Dashboard header controls not in `.page-header-actions` div (15 min) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
+| FC-UIUX-013 | Bug | P2 | XS | Done | **Dashboard missing page header wrapper** — index.html lacks `.page-header` structure, causing inconsistent spacing vs other pages (15 min) — FIXED commit 10c6281 (2026-02-16) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
+| FC-UIUX-014 | Bug | P2 | XS | Done | **Inconsistent button placement** — Dashboard header controls not in `.page-header-actions` div (15 min) — FIXED commit 10c6281 (2026-02-16) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
 | FC-UIUX-015 | Bug | P3 | XS | Done | **Modal footer spacing inconsistency** — Duplicate `.modal-footer` definition with 8px gap instead of 12px (5 min) — FIXED commit (Sprint Dev 0636, 2026-02-16) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
 | FC-UIUX-016 | Bug | P3 | XS | Done | **Empty state icon size** — Icons should be 80px, not 64px (2 min) — ALREADY FIXED (FC-UIUX-004) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
 | FC-UIUX-017 | Bug | P3 | S | Ready | **Stat card trend labels inconsistent** — CSS defines `.trend-label` but not used consistently in HTML templates (30 min) — Sprint UI/UX Audit (Session 1127, 2026-02-16) — see reports/UIUX-SPRINT-AUDIT-2026-02-16.md |
+| FC-UIUX-018 | Bug | P2 | XS | Done | **Reports page Export button incorrect hierarchy** — Export button uses btn-secondary (blue filled), should be btn-outline-secondary for utility actions (2 min) — FIXED commit (Sprint Dev 0722, 2026-02-16) — Sprint UI/UX Audit (Session 0645, 2026-02-16) — see reports/UI-UX-AUDIT-REPORTS-2026-02-16-0645.md |
+| FC-UIUX-019 | Bug | P2 | XS | Done | **Reports page inconsistent section spacing** — Chart rows use mt-3 (16px), breaks 8px grid system, should use mb-24 or mb-32 (5 min) — FIXED commit (Sprint Dev 0722, 2026-02-16) — Sprint UI/UX Audit (Session 0645, 2026-02-16) — see reports/UI-UX-AUDIT-REPORTS-2026-02-16-0645.md |
+| FC-UIUX-020 | Feature | P2 | S | Ready | **Reports page missing empty state** — No empty state for new users with no snapshot data, should show educational context + CTA (30 min) — Sprint UI/UX Audit (Session 0645, 2026-02-16) — see reports/UI-UX-AUDIT-REPORTS-2026-02-16-0645.md |
+| FC-UIUX-021 | Chore | P3 | M | Ready | **Summary card semantic inconsistency** — Reports uses .summary-card, Dashboard uses .stat-card for same pattern, need unified naming (1h) — Sprint UI/UX Audit (Session 0645, 2026-02-16) — see reports/UI-UX-AUDIT-REPORTS-2026-02-16-0645.md |
+| FC-UIUX-022 | Bug | P3 | XS | Ready | **Reports page chart heights not defined** — Chart wrappers missing .chart-height-lg or .chart-height-md classes for consistent sizing (5 min) — Sprint UI/UX Audit (Session 0645, 2026-02-16) — see reports/UI-UX-AUDIT-REPORTS-2026-02-16-0645.md |
+| FC-UIUX-023 | Feature | P2 | XL | Ready | **Settings page severely under-featured** — Only 1 setting (Emergency Fund Goal), missing 5 essential sections: Notifications, Account Security, Display Prefs, Data Management, Privacy (12-16h) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
+| FC-UIUX-024 | Bug | P2 | XS | Ready | **Settings page no save state feedback** — No loading spinner, success message, or error state when saving settings, #settingsStatus span exists but never populated (20 min) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
+| FC-UIUX-025 | Bug | P2 | XS | Ready | **Settings page no form validation** — Emergency Fund Goal input accepts any number with no validation hints for unrealistic values (30 min) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
+| FC-UIUX-026 | Feature | P2 | XS | Ready | **Settings page missing empty state** — No empty state for new users with no goal set, should show educational context about 3-6 months rule (30 min) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
+| FC-UIUX-027 | Bug | P3 | XS | Ready | **Settings page inline style on section heading** — Section heading uses inline style attribute instead of CSS class, breaks separation of concerns (2 min) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
+| FC-UIUX-028 | Chore | P3 | XS | Ready | **Password reset modal placement** — Modal hardcoded in settings.html, should be global shared component triggered from any page (1h) — Sprint UI/UX Audit (Session 0710, 2026-02-16) — see reports/UI-UX-AUDIT-SETTINGS-2026-02-16-0710.md |
 
 ### EPIC-002: Mobile Application
 
