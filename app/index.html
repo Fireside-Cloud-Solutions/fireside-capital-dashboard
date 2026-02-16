@@ -37,59 +37,10 @@
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
   <link rel="stylesheet" href="assets/css/onboarding.css" />
+  <link rel="stylesheet" href="assets/css/critical.css" />
   
   <!-- Performance: Chart.js lazy-loaded on dashboard only (saves 270 KB on other pages) -->
   <!-- See assets/js/lazy-loader.js -->
-  
-  <style>
-    /* Critical inline CSS: prevent auth flash and layout shift on page load */
-    @media (max-width: 991.98px) {
-      /* Hamburger: fixed position to prevent snap */
-      .sidebar-toggle {
-        position: fixed !important;
-        top: max(12px, env(safe-area-inset-top)) !important;
-        left: 16px !important;
-        z-index: var(--z-sticky) !important; /* 200 - sticky element, below modals (400) */
-        width: 48px;
-        height: 48px;
-        background: #1a1a1a !important;
-        border: 1px solid #2a2a2a !important;
-        border-radius: 0.5rem !important;
-      }
-      
-      /* Auth state containers: fixed position, hidden until auth resolves */
-      #loggedInState, #loggedOutState {
-        position: fixed !important;
-        top: max(12px, env(safe-area-inset-top)) !important;
-        right: 16px;
-        z-index: var(--z-sticky); /* 200 - Page-level UI, not modal-level */
-        opacity: 0;
-        visibility: hidden;
-      }
-      
-      /* Fade in when auth resolves */
-      body.auth-resolved #loggedInState:not(.d-none),
-      body.auth-resolved #loggedOutState:not(.d-none) {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 0.15s ease;
-      }
-    }
-    
-    /* Very small screens (<360px): tighter spacing to prevent overlap */
-    @media (max-width: 359.98px) {
-      .sidebar-toggle {
-        top: max(8px, env(safe-area-inset-top)) !important;
-        left: 8px !important;
-        width: 40px !important;
-        height: 40px !important;
-      }
-      
-      #loggedInState, #loggedOutState {
-        right: 8px !important;
-      }
-    }
-  </style>
 </head>
 
 <body data-theme="dark">

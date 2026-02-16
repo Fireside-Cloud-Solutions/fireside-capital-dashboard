@@ -27,41 +27,7 @@
   
   <link rel="stylesheet" href="assets/css/accessibility.css" />
   <link rel="stylesheet" href="assets/css/logged-out-cta.css" />
-  <style>
-    /* Critical inline CSS: prevent auth flash and layout shift on page load */
-    @media (max-width: 991.98px) {
-      /* Hamburger: fixed position to prevent snap */
-      .sidebar-toggle {
-        position: fixed !important;
-        top: max(12px, env(safe-area-inset-top)) !important;
-        left: 16px !important;
-        z-index: var(--z-sticky) !important; /* 200 - sticky element, below modals (400) */
-        width: 48px;
-        height: 48px;
-        background: #1a1a1a !important;
-        border: 1px solid #2a2a2a !important;
-        border-radius: 0.5rem !important;
-      }
-      
-      /* Auth state containers: fixed position, hidden until auth resolves */
-      #loggedInState, #loggedOutState {
-        position: fixed !important;
-        top: max(12px, env(safe-area-inset-top)) !important;
-        right: 16px;
-        z-index: var(--z-sticky); /* 200 - Page-level UI, not modal-level */
-        opacity: 0;
-        visibility: hidden;
-      }
-      
-      /* Fade in when auth resolves */
-      body.auth-resolved #loggedInState:not(.d-none),
-      body.auth-resolved #loggedOutState:not(.d-none) {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 0.15s ease;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/critical.css" />
 </head>
 <body data-theme="dark">
   <a href="#main-content" class="skip-link">Skip to main content</a>
