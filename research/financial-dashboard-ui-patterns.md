@@ -1,414 +1,658 @@
 # Financial Dashboard UI Patterns Research
-**Date:** February 13, 2026  
-**Status:** Complete  
-**Tags:** research, ui, ux, dashboard, fintech, sprint
-
-## Summary
-Researched fintech dashboard UX best practices, common patterns, and trends for 2026. Identified **10 critical design principles** for personal finance dashboards focused on trust, clarity, and emotional support.
-
-## Key Findings
-
-### 10 Fintech UX Design Practices for 2026
-
-#### 1. Hyper-Personalization Through AI
-**Pattern:** Adaptive Personalization
-- Dynamic dashboards based on user habits (not demographics)
-- Predictive suggestions ("You'll reach your goal 2 weeks early")
-- Adaptive onboarding based on behavior
-- **Control toggles** so users decide personalization level
-- Add confidence levels to predictions ("85% sure...")
-
-#### 2. Transparent, Human-Centered Flows
-**Pattern:** Radical Transparency
-- **Plain-language microcopy** for fees, risks, wait times
-- Fee breakdowns visualized upfront (like Wise)
-- Previews before committing (loan terms, transfers)
-- Secure state indicators (lock icons, badges)
-
-#### 3. Frictionless Onboarding & KYC
-**Pattern:** Progressive Disclosure
-- Break forms into single-step screens
-- Live validation to prevent end-of-form errors
-- Let users save progress and return later
-- Visual reassurance: "Your info is encrypted"
-
-#### 4. Minimalist UI (Reduce Cognitive Load)
-**Pattern:** Cognitive Simplicity Framework
-- **Generous white space** to reduce visual stress
-- **Strong visual hierarchy** for instant identification
-- **Limited color usage** - color guides decisions, doesn't decorate
-- Dashboard layouts highlight the next step
-- Soft gradients, bold typography, neutral palettes
-
-#### 5. Intuitive Navigation (Task-Based IA)
-**Pattern:** Intent-Based Navigation
-Organize around user tasks, not internal structure:
-- Send/receive money
-- Track income & expenses
-- Pay bills
-- Invest/withdraw
-- Manage cards
-- Review insights
-- **Smart shortcuts** based on recent behavior
-- Keep core tasks **one tap away**
-
-#### 6. Emotionally Supportive UX
-**Pattern:** Calm Design Framework
-- Soft, empathetic microcopy
-- Positive reinforcement ("You're on track!")
-- Fail-safe states and clear recovery paths
-- **Avoid alarming red** unless real danger
-- Reassure during wait times ("This may take 10 minutes...")
-
-#### 7. Accessible & Inclusive Design
-**Pattern:** Universal Financial Access
-- **WCAG 2.2+ compliance**
-- High color contrast ratios
-- Scalable, legible font sizes
-- Voice input and screen reader support
-- Larger tap targets (44px minimum)
-- Multiple input paths (visual + text + voice)
-
-#### 8. Data Visualization That Drives Decisions
-**Pattern:** Actionable Analytics
-- Labels directly on charts (remove guesswork)
-- Highlight anomalies ("Spending increased 20% last month")
-- Use color sparingly to indicate meaning
-- Provide drill-down affordances
-
-#### 9. Microinteractions for Context
-**Pattern:** Contextual Microfeedback System
-- Soft vibration/pulse on payment completion
-- Animated category expansion
-- Smooth tab transitions
-- Instant visual confirmation for investments
-- Motion explains spatial relationships
-
-#### 10. Secure UX (Invisible Security)
-**Pattern:** Invisible Security Framework
-- Biometric-first authentication (Face ID, fingerprint)
-- Trusted device recognition
-- Explain security actions clearly
-- Calm, solution-oriented error states
-- Alternative verification paths
+**Research Sprint:** February 16, 2026  
+**Status:** ✅ Complete  
+**Researcher:** Capital (Orchestrator)
 
 ---
 
-## Dashboard Layout Patterns
+## Executive Summary
 
-### F/Z Pattern Scanning (LTR languages)
-Users scan top-left first, then horizontally, then zig-zag down.
+Analyzed industry best practices for financial dashboards and evaluated Fireside Capital's current implementation. The dashboard has a strong foundation but could benefit from enhanced data visualization patterns, progressive disclosure, and contextual guidance.
 
-**Best practices:**
-- **Top-left corner** = most important data (global metrics)
-- **Top row** = primary KPIs and actionable items
-- **Middle** = global overview charts
-- **Bottom** = detailed breakdowns
+## Current State Analysis
 
-### Consistent Card Layout
-- Treat all chart cards the same way
-- Consistent placement: title (top-left), legend (bottom-center), date pickers
-- Reduces visual noise when scanning
+### Strengths ✅
 
-### Types of Dashboards
+1. **Clean Visual Hierarchy** — Net Worth, Assets, Liabilities prominently displayed
+2. **Financial Patterns CSS** — Dedicated `financial-patterns.css` with tabular numbers, trend indicators, amount formatting
+3. **Loading States** — Skeleton loaders prevent layout shift
+4. **Responsive Design** — Mobile-first approach with responsive grids
+5. **Accessibility** — Skip links, ARIA labels, keyboard navigation
+6. **Dark Theme** — Reduces eye strain for extended use
 
-| Type | Purpose | Use Case |
-|------|---------|----------|
-| **Reporting** | Tell a story with data | Quarterly earnings, monthly summaries |
-| **Monitoring** | Alert and warn | Real-time account activity, bill due dates |
-| **Exploring** | Discover insights | Spending patterns, trend analysis |
-| **Functional** | Guide user focus | Upcoming bills, "at risk" items |
-| **Product Home** | Contextual navigation | Main sections with totals and deltas |
+### Gaps Identified 🔍
 
-**Fireside Capital needs:** Monitoring + Functional + Product Home
+1. No progressive disclosure (all data shown at once — overwhelming)
+2. Limited contextual help (users may not understand KPIs)
+3. Static layout (no customizable widget arrangement)
+4. No comparison/benchmarking features (e.g., vs. last month, vs. budget)
+5. Missing micro-interactions (celebratory animations for milestones)
+6. No data export/sharing features
 
 ---
 
-## Dashboard Anatomy & UX Moments
+## Industry Best Practices (2026)
 
-### 1. Navigation (Getting There)
-- Follow navigation best practices
-- Set clear expectations before arrival
+Based on research from F9Finance, Onething Design, and Eleken:
 
-### 2. Getting Oriented (First Impression)
-- **Clear page title** (what is this page?)
-- **Clear description** (what can I do here?)
-- **Conceptual grouping** (don't show "a bunch of data")
-- **Smart defaults** (don't show #allthethings)
-- **Explain jargon** via tooltips
-- **Loading states & empty states** (critical for trust)
+### 1. **Progressive Disclosure**
+**Principle:** Show only what's needed, hide complexity until requested.
 
-### 3. Filtering & Parsing Data
-- Prioritize useful filters by default
-- Provide loading feedback
-- Don't forget progressive disclosure
+**Problem:** Information overload leads to decision paralysis. Fireside currently shows all cards at once.
 
-### 4. Drilling Into Information
-- **Drawer pattern** (view details without leaving context)
-- **Details page** (full view with sub-dashboard)
+**Solution:** Implement collapsible sections + drill-down patterns.
 
-### 5. Executing Actions
-- Clear interaction feedback (success/error)
-- Obvious multi-select affordances
-- Prioritize actions (most important = most noticeable)
-- House multiple actions in dropdown
+#### Implementation Example:
 
----
-
-## Chart UX Patterns
-
-### Use of Color
-- **Blues** for positive values
-- **Oranges** for negative trends
-- **Shades of brand color** for intensity levels
-- **High contrast** against background (accessibility)
-- **Don't rely on color alone** (use textures, patterns)
-
-### Lines, Fills, Textures
-- Add hashes/textures to fills for accessibility
-- Use dotted/dashed lines for variety (not just solid)
-
-### Deltas (Show Changes)
-- Relative deltas (% change since last month)
-- Absolute deltas (difference vs average)
-- Visual indicators: ↑ positive, ↓ negative, — neutral
-
-### Data Labels
-- Angled labels for large timescales
-- Truncate intelligently ("Sept... 19" vs "Septem...")
-- Hide labels on dense views, show in tooltips on hover
-- Limit selectable date ranges to prevent overflow
-
-### Typography & Hierarchy
-- **Big bold numbers** in display font for key metrics
-- Builds trust ("we know what matters")
-- Strong visual hierarchy guides the eye
-
-### Interactive Patterns
-- **Tooltips on hover** (progressive disclosure)
-- **Toggling variables** (checkbox legend to hide/show lines)
-- **Filters within dashboards** (whole-page vs per-module)
-- **Custom personalization** (drag-and-drop widgets, hide/show sections)
-
----
-
-## Common Dashboard UX Problems
-
-| Problem | Symptom | Solution |
-|---------|---------|----------|
-| **Density Disjoint** | Data eyeball attack, wall of data | Add whitespace, reduce defaults |
-| **Random/Unfocused** | "We have it, so show it" | Prioritize charts based on user tasks |
-| **Lacking Comparisons** | "Just a bunch of numbers" | Add baselines, averages, targets, deltas |
-| **Technical Jargon** | Users stare blankly | Explain acronyms, add tooltips, provide context |
-| **Color-Coding Mishaps** | Rainbow salad, inaccessible | Use color functionally, add textures for accessibility |
-
----
-
-## Recommendations for Fireside Capital
-
-### 1. Dashboard Type Strategy
-**Hybrid approach:**
-- **Monitoring:** Alert for upcoming bills (7-day warning)
-- **Functional:** Show "at risk" items (low balance, overdue)
-- **Product Home:** Navigation hub with totals/deltas
-
-### 2. Layout Structure (F-Pattern)
-```
-┌─────────────────────────────────────┐
-│ Top-Left: Net Worth (BIG NUMBER)    │  ← Primary KPI
-├─────────────────────────────────────┤
-│ Row 1: Critical Alerts              │  ← Monitoring
-│   - Bills due in 7 days             │
-│   - Low balance warnings            │
-├─────────────────────────────────────┤
-│ Row 2: Financial Overview (4 cards) │  ← Global metrics
-│   - Assets | Debts | Income | Budget│
-├─────────────────────────────────────┤
-│ Row 3: Trend Charts (2 columns)     │  ← Insights
-│   - Net worth over time             │
-│   - Spending by category            │
-└─────────────────────────────────────┘
-```
-
-### 3. Component Patterns
-
-**Dashboard Card (Stat Card):**
 ```html
-<div class="c-dashboard-card c-dashboard-card--stat">
-  <h3 class="c-dashboard-card__title">Net Worth</h3>
-  <div class="c-dashboard-card__value c-dashboard-card__value--primary">
-    $142,350
+<!-- Summary View (Default) -->
+<div class="metric-card collapsible-card">
+  <div class="metric-card__header" data-bs-toggle="collapse" data-bs-target="#assetsBreakdown">
+    <span class="stat-label">Total Assets</span>
+    <span class="stat-value">$542,891</span>
+    <i class="bi bi-chevron-down"></i>
   </div>
-  <div class="c-dashboard-card__delta c-dashboard-card__delta--positive">
-    ↑ $2,450 (1.7%) vs last month
+  
+  <!-- Expanded Details (Hidden by default) -->
+  <div id="assetsBreakdown" class="collapse mt-3">
+    <div class="breakdown-list">
+      <div class="breakdown-item">
+        <span class="breakdown-label">Real Estate</span>
+        <span class="breakdown-value">$450,000</span>
+        <span class="breakdown-percentage">83%</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="breakdown-label">Investments</span>
+        <span class="breakdown-value">$75,432</span>
+        <span class="breakdown-percentage">14%</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="breakdown-label">Cash</span>
+        <span class="breakdown-value">$17,459</span>
+        <span class="breakdown-percentage">3%</span>
+      </div>
+    </div>
   </div>
 </div>
 ```
 
-**Alert Card (Monitoring):**
-```html
-<div class="c-alert c-alert--warning">
-  <div class="c-alert__icon">⚠️</div>
-  <div class="c-alert__content">
-    <h4 class="c-alert__title">Bill Due Soon</h4>
-    <p class="c-alert__message">Electric bill ($127.50) due in 3 days</p>
-    <button class="c-alert__action">Pay Now</button>
-  </div>
-</div>
-```
+```css
+/* financial-patterns.css addition */
+.collapsible-card .metric-card__header {
+  cursor: pointer;
+  transition: background-color var(--duration-fast);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-**Chart Card:**
-```html
-<div class="c-dashboard-card c-dashboard-card--chart">
-  <div class="c-dashboard-card__header">
-    <h3 class="c-dashboard-card__title">Net Worth Trend</h3>
-    <select class="c-dashboard-card__filter">
-      <option>Last 6 months</option>
-      <option>Last year</option>
-      <option>All time</option>
-    </select>
-  </div>
-  <div class="c-dashboard-card__body">
-    <canvas id="netWorthChart" class="c-chart"></canvas>
-  </div>
-  <div class="c-dashboard-card__footer">
-    <span class="c-legend">
-      <span class="c-legend__item">
-        <span class="c-legend__color c-legend__color--assets"></span>
-        Assets
-      </span>
-      <span class="c-legend__item">
-        <span class="c-legend__color c-legend__color--debts"></span>
-        Debts
-      </span>
-    </span>
-  </div>
-</div>
-```
+.collapsible-card .metric-card__header:hover {
+  background-color: var(--color-bg-3);
+}
 
-### 4. Microinteractions
-```javascript
-// Payment confirmation
-function confirmPayment(amount) {
-  // Soft pulse animation
-  card.classList.add('is-processing');
-  
-  // Success feedback after API call
-  card.classList.remove('is-processing');
-  card.classList.add('is-success');
-  
-  // Show checkmark animation
-  showCheckmark();
-  
-  // Haptic feedback (if mobile)
-  navigator.vibrate?.(50);
+.collapsible-card .bi-chevron-down {
+  transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.collapsible-card .metric-card__header[aria-expanded="true"] .bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.breakdown-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-bg-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-small);
+}
+
+.breakdown-percentage {
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
 }
 ```
 
-### 5. Emotional Support Microcopy
-```javascript
-const supportiveCopy = {
-  onTrack: "Nice! You're on track to meet your savings goal 2 weeks early.",
-  overBudget: "Your dining budget is 15% over this month. Small adjustments can help.",
-  lowBalance: "Heads up: your checking balance is lower than usual. Everything okay?",
-  success: "Payment sent! We'll update your balance in a few moments."
-};
+---
+
+### 2. **Contextual Tooltips & Help**
+**Principle:** Don't assume users understand financial jargon.
+
+**Problem:** Terms like "Net Worth", "Liquid Assets", "Debt-to-Income Ratio" may confuse users.
+
+**Solution:** Add contextual help icons with tooltips.
+
+#### Implementation:
+
+```html
+<div class="stat-card">
+  <div class="stat-card-header">
+    <span class="stat-label">
+      Net Worth
+      <button class="help-icon" 
+              data-bs-toggle="tooltip" 
+              data-bs-placement="top" 
+              data-bs-custom-class="tooltip-help"
+              title="Total assets minus total liabilities. This is your true financial value.">
+        <i class="bi bi-question-circle"></i>
+      </button>
+    </span>
+  </div>
+  <div class="stat-value">$125,432</div>
+</div>
 ```
 
-### 6. Accessibility Checklist
-- [x] WCAG 2.1 AA compliant (existing)
-- [ ] Color + texture for chart differentiation
-- [ ] Tooltips explain all financial jargon
-- [ ] Screen reader labels on all charts
-- [ ] Keyboard navigation for all interactions
-- [ ] Focus indicators on interactive elements
-- [ ] Skip links for dashboard sections
+```css
+/* components.css addition */
+.help-icon {
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  font-size: 14px;
+  transition: color var(--duration-fast);
+  vertical-align: middle;
+}
 
-### 7. Loading & Empty States
+.help-icon:hover {
+  color: var(--color-secondary);
+}
+
+/* Bootstrap tooltip customization */
+.tooltip-help .tooltip-inner {
+  max-width: 300px;
+  text-align: left;
+  background-color: var(--color-bg-3);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--text-small);
+  line-height: var(--leading-relaxed);
+}
+
+.tooltip-help .tooltip-arrow::before {
+  border-top-color: var(--color-border-default);
+}
+```
+
+```javascript
+// app.js addition
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', () => {
+  const tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.map(tooltipTriggerEl => {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+});
+```
+
+---
+
+### 3. **Comparison Views**
+**Principle:** Show context, not just current values.
+
+**Problem:** Seeing "$125,432 net worth" is meaningless without knowing if it's up or down.
+
+**Solution:** Add comparison periods and visual indicators.
+
+#### Implementation:
+
 ```html
-<!-- Skeleton loader for charts -->
-<div class="c-skeleton c-skeleton--chart">
-  <div class="c-skeleton__header"></div>
-  <div class="c-skeleton__body">
-    <div class="c-skeleton__bar" style="height: 60%"></div>
-    <div class="c-skeleton__bar" style="height: 80%"></div>
-    <div class="c-skeleton__bar" style="height: 40%"></div>
+<div class="stat-card">
+  <div class="stat-card-header">
+    <span class="stat-label">Net Worth</span>
+    <select class="comparison-select" id="netWorthCompare">
+      <option value="mtd">vs. Last Month</option>
+      <option value="ytd">vs. Last Year</option>
+      <option value="goal" selected>vs. Goal</option>
+    </select>
+  </div>
+  
+  <div class="stat-value">$125,432</div>
+  
+  <div class="stat-comparison">
+    <div class="comparison-bar">
+      <div class="comparison-progress" style="width: 62.7%"></div>
+    </div>
+    <div class="comparison-label">
+      <span class="comparison-current">$125,432</span>
+      <span class="comparison-target">of $200,000 goal</span>
+    </div>
+    <div class="stat-trend trend--up">
+      <span class="trend-value">+$12,543</span>
+      <span class="trend-percentage">(+11.1%)</span>
+      <span class="trend-period">this month</span>
+    </div>
   </div>
 </div>
+```
 
-<!-- Empty state for new users -->
-<div class="c-empty-state">
-  <div class="c-empty-state__icon">💰</div>
-  <h3 class="c-empty-state__title">Welcome to Fireside Capital</h3>
-  <p class="c-empty-state__message">
-    Let's get started by connecting your accounts.
-  </p>
-  <button class="c-empty-state__action btn btn-primary">
-    Connect Bank Account
-  </button>
-</div>
+```css
+/* financial-patterns.css addition */
+.comparison-select {
+  background-color: var(--color-bg-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--text-caption);
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: var(--transition-bg);
+}
+
+.comparison-select:hover,
+.comparison-select:focus {
+  background-color: var(--color-bg-2);
+  border-color: var(--color-border-default);
+  outline: none;
+}
+
+.stat-comparison {
+  margin-top: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.comparison-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--color-bg-3);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.comparison-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-default);
+}
+
+.comparison-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-small);
+  color: var(--color-text-secondary);
+}
+
+.comparison-current {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.trend-period {
+  margin-left: var(--space-1);
+  color: var(--color-text-tertiary);
+  font-weight: var(--weight-regular);
+}
 ```
 
 ---
 
-## 2026 UI Trends (Apply with Caution)
+### 4. **Micro-Interactions & Celebrations**
+**Principle:** Money can be stressful — celebrate wins.
 
-### ✅ Recommended
-- **Minimalism** (generous whitespace, reduced noise)
-- **Dark mode** (properly designed, not just inverted)
-- **Microinteractions** (loading, hover, transitions)
-- **Bento grids** (modular, mobile-friendly KPI blocks)
+**Problem:** Dashboard feels cold and transactional.
 
-### ⚠️ Use Sparingly
-- **Neumorphism** (can reduce clarity)
-- **Liquid glass** (can hurt contrast and accessibility)
+**Solution:** Animate milestones (debt payoff, net worth goals, etc.).
+
+#### Implementation:
+
+```javascript
+// app.js addition
+function celebrateAchievement(type, message) {
+  // Confetti animation
+  if (typeof confetti !== 'undefined') {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#f44e24', '#01a4ef', '#81b900']
+    });
+  }
+  
+  // Toast notification
+  showToast({
+    icon: '🎉',
+    title: 'Achievement Unlocked!',
+    message: message,
+    variant: 'success',
+    duration: 5000
+  });
+}
+
+// Trigger celebrations when milestones are hit
+function checkMilestones(netWorth, previousNetWorth) {
+  const milestones = [50000, 100000, 250000, 500000, 1000000];
+  
+  milestones.forEach(milestone => {
+    if (previousNetWorth < milestone && netWorth >= milestone) {
+      celebrateAchievement('net-worth', 
+        `Your net worth just hit $${milestone.toLocaleString()}! 🚀`
+      );
+    }
+  });
+}
+```
+
+```html
+<!-- Add to index.html before closing </body> -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+```
 
 ---
 
-## Dashboard Evaluation Metrics
+### 5. **Empty States with Guidance**
+**Principle:** Never show a blank screen without context.
 
-### Qualitative
-- Time to find key information (< 3 seconds ideal)
-- User confusion during navigation
-- Usability test observations
+**Problem:** New users see empty charts and tables — feels broken.
 
-### Quantitative
-- **Time to insight** (how long to get value?)
-- **Task success rate** (can users filter, export, pay?)
-- **Click paths** (unnecessary steps?)
-- **Feature usage** (which widgets are ignored?)
-- **Net Promoter Score** for dashboard experience
-- **Retention** (do users return daily?)
+**Solution:** Show helpful empty states with CTAs.
+
+#### Implementation:
+
+```html
+<!-- When no transactions exist -->
+<div class="empty-state">
+  <div class="empty-state__icon">
+    <i class="bi bi-inbox"></i>
+  </div>
+  <h3 class="empty-state__title">No transactions yet</h3>
+  <p class="empty-state__description">
+    Connect your bank account to automatically import and categorize transactions.
+  </p>
+  <button class="btn btn-primary" data-action="open-plaid-link">
+    <i class="bi bi-bank2 me-2"></i>
+    Connect Your Bank
+  </button>
+  
+  <!-- Alternative action -->
+  <div class="empty-state__alt-action">
+    or <a href="transactions.html#add-manual" class="link-secondary">add a transaction manually</a>
+  </div>
+</div>
+```
+
+```css
+/* empty-states.css (already exists, enhance it) */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-3xl);
+  min-height: 400px;
+}
+
+.empty-state__icon {
+  font-size: 4rem;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state__description {
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+  max-width: 400px;
+  margin-bottom: var(--space-lg);
+  line-height: var(--leading-relaxed);
+}
+
+.empty-state__alt-action {
+  margin-top: var(--space-md);
+  font-size: var(--text-small);
+  color: var(--color-text-tertiary);
+}
+
+.link-secondary {
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: var(--weight-medium);
+}
+
+.link-secondary:hover {
+  text-decoration: underline;
+}
+```
 
 ---
 
-## Implementation Tasks
-- [ ] Redesign dashboard layout using F-pattern
-- [ ] Create alert card component for monitoring
-- [ ] Add deltas to all stat cards
-- [ ] Build skeleton loaders for charts
-- [ ] Create emotionally supportive empty states
-- [ ] Add microinteractions for payment confirmations
-- [ ] Implement dark mode (proper design, not inverted)
-- [ ] Add tooltips for financial jargon
-- [ ] Build customizable widget system (drag-and-drop)
+### 6. **Data Density Controls**
+**Principle:** Let users choose their information density.
+
+**Problem:** Some users want overview, others want details.
+
+**Solution:** Density toggle (already partially in `financial-patterns.css`, make it interactive).
+
+#### Implementation:
+
+```html
+<!-- Add to dashboard header -->
+<div class="view-controls">
+  <div class="btn-group" role="group" aria-label="Data density">
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-density="compact">
+      <i class="bi bi-list"></i>
+      <span class="d-none d-md-inline ms-1">Compact</span>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary active" data-density="normal">
+      <i class="bi bi-list-ul"></i>
+      <span class="d-none d-md-inline ms-1">Normal</span>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-density="comfortable">
+      <i class="bi bi-list-stars"></i>
+      <span class="d-none d-md-inline ms-1">Comfortable</span>
+    </button>
+  </div>
+</div>
+```
+
+```javascript
+// app.js addition
+document.querySelectorAll('[data-density]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const density = e.currentTarget.dataset.density;
+    
+    // Update active state
+    document.querySelectorAll('[data-density]').forEach(b => 
+      b.classList.remove('active')
+    );
+    e.currentTarget.classList.add('active');
+    
+    // Apply density class to body
+    document.body.className = document.body.className
+      .replace(/density-\w+/g, '')
+      .trim();
+    document.body.classList.add(`density-${density}`);
+    
+    // Save preference
+    localStorage.setItem('dashboard-density', density);
+  });
+});
+
+// Load saved preference on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const savedDensity = localStorage.getItem('dashboard-density') || 'normal';
+  document.body.classList.add(`density-${savedDensity}`);
+  document.querySelector(`[data-density="${savedDensity}"]`)?.classList.add('active');
+});
+```
 
 ---
 
-## Resources
-- **Fintech UX 2026:** https://www.onething.design/post/top-10-fintech-ux-design-practices-2026
-- **Dashboard Best Practices:** https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards
-- **Dashboard Principles:** https://excited.agency/blog/dashboard-ux-design
-- **Wise (transparency):** https://wise.com
-- **Mint (data viz):** https://mint.intuit.com
-- **Robinhood (minimalism):** https://robinhood.com
+### 7. **Sparklines for Trend Visualization**
+**Principle:** Show trends inline without cluttering.
+
+**Problem:** Charts take up space; sometimes you just need a quick trend.
+
+**Solution:** Inline sparklines next to metrics.
+
+#### Implementation:
+
+```html
+<div class="stat-card">
+  <div class="stat-card-header">
+    <span class="stat-label">Net Worth</span>
+  </div>
+  <div class="stat-value">$125,432</div>
+  <div class="stat-sparkline">
+    <canvas id="netWorthSparkline" width="200" height="40"></canvas>
+  </div>
+  <div class="stat-trend trend--up">
+    <span class="trend-value">+11.1%</span>
+    <span class="trend-period">this month</span>
+  </div>
+</div>
+```
+
+```javascript
+// charts.js addition
+function renderSparkline(canvasId, data, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+  
+  // Calculate bounds
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1; // Avoid division by zero
+  
+  // Draw line
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  
+  data.forEach((value, index) => {
+    const x = (index / (data.length - 1)) * width;
+    const y = height - ((value - min) / range) * height;
+    
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  
+  ctx.stroke();
+  
+  // Optional: fill area under curve
+  ctx.lineTo(width, height);
+  ctx.lineTo(0, height);
+  ctx.closePath();
+  ctx.fillStyle = `${color}20`; // 20 = 12.5% opacity
+  ctx.fill();
+}
+
+// Usage:
+renderSparkline('netWorthSparkline', [100000, 105000, 110000, 115000, 125432], '#01a4ef');
+```
+
+```css
+/* financial-patterns.css addition */
+.stat-sparkline {
+  margin: var(--space-sm) 0;
+  height: 40px;
+}
+
+.stat-sparkline canvas {
+  width: 100%;
+  height: 100%;
+}
+```
+
+---
+
+## Implementation Priority
+
+| Feature | Priority | Effort | Impact | Assigned To |
+|---------|----------|--------|--------|-------------|
+| Progressive Disclosure | High | 4h | High | Builder |
+| Contextual Tooltips | High | 2h | High | Builder |
+| Comparison Views | High | 6h | High | Builder |
+| Empty States Enhancement | Medium | 3h | Medium | Builder |
+| Data Density Controls | Medium | 2h | Medium | Builder |
+| Sparklines | Low | 4h | Medium | Builder |
+| Milestone Celebrations | Low | 3h | Low (delight) | Builder |
+
+**Total Estimated Effort:** 24 hours (3 days)
+
+---
+
+## Testing Requirements
+
+All UI pattern changes MUST be tested on the live site:
+
+1. **Browser Testing:**
+   - Chrome, Firefox, Safari, Edge
+   - Mobile (iOS Safari, Android Chrome)
+   - Tablet (iPad, Android tablet)
+
+2. **Accessibility Testing:**
+   - Keyboard navigation (Tab, Enter, Escape)
+   - Screen reader (NVDA, JAWS, VoiceOver)
+   - Color contrast (WCAG AAA minimum)
+
+3. **User Flow Testing:**
+   - New user (empty state → onboarding → first data)
+   - Returning user (dashboard load → drill-down → comparison)
+   - Mobile user (touch interactions, responsive layout)
+
+4. **Performance Testing:**
+   - Lighthouse score (Performance > 90, Accessibility > 95)
+   - Time to Interactive (TTI < 3s)
+   - Chart rendering (< 500ms)
 
 ---
 
 ## Next Steps
-1. **Audit current dashboard** against 10 fintech UX practices
-2. **Redesign layout** using F-pattern hierarchy
-3. **Build monitoring components** (alert cards, upcoming bills)
-4. **Add emotional support** microcopy throughout
-5. **Implement microinteractions** for high-stakes actions
-6. **User test** with real financial data (not fake datasets)
+
+1. ✅ Create Azure DevOps work items for each UI pattern
+2. Builder to implement **Progressive Disclosure** first (highest impact)
+3. Builder to add **Contextual Tooltips** (quick win)
+4. Auditor to review accessibility after each change
+5. Test all changes on live site per `docs/browser-testing-guide.md`
+
+---
+
+## References
+
+- [F9Finance: Finance Dashboard Design Best Practices](https://www.f9finance.com/dashboard-design-best-practices/)
+- [Onething Design: Top 10 Fintech UX Design Practices](https://www.onething.design/post/top-10-fintech-ux-design-practices-2026)
+- [Eleken: Modern Fintech Design Guide](https://www.eleken.co/blog-posts/modern-fintech-design-guide)
+- [DesignRush: 9 Dashboard Design Principles](https://www.designrush.com/agency/ui-ux-design/dashboard/trends/dashboard-design-principles)
+
+---
+
+**Research Status:** ✅ Complete  
+**Next Research Topic:** Chart.js Best Practices & Performance Optimization

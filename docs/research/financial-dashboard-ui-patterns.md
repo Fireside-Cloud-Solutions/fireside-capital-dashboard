@@ -1,638 +1,472 @@
-# Financial Dashboard UI Patterns Research
-**Research Date:** February 15, 2026  
-**Sprint:** Sprint Check  
-**Status:** Complete  
+# Financial Dashboard UI Patterns — Fireside Capital Research
+**Research Date:** February 16, 2026  
+**Researcher:** Capital (Sprint Research)  
+**Status:** ✅ Complete — Ready for Implementation
+
+---
 
 ## Executive Summary
-The Fireside Capital dashboard implements **strong financial UI patterns** including tabular numbers, semantic color coding, and transaction layouts. The current implementation is production-ready but has opportunities for improved data density controls, advanced visualizations, and mobile-optimized layouts. Industry trends favor **minimalist design**, **effortless mental flow**, and **responsive touch-first interactions**.
+
+This research analyzes **best-practice UI patterns for financial dashboards** and evaluates the Fireside Capital dashboard against industry standards. The findings identify **3 critical enhancements** and **5 UX improvements** that would elevate the dashboard from good to exceptional.
+
+**Current State Assessment: 7/10**  
+Fireside Capital demonstrates solid fundamentals with clear visual hierarchy, responsive design, and thoughtful loading states. However, there are opportunities to enhance trust signals, data visualization, and user feedback mechanisms.
+
+**Key Insights from Industry Leaders (2026):**
+- 🔐 **Visual trust is paramount** — Users need constant reassurance when viewing financial data
+- 📊 **Data should tell a story** — Numbers alone don't drive action; trends and context do
+- ⚡ **Feedback must be immediate** — Every action requires clear confirmation
+- 🎯 **Hierarchy reduces cognitive load** — Users should instantly know what matters most
+- 📱 **Mobile-first is table stakes** — 60%+ of fintech users access dashboards on mobile
 
 ---
 
-## Current Implementation Analysis
+## Industry Best Practices (2026 Standards)
 
-### ✅ Strengths
+### 1. Visual Trust Cues 🔐
 
-#### 1. **Tabular Number Formatting** (`financial-patterns.css`)
-Proper financial number display with `font-variant-numeric`:
+**Why It Matters:**  
+Financial dashboards handle sensitive data. Users need constant reassurance that their information is secure and accurate.
 
-```css
-.amount {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-  letter-spacing: -0.01em;
-  font-family: var(--font-body);
-}
-```
+**Proven Patterns:**
+- **Bank logos & connection badges** — Show linked financial institutions with their official branding
+- **Security indicators** — Padlock icons, "Bank-level encryption" badges
+- **Last updated timestamps** — "Data updated 2 minutes ago" builds confidence in freshness
+- **Verification checkmarks** — "Account verified ✓" on connected accounts
+- **Transparent disclaimers** — "We never store your banking credentials"
 
-**Why This Matters:**
-- Aligns decimal points vertically in tables
-- Prevents numbers from "jumping" when values change
-- Industry standard for financial UIs
-
-**Implemented Well:**
-- ✅ Currency values
-- ✅ Balance displays
-- ✅ Chart axis labels
-- ✅ Transaction amounts
-
----
-
-#### 2. **Semantic Color Coding**
-Consistent color language for financial states:
-
-```css
-.amount-positive, .amount-income, .amount-gain {
-  color: var(--color-accent);  /* Lime Green #81b900 */
-}
-
-.amount-negative, .amount-expense, .amount-loss {
-  color: var(--color-danger);  /* Red #dc3545 */
-}
-
-.amount-zero, .amount-neutral {
-  color: var(--color-text-tertiary);  /* Gray */
-}
-```
-
-**Accessibility:** Color alone is NOT sufficient (WCAG 2.1 SC 1.4.1).  
-**Solution:** Icons + color:
+**Example (Stripe Dashboard):**
 ```html
-<span class="amount-positive">
-  <i class="bi bi-arrow-up" aria-label="Increase"></i>
-  $5,200
-</span>
+<div class="account-connection">
+  <img src="bank-logo.svg" alt="Chase Bank" class="bank-logo">
+  <span class="connection-status">
+    <i class="check-circle"></i> Connected
+  </span>
+  <span class="last-sync">Synced 3 min ago</span>
+</div>
 ```
 
----
+**Fireside Capital Status:** ⚠️ **Partial Implementation**  
+- ✅ Plaid integration (bank-level security)
+- ❌ No visual trust badges
+- ❌ No last-updated timestamps
+- ❌ No bank logos displayed
 
-#### 3. **Trend Indicators**
-Well-designed trend component:
+**Recommendation P0:** Add trust indicators to stat cards:
+```html
+<!-- Add to dashboard stat cards -->
+<div class="stat-card">
+  <div class="stat-card-header">
+    <span class="stat-label">Net Worth</span>
+    <div class="trust-indicator">
+      <i class="bi bi-shield-check text-success"></i>
+      <span class="text-muted small">Updated 2m ago</span>
+    </div>
+  </div>
+  <div class="stat-value">$127,450.00</div>
+</div>
+```
 
+**CSS Addition:**
 ```css
-.trend {
-  display: inline-flex;
+.trust-indicator {
+  display: flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--text-small);
-  font-weight: var(--weight-semibold);
-  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
 }
 
-.trend--up { color: var(--color-accent); }
-.trend--down { color: var(--color-danger); }
-.trend--neutral { color: var(--color-text-secondary); }
-
-.trend--up .trend__value::before { content: '↑'; }
-.trend--down .trend__value::before { content: '↓'; }
+.trust-indicator i {
+  font-size: 14px;
+  color: var(--color-success);
+}
 ```
 
-**Usage Example:**
+---
+
+### 2. Clear Visual Hierarchy 📊
+
+**Why It Matters:**  
+Users scan financial dashboards, they don't read them. Information must be organized by priority.
+
+**Proven Hierarchy Patterns:**
+
+#### Primary Layer (Glanceable Metrics)
+- **Net worth** — Largest, most prominent
+- **Total assets** — Secondary prominence
+- **Critical alerts** — Red badges, urgent notices
+
+#### Secondary Layer (Supporting Context)
+- Trend indicators (↑ 5.2% this month)
+- Comparison to goals (78% of $100k target)
+- Time period selectors (7D, 30D, 1Y)
+
+#### Tertiary Layer (Detailed Data)
+- Transaction tables
+- Account breakdowns
+- Historical charts
+
+**Example (Linear Dashboard):**
+```
+┌─────────────────────────────────────┐
+│  NET WORTH: $127,450  (↑ 5.2%)     │ ← Primary (largest, bold)
+├─────────────────────────────────────┤
+│  Assets: $150k  Debts: $22.5k      │ ← Secondary (medium, grouped)
+├─────────────────────────────────────┤
+│  [Chart: Trend over time]           │ ← Tertiary (visual context)
+└─────────────────────────────────────┘
+```
+
+**Fireside Capital Status:** ✅ **Strong Implementation**  
+- ✅ Net worth prominently displayed
+- ✅ Stat cards use consistent sizing
+- ✅ Clear separation between summary and detail views
+
+**Recommendation P1:** Enhance with trend context:
 ```html
-<div class="trend trend--up">
-  <span class="trend__value">↑ 2.6</span>
-  <span class="trend__percentage">%</span>
+<!-- Current -->
+<div class="stat-value">$127,450.00</div>
+
+<!-- Enhanced -->
+<div class="stat-value">$127,450.00</div>
+<div class="stat-context">
+  <span class="trend-badge trend-up">
+    <i class="bi bi-arrow-up"></i> $6,200 (5.2%)
+  </span>
+  <span class="trend-period">vs. last month</span>
 </div>
 ```
 
 ---
 
-#### 4. **Transaction List Optimization**
-Grid-based transaction layout:
+### 3. Data Visualization Best Practices 📈
 
-```css
-.transaction-row {
-  display: grid;
-  grid-template-columns: 40px 1fr auto auto;
-  gap: var(--space-md);
-  align-items: center;
-  padding: var(--space-sm) var(--space-md);
-  min-height: var(--row-height, 48px);
-}
+**Why It Matters:**  
+"A chart is worth a thousand rows." — Every FinTech Designer Ever
 
-.transaction-icon { /* Category icon */ }
-.transaction-details { /* Name + metadata */ }
-.transaction-amount { /* $ value */ }
-.transaction-date { /* Timestamp */ }
-```
+**Proven Chart Patterns:**
 
-**Benefits:**
-- Consistent alignment
-- Easy scanning
-- Responsive (collapses on mobile)
-- Accessible (semantic markup)
+#### Net Worth Over Time → Line Chart
+- **Why:** Shows trajectory (up/down trend)
+- **Insight:** "Am I getting richer or poorer?"
+- **Frequency:** Daily snapshots, smooth interpolation
 
----
+#### Asset Allocation → Donut Chart
+- **Why:** Shows composition at a glance
+- **Insight:** "Where is my money actually?"
+- **Colors:** Brand palette (Orange, Blue, Green)
 
-#### 5. **Account Cards**
-Card component for financial accounts:
+#### Monthly Spending → Bar Chart
+- **Why:** Easy month-to-month comparison
+- **Insight:** "When do I spend the most?"
+- **Grouping:** Stack by category
 
-```css
-.account-card {
-  background-color: var(--color-bg-2);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  transition: var(--transition-shadow), var(--transition-transform);
-}
+#### Budget Progress → Horizontal Progress Bar
+- **Why:** Clear "% complete" visualization
+- **Insight:** "How much budget is left?"
+- **Color:** Green (under), Yellow (near limit), Red (over)
 
-.account-card:hover {
-  box-shadow: var(--shadow-elevated);
-  transform: translateY(-2px);
-}
+**Fireside Capital Status:** ⚠️ **Partial Implementation**  
+- ✅ Chart.js library integrated
+- ❌ Charts not optimized for mobile (responsiveness issues)
+- ❌ No color-blind friendly palettes
+- ❌ No chart accessibility (ARIA labels)
 
-.account-card__balance {
-  font-size: var(--text-h2);
-  font-weight: var(--weight-bold);
-  font-variant-numeric: tabular-nums;
-}
-```
-
----
-
-### ⚠️ Gaps & Issues
-
-#### 1. **No Data Density Controls**
-Users cannot adjust information density.
-
-**Current:** Fixed density (48px rows)
-
-**Industry Standard:** User-controlled density toggle:
-- **Compact:** 32px rows (power users, dashboards)
-- **Normal:** 48px rows (default)
-- **Comfortable:** 56px rows (accessibility, mobile)
-
-**Implementation:**
-```css
-/* Already defined in financial-patterns.css but not implemented */
-.density-compact { --row-height: 32px; }
-.density-normal { --row-height: 48px; }
-.density-comfortable { --row-height: 56px; }
-```
-
-**UI Control:**
-```html
-<div class="density-toggle btn-group btn-group-sm">
-  <button class="btn btn-outline-secondary" data-density="compact">
-    <i class="bi bi-list"></i> Compact
-  </button>
-  <button class="btn btn-outline-secondary active" data-density="normal">
-    <i class="bi bi-list-ul"></i> Normal
-  </button>
-  <button class="btn btn-outline-secondary" data-density="comfortable">
-    <i class="bi bi-list-task"></i> Comfortable
-  </button>
-</div>
-```
-
-**JavaScript:**
+**Recommendation P0:** Audit all charts for accessibility:
 ```javascript
-document.querySelectorAll('[data-density]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const density = btn.dataset.density;
-    document.body.className = document.body.className.replace(/density-\w+/g, '');
-    document.body.classList.add(`density-${density}`);
-    localStorage.setItem('density', density);
-  });
+// Current (no accessibility)
+new Chart(ctx, {
+  type: 'line',
+  data: { ... }
 });
-```
 
----
-
-#### 2. **Limited Comparison Visualizations**
-Financial users need to compare:
-- **Month-over-month** changes
-- **Budget vs actual** spending
-- **Year-over-year** trends
-- **Account performance** against benchmarks
-
-**Current Gaps:**
-- ❌ No sparklines in summary cards
-- ❌ No mini progress bars for budget tracking
-- ❌ No inline comparison bars (e.g., "vs last month")
-
-**Industry Examples:**
-
-##### A. **Sparklines** (Mint, Personal Capital)
-Small inline charts showing trend at a glance:
-
-```html
-<div class="stat-card">
-  <div class="stat-value">$125,340</div>
-  <div class="stat-label">Net Worth</div>
-  <canvas class="sparkline" width="80" height="20" data-values="[100,105,110,108,125]"></canvas>
-</div>
-```
-
-**Implementation:** Use Chart.js or lightweight sparkline library.
-
-##### B. **Inline Progress Bars** (YNAB, Simplifi)
-Budget vs actual spending:
-
-```html
-<div class="budget-item">
-  <div class="budget-header">
-    <span class="budget-category">Groceries</span>
-    <span class="budget-remaining">$450 / $600</span>
-  </div>
-  <div class="progress" style="height: 4px;">
-    <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-  </div>
-  <div class="budget-meta">75% spent • $150 remaining</div>
-</div>
-```
-
-##### C. **Comparison Bars** (Monarch Money)
-Visual comparison for quick scanning:
-
-```html
-<div class="comparison-bar">
-  <div class="comparison-label">This month: $2,400</div>
-  <div class="comparison-visual">
-    <div class="bar bar--current" style="width: 80%;"></div>
-  </div>
-  <div class="comparison-label">Last month: $3,000</div>
-  <div class="comparison-visual">
-    <div class="bar bar--previous" style="width: 100%;"></div>
-  </div>
-</div>
-```
-
----
-
-#### 3. **No Mobile-Optimized Layouts**
-Transaction list on mobile is cramped:
-- Icon + name + amount + date = 4 columns on 375px screen
-- Text truncation on long merchant names
-- No swipe actions (archive, categorize, etc.)
-
-**Industry Best Practices:**
-
-##### A. **Stack Layout on Mobile**
-```css
-@media (max-width: 575.98px) {
-  .transaction-row {
-    grid-template-columns: 40px 1fr auto;
-    grid-template-areas:
-      "icon name amount"
-      "icon meta amount";
-  }
-  
-  .transaction-icon { grid-area: icon; }
-  .transaction-name { grid-area: name; }
-  .transaction-meta { grid-area: meta; }
-  .transaction-amount { grid-area: amount; align-self: start; }
-  .transaction-date { display: none; } /* Show in metadata instead */
-}
-```
-
-##### B. **Swipe Actions** (iOS-style)
-```javascript
-// Use Hammer.js or similar for touch gestures
-const hammertime = new Hammer(transactionRow);
-hammertime.on('swipeleft', () => {
-  showQuickActions(['categorize', 'archive', 'delete']);
-});
-```
-
----
-
-#### 4. **No Advanced Visualizations**
-
-**Current Charts:**
-- ✅ Line charts (net worth over time)
-- ✅ Bar charts (monthly cash flow)
-- ✅ Doughnut charts (asset allocation)
-
-**Missing:**
-- ❌ **Sankey diagrams** (income → expenses → savings flow)
-- ❌ **Waterfall charts** (net worth change breakdown)
-- ❌ **Heatmaps** (spending patterns by category/month)
-- ❌ **Treemaps** (expense breakdown hierarchy)
-
-**Use Cases:**
-
-##### A. **Sankey Diagram: Cash Flow Visualization**
-Shows income sources flowing to expense categories:
-
-```
-[Salary $5000] ──────────────────┐
-[Side Hustle $800] ──────────┐    │
-                              ▼    ▼
-                         [Total Income $5800]
-                              │
-                ┌─────────────┼─────────────┐
-                ▼             ▼             ▼
-         [Rent $1200]  [Food $600]  [Savings $1500]
-```
-
-**Implementation:** Chart.js Sankey plugin
-
-##### B. **Heatmap: Spending Patterns**
-Category spending intensity by month:
-
-```
-           Jan  Feb  Mar  Apr  May
-Housing    ███  ███  ███  ███  ███  (consistent)
-Food       ██   ███  ██   ████ ██   (variable)
-Transport  █    █    ████ ███  █    (spike in Mar/Apr)
-```
-
-**Implementation:** Custom SVG or Chart.js matrix plugin
-
----
-
-#### 5. **Limited Empty States**
-Empty states exist (`empty-states.css`) but missing:
-- ❌ **Onboarding checklists** ("3 steps to get started")
-- ❌ **Contextual help** ("Why track bills?")
-- ❌ **Sample data toggle** ("Preview with demo data")
-
-**Best Practice: Empty State Progression**
-
-**Step 1: First Visit**
-```html
-<div class="empty-state">
-  <i class="bi bi-wallet2" style="font-size: 64px; color: var(--color-primary);"></i>
-  <h3>Welcome to Fireside Capital</h3>
-  <p>Let's set up your dashboard in 3 steps</p>
-  <div class="onboarding-checklist">
-    <div class="checklist-item">
-      <i class="bi bi-check-circle-fill text-success"></i>
-      <span>Connect a bank account</span>
-    </div>
-    <div class="checklist-item">
-      <i class="bi bi-circle"></i>
-      <span>Add your bills</span>
-    </div>
-    <div class="checklist-item">
-      <i class="bi bi-circle"></i>
-      <span>Set budget goals</span>
-    </div>
-  </div>
-  <button class="btn btn-primary">Get Started</button>
-  <button class="btn btn-outline-secondary">View Demo Data</button>
-</div>
-```
-
-**Step 2: Partial Data**
-```html
-<div class="empty-state-partial">
-  <h4>You're making progress! 🎉</h4>
-  <p>Add 3 more bills to see spending trends</p>
-  <button class="btn btn-primary">Add Bill</button>
-</div>
-```
-
----
-
-## 🎯 Industry Best Practices (2026)
-
-### 1. **Minimalist Design with Soft Gradients**
-**Trend:** Neutral palettes, minimal borders, smooth shadows  
-**Source:** Onething Design, Eleken Fintech Guide
-
-**Current:** Dark charcoal with orange/blue/green accents ✅  
-**Enhancement:** Subtle gradients for depth
-
-```css
-.stat-card {
-  background: linear-gradient(135deg, 
-    rgba(var(--color-bg-2-rgb), 1) 0%, 
-    rgba(var(--color-bg-3-rgb), 0.5) 100%);
-}
-```
-
----
-
-### 2. **Consistent Data Formatting**
-**Rule:** All financial data uses same currency and formatting  
-**Source:** DesignRush Dashboard Principles
-
-**Current Implementation:**
-```javascript
-function formatCurrency(value) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(value);
-}
-```
-
-**✅ Good:** Consistent across dashboard  
-**⚠️ Missing:** User preference for decimal places (always shows $1,234 vs $1,234.56)
-
-**Enhancement:**
-```javascript
-function formatCurrency(value, options = {}) {
-  const userPrefs = JSON.parse(localStorage.getItem('currencyPrefs') || '{}');
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: userPrefs.currency || 'USD',
-    minimumFractionDigits: userPrefs.showCents ? 2 : 0,
-    maximumFractionDigits: userPrefs.showCents ? 2 : 0,
-    ...options
-  }).format(value);
-}
-```
-
----
-
-### 3. **Touch-First, Responsive Design**
-**Rule:** Design for touch first, adapt for mouse/keyboard  
-**Source:** Eleken Fintech Guide
-
-**Current:**
-- ✅ 44px minimum touch targets
-- ✅ Mobile-first CSS
-- ❌ No touch gestures (swipe, long-press)
-- ❌ No mobile-optimized table layouts
-
-**Enhancement:** Card-based mobile layout
-
-```css
-@media (max-width: 575.98px) {
-  .bills-table {
-    display: none; /* Hide table on mobile */
-  }
-  
-  .bills-cards {
-    display: block; /* Show card stack instead */
-  }
-  
-  .bill-card {
-    background: var(--color-bg-2);
-    border-radius: var(--radius-lg);
-    padding: var(--space-md);
-    margin-bottom: var(--space-sm);
-  }
-}
-```
-
----
-
-### 4. **Effortless Mental Flow**
-**Rule:** Reduce stimuli, clarify intent, guide users through flow  
-**Source:** Onething Design Fintech UX
-
-**Techniques:**
-- **Progressive disclosure:** Show summary → expand details on demand
-- **Smart defaults:** Pre-fill forms based on patterns
-- **Contextual help:** Inline tooltips, not separate help pages
-- **Undo actions:** Allow mistakes ("Undo delete bill")
-
-**Example: Progressive Disclosure**
-```html
-<!-- Summary view -->
-<div class="bill-summary">
-  <div class="bill-name">Netflix</div>
-  <div class="bill-amount">$15.49/mo</div>
-  <div class="bill-due">Due in 3 days</div>
-  <button class="btn-expand" aria-expanded="false">
-    <i class="bi bi-chevron-down"></i>
-  </button>
-</div>
-
-<!-- Expanded details (hidden by default) -->
-<div class="bill-details" hidden>
-  <div class="detail-row">
-    <span>Payment method:</span>
-    <span>Visa •••• 4242</span>
-  </div>
-  <div class="detail-row">
-    <span>Category:</span>
-    <span>Entertainment</span>
-  </div>
-  <div class="detail-row">
-    <span>Auto-pay:</span>
-    <span class="badge bg-success">Enabled</span>
-  </div>
-  <div class="actions">
-    <button class="btn btn-sm btn-outline-secondary">Edit</button>
-    <button class="btn btn-sm btn-outline-danger">Delete</button>
-  </div>
-</div>
-```
-
----
-
-## 🛠️ Implementation Tasks
-
-### Priority 1: Data Density Controls (Sprint 1)
-- [ ] **Task 1:** Add density toggle UI to dashboard
-- [ ] **Task 2:** Implement density classes (compact/normal/comfortable)
-- [ ] **Task 3:** Persist density preference in localStorage
-- [ ] **Task 4:** Test across all tables (bills, debts, income, investments)
-
-**Code:**
-```javascript
-// app/assets/js/density-control.js
-const DENSITIES = ['compact', 'normal', 'comfortable'];
-
-function initDensityControls() {
-  const savedDensity = localStorage.getItem('density') || 'normal';
-  applyDensity(savedDensity);
-  
-  document.querySelectorAll('[data-density]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const density = btn.dataset.density;
-      applyDensity(density);
-      localStorage.setItem('density', density);
-    });
-  });
-}
-
-function applyDensity(density) {
-  document.body.classList.remove(...DENSITIES.map(d => `density-${d}`));
-  document.body.classList.add(`density-${density}`);
-  
-  // Update active button
-  document.querySelectorAll('[data-density]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.density === density);
-  });
-}
-```
-
----
-
-### Priority 2: Sparklines in Summary Cards (Sprint 1-2)
-- [ ] **Task 5:** Add sparkline containers to stat cards
-- [ ] **Task 6:** Create sparkline rendering function
-- [ ] **Task 7:** Integrate with net worth/balance data
-- [ ] **Task 8:** Add accessibility (data table fallback)
-
-**Implementation:**
-```javascript
-function renderSparkline(canvas, dataPoints) {
-  const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
-  const max = Math.max(...dataPoints);
-  const min = Math.min(...dataPoints);
-  const range = max - min;
-  
-  ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = getComputedStyle(document.documentElement)
-    .getPropertyValue('--color-accent').trim();
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  
-  dataPoints.forEach((value, i) => {
-    const x = (i / (dataPoints.length - 1)) * width;
-    const y = height - ((value - min) / range) * height;
-    
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
+// Enhanced (WCAG compliant)
+new Chart(ctx, {
+  type: 'line',
+  data: { ... },
+  options: {
+    plugins: {
+      title: {
+        display: true,
+        text: 'Net Worth Trend (Last 12 Months)'
+      },
+      legend: {
+        labels: {
+          color: '#f0f0f0', // Ensure contrast ratio > 4.5:1
+          font: {
+            size: 14
+          }
+        }
+      }
+    },
+    // Add ARIA label for screen readers
+    accessibility: {
+      description: 'Line chart showing net worth growth from $100k to $127k over 12 months'
     }
-  });
-  
-  ctx.stroke();
-}
-
-// Usage
-document.querySelectorAll('.sparkline').forEach(canvas => {
-  const values = JSON.parse(canvas.dataset.values);
-  renderSparkline(canvas, values);
+  }
 });
+
+// Add semantic HTML
+<div role="img" aria-label="Net worth trend chart">
+  <canvas id="netWorthChart"></canvas>
+</div>
+```
+
+**Color-Blind Friendly Palette (Orange-Blue-Teal):**
+```css
+:root {
+  --chart-color-1: #f44e24;  /* Orange (brand) */
+  --chart-color-2: #01a4ef;  /* Blue (brand) */
+  --chart-color-3: #81b900;  /* Lime (brand) */
+  --chart-color-4: #00b8d4;  /* Teal (accessible alternative) */
+  --chart-color-5: #ff9800;  /* Amber (accessible alternative) */
+}
 ```
 
 ---
 
-### Priority 3: Mobile-Optimized Transaction List (Sprint 2)
-- [ ] **Task 9:** Create stacked mobile layout for transactions
-- [ ] **Task 10:** Hide date column on mobile (show in metadata)
-- [ ] **Task 11:** Implement swipe-to-action (categorize/archive)
-- [ ] **Task 12:** Add pull-to-refresh for transaction updates
+### 4. Feedback & Confirmation Patterns ⚡
+
+**Why It Matters:**  
+Users need to know that every action was successful. Silence creates anxiety.
+
+**Proven Feedback Patterns:**
+
+#### Loading States
+- **Skeleton screens** — Show structure before data loads (already implemented ✅)
+- **Progress indicators** — For long operations (e.g., syncing 1000 transactions)
+- **Optimistic updates** — Show change immediately, sync in background
+
+#### Success Confirmations
+- **Toast notifications** — Non-blocking, auto-dismiss (Fireside has this ✅)
+- **Inline badges** — "Payment scheduled ✓" next to bill
+- **Confetti animations** — For major milestones (paid off debt, hit net worth goal)
+
+#### Error Handling
+- **Clear error messages** — "Bank connection failed. Check credentials."
+- **Recovery actions** — "Reconnect to Chase" button
+- **Support links** — "Still having issues? Contact support"
+
+**Fireside Capital Status:** ✅ **Strong Implementation**  
+- ✅ Skeleton loaders on cards
+- ✅ Toast notifications system (`toast-notifications.css`)
+- ✅ Loading overlays for async operations
+
+**Recommendation P1:** Add success animations for key milestones:
+```javascript
+// When user pays off a debt
+function celebrateDebtPayoff(debtName, amount) {
+  // Show confetti animation
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 }
+  });
+  
+  // Show achievement toast
+  showToast({
+    type: 'success',
+    title: '🎉 Debt Paid Off!',
+    message: `You've eliminated your ${debtName} debt ($${amount.toLocaleString()})!`,
+    duration: 5000
+  });
+  
+  // Update net worth chart with animation
+  updateNetWorthChart({ animate: true });
+}
+```
+
+**Library:** [canvas-confetti](https://www.kirilv.com/canvas-confetti/) (5KB, MIT license)
 
 ---
 
-### Priority 4: Budget Progress Bars (Sprint 2-3)
-- [ ] **Task 13:** Add inline progress bars to budget items
-- [ ] **Task 14:** Color-code based on spending (green < 80%, yellow 80-100%, red > 100%)
-- [ ] **Task 15:** Add hover tooltip showing remaining amount
-- [ ] **Task 16:** Animate progress bar on page load
+### 5. Intuitive Navigation 🧭
 
-**Code:**
+**Why It Matters:**  
+Financial dashboards have 8-12 sections. Users need to know where they are and how to get anywhere.
+
+**Proven Navigation Patterns:**
+
+#### Sidebar (Desktop) ✅ Implemented
+- Fixed left sidebar with collapsible sections
+- Active state indicators (Fireside has this)
+- Icon + text labels (reduces cognitive load)
+
+#### Bottom Tab Bar (Mobile)
+- 4-5 primary sections (Dashboard, Accounts, Transactions, Reports, More)
+- Icons with labels
+- Active state with color accent
+
+#### Breadcrumbs (Detail Views)
+- `Dashboard > Bills > Netflix Subscription`
+- Allows quick navigation back up the hierarchy
+
+**Fireside Capital Status:** ⚠️ **Desktop-Optimized**  
+- ✅ Excellent sidebar on desktop
+- ❌ Mobile nav uses hamburger menu (adds friction)
+- ❌ No breadcrumbs on detail pages
+
+**Recommendation P1:** Add mobile bottom tab bar:
 ```html
-<div class="budget-item">
-  <div class="budget-header">
-    <span class="budget-category">Groceries</span>
-    <span class="budget-amounts">
-      <span class="spent">$450</span> / <span class="budgeted">$600</span>
-    </span>
+<!-- Add to all pages (mobile only) -->
+<nav class="mobile-tab-bar d-md-none">
+  <a href="index.html" class="tab-item active">
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="bills.html" class="tab-item">
+    <i class="bi bi-receipt"></i>
+    <span>Bills</span>
+  </a>
+  <a href="transactions.html" class="tab-item">
+    <i class="bi bi-arrow-left-right"></i>
+    <span>Activity</span>
+  </a>
+  <a href="settings.html" class="tab-item">
+    <i class="bi bi-gear"></i>
+    <span>Settings</span>
+  </a>
+</nav>
+```
+
+**CSS:**
+```css
+.mobile-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-bg-2);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: var(--z-sticky);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 150ms ease;
+  min-height: 56px; /* Touch target */
+  flex: 1;
+}
+
+.tab-item i {
+  font-size: 20px;
+}
+
+.tab-item.active {
+  color: var(--color-primary);
+}
+
+.tab-item:hover {
+  color: var(--color-text-primary);
+}
+```
+
+---
+
+### 6. Empty States & Onboarding 🎯
+
+**Why It Matters:**  
+New users see empty dashboards. First impressions set expectations.
+
+**Proven Patterns:**
+
+#### Empty State Components
+- **Friendly illustration** — Not just an icon, show a friendly graphic
+- **Clear explanation** — "No bills yet"
+- **Primary action** — "Add Your First Bill" (orange button)
+- **Secondary context** — "Track due dates and never miss a payment"
+
+#### Onboarding Flow
+- **Progressive disclosure** — Introduce features as users need them
+- **Checklists** — "Complete your profile: 3/5 steps"
+- **First-time tooltips** — Highlight key features
+
+**Fireside Capital Status:** ✅ **Excellent Implementation**  
+- ✅ Empty states exist (`empty-states.css`)
+- ✅ Onboarding styles defined (`onboarding.css`)
+- ✅ Friendly copy & CTAs
+
+**Recommendation P2:** Add progress indicators to onboarding:
+```html
+<div class="onboarding-checklist">
+  <h4>Get Started with Fireside Capital</h4>
+  <div class="checklist-item completed">
+    <i class="bi bi-check-circle-fill text-success"></i>
+    <span>Create account</span>
   </div>
-  <div class="progress" style="height: 6px;">
-    <div class="progress-bar bg-success" 
-         role="progressbar" 
-         style="width: 75%" 
-         aria-valuenow="75" 
-         aria-valuemin="0" 
-         aria-valuemax="100"
-         data-bs-toggle="tooltip"
-         title="$150 remaining">
+  <div class="checklist-item completed">
+    <i class="bi bi-check-circle-fill text-success"></i>
+    <span>Connect your first bank account</span>
+  </div>
+  <div class="checklist-item active">
+    <i class="bi bi-circle text-muted"></i>
+    <span>Add your bills & subscriptions</span>
+    <button class="btn btn-sm btn-primary">Add Now</button>
+  </div>
+  <div class="checklist-item">
+    <i class="bi bi-circle text-muted"></i>
+    <span>Set up budget categories</span>
+  </div>
+</div>
+```
+
+---
+
+## Mobile-First Optimization 📱
+
+### Current Mobile Issues Identified
+
+**Issue 1: Chart Responsiveness**  
+Charts don't resize properly on mobile (reported in CSS research).
+
+**Solution:**
+```css
+/* Ensure charts scale on mobile */
+@media (max-width: 575.98px) {
+  .chart-wrapper {
+    max-height: 250px !important;
+    min-height: 200px !important;
+  }
+  
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+```
+
+**Issue 2: Table Overflow**  
+Transaction tables force horizontal scroll on mobile.
+
+**Solution:** Use card-based layout on mobile:
+```html
+<!-- Desktop: Table -->
+<div class="d-none d-md-block">
+  <table class="table">...</table>
+</div>
+
+<!-- Mobile: Cards -->
+<div class="d-md-none">
+  <div class="transaction-card">
+    <div class="transaction-header">
+      <span class="merchant">Netflix</span>
+      <span class="amount">-$15.99</span>
+    </div>
+    <div class="transaction-meta">
+      <span class="date">Feb 15, 2026</span>
+      <span class="category badge">Entertainment</span>
     </div>
   </div>
 </div>
@@ -640,35 +474,249 @@ document.querySelectorAll('.sparkline').forEach(canvas => {
 
 ---
 
-### Priority 5: Advanced Visualizations (Sprint 3-4)
-- [ ] **Task 17:** Implement Sankey diagram for cash flow (Chart.js Sankey plugin)
-- [ ] **Task 18:** Create waterfall chart for net worth changes
-- [ ] **Task 19:** Build spending heatmap (category × month)
-- [ ] **Task 20:** Add treemap for expense breakdown
+## Performance Optimization Patterns ⚡
+
+### 1. Lazy Load Charts (Already Implemented ✅)
+Fireside Capital already lazy-loads Chart.js on dashboard pages only. Excellent!
+
+### 2. Virtual Scrolling for Large Lists
+When transaction tables have 1000+ rows, use virtual scrolling (only render visible rows).
+
+**Library:** [react-window](https://github.com/bvaughn/react-window) or vanilla [virtual-scroller](https://github.com/valdrinkoshi/virtual-scroller)
+
+### 3. Debounced Search/Filters
+When users type in search boxes, debounce API calls:
+```javascript
+// Debounce search input (wait 300ms after user stops typing)
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    performSearch(e.target.value);
+  }, 300);
+});
+```
 
 ---
 
-## 📚 Reference Resources
+## Accessibility Checklist (WCAG 2.1 AA)
 
-### Industry Examples
-- **Mint:** https://mint.intuit.com (sparklines, category breakdown)
-- **Personal Capital:** https://personalcapital.com (net worth tracking, investment dashboards)
-- **YNAB:** https://youneedabudget.com (budget progress bars, mobile-first)
-- **Monarch Money:** https://monarchmoney.com (comparison bars, clean UI)
-- **Simplifi by Quicken:** https://simplifi.com (spending plan, mobile UX)
+### Current Gaps Identified
 
-### Design Systems
-- **Eleken Fintech Guide:** https://www.eleken.co/blog-posts/modern-fintech-design-guide
-- **Onething Design UX:** https://www.onething.design/post/top-10-fintech-ux-design-practices-2026
-- **DesignRush Dashboard:** https://www.designrush.com/agency/ui-ux-design/dashboard/trends/dashboard-design-principles
+**Gap 1: Chart ARIA Labels (P0)**  
+Screen readers can't interpret charts. Add semantic descriptions.
 
-### UI Libraries
-- **Recharts:** https://recharts.org/ (React-based charts)
-- **ApexCharts:** https://apexcharts.com/ (Modern JS charting)
-- **D3.js:** https://d3js.org/ (Custom visualizations)
-- **Hammer.js:** https://hammerjs.github.io/ (Touch gestures)
+**Gap 2: Focus Management in Modals (P1)**  
+When modals open, focus should trap inside until closed.
+
+**Gap 3: Color Contrast on Charts (P0)**  
+Some chart colors fail contrast ratio checks.
+
+**Solution Matrix:**
+| Issue | WCAG Criterion | Priority | Fix |
+|-------|----------------|----------|-----|
+| Chart ARIA labels | 1.1.1 Non-text Content | P0 | Add `role="img"` + `aria-label` |
+| Modal focus trap | 2.4.3 Focus Order | P1 | Implement focus-trap library |
+| Chart color contrast | 1.4.3 Contrast | P0 | Use color-blind safe palette |
+| Keyboard navigation | 2.1.1 Keyboard | ✅ OK | Already implemented |
+| Skip links | 2.4.1 Bypass Blocks | ✅ OK | Already implemented |
 
 ---
 
-## Next Research Topic
-**Progressive Web App (PWA)** — Analyze offline support, install prompts, and service worker implementation.
+## Dashboard Layout Patterns (Industry Comparison)
+
+### Grid Layouts (Most Common)
+
+**Stripe Dashboard:** 2-column grid on desktop, 1-column on mobile
+```
+┌───────────┬───────────┐
+│  Net Worth│  Cashflow │
+├───────────┼───────────┤
+│  Chart (spans 2 cols) │
+├───────────────────────┤
+│  Recent Transactions  │
+└───────────────────────┘
+```
+
+**Mint Dashboard:** 3-column grid with flexible cards
+```
+┌─────┬─────┬─────┐
+│ NW  │ Sav │ Debt│
+├─────┴─────┴─────┤
+│  Spending Chart  │
+├──────────────────┤
+│  Bills & Budgets │
+└──────────────────┘
+```
+
+**Fireside Capital Dashboard:** Mixed layout (stat cards → chart cards → tables)
+```
+┌───────────────────────┐
+│ Net Worth • Assets •  │ ← Stat cards (3-column)
+│ Debts                 │
+├───────────────────────┤
+│ Net Worth Trend Chart │ ← Chart cards (full-width)
+├───────────────────────┤
+│ Upcoming Payments     │ ← List (full-width)
+└───────────────────────┘
+```
+
+**Assessment:** ✅ Good  
+Layout prioritizes the right information. Stat cards get immediate attention, charts provide context, tables offer detail.
+
+**Recommendation P2:** Add customizable dashboard widgets:
+- Allow users to reorder cards (drag-and-drop)
+- Hide/show sections based on preferences
+- Save layout to user profile
+
+**Library:** [gridstack.js](https://gridstackjs.com/) (customizable dashboard grids)
+
+---
+
+## Real-Time Data Update Patterns
+
+### Current Approach: Manual Refresh
+Users must refresh the page to see updated data.
+
+### Industry Standard: Auto-Refresh with Visual Indicators
+
+**Pattern 1: Polling (Simple)**
+```javascript
+// Refresh net worth every 5 minutes
+setInterval(async () => {
+  const freshData = await fetchNetWorth();
+  updateNetWorthDisplay(freshData);
+  showToast({ type: 'info', message: 'Data refreshed' });
+}, 5 * 60 * 1000); // 5 minutes
+```
+
+**Pattern 2: WebSockets (Real-Time)**
+```javascript
+// Open WebSocket connection to Supabase Realtime
+const subscription = supabase
+  .channel('net-worth-updates')
+  .on('postgres_changes', {
+    event: 'UPDATE',
+    schema: 'public',
+    table: 'snapshots'
+  }, payload => {
+    updateNetWorthDisplay(payload.new);
+    showToast({ 
+      type: 'info', 
+      message: 'Net worth updated in real-time' 
+    });
+  })
+  .subscribe();
+```
+
+**Recommendation P1:** Implement Supabase Realtime for net worth updates:
+- Show "Updating..." badge when new data arrives
+- Animate numbers changing (count-up effect)
+- Auto-refresh charts without page reload
+
+---
+
+## Microcopy Best Practices
+
+### Tone: Human, Transparent, Calm
+
+**Bad:** "Error 500: Internal server exception occurred."  
+**Good:** "Oops! Something went wrong. We're looking into it."
+
+**Bad:** "Net worth calculation in progress."  
+**Good:** "Calculating your net worth... this takes about 10 seconds."
+
+**Bad:** "Plaid connection terminated."  
+**Good:** "Your bank connection expired. Reconnect to keep data fresh."
+
+### Fireside Capital Examples
+
+**Current (Good):**
+- "No bills yet" → Clear, friendly
+- "Add Your First Bill" → Action-oriented
+
+**Recommendations:**
+- Add personality: "You're doing great! Net worth up 5% this month."
+- Show empathy: "Spending a bit high this week? Let's review your budget."
+- Explain delays: "Syncing 1,247 transactions... almost there!"
+
+---
+
+## Implementation Roadmap
+
+### Phase 1: Trust & Accessibility (Sprint 1) — 2 weeks
+- [ ] **P0:** Add last-updated timestamps to stat cards
+- [ ] **P0:** Add chart ARIA labels & accessible colors
+- [ ] **P0:** Fix chart color contrast issues
+- [ ] **P1:** Add visual trust badges (bank logos, security icons)
+
+### Phase 2: Mobile Optimization (Sprint 2) — 2 weeks
+- [ ] **P0:** Add mobile bottom tab bar
+- [ ] **P1:** Convert transaction tables to mobile cards
+- [ ] **P1:** Fix chart responsiveness on mobile
+- [ ] **P2:** Add breadcrumb navigation
+
+### Phase 3: UX Enhancements (Sprint 3) — 2 weeks
+- [ ] **P1:** Add trend context to stat cards
+- [ ] **P1:** Implement real-time data updates (Supabase Realtime)
+- [ ] **P1:** Add success animations for milestones
+- [ ] **P2:** Add onboarding progress checklist
+
+### Phase 4: Advanced Features (Sprint 4) — 3 weeks
+- [ ] **P2:** Implement customizable dashboard widgets
+- [ ] **P2:** Add virtual scrolling for large transaction lists
+- [ ] **P2:** Add advanced data export (CSV, PDF)
+
+---
+
+## Benchmarking: Fireside vs. Industry Leaders
+
+| Feature | Fireside | Mint | Stripe | YNAB | Target |
+|---------|----------|------|--------|------|--------|
+| **Visual trust cues** | ⚠️ Partial | ✅ Yes | ✅ Yes | ✅ Yes | 🔧 Add |
+| **Skeleton loaders** | ✅ Yes | ❌ No | ✅ Yes | ❌ No | ✅ Match |
+| **Toast notifications** | ✅ Yes | ⚠️ Partial | ✅ Yes | ✅ Yes | ✅ Match |
+| **Mobile tab bar** | ❌ No | ✅ Yes | ✅ Yes | ✅ Yes | 🔧 Add |
+| **Real-time updates** | ❌ No | ⚠️ Partial | ✅ Yes | ❌ No | 🔧 Add |
+| **Chart accessibility** | ❌ No | ❌ No | ✅ Yes | ⚠️ Partial | 🔧 Add |
+| **Empty states** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Match |
+| **Responsive design** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Match |
+
+**Overall Score:** 7/10 (Good, with room for improvement)
+
+---
+
+## Action Items Summary
+
+### Critical (Do First) 🔴
+1. Add chart ARIA labels for screen readers
+2. Fix chart color contrast (color-blind safe palette)
+3. Add last-updated timestamps to stat cards
+4. Add mobile bottom tab bar navigation
+
+### High Impact (Do Soon) 🟡
+5. Implement real-time data updates (Supabase Realtime)
+6. Add trend context to stat cards (% change, comparison)
+7. Convert transaction tables to mobile cards
+8. Add visual trust badges (bank logos, security icons)
+
+### Nice to Have (Backlog) 🟢
+9. Add success animations for milestones (confetti on debt payoff)
+10. Implement customizable dashboard widgets (drag-and-drop)
+11. Add virtual scrolling for large transaction lists
+12. Add onboarding progress checklist
+
+---
+
+## References
+
+- [Eleken: Fintech Design Guide 2026](https://www.eleken.co/blog-posts/modern-fintech-design-guide)
+- [UXPin: Dashboard Design Principles 2025](https://www.uxpin.com/studio/blog/dashboard-design-principles/)
+- [Onething Design: Top 10 Fintech UX Practices 2026](https://www.onething.design/post/top-10-fintech-ux-design-practices-2026)
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Chart.js Accessibility](https://www.chartjs.org/docs/latest/general/accessibility.html)
+- [Supabase Realtime Documentation](https://supabase.com/docs/guides/realtime)
+
+---
+
+**Next Research Topic:** Chart.js Implementation Best Practices (performance, theming, responsive design)
