@@ -332,7 +332,7 @@ async function addManualTransaction() {
     document.getElementById('addTransactionForm').reset();
     
     // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addTransactionModal'));
     modal.hide();
     
     // Reload transactions

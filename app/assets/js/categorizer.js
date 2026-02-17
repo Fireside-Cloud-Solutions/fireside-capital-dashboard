@@ -84,6 +84,7 @@ async function categorizeTransactionsBatch(transactions) {
 // Check learned patterns
 async function checkLearnedPattern(merchantName) {
   try {
+    if (typeof sb === 'undefined') return null;
     const user = await sb.auth.getUser();
     if (!user.data.user) return null;
     
