@@ -3593,3 +3593,15 @@ body[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
     color: black !important;
   }
 }
+
+/* -- Demo Mode Banner (FC-184 / BUG-UIUX-DEMO-STYLE-001) -------------------- */
+.demo-banner {
+  border-radius: 0;
+  margin: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1060;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}

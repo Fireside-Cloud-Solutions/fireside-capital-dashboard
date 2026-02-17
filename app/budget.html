@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8" />
@@ -232,7 +232,23 @@
                   <i class="bi bi-pie-chart me-2 text-primary"></i>Spending vs Budget
                 </h5>
               </div>
-              <div id="bvaCardBody"></div>
+              <div id="bvaCardBody">
+                <!-- BVA skeleton (replaced by renderBudgetVsActuals()) -->
+                <div class="bva-skeleton">
+                  <div class="d-flex justify-content-between mb-3">
+                    <div class="skeleton-loader skeleton-line" style="width: 100px;"></div>
+                    <div class="skeleton-loader skeleton-line" style="width: 80px;"></div>
+                  </div>
+                  <div class="row mb-4 text-center">
+                    <div class="col-4"><div class="skeleton-loader skeleton-value" style="width: 80px; height: 28px; margin: 0 auto;"></div></div>
+                    <div class="col-4"><div class="skeleton-loader skeleton-value" style="width: 80px; height: 28px; margin: 0 auto;"></div></div>
+                    <div class="col-4"><div class="skeleton-loader skeleton-value" style="width: 60px; height: 28px; margin: 0 auto;"></div></div>
+                  </div>
+                  <div class="mb-3"><div class="skeleton-loader skeleton-line mb-1" style="width: 140px;"></div><div class="skeleton-loader" style="height: 6px; border-radius: 3px;"></div></div>
+                  <div class="mb-3"><div class="skeleton-loader skeleton-line mb-1" style="width: 160px;"></div><div class="skeleton-loader" style="height: 6px; border-radius: 3px;"></div></div>
+                  <div class="mb-3"><div class="skeleton-loader skeleton-line mb-1" style="width: 120px;"></div><div class="skeleton-loader" style="height: 6px; border-radius: 3px;"></div></div>
+                </div>
+              </div>
             </div>
 
             </div> <!-- end dataContainer -->
@@ -256,7 +272,18 @@
                 </div>
                 <div class="mb-3">
                   <label for="budgetItemCategory" class="form-label">Category</label>
-                  <input type="text" class="form-control" id="budgetItemCategory" placeholder="e.g., Food" required>
+                  <select class="form-select" id="budgetItemCategory" required>
+                    <option value="" disabled selected>Select a category...</option>
+                    <option value="dining">Dining</option>
+                    <option value="groceries">Groceries</option>
+                    <option value="transportation">Transportation</option>
+                    <option value="utilities">Utilities</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="travel">Travel</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
                 <div class="mb-3">
                   <label for="budgetItemNeeded" class="form-label">Amount Needed ($)</label>
@@ -264,6 +291,7 @@
                 </div>
               </div>
               <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" id="saveBudgetItemBtn" class="btn btn-primary">Add Item</button>
               </div>
             </form>

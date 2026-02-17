@@ -1,5 +1,372 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-17 06:50 EST (Sprint UI/UX 0650 — FULL AUDIT COMPLETE, 4 NEW DESIGN BUGS, FC-180 GAP FLAGGED)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0650 (Feb 17, 6:50 AM) — FEATURE DESIGN REVIEW ✅
+
+**Status:** ✅ **4 NEW BUGS DOCUMENTED** — Full audit complete, pivoting to feature design review
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~5 minutes
+**Task:** Continue UI/UX audit — check Azure DevOps, review next unaudited page, verify prior recommendations
+
+### Audit Phase Status — COMPLETE ✅
+
+| Area | Status |
+|------|--------|
+| HTML pages (11/11) | ✅ **COMPLETE** |
+| CSS files (9/9 + 3 deleted) | ✅ **COMPLETE** |
+| JS files (26/26) | ✅ **COMPLETE** |
+| Feature design review | 🔄 **NEW PHASE** |
+
+### Prior Fixes Verified ✅
+
+All commits through `e96d45b` confirmed intact:
+- FC-182 ✅ — BvA card on budget.html (commit 88494b9)
+- FC-184 ✅ — demo-data.js (commit d29fbff)
+- FC-181 ✅ — budget-actuals.js (commit d29fbff)
+- BUG-CATEGORIZER-GUARD-001 + BUG-TRANS-MODAL-001 ✅ (commit dc8dd1c)
+
+### Design Review: FC-181/FC-182/FC-184 (newly shipped)
+
+**Reviewed:** budget.html BvA card, budget-actuals.js renderer, demo-data.js banner
+
+### New Issues Found (4)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-UIUX-BVA-CAT-001 | **P2** | 15 min | **Critical UX gap**: Budget modal category `<input>` type mismatch — free text won't match BVA_CATEGORIES enum. BvA card will never show user budget data. Must be a `<select>` |
+| BUG-UIUX-DEMO-STYLE-001 | P3 | 20 min | Demo banner inline styles (7 properties) across all 11 pages → `.demo-banner` CSS class |
+| BUG-UIUX-BVA-SKEL-001 | P3 | 15 min | `#bvaCardBody` empty on load → layout shift. Add 3 skeleton rows as static HTML |
+| BUG-UIUX-MODAL-CANCEL-001 | P3 | 2 min | Add Budget Item modal footer missing Cancel button |
+
+### Critical Gap Flagged: FC-180 (P1)
+
+**FC-180 (Category Budget Settings UI)** — STILL NOT STARTED
+- Without it: BvA card always shows "No budget data" for ALL live users
+- Only demo mode shows actual data (which bypasses settings entirely)
+- FC-181 + FC-182 are non-functional for real users until FC-180 ships
+- **Recommendation**: FC-180 is the highest-priority P1 remaining for the BvA feature to be useful
+
+### All Open UI/UX Issues
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| **FC-180** | **P1** | **1h** | **Category Budget Settings UI — PREREQUISITE for BvA to work** |
+| BUG-UIUX-BVA-CAT-001 | **P2** | 15 min | **Budget modal category input type mismatch** |
+| FC-UIUX-023 | P2 | 12-16h | Settings page severely under-featured (5 missing sections) |
+| FC-173 | P1 | 5-6h | Operations Dashboard page (new page, not built) |
+| BUG-UIUX-DEMO-STYLE-001 | P3 | 20 min | Demo banner inline styles → CSS class |
+| BUG-UIUX-BVA-SKEL-001 | P3 | 15 min | BvA card body no skeleton |
+| BUG-UIUX-MODAL-CANCEL-001 | P3 | 2 min | Add Budget Item modal no Cancel button |
+| FC-UIUX-017 | P3 | 30 min | Stat card trend labels inconsistent |
+| FC-UIUX-020 | P2 | 30 min | Reports page missing empty state |
+| FC-UIUX-021 | P3 | 1h | Summary card vs stat-card naming inconsistency |
+| FC-UIUX-022 | P3 | 5 min | Reports chart heights not defined |
+| FC-UIUX-028 | P3 | 1h | Password reset modal should be global component |
+| FC-UIUX-032 | P3 | 15 min | Skeleton inline width styles → CSS classes |
+| FC-UIUX-037 | P3 | 30 min | Transactions inline script block |
+| BUG-CSS-DUPE-001 | P3 | 1h | Duplicate .empty-state{} blocks |
+| BUG-UIUX-ICONS-001 | P3 | 2h | empty-states.js Heroicons → Bootstrap Icons |
+| BUG-UIUX-EMPTYSTATE-CSP-001 | P3 | 1h | generateEmptyStateHTML() inline onclick |
+| BUG-NOTIF-STYLE-001 | P3 | 30 min | notification-enhancements.js inline color styles |
+| BUG-TOUR-INLINE-001 | P3 | 30 min | tour.js inline onclick |
+| BUG-CHART-ALERT-001 | P3 | 30 min | charts.js pie click → alert() |
+
+### Next Steps for UI/UX Agent
+
+**Immediate priority:** BUG-UIUX-BVA-CAT-001 (P2, 15 min) — change category `<input>` to `<select>` in budget.html
+**Then:** FC-180 (P1, 1h) — Category budget settings UI in settings.html
+
+---
+
+**Last Updated:** 2026-02-17 06:45 EST (Sprint QA 0645 — JS AUDIT 100% COMPLETE, 4 NEW BUGS, 3 COMMITS VERIFIED)
+
+---
+
+## 🔍 SPRINT QA — SESSION 0645 (Feb 17, 6:45 AM) — JS AUDIT COMPLETE ✅
+
+**Status:** ✅ **ALL 26 JS FILES AUDITED — 4 NEW BUGS DOCUMENTED**
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)
+**Duration:** ~8 minutes
+**Task:** Continue QA audit — check new commits, verify fixes, complete JS file audit
+
+### New Commits Verified (Since Last QA Check d2c17e9)
+
+| Commit | Description | Verified |
+|--------|-------------|---------|
+| `dc8dd1c` | BUG-CATEGORIZER-GUARD-001 + BUG-TRANS-MODAL-001: 2 quick fixes | ✅ |
+| `88494b9` | FC-182: Budget vs Actuals UI card wired in budget.html + app.js | ✅ |
+| `e96d45b` | Docs: BACKLOG.md update (docs only) | ✅ |
+
+**FC-182 Verified:** `#bvaSection`/`#bvaCardBody` present in budget.html; `loadAndRenderBudget()` in app.js calls `renderBudgetVsActuals('bvaCardBody', monthString)` with `typeof` guard. Script load order: `demo-data.js` → `budget-actuals.js` → `app.js` ✅
+
+### JS Files Audited This Session (Final 6)
+
+| File | Status | Issues Found |
+|------|--------|-------------|
+| app-polish-enhancements.js | ⚠️ 1 issue | BUG-POLISH-DBLINT-001 — double-init via setTimeout |
+| session-security.js | ⚠️ 2 issues | BUG-SECURITY-INLINE-002 (logout modal onclick) + BUG-SECURITY-MODAL-001 (new Modal vs getOrCreateInstance) |
+| security-utils.js | ✅ Clean | BUG-CSRF-DUPLICATE-001 confirmed (already tracked) |
+| csrf.js | ✅ Clean | BUG-CSRF-DUPLICATE-001 confirmed (already tracked) |
+| rate-limiter.js | ✅ Clean | No issues |
+| rate-limit-db.js | ⚠️ 1 issue | BUG-RATELIMIT-CROSS-001 — no typeof guard on disableButtonTemporarily() call |
+
+### 🎉 JS AUDIT COMPLETE — ALL 26 FILES REVIEWED
+
+| File | Status |
+|------|--------|
+| app.js | ✅ Done |
+| charts.js | ✅ Done |
+| email-bills.js | ✅ Done |
+| empty-states.js | ✅ Done |
+| event-handlers.js | ✅ Done |
+| loading-states.js | ✅ Done |
+| notification-enhancements.js | ✅ Done |
+| onboarding.js | ✅ Done |
+| plaid.js | ✅ Done |
+| polish-utilities.js | ✅ Done |
+| reports.js | ✅ Done |
+| security-patch.js | ✅ Done |
+| subscriptions.js | ✅ Done |
+| toast-notifications.js | ✅ Done |
+| tour.js | ✅ Done |
+| demo-data.js | ✅ Done |
+| budget-actuals.js | ✅ Done |
+| transactions.js | ✅ Done |
+| categorizer.js | ✅ Done |
+| lazy-loader.js | ✅ Done |
+| chart-theme.js | ✅ Done |
+| app-polish-enhancements.js | ✅ Done (BUG-POLISH-DBLINT-001) |
+| session-security.js | ✅ Done (BUG-SECURITY-INLINE-002 + BUG-SECURITY-MODAL-001) |
+| security-utils.js | ✅ Done (Clean) |
+| csrf.js | ✅ Done (Clean) |
+| rate-limiter.js | ✅ Done (Clean) |
+| rate-limit-db.js | ✅ Done (BUG-RATELIMIT-CROSS-001) |
+
+### New Bugs Found (4)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-SECURITY-INLINE-002 | P3 | 10 min | session-security.js: showLogoutMessage() modal button has inline `onclick="location.reload()"` — CSP violation |
+| BUG-SECURITY-MODAL-001 | P3 | 5 min | session-security.js: showLogoutMessage() uses `new bootstrap.Modal()` → should be `getOrCreateInstance()` |
+| BUG-POLISH-DBLINT-001 | P3 | 30 min | app-polish-enhancements.js: setTimeout re-runs initializePolishEnhancements() 1s later — double modal/form event binding |
+| BUG-RATELIMIT-CROSS-001 | P3 | 10 min | rate-limit-db.js: calls disableButtonTemporarily() without typeof guard — ReferenceError if rate-limiter.js fails to load |
+
+### Full Open Bug List (P3 — All Remaining)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-JS-001 | P2 | 2-3h | 52 console.log remaining — needs webpack TerserPlugin |
+| BUG-TRANS-INLINE-001 | P2 | 30 min | transactions.js: inline onchange on category select — CSP violation |
+| BUG-TOAST-DUPLICATE-001 | P2 | 2h | Toast vs ToastManager dual systems |
+| BUG-CATEGORIZER-TABLE-001 | P2 | 30 min | transaction_category_patterns table undocumented/may not exist |
+| BUG-CSS-DUPE-001 | P3 | 2h | 3x .empty-state{} in main.css + 1x components.css |
+| FC-UIUX-032 | P3 | 15 min | 171 skeleton inline width styles → CSS classes |
+| FC-UIUX-037 | P3 | 30 min | Transactions inline script block |
+| BUG-CSS-001 | P3 | 8-12h | 304 !important instances |
+| BUG-UIUX-ICONS-001 | P3 | 2h | empty-states.js Heroicons SVG → Bootstrap Icons |
+| BUG-UIUX-EMPTYSTATE-CSP-001 | P3 | 1h | generateEmptyStateHTML() inline onclick → event delegation |
+| BUG-NOTIF-STYLE-001 | P3 | 30 min | notification-enhancements.js inline color styles |
+| BUG-TOUR-INLINE-001 | P3 | 30 min | tour.js inline onclick → event listeners |
+| BUG-NOTIF-INLINE-002 | P3 | 30 min | toast close button inline onclick |
+| BUG-SESSIONSEC-INLINE-001 | P3 | 15 min | session-security.js warning banner dismiss inline onclick |
+| BUG-SECURITY-INLINE-002 | P3 | 10 min | session-security.js logout modal button inline onclick |
+| BUG-SECURITY-MODAL-001 | P3 | 5 min | session-security.js: new bootstrap.Modal() → getOrCreateInstance() |
+| BUG-CATEGORIZER-DUP-001 | P3 | 20 min | CATEGORIES constant duplicated in transactions.js + categorizer.js |
+| BUG-CATEGORIZER-DELAY-001 | P3 | 30 min | Batch categorizer 3.5s delay with no UX feedback |
+| BUG-LAZY-REGISTRY-001 | P3 | 1h | LazyLoader registry missing demo-data.js, budget-actuals.js, onboarding.js |
+| BUG-CSRF-DUPLICATE-001 | P3 | 30 min | Dual CSRF token systems (security-utils.js + csrf.js, same sessionStorage key) |
+| BUG-DEMO-BILLS-SCHEMA-001 | P3 | 15 min | DEMO_BILLS missing nextDueDate field |
+| BUG-POLISH-DBLINT-001 | P3 | 30 min | app-polish-enhancements.js double-init via 1s setTimeout |
+| BUG-RATELIMIT-CROSS-001 | P3 | 10 min | rate-limit-db.js: no typeof guard on disableButtonTemporarily() |
+
+### Audit Completion Status
+
+| Area | Status |
+|------|--------|
+| HTML pages (11/11) | ✅ **COMPLETE** |
+| CSS files (9/9 + 3 deleted) | ✅ **COMPLETE** |
+| JS files (26/26) | ✅ **COMPLETE** |
+
+### Production Grade
+
+**Overall: A+** — All P0/P1 bugs resolved. No new P2 bugs added this session. P3 backlog is tech debt / CSP compliance / code quality only.
+
+---
+
+**Last Updated:** 2026-02-17 06:35 EST (Sprint Research 0635 — WEBPACK BUILD PIPELINE RESEARCHED, 5 NEW TASKS)
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0635 (Feb 17, 6:35 AM) — WEBPACK BUILD PIPELINE ✅
+
+**Status:** ✅ **RESEARCH COMPLETE** — Full webpack implementation guide, 5 new tasks created
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** 5 minutes
+**Task:** Continue research backlog — all prior topics complete, moved to Webpack Build Pipeline (FC-118)
+
+### Summary
+
+All 8 prior research topics done. Pivoted to **Webpack/Build Pipeline** — the single highest-impact unresearched P1 item. Identified the global variable challenge and designed two practical implementation tracks.
+
+### Key Findings
+
+**Current state:** 463KB JS (26 files, 22 script tags/page) + 200KB CSS (9 files) — all unminified, 52 console.logs in production.
+
+**Critical insight:** The codebase uses `window.*` globals — direct webpack module bundling needs minor JS refactoring (adding `export` to 26 files, ~4h total). BUT there's a zero-refactoring Track A that delivers most of the wins immediately.
+
+**Two tracks designed:**
+
+**Track A (2-3h, zero risk, do NOW):**
+- `scripts/minify-js.js` — TerserPlugin CLI on all 26 JS files → 463KB → ~160KB (-65%)
+- Strips all 52 console.logs → **BUG-JS-001 permanently closed**
+- CSS: concat + cssnano + purgecss CLI → 200KB → ~85KB (-57%)
+- GitHub Actions build step → minified code in production
+
+**Track B (10h, proper webpack, Sprint 3):**
+- Full `webpack.config.js` with HtmlWebpackPlugin for all 11 pages
+- splitChunks: vendors/common/page-specific bundles
+- TerserPlugin `drop_console: true`
+- MiniCssExtractPlugin + PurgeCSS with Bootstrap safelist
+- Content hashing (`[contenthash:8]`) → immutable cache headers
+- 22 script tags → 3 per page
+- JS: 463KB → ~110KB total, CSS: 200KB → ~35-50KB
+
+### New Tasks Created (5 tasks)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-188 | P1 | 2h | Track A: npm build scripts (terser + cssnano CLI) |
+| FC-189 | P1 | 1h | Add build step to GitHub Actions CI |
+| FC-190 | P2 | 4h | JS module refactoring — add export to 26 files |
+| FC-191 | P2 | 5h | Track B: Full webpack config for all 11 pages |
+| FC-192 | P2 | 1h | Move Bootstrap + Supabase from CDN to npm |
+
+**Total: ~13h → 76% JS reduction, 75% CSS reduction, BUG-JS-001 closed**
+
+### Research Backlog Status
+
+All original 6 topics + 4 additional topics now complete:
+
+| Session | Topic | Status |
+|---------|-------|--------|
+| Feb 16 | CSS Architecture | ✅ Done |
+| Feb 16 | Financial Dashboard UI Patterns | ✅ Done |
+| 0450 | Chart.js | ✅ Done |
+| 0450 | Bootstrap Dark Theme | ✅ Done |
+| Feb 13 | PWA | ✅ Done |
+| Feb 13 | Performance | ✅ Done |
+| 0431 | Cash Flow Forecasting | ✅ Done |
+| 0535 | Budget vs Actuals + Demo Mode | ✅ Done |
+| **0635** | **Webpack Build Pipeline** | ✅ **Done** |
+
+**Next research topic:** Supabase Advanced Query Patterns (aggregates, RPCs, views — needed for FC-173 Operational Dashboard)
+
+### Report
+`reports/webpack-build-pipeline-research-2026-02-17.md` — Full webpack.config.js + CLI scripts + GitHub Actions config
+
+---
+
+**Last Updated:** 2026-02-17 06:31 EST (Sprint UI/UX 0631 — 5 NEW BUGS DOCUMENTED, 0 FIXES)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0631 (Feb 17, 6:31 AM) — JS LAYER AUDIT ROUND 3 ✅
+
+**Status:** ✅ **5 NEW BUGS DOCUMENTED** — No code changes this session
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~10 minutes
+**Task:** Continue UI/UX audit — check Azure DevOps, read next unaudited files, verify prior recommendations
+
+### Prior Fixes Verified ✅
+
+All commits through `d2c17e9` confirmed intact. Latest dev commit `9343f07` (2 fixes: duplicate @keyframes + dead ConfirmDialog) both verified.
+
+### Files Audited This Session
+
+| File | Status | Issues Found |
+|------|--------|-------------|
+| transactions.js (389 lines) | ⚠️ 2 issues | BUG-TRANS-INLINE-001, BUG-TRANS-MODAL-001 |
+| categorizer.js (165 lines) | ⚠️ 2 issues | BUG-CATEGORIZER-DUP-001, BUG-CATEGORIZER-DELAY-001 |
+| lazy-loader.js (112 lines) | ⚠️ 1 issue | BUG-LAZY-REGISTRY-001 |
+| chart-theme.js (175 lines) | ✅ Clean | BUG-CHARTTHEME-DEADCODE-001 confirmed fixed ✅ |
+| app-polish-enhancements.js (first look) | ℹ️ Note | ToastManager vs Toast duality already tracked (BUG-TOAST-DUPLICATE-001) |
+
+### New Bugs Found
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-TRANS-INLINE-001 | P2 | 30 min | transactions.js: category `<select>` has `onchange="updateTransactionCategory(...)"` inline handler — CSP violation (same pattern as BUG-TOUR-INLINE-001) |
+| BUG-TRANS-MODAL-001 | P3 | 5 min | addManualTransaction() uses `Modal.getInstance()` — can null-throw; fix: `getOrCreateInstance()` |
+| BUG-CATEGORIZER-DUP-001 | P3 | 20 min | `CATEGORIES` constant duplicated in transactions.js (11 items) and categorizer.js (12 items, diverged) |
+| BUG-CATEGORIZER-DELAY-001 | P3 | 30 min | categorizeTransactionsBatch() 100ms/transaction artificial delay (35 transactions = 3.5s) with zero progress feedback |
+| BUG-LAZY-REGISTRY-001 | P3 | 1h | LazyLoader missing demo-data.js, budget-actuals.js, onboarding.js — these load on ALL 11 pages unnecessarily |
+
+### Open Issues (All Remaining)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-JS-001 | P2 | 2-3h | 52 console.log remaining across all JS |
+| **BUG-TRANS-INLINE-001** | **P2** | **30 min** | **transactions.js: inline onchange handler — NEW** |
+| BUG-TOAST-DUPLICATE-001 | P2 | 2h | Toast vs ToastManager dual systems |
+| BUG-CATEGORIZER-TABLE-001 | P2 | 30 min | transaction_category_patterns table undocumented/may not exist |
+| BUG-CSS-DUPE-001 | P3 | 2h | 3x .empty-state{} in main.css + 1x components.css |
+| FC-UIUX-032 | P3 | 15 min | 171 skeleton inline width styles → CSS classes |
+| FC-UIUX-037 | P3 | 30 min | Transactions inline script block |
+| BUG-CSS-001 | P3 | 8-12h | 304 !important instances |
+| BUG-UIUX-ICONS-001 | P3 | 2h | empty-states.js Heroicons SVG → Bootstrap Icons |
+| BUG-UIUX-EMPTYSTATE-CSP-001 | P3 | 1h | generateEmptyStateHTML() inline onclick → event delegation |
+| BUG-NOTIF-STYLE-001 | P3 | 30 min | notification-enhancements.js inline color styles |
+| BUG-TOUR-INLINE-001 | P3 | 30 min | tour.js inline onclick → event delegation |
+| BUG-NOTIF-INLINE-002 | P3 | 30 min | toast close button inline onclick |
+| BUG-SESSIONSEC-INLINE-001 | P3 | 15 min | session-security.js warning dismiss inline onclick |
+| BUG-TRANS-MODAL-001 | P3 | 5 min | Modal.getInstance() → getOrCreateInstance() |
+| BUG-CATEGORIZER-DUP-001 | P3 | 20 min | CATEGORIES constant duplicated |
+| BUG-CATEGORIZER-DELAY-001 | P3 | 30 min | Batch categorizer 3.5s delay with no UX feedback |
+| BUG-LAZY-REGISTRY-001 | P3 | 1h | LazyLoader registry incomplete |
+| BUG-CSRF-DUPLICATE-001 | P3 | 30 min | Dual CSRF token systems |
+| BUG-DEMO-BILLS-SCHEMA-001 | P3 | 15 min | DEMO_BILLS missing nextDueDate field |
+
+### JS Files Audit Status
+
+| File | Status |
+|------|--------|
+| app.js | ✅ Audited (round 1) |
+| charts.js | ✅ Audited (round 1 + FC-178 fixed) |
+| email-bills.js | ✅ Audited (round 1) |
+| empty-states.js | ✅ Audited (round 2) |
+| event-handlers.js | ✅ Audited (round 2) |
+| loading-states.js | ✅ Audited (round 1) |
+| notification-enhancements.js | ✅ Audited (round 2, fixes applied) |
+| onboarding.js | ✅ Audited (round 1) |
+| plaid.js | ✅ Audited (round 1) |
+| polish-utilities.js | ✅ Audited (dead ConfirmDialog removed) |
+| reports.js | ✅ Audited (round 1) |
+| security-patch.js | ✅ Audited (round 1) |
+| subscriptions.js | ✅ Audited (round 1) |
+| toast-notifications.js | ✅ Audited (round 1 + modal fix) |
+| tour.js | ✅ Audited (round 2) |
+| demo-data.js | ✅ Audited (QA session) |
+| budget-actuals.js | ✅ Audited (QA session) |
+| transactions.js | ✅ Audited (round 3) — 2 issues found |
+| categorizer.js | ✅ Audited (round 3) — 2 issues found |
+| lazy-loader.js | ✅ Audited (round 3) — 1 issue found |
+| chart-theme.js | ✅ Audited (round 3) — Clean |
+| app-polish-enhancements.js | 🔄 Partial (first look, BUG-TOAST-DUPLICATE already tracked) |
+| session-security.js | ⏳ Not fully audited (BUG-SESSIONSEC-INLINE-001 already found by QA) |
+| security-utils.js | ⏳ Not audited |
+| csrf.js | ⏳ Not audited (BUG-CSRF-DUPLICATE already found) |
+| rate-limiter.js | ⏳ Not audited |
+| rate-limit-db.js | ⏳ Not audited |
+
+### Production Grade
+
+**Overall: A+** — No new P0/P1 bugs. BUG-TRANS-INLINE-001 (P2) is a CSP compliance issue affecting the transaction category dropdown in every rendered row — should be fixed before production CSP header enforcement.
+
+---
+
 **Last Updated:** 2026-02-17 06:20 EST (Sprint QA 0620 — 7 FIXES + 2 NEW BUGS DOCUMENTED)
 
 ---
