@@ -67,6 +67,13 @@
     </div>
 
     <main class="main-content flex-grow-1" id="main-content">
+  <!-- FC-184: Demo Mode Banner -->
+  <div id="demoBanner" class="alert alert-info alert-dismissible d-none"
+       style="border-radius: 0; margin: 0; position: sticky; top: 0; z-index: 1060; border-left: none; border-right: none; border-top: none;">
+    <i class="bi bi-eye me-2"></i>
+    <strong>Preview Mode</strong> — You're viewing sample data. This is a demo of Fireside Capital.
+    <a href="#" onclick="disableDemoMode(); return false;" class="alert-link ms-2">Sign in for real data ?</a>
+  </div>
       <div class="page-header">
         <h2>Debts</h2>
         <div class="page-header-actions">
@@ -344,6 +351,7 @@
   <script src="assets/js/session-security.js"></script>
   <script src="assets/js/empty-states.js"></script>
   <script src="assets/js/toast-notifications.js"></script>
+  <script src="assets/js/demo-data.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/event-handlers.js"></script>
   

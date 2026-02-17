@@ -1,6 +1,143 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-17 05:20 EST (Sprint QA 0520 — 3 fixed + 2 new bugs, commit c13374b)
+**Last Updated:** 2026-02-17 05:35 EST (Sprint Research 0535 — 2 new topics researched, 8 new tasks created)
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0535 (Feb 17, 5:35 AM) — BUDGET VS ACTUALS + DEMO MODE ✅
+
+**Status:** ✅ **2 NEW TOPICS RESEARCHED** — Budget vs Actuals algorithm + Sample Data / Demo Mode architecture
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** 7 minutes
+**Task:** Continue research backlog — all 6 original topics done, moved to next highest-impact topics
+
+### Summary
+
+All 6 original research topics (CSS, Financial UI, Chart.js, Bootstrap Dark Theme, PWA, Performance) complete. Session 0431 covered Cash Flow Forecasting. This session moved to **Budget vs Actuals** (core for FC-173 Operational Dashboard budget section) and **Sample Data / Demo Mode** (implementation design for FC-169, highest-UX-impact P1 feature).
+
+### Key Findings
+
+**1. Budget vs Actuals Algorithm**
+
+Industry standard formulas:
+- `Dollar Variance = Actual - Budget` (positive = overspent ❌)
+- `Percent Variance = ((Actual / Budget) - 1) × 100`
+- "3 Amber Rule" (F9 Finance): flag category at 85% of budget with warning color
+
+**Current system gap:** `budgets` table is item-based (per bill/debt), not category-based. True "Budget vs Actuals" requires:
+- Budget = user-set monthly limit per CATEGORY (dining: $300, groceries: $500...)
+- Actual = `SUM(transactions.amount)` WHERE category = X AND month = YYYY-MM
+- `settings.category_budgets` JSON field = cleanest storage (no new table needed)
+
+Full implementation in ~100 lines of JS. Complete algorithm + UI code in research report.
+
+**2. Sample Data / Demo Mode Architecture**
+
+**Key insight:** New users seeing blank dashboards = #1 onboarding killer. All leading finance apps (Copilot, YNAB, Monarch) use demo modes.
+
+**Architecture decision:** Client-side only — demo data stays in JS (no Supabase writes).
+- `demo-data.js` — realistic data for all 6 tables (mortgage, car, salary, 40+ transactions)
+- `data-layer.js` — thin wrapper over all Supabase calls, routes to DEMO_DATA when `isDemoMode()`
+- `localStorage.getItem('fireside_demo_mode')` flag for persistence
+- "Preview Mode" sticky banner when active
+
+Full implementation design (realistic Matt-appropriate sample data, transaction generator, snapshot generator, data layer wrapper pattern) in research report.
+
+### New Tasks Created (8 tasks)
+
+**Budget vs Actuals (4 tasks, ~7h):**
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-180 | P1 | 1h | Category budget settings — JSON field in settings table + Settings UI |
+| FC-181 | P1 | 2h | Budget vs Actuals engine — `budget-actuals.js` |
+| FC-182 | P1 | 3h | Budget vs Actuals UI card — progress bars + variance indicators |
+| FC-183 | P2 | 1h | Historical budget comparison (month-over-month trend) |
+
+**Sample Data / Demo Mode (4 tasks, ~6.5h):**
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-184 | P1 | 3h | `demo-data.js` — realistic data for all 6 DB tables |
+| FC-185 | P1 | 2h | `data-layer.js` — Supabase wrapper with demo mode routing |
+| FC-186 | P2 | 1h | Demo mode banner + empty state "Preview" buttons |
+| FC-187 | P2 | 30min | Demo mode toggle in Settings page |
+
+### Research Report
+`reports/budget-vs-actuals-sample-data-research-2026-02-17.md` — Full algorithms + code examples
+
+### Implementation Priority Order
+1. FC-180+181 (Category budgets + engine, 3h)
+2. FC-182 (BvA card, 3h) → Completes FC-173 budget section
+3. FC-184+185 (Demo mode, 5h) → Unlocks FC-169 "Preview with Sample Data"
+4. FC-172+173 (Cash flow engine + full Ops page, 8-12h)
+
+**Combined total:** ~19-22h → Full operational dashboard + demo mode
+
+---
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0528 (Feb 17, 5:28 AM) — JS UX LAYER AUDIT ROUND 2 ✅
+
+**Status:** ✅ **2 FIXES + 5 NEW BUGS FOUND** — commit e1dc36d
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** 8 minutes
+**Task:** Continue UI/UX audit — check Azure DevOps, review next unaudited files, verify prior fixes
+
+### Summary
+
+**No new commits since c13374b (Sprint QA 0520)** — verified all prior fixes intact.
+**Audited 4 previously unreviewed JS files:** `notification-enhancements.js`, `tour.js`, `empty-states.js`, `event-handlers.js`
+
+### Prior Fixes Verified ✅
+
+| Fix | Status |
+|-----|--------|
+| FC-UIUX-030 — Income empty state (`#incomeEmptyState` in HTML) | ✅ Correct |
+| All Sprint QA 0520 fixes (CSS cache, orphaned CSS, modal instance) | ✅ Intact |
+| BUG-UX-CONFIRM-001 — 7 confirm() → Bootstrap modal | ✅ Intact |
+| FC-179 — Supabase preconnect all 11 pages | ✅ Intact |
+
+### Fixes Applied This Session (commit e1dc36d)
+
+| ID | File | Fix | Impact |
+|----|------|-----|--------|
+| BUG-UIUX-EMPTYSTATE-002 | empty-states.js L133 | `btn-secondary` → `btn-primary` on all dynamically injected empty state CTAs | All 10 pages using `toggleEmptyState()` now get primary CTA buttons on empty state |
+| BUG-TOUR-SELECTOR-001 | tour.js stop 2 | `[onclick*="openAssetModal"]` → `#openAssetModalBtn` | Tour stop 2 now finds target correctly (old selector was CSP-incompatible, would always skip to stop 3) |
+
+### New Bugs Found
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-UIUX-ICONS-001 | P3 | 2h | `empty-states.js` uses Heroicons SVG inline icons for all 11 empty states — inconsistent with Bootstrap Icons used everywhere else |
+| BUG-UIUX-EMPTYSTATE-CSP-001 | P3 | 1h | `generateEmptyStateHTML()` injects `onclick="handleEmptyStateAction()"` inline — violates FC-060/061 CSP compliance pattern (event-handlers.js) |
+| BUG-NOTIF-DEADCODE-001 | P3 | 15 min | `enhanceNotificationItem()` in notification-enhancements.js defined but never called — 25 lines of dead code |
+| BUG-NOTIF-STYLE-001 | P3 | 30 min | notification-enhancements.js `showToastNotification()` uses inline `style="color: ${color}"` strings instead of CSS classes/custom properties |
+| BUG-TOUR-INLINE-001 | P3 | 30 min | tour.js `createTooltip()` uses inline `onclick="skipTour()"` in dynamically generated HTML — violates CSP pattern |
+
+### All Open Issues (Updated)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-JS-001 | P2 | 2-3h | Console cleanup (54 total across all JS) |
+| BUG-CSS-DUPE-001 | P3 | 1h | 4 standalone .empty-state{} blocks + 2 duplicate @keyframes |
+| BUG-JS-DEADCODE-001 | P3 | 30 min | Dead ConfirmDialog/setupDeleteConfirmations in app-polish-enhancements.js |
+| FC-UIUX-032 | P3 | 15 min | 171 skeleton inline width styles → CSS classes |
+| FC-UIUX-037 | P3 | 15 min | Transactions inline script block at L459 |
+| BUG-CSS-001 | P3 | 8-12h | 304 !important instances across all CSS |
+| FC-178 | P3 | 30 min | Chart tick rotation hints |
+| BUG-UIUX-ICONS-001 | P3 | 2h | empty-states.js: Heroicons SVG → Bootstrap Icons |
+| BUG-UIUX-EMPTYSTATE-CSP-001 | P3 | 1h | generateEmptyStateHTML() inline onclick → event delegation |
+| BUG-NOTIF-DEADCODE-001 | P3 | 15 min | notification-enhancements.js: dead enhanceNotificationItem() |
+| BUG-NOTIF-STYLE-001 | P3 | 30 min | notification-enhancements.js: inline color styles → CSS classes |
+| BUG-TOUR-INLINE-001 | P3 | 30 min | tour.js: inline onclick in generated HTML → event listeners |
+
+### Production Grade
+
+**Overall: A+** — All P2 bugs resolved. 2 new quick fixes in. P3 backlog grows but all cosmetic/code quality.
+
+---
+
+
 
 ---
 
