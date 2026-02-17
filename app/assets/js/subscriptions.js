@@ -217,16 +217,21 @@ async function loadSubscriptionWidget() {
  * @param {String} billId - Bill ID
  */
 async function removeSubscription(billId) {
-  if (!confirm('Mark this as not a subscription?')) return;
-  
-  await markAsSubscription(billId, false);
-  
-  // Reload widget
-  await loadSubscriptionWidget();
-  
-  // Also reload dashboard cards and bills table if they exist
-  if (typeof updateDashboardCards === 'function') updateDashboardCards();
-  if (typeof renderBills === 'function') renderBills();
+  showConfirmModal(
+    'Remove Subscription',
+    'Mark this as not a subscription?',
+    async () => {
+      await markAsSubscription(billId, false);
+
+      // Reload widget
+      await loadSubscriptionWidget();
+
+      // Also reload dashboard cards and bills table if they exist
+      if (typeof updateDashboardCards === 'function') updateDashboardCards();
+      if (typeof renderBills === 'function') renderBills();
+    },
+    { confirmText: 'Remove', confirmClass: 'btn-warning' }
+  );
 }
 
 // ===== BILLS PAGE INTEGRATION =====

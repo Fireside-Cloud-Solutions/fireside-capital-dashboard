@@ -1171,9 +1171,12 @@ async function saveInvestment() {
 }
 function confirmDeleteInvestment(id, name) {
   // BUG-04 FIX: Accept name as parameter instead of looking up by ID (prevents "undefined" for new items)
-  if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      deleteInvestmentConfirmed(id);
-  }
+  showConfirmModal(
+    'Delete Investment',
+    `Are you sure you want to delete "${name}"?`,
+    () => deleteInvestmentConfirmed(id),
+    { confirmText: 'Delete', confirmClass: 'btn-danger' }
+  );
 }
 async function deleteInvestmentConfirmed(id) {
   // Rate limiting
@@ -3091,7 +3094,18 @@ async function deleteBudgetItem(itemId, monthString) {
   }
 
   if (!currentUser || !itemId) return;
-  if (!confirm('Remove this item from the budget for this month?')) return;
+
+  showConfirmModal(
+    'Remove Budget Item',
+    'Remove this item from the budget for this month?',
+    () => _deleteBudgetItemConfirmed(itemId, monthString),
+    { confirmText: 'Remove', confirmClass: 'btn-danger' }
+  );
+}
+
+// Internal: performs the actual budget item deletion after user confirmation
+async function _deleteBudgetItemConfirmed(itemId, monthString) {
+  if (!currentUser || !itemId) return;
 
   // Check if there's a budget record for this item (bill/debt items may not have one yet)
   const { data: existing } = await sb
@@ -4528,12 +4542,15 @@ async function cancelFriendRequest(connectionId) {
 }
 
 async function removeFriend(connectionId, friendName) {
-  if (!confirm(`Are you sure you want to remove ${friendName} from your friends?`)) return;
-  
-  await sb.from('connections')
-    .delete()
-    .eq('id', connectionId);
-  loadFriendsPage();
+  showConfirmModal(
+    'Remove Friend',
+    `Are you sure you want to remove ${friendName} from your friends?`,
+    async () => {
+      await sb.from('connections').delete().eq('id', connectionId);
+      loadFriendsPage();
+    },
+    { confirmText: 'Remove', confirmClass: 'btn-danger' }
+  );
 }
 
 async function loadFriendsPage() {
@@ -4888,16 +4905,20 @@ function renderMySharedBills(shares) {
 }
 
 async function revokeShareBill(shareId) {
-  if (!confirm('Are you sure you want to revoke this shared bill? The other person will no longer see it.')) return;
-  
-  const { error } = await sb.from('bill_shares').delete().eq('id', shareId).eq('owner_id', currentUser.id);
-  if (error) {
-    alert('Error revoking share: ' + error.message);
-    return;
-  }
-  
-  await loadSharedBillsData();
-  renderBills(); // Re-render to update share indicators
+  showConfirmModal(
+    'Revoke Shared Bill',
+    'Are you sure you want to revoke this shared bill? The other person will no longer see it.',
+    async () => {
+      const { error } = await sb.from('bill_shares').delete().eq('id', shareId).eq('owner_id', currentUser.id);
+      if (error) {
+        Toast.error('Error revoking share: ' + error.message);
+        return;
+      }
+      await loadSharedBillsData();
+      renderBills(); // Re-render to update share indicators
+    },
+    { confirmText: 'Revoke', confirmClass: 'btn-danger' }
+  );
 }
 
 async function openShareBillModal(billId) {

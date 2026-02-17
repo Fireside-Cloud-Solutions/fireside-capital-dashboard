@@ -317,3 +317,64 @@ window.alert = function(message) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = Toast;
 }
+
+// ===== BOOTSTRAP CONFIRMATION MODAL =====
+
+/**
+ * Show a Bootstrap confirmation modal for destructive actions.
+ * Replaces native confirm() with a styled, non-blocking modal.
+ *
+ * @param {string}   title        - Modal heading (e.g. "Delete Investment")
+ * @param {string}   message      - Body text (e.g. "Are you sure you want to delete…")
+ * @param {Function} onConfirm    - Called when user clicks the confirm button
+ * @param {Object}   [opts]
+ * @param {string}   [opts.confirmText='Confirm']    - Confirm button label
+ * @param {string}   [opts.confirmClass='btn-danger'] - Bootstrap button class
+ */
+function showConfirmModal(title, message, onConfirm, opts = {}) {
+  const {
+    confirmText  = 'Confirm',
+    confirmClass = 'btn-danger',
+  } = opts;
+
+  // Lazily inject the modal HTML once
+  const MODAL_ID = 'globalConfirmModal';
+  if (!document.getElementById(MODAL_ID)) {
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="modal fade" id="${MODAL_ID}" tabindex="-1"
+           aria-labelledby="${MODAL_ID}Label" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="${MODAL_ID}Label"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="${MODAL_ID}Body"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn" id="${MODAL_ID}Btn"></button>
+            </div>
+          </div>
+        </div>
+      </div>`);
+  }
+
+  // Populate title & body
+  document.getElementById(`${MODAL_ID}Label`).textContent = title;
+  document.getElementById(`${MODAL_ID}Body`).textContent  = message;
+
+  // Update confirm button (clone to wipe old click listeners)
+  const oldBtn  = document.getElementById(`${MODAL_ID}Btn`);
+  const newBtn  = oldBtn.cloneNode(true);
+  newBtn.textContent  = confirmText;
+  newBtn.className    = `btn ${confirmClass}`;
+  oldBtn.replaceWith(newBtn);
+
+  newBtn.addEventListener('click', () => {
+    bootstrap.Modal.getInstance(document.getElementById(MODAL_ID))?.hide();
+    onConfirm();
+  });
+
+  // Show
+  new bootstrap.Modal(document.getElementById(MODAL_ID)).show();
+}

@@ -515,16 +515,17 @@ async function approveAllHighConfidence() {
     return;
   }
 
-  const confirmed = confirm(
-    `Approve ${highConfidenceBills.length} high-confidence bills?`
+  showConfirmModal(
+    'Approve Bills',
+    `Approve ${highConfidenceBills.length} high-confidence bills?`,
+    async () => {
+      for (const bill of highConfidenceBills) {
+        await approveBill(bill.id);
+      }
+      showToast(`Approved ${highConfidenceBills.length} bills`, 'success');
+    },
+    { confirmText: 'Approve All', confirmClass: 'btn-success' }
   );
-  if (!confirmed) return;
-
-  for (const bill of highConfidenceBills) {
-    await approveBill(bill.id);
-  }
-
-  showToast(`Approved ${highConfidenceBills.length} bills`, 'success');
 }
 
 /**
@@ -540,16 +541,17 @@ async function rejectAllLowConfidence() {
     return;
   }
 
-  const confirmed = confirm(
-    `Reject ${lowConfidenceBills.length} low-confidence bills?`
+  showConfirmModal(
+    'Reject Bills',
+    `Reject ${lowConfidenceBills.length} low-confidence bills?`,
+    async () => {
+      for (const bill of lowConfidenceBills) {
+        await rejectBill(bill.id);
+      }
+      showToast(`Rejected ${lowConfidenceBills.length} bills`, 'success');
+    },
+    { confirmText: 'Reject All', confirmClass: 'btn-danger' }
   );
-  if (!confirmed) return;
-
-  for (const bill of lowConfidenceBills) {
-    await rejectBill(bill.id);
-  }
-
-  showToast(`Rejected ${lowConfidenceBills.length} bills`, 'success');
 }
 
 /**
