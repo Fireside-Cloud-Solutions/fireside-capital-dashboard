@@ -2758,6 +2758,11 @@ main {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* BUG-SKEL-001: Hide skeleton when card finishes loading */
+.summary-card:not(.loading) .skeleton-loader {
+  display: none !important;
+}
+
 .skeleton-line {
   height: 16px;
   background: linear-gradient(

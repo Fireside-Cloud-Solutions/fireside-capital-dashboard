@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-16 07:36 EST (Sprint Research: CSS architecture + financial dashboard UI patterns complete, 11 new items added FC-161 through FC-171)
+**Last Updated:** 2026-02-17 04:05 EST (Sprint UI/UX Final Audit: Income + Transactions + Friends audited, 16 new items FC-UIUX-029 through FC-UIUX-044 — AUDIT 100% COMPLETE 11/11 pages)
 
 ---
 
@@ -229,6 +229,22 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-169 | Feature | P1 | M | Ready | **Add contextual empty states with sample data toggle** — Educational empty states with "Preview with Sample Data" button for new users (3h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
 | FC-170 | Feature | P2 | S | Ready | **Add keyboard navigation for charts** — Allow arrow keys to navigate data points with screen reader announcements (2h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
 | FC-171 | Feature | P3 | S | Ready | **Add "Export to Excel" for all tables** — Financial users expect Excel exports, add XLSX export function (1h) — Sprint Research Task (Session 0736) — Financial Dashboard UI Patterns |
+| FC-UIUX-029 | Feature | P1 | S | Done | **Income page missing KPI summary cards** — Only financial page with ZERO stat cards. Add Monthly Total, Annual Total, Next Paycheck cards above the income table (2h) — FIXED commit 1b38a90 (2026-02-17) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-030 | Feature | P2 | XS | Ready | **Income page missing empty state** — Skeleton rows vanish on empty data, no guidance shown. Add #incomeEmptyState div with btn-primary CTA (20 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-031 | Bug | P3 | XS | Ready | **Income modal field order suboptimal** — Amount before Date/Frequency. Reorder: Name → Type → Amount → Frequency → Date (2 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-032 | Chore | P3 | XS | Ready | **Income skeleton inline width styles** — 18 skeleton cells use inline style="width:XXpx". Add .skeleton-col-sm/md/lg CSS utilities (15 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-033 | Bug | P2 | XS | Done | **Transactions "Sync from Bank" wrong button style** — Uses btn-secondary (filled blue) for utility action, should be btn-outline-secondary (2 min) — FIXED commit 1b38a90 (2026-02-17) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-034 | Bug | P2 | XS | Ready | **Transactions primary action outside page-header-actions** — "Add Transaction" inside #dataContainer instead of .page-header-actions like all other pages (20 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-035 | Feature | P2 | S | Ready | **Transactions page missing skeleton loaders** — Table starts empty with just a CSS spinner. Add skeleton rows matching 5-column structure (20 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-036 | Bug | P2 | XS | Done | **Transactions empty state CTA uses btn-secondary** — Empty state buttons should be btn-primary to drive onboarding action (2 min) — FIXED commit 1b38a90 (2026-02-17) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-037 | Chore | P3 | XS | Ready | **Transactions inline script block in HTML** — 82-line script block at EOF should be extracted to transactions-init.js (15 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-038 | Bug | P3 | XS | Done | **Transactions "Apply Filters" uses btn-secondary** — Primary panel action should be btn-primary to differentiate from "Clear" (2 min) — FIXED commit 1b38a90 (2026-02-17) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-039 | Bug | P2 | XS | Ready | **Friends page all empty state CTAs use btn-secondary** — 3 empty state buttons across Pending/Friends/Outgoing sections should be btn-primary (5 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-040 | Feature | P2 | XS | Ready | **Friends page-header-actions empty** — Only page with user content but zero header action button. Add "Find Friend" CTA to header (30 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-041 | Feature | P2 | S | Ready | **Friends page missing skeleton loaders** — FC-040 marked Done but no skeletons in static HTML for 3 content sections (30 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-042 | Bug | P3 | XS | Ready | **Friends search button uses btn-secondary** — Input-group trigger action should be btn-primary (2 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-043 | Bug | P3 | XS | Ready | **Friends H2 title mismatch** — H2 says "Friends & Connections", sidebar says "Friends" — should match (1 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
+| FC-UIUX-044 | Bug | P3 | XS | Ready | **Friends empty states use inline SVG icons** — 3 empty state icon sections use raw SVG instead of Bootstrap Icons like all other pages (5 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
 
 ### EPIC-002: Mobile Application
 

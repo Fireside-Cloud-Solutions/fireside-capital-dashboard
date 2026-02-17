@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fireside Capital - Friends</title>
+  <title>Fireside Capital - Friends &amp; Connections</title>
   <meta name="description" content="Share bills and expenses with friends, roommates, and family members. Split shared costs and track who owes what.">
   
   <!-- PWA Manifest -->
@@ -74,7 +74,7 @@
             <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
               <i class="bi bi-box-arrow-in-right"></i> Login
             </button>
-            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#signupModal">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal">
               <i class="bi bi-person-plus"></i> Sign Up
             </button>
           </div>
@@ -117,7 +117,7 @@
           <div class="input-group">
             <label for="friendSearchInput" class="visually-hidden">Search by username or email</label>
             <input type="text" class="form-control" id="friendSearchInput" placeholder="Search by username or email..." autocomplete="off">
-            <button class="btn btn-secondary" type="button" id="friendSearchBtn">
+            <button class="btn btn-primary" type="button" id="friendSearchBtn">
               <i class="bi bi-search"></i> Search
             </button>
           </div>
@@ -130,14 +130,10 @@
           <div id="pendingRequestsContainer" class="row g-3 mb-4">
             <div class="col-12">
               <div class="empty-state" data-empty-state="pending-requests">
-                <div class="empty-state-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                  </svg>
-                </div>
+                <i class="bi bi-inbox empty-state-icon"></i>
                 <h3 class="empty-state-title">No pending requests</h3>
                 <p class="empty-state-text">When someone sends you a friend request, it will appear here.</p>
-                <button class="btn btn-secondary" data-action="focus-friend-search">
+                <button class="btn btn-primary" data-action="focus-friend-search">
                   <i class="bi bi-search me-1"></i> Search for Friends
                 </button>
               </div>
@@ -150,14 +146,10 @@
         <div id="myFriendsContainer" class="row g-3 mb-4">
           <div class="col-12">
             <div class="empty-state" data-empty-state="my-friends">
-              <div class="empty-state-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
+              <i class="bi bi-people empty-state-icon"></i>
               <h3 class="empty-state-title">No friends yet</h3>
               <p class="empty-state-text">Search for friends by username or email to start connecting and sharing expenses.</p>
-              <button class="btn btn-secondary" data-action="focus-friend-search">
+              <button class="btn btn-primary" data-action="focus-friend-search">
                 <i class="bi bi-search me-1"></i> Find Friends
               </button>
             </div>
@@ -170,14 +162,10 @@
           <div id="outgoingRequestsContainer" class="row g-3 mb-4">
             <div class="col-12">
               <div class="empty-state" data-empty-state="outgoing-requests">
-                <div class="empty-state-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </div>
+                <i class="bi bi-send empty-state-icon"></i>
                 <h3 class="empty-state-title">No sent requests</h3>
                 <p class="empty-state-text">Friend requests you send will appear here while waiting for acceptance.</p>
-                <button class="btn btn-secondary" data-action="focus-friend-search">
+                <button class="btn btn-primary" data-action="focus-friend-search">
                   <i class="bi bi-search me-1"></i> Search for Friends
                 </button>
               </div>
