@@ -2989,7 +2989,7 @@ async function saveBudgetItem() {
     user_id: currentUser.id,
     month: monthString,
     item_id: customItemId,
-    item_type: 'custom',
+    item_type: 'saving',  // Must be 'bill', 'debt', or 'saving' per DB constraint
     name: document.getElementById('budgetItemName').value,
     category: document.getElementById('budgetItemCategory').value,
     needed_amount: neededAmount,

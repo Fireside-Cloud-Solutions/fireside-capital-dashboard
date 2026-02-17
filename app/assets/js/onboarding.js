@@ -103,41 +103,59 @@ function onboardingSkipProfile() {
 
 // ===== STEP 3: QUICK START OPTIONS =====
 function onboardingQuickStartAction(action) {
-  // Close onboarding modal temporarily
   const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('onboardingModal'));
-  if (onboardingModal) {
-    onboardingModal.hide();
+  let actionSucceeded = false;
+  
+  try {
+    // Open the relevant modal based on action
+    switch(action) {
+      case 'connect-bank':
+        if (typeof openPlaidLink === 'function') {
+          openPlaidLink();
+          actionSucceeded = true;
+        } else {
+          alert('Bank connection feature is not yet available. Continuing setup...');
+        }
+        break;
+      case 'add-asset':
+        if (typeof openAssetModal === 'function') {
+          openAssetModal();
+          actionSucceeded = true;
+        } else {
+          alert('Asset feature is loading. Please try again in a moment.');
+        }
+        break;
+      case 'add-bill':
+        if (typeof openBillModal === 'function') {
+          openBillModal();
+          actionSucceeded = true;
+        } else {
+          alert('Bills feature is loading. Please try again in a moment.');
+        }
+        break;
+      case 'add-income':
+        if (typeof openIncomeModal === 'function') {
+          openIncomeModal();
+          actionSucceeded = true;
+        } else {
+          alert('Income feature is loading. Please try again in a moment.');
+        }
+        break;
+    }
+  } catch (err) {
+    console.error('Error in quick start action:', err);
+    alert('Something went wrong. Please try again.');
   }
   
-  // Open the relevant modal based on action
-  switch(action) {
-    case 'connect-bank':
-      // Trigger Plaid link
-      if (typeof openPlaidLink === 'function') {
-        openPlaidLink();
-      } else {
-        alert('Bank connection feature is not yet available.');
-      }
-      break;
-    case 'add-asset':
-      if (typeof openAssetModal === 'function') {
-        openAssetModal();
-      }
-      break;
-    case 'add-bill':
-      if (typeof openBillModal === 'function') {
-        openBillModal();
-      }
-      break;
-    case 'add-income':
-      if (typeof openIncomeModal === 'function') {
-        openIncomeModal();
-      }
-      break;
+  if (actionSucceeded) {
+    // Only close onboarding if the action worked
+    if (onboardingModal) {
+      onboardingModal.hide();
+    }
+    // Set flag to continue onboarding after modal closes
+    window.onboardingPendingStep = 4; // Will resume at Feature Tour step
   }
-  
-  // Set flag to continue onboarding after modal closes
-  window.onboardingPendingStep = 4; // Will resume at Feature Tour step
+  // If action failed, onboarding stays open so user can try again or skip
 }
 
 function onboardingSkipQuickStart() {
@@ -199,22 +217,40 @@ async function onboardingComplete() {
 }
 
 // ===== MAIN ONBOARDING TRIGGER =====
+let onboardingInProgress = false;
+
 function showOnboardingWizard() {
+  // Don't reset if already showing onboarding
+  const modalEl = document.getElementById('onboardingModal');
+  if (!modalEl) return;
+  
+  // Check if modal is already visible or onboarding is in progress
+  if (onboardingInProgress || modalEl.classList.contains('show')) {
+    return; // Don't reset — user is already in onboarding flow
+  }
+  
+  onboardingInProgress = true;
+  
   // Reset to first step
   currentOnboardingStep = 1;
   showOnboardingStep(1);
   
   // Show the modal
-  const onboardingModal = new bootstrap.Modal(document.getElementById('onboardingModal'), {
+  const onboardingModal = new bootstrap.Modal(modalEl, {
     backdrop: 'static', // Prevent clicking outside to close
     keyboard: false     // Prevent ESC key from closing
   });
   onboardingModal.show();
+  
+  // Clear flag when modal is hidden
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    onboardingInProgress = false;
+  }, { once: true });
 }
 
 // ===== RESUME ONBOARDING AFTER EXTERNAL MODAL =====
-// Called when user finishes adding an item during Quick Start
-window.addEventListener('modalClosed', () => {
+// Hook into Bootstrap modal close events for asset/bill/income modals
+function resumeOnboardingIfPending() {
   if (window.onboardingPendingStep) {
     const stepToResume = window.onboardingPendingStep;
     window.onboardingPendingStep = null;
@@ -226,4 +262,18 @@ window.addEventListener('modalClosed', () => {
       onboardingModal.show();
     }, 300); // Small delay for smooth transition
   }
+}
+
+// Listen for Bootstrap modal hidden events on add item modals
+document.addEventListener('DOMContentLoaded', () => {
+  const modalIds = ['addAssetModal', 'addBillModal', 'addIncomeModal', 'addDebtModal'];
+  modalIds.forEach(id => {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.addEventListener('hidden.bs.modal', resumeOnboardingIfPending);
+    }
+  });
 });
+
+// Legacy support: also listen for custom modalClosed event
+window.addEventListener('modalClosed', resumeOnboardingIfPending);

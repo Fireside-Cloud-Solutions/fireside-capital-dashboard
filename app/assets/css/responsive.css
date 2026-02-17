@@ -1134,9 +1134,7 @@ body.sidebar-open {
 /* Investments table: Hide Starting Balance + Monthly Contribution on medium screens */
 @media (max-width: 1399.98px) {
   #investmentTableBody tr td:nth-child(3),
-  #investmentTableBody tr td:nth-child(4),
-  #investmentTableBody ~ thead tr th:nth-child(3),
-  #investmentTableBody ~ thead tr th:nth-child(4) {
+  #investmentTableBody tr td:nth-child(4) {
     display: none;
   }
   
