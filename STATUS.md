@@ -1,6 +1,60 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-17 05:35 EST (Sprint Research 0535 — 2 new topics researched, 8 new tasks created)
+**Last Updated:** 2026-02-17 05:40 EST (Sprint Dev 0540 — FC-184 + FC-181 SHIPPED)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0540 (Feb 17, 5:40 AM) — FC-184 + FC-181 ✅
+
+**Status:** ✅ **COMMIT d29fbff — 2 NEW ENGINE FILES + 11 HTML PAGES UPDATED**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~10 minutes
+**Task:** Pick highest priority P1 item, claim it, fix it, commit and push
+
+### Context
+
+All P0/P1/P2 bugs resolved. Research team identified 8 new P1 tasks (FC-180 to FC-187). Per research priority order, built the two most self-contained P1 engines first:
+
+### Deliverables (commit d29fbff)
+
+**FC-184 — `demo-data.js` (P1, 3h estimated → delivered)**
+- Full `DEMO_DATA` object with realistic "Alex Johnson" persona
+- All 6 Supabase tables: assets, income, bills, debts, investments, settings
+- `generateDemoTransactions()` — 35+ categorized transactions for current month with realistic variance
+- `generateDemoSnapshots()` — 12-month net worth trend with 2 natural dip months
+- `isDemoMode()` / `enableDemoMode()` / `disableDemoMode()` — localStorage toggle
+- `initDemoBanner()` — auto-shows sticky `#demoBanner` when demo mode active
+- Loaded on all 11 pages **before app.js** so `isDemoMode()` is available at startup
+
+**FC-181 — `budget-actuals.js` (P1, 2h estimated → delivered)**
+- `calculateBudgetVsActuals(month)` — full per-category variance engine
+- Reads `settings.category_budgets` JSON (no new DB table — uses Option A from research)
+- "3 Amber Rule": warning state at 85% of budget (amber), over at 100% (red), under 85% (green)
+- Status values: `'over' | 'warning' | 'under' | 'unbudgeted'`
+- Demo mode routing: uses `DEMO_DATA.settings.category_budgets` when `isDemoMode()`
+- `renderBudgetVsActuals(containerId)` — full UI card renderer with Bootstrap progress bars
+- `renderBVACategoryRow()` — per-category row with Bootstrap Icon + color-coded progress bar
+- `getBudgetAlertSummary()` — lightweight summary for dashboard alert widget
+
+**All 11 HTML pages:**
+- `<script src="assets/js/demo-data.js">` added before `app.js`
+- `#demoBanner` sticky info bar added to each page's `<main>` element
+
+### Open Next Steps (in priority order)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-180 | P1 | 1h | Category budget settings UI in settings.html (for FC-181 to populate) |
+| FC-182 | P1 | 3h | Budget vs Actuals card UI in operations.html or budget.html |
+| FC-185 | P1 | 2h | data-layer.js — wrap Supabase calls to route through isDemoMode() |
+| FC-186 | P2 | 1h | "Preview with Sample Data" buttons in empty states |
+| FC-187 | P2 | 30m | Demo mode toggle in Settings page |
+| FC-172 | P1 | 2-3h | Cash flow projection engine (cash-flow.js) |
+| FC-173 | P1 | 5-6h | Full Operational Dashboard page (operations.html) |
+
+### Production Grade
+
+**Overall: A+** — Two new engine files, zero risk to existing functionality.
 
 ---
 

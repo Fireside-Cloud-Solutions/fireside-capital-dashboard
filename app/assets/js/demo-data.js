@@ -230,6 +230,10 @@ function generateDemoSnapshots() {
 
 // ─── Main DEMO_DATA Export ────────────────────────────────────────────────────
 
+// Memoized demo data — generated once per page session, consistent across calls
+let _demoTransactionsCache = null;
+let _demoSnapshotsCache = null;
+
 const DEMO_DATA = {
   user: DEMO_USER,
   assets: DEMO_ASSETS,
@@ -239,9 +243,16 @@ const DEMO_DATA = {
   investments: DEMO_INVESTMENTS,
   settings: DEMO_SETTINGS,
 
-  // Lazy getters — generated fresh each call
-  get transactions() { return generateDemoTransactions(); },
-  get snapshots()    { return generateDemoSnapshots(); }
+  // Memoized getters — generated once, then cached for page session consistency
+  // (enableDemoMode/disableDemoMode reload the page, so cache is always fresh)
+  get transactions() {
+    if (!_demoTransactionsCache) _demoTransactionsCache = generateDemoTransactions();
+    return _demoTransactionsCache;
+  },
+  get snapshots() {
+    if (!_demoSnapshotsCache) _demoSnapshotsCache = generateDemoSnapshots();
+    return _demoSnapshotsCache;
+  }
 };
 
 // ─── Demo Banner Init ────────────────────────────────────────────────────────
