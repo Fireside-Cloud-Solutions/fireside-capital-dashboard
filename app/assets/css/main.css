@@ -3605,3 +3605,8 @@ body[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
   border-right: none;
   border-top: none;
 }
+
+/* FC-180: Budget total preview panel */
+.budget-total-preview {
+  background: var(--bs-tertiary-bg, rgba(255,255,255,0.05));
+}

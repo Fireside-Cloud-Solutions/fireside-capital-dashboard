@@ -2714,6 +2714,7 @@ async function renderAdditionalCharts() {
 // This is the main function that runs when the budget page loads or the month changes
 // BUG-BUDGET-DOUBLE-RENDER-001: Mutex prevents concurrent renders (e.g. init + loadSharedBillsData)
 let _budgetRenderLock = false;
+let _budgetRenderQueued = false;
 async function loadAndRenderBudget() {
   // Only run this function if we are on the budget page
   if (!document.getElementById('budgetAssignmentTable')) return;
@@ -3064,7 +3065,6 @@ async function loadAndRenderBudget() {
     _budgetRenderLock = false;
   }
 }
-let _budgetRenderQueued = false;
 async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
   // CSRF Protection
   try {
