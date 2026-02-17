@@ -894,6 +894,19 @@ async function renderAll() {
     }
   }
 
+  // FC-180: Pre-populate category budget inputs and show the budgets card
+  const categoryBudgetsCard = document.getElementById('categoryBudgetsCard');
+  if (categoryBudgetsCard) {
+    const savedBudgets = window.settings?.category_budgets || {};
+    document.querySelectorAll('.category-budget-input').forEach(input => {
+      const cat = input.dataset.category;
+      if (cat && savedBudgets[cat]) input.value = savedBudgets[cat];
+    });
+    updateCategoryBudgetTotal();
+    // Show card whenever settings are visible (logged in)
+    if (currentUser) categoryBudgetsCard.classList.remove('d-none');
+  }
+
   // Populate reports summary cards
   renderReportsSummary();
 }
@@ -2460,6 +2473,49 @@ async function saveSettings() {
   setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
 }
 
+// FC-180: Save category budgets to Supabase settings.category_budgets (JSON)
+async function saveCategoryBudgets() {
+  if (!currentUser) return;
+
+  const statusEl = document.getElementById('budgetSettingsStatus');
+  if (!statusEl) return;
+
+  // Collect values from all category inputs
+  const budgets = {};
+  document.querySelectorAll('.category-budget-input').forEach(input => {
+    const cat = input.dataset.category;
+    const val = parseFloat(input.value) || 0;
+    if (cat && val > 0) budgets[cat] = val;
+  });
+
+  statusEl.innerHTML = '<span class="text-muted"><i class="spinner-border spinner-border-sm me-1"></i>Saving...</span>';
+
+  const { error } = await sb
+    .from('settings')
+    .upsert({ user_id: currentUser.id, category_budgets: budgets });
+
+  if (error) {
+    statusEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Save failed. Try again.</span>';
+  } else {
+    // Update in-memory settings so BvA reads it immediately
+    if (window.settings) window.settings.category_budgets = budgets;
+    statusEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Budgets saved!</span>';
+    clearCache();
+  }
+  setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
+}
+
+// FC-180: Live total preview — sum all category budget inputs
+function updateCategoryBudgetTotal() {
+  const totalEl = document.getElementById('categoryBudgetTotal');
+  if (!totalEl) return;
+  let total = 0;
+  document.querySelectorAll('.category-budget-input').forEach(input => {
+    total += parseFloat(input.value) || 0;
+  });
+  totalEl.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mo';
+}
+
 async function renderAdditionalCharts() {
   if (!currentUser) return;
 
@@ -3967,7 +4023,13 @@ function init() {
   document.getElementById('saveIncomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveIncome(); });
   document.getElementById('saveBudgetItemBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBudgetItem(); });
   document.getElementById('saveSettingsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveSettings(); });
-  
+
+  // FC-180: Save category budgets button
+  document.getElementById('saveBudgetsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveCategoryBudgets(); });
+
+  // FC-180: Live total preview on any budget input change
+  document.getElementById('categoryBudgetsGrid')?.addEventListener('input', () => { updateCategoryBudgetTotal(); });
+
   // Wire up "Set Emergency Fund Goal" button in empty state
   document.getElementById('showGoalFormBtn')?.addEventListener('click', () => {
     const emptyState = document.getElementById('settingsEmptyState');
@@ -3977,6 +4039,8 @@ function init() {
     if (emptyState && settingsCard && goalInput) {
       emptyState.classList.add('d-none');
       settingsCard.classList.remove('d-none');
+      // FC-180: also reveal budgets card for new users
+      document.getElementById('categoryBudgetsCard')?.classList.remove('d-none');
       goalInput.focus();
     }
   });

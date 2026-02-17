@@ -161,6 +161,124 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- FC-180: Category Budget Settings -->
+                <div class="card card-max-width-md d-none mt-4" id="categoryBudgetsCard">
+                    <div class="card-body-padded">
+                        <h5 class="mb-1 card-section-heading">
+                          <i class="bi bi-calculator me-2 icon-primary"></i>Monthly Category Budgets
+                        </h5>
+                        <p class="text-muted small mb-4">Set a monthly spending limit per category. These power the Budget vs Actuals tracker on the Budget page.</p>
+
+                        <div class="row g-3" id="categoryBudgetsGrid">
+                          <!-- dining -->
+                          <div class="col-md-6">
+                            <label for="budget_dining" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-cup-hot text-muted"></i> Dining
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_dining" data-category="dining" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- groceries -->
+                          <div class="col-md-6">
+                            <label for="budget_groceries" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-cart3 text-muted"></i> Groceries
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_groceries" data-category="groceries" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- transportation -->
+                          <div class="col-md-6">
+                            <label for="budget_transportation" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-car-front text-muted"></i> Transportation
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_transportation" data-category="transportation" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- utilities -->
+                          <div class="col-md-6">
+                            <label for="budget_utilities" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-lightning-charge text-muted"></i> Utilities
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_utilities" data-category="utilities" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- entertainment -->
+                          <div class="col-md-6">
+                            <label for="budget_entertainment" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-controller text-muted"></i> Entertainment
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_entertainment" data-category="entertainment" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- shopping -->
+                          <div class="col-md-6">
+                            <label for="budget_shopping" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-bag text-muted"></i> Shopping
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_shopping" data-category="shopping" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- healthcare -->
+                          <div class="col-md-6">
+                            <label for="budget_healthcare" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-heart-pulse text-muted"></i> Healthcare
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_healthcare" data-category="healthcare" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- travel -->
+                          <div class="col-md-6">
+                            <label for="budget_travel" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-airplane text-muted"></i> Travel
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_travel" data-category="travel" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                          <!-- other -->
+                          <div class="col-md-6">
+                            <label for="budget_other" class="form-label d-flex align-items-center gap-2">
+                              <i class="bi bi-three-dots text-muted"></i> Other
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control category-budget-input" id="budget_other" data-category="other" placeholder="0" min="0" max="99999" step="10">
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Live total preview -->
+                        <div class="mt-3 p-3 rounded" style="background: var(--bs-tertiary-bg, rgba(255,255,255,0.05));">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">Monthly Budget Total</span>
+                            <span class="fw-bold" id="categoryBudgetTotal">$0.00 / mo</span>
+                          </div>
+                        </div>
+
+                        <div class="mt-4 d-flex align-items-center gap-3">
+                            <button class="btn btn-primary" id="saveBudgetsBtn">
+                              <i class="bi bi-check-lg"></i> Save Budgets
+                            </button>
+                            <span id="budgetSettingsStatus"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
