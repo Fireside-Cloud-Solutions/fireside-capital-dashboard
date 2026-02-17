@@ -1,6 +1,69 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-17 06:50 EST (Sprint UI/UX 0650 — FULL AUDIT COMPLETE, 4 NEW DESIGN BUGS, FC-180 GAP FLAGGED)
+**Last Updated:** 2026-02-17 06:57 EST (Sprint Research 0657 — SUPABASE ADVANCED QUERY PATTERNS RESEARCHED, 4 NEW TASKS)
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0657 (Feb 17, 6:57 AM) — SUPABASE ADVANCED QUERY PATTERNS ✅
+
+**Status:** ✅ **RESEARCH COMPLETE** — 5 production-ready RPCs designed, 4 new tasks created
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** ~7 minutes
+**Task:** Continue research backlog — Webpack done, pivoting to Supabase Advanced Query Patterns (needed for FC-173)
+
+### Summary
+
+All prior research topics (CSS, UI patterns, Chart.js, Bootstrap dark theme, PWA, performance, cash flow, BvA/demo mode, webpack) complete. Researched **Supabase RPC patterns** for the Operational Dashboard — the single highest-impact unresearched dependency blocking FC-173.
+
+### Key Findings
+
+**Current problem:** App fetches all rows and aggregates in JS. For 500+ transactions, this is slow.
+
+**Solution:** 5 Postgres RPCs using `SECURITY INVOKER` + `auth.uid()`:
+- RLS handles user scoping automatically — no `user_id` param needed
+- Use `Promise.all()` to fire all 5 simultaneously → ~200ms total dashboard load
+- PostgREST native aggregates require manual Supabase config (not reliable) — RPCs are the right pattern
+
+**Why NOT PostgREST aggregates:** Require `ALTER ROLE authenticator SET pgrst.db_aggregates_enabled = 'true'` — this setting may not be available on free-tier Supabase. RPCs always work.
+
+### 5 RPCs Designed (Full SQL in Report)
+
+| RPC | Returns | Used For |
+|-----|---------|----------|
+| `get_monthly_spending(month)` | `[{category, total, txn_count}]` | Spending pie chart, BvA card |
+| `get_monthly_cash_flow(month)` | `{income, expenses, net, savings_rate}` | KPI header cards |
+| `get_spending_trend(months)` | `[{month, total_spending, total_income, net}]` | 6-month trend chart |
+| `get_bills_due_soon(days)` | `[{name, amount, due_date, days_until, is_overdue}]` | Upcoming bills widget |
+| `get_net_worth_breakdown()` | `{real_estate, vehicles, investments, total_assets, liabilities, net_worth}` | Net worth header |
+
+### New Tasks Created (4)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-193 | P1 | 1h | Deploy 5 Supabase RPCs (SQL Editor paste + verify) |
+| FC-194 | P1 | 5h | Build `operational-dashboard.js` — all 5 RPCs + Promise.all + full Ops Dashboard renderer |
+| FC-195 | P2 | 1h | Migrate `budget-actuals.js` live mode to RPC (push SUM server-side) |
+| FC-196 | P3 | 1h | Add `buildDemoOpsData()` to `demo-data.js` (aggregate existing demo arrays) |
+
+### Research Backlog Status — COMPLETE ✅
+
+| Session | Topic | Status |
+|---------|-------|--------|
+| Feb 16 | CSS Architecture | ✅ Done |
+| Feb 16 | Financial Dashboard UI Patterns | ✅ Done |
+| 0450 | Chart.js | ✅ Done |
+| 0450 | Bootstrap Dark Theme | ✅ Done |
+| Feb 13 | PWA | ✅ Done |
+| Feb 13 | Performance | ✅ Done |
+| 0431 | Cash Flow Forecasting | ✅ Done |
+| 0535 | Budget vs Actuals + Demo Mode | ✅ Done |
+| 0635 | Webpack Build Pipeline | ✅ Done |
+| **0657** | **Supabase Advanced Query Patterns** | ✅ **Done** |
+
+**All 10 research topics complete.** Research backlog exhausted. Next research cycle should cover: React Native Expo for FC-173 mobile, or AI/ML categorization improvements.
+
+### Report
+`reports/supabase-advanced-query-patterns-2026-02-17.md` — Full SQL for all 5 RPCs + parallel execution pattern + demo mode wiring
 
 ---
 

@@ -2712,9 +2712,18 @@ async function renderAdditionalCharts() {
 // ===== BUDGET LOGIC =====
 
 // This is the main function that runs when the budget page loads or the month changes
+// BUG-BUDGET-DOUBLE-RENDER-001: Mutex prevents concurrent renders (e.g. init + loadSharedBillsData)
+let _budgetRenderLock = false;
 async function loadAndRenderBudget() {
   // Only run this function if we are on the budget page
   if (!document.getElementById('budgetAssignmentTable')) return;
+  // Anti-double-render: skip if already rendering, queue one follow-up to catch new data
+  if (_budgetRenderLock) {
+    if (!_budgetRenderQueued) { _budgetRenderQueued = true; setTimeout(() => { _budgetRenderQueued = false; loadAndRenderBudget(); }, 600); }
+    return;
+  }
+  _budgetRenderLock = true;
+  try {
 
   // --- NEW FIX #1: Wait for data before rendering ---
   // This robustly checks if the data from Supabase has arrived.
@@ -3050,7 +3059,12 @@ async function loadAndRenderBudget() {
       remainingCell.className = `fw-bold ${remTextColor}`;
     });
   });
+
+  } finally {
+    _budgetRenderLock = false;
+  }
 }
+let _budgetRenderQueued = false;
 async function saveBudgetAssignment(itemId, assignedAmount, itemType) {
   // CSRF Protection
   try {
