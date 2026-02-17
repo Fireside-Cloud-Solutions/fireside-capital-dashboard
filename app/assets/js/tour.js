@@ -11,7 +11,7 @@ const TOUR_STOPS = [
     position: 'right'
   },
   {
-    target: '[onclick*="openAssetModal"]', // Target "Add Asset" button
+    target: '#openAssetModalBtn', // Target "Add Asset" button
     title: 'Quick Actions',
     description: 'Quickly add assets, bills, debts, and more from any page.',
     position: 'bottom'
