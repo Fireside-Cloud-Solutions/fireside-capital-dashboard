@@ -375,6 +375,6 @@ function showConfirmModal(title, message, onConfirm, opts = {}) {
     onConfirm();
   });
 
-  // Show
-  new bootstrap.Modal(document.getElementById(MODAL_ID)).show();
+  // Show (getOrCreateInstance avoids duplicate-instance warning on reuse)
+  bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID)).show();
 }
