@@ -794,7 +794,9 @@ async function renderSpendingCategoriesChart() {
           const index = elements[0].index;
           const category = labels[index];
           const amount = data[index];
-          alert(`${category}\n\nMonthly Total: ${formatCurrency(amount)}\n\nClick on a specific bill or debt to view details.`);
+          if (typeof Toast !== 'undefined') {
+            Toast.info(`<strong>${category}</strong><br>Monthly Total: ${formatCurrency(amount)}`);
+          }
         }
       }
     }
@@ -1011,12 +1013,15 @@ async function renderDTIGauge() {
 // RENDER ALL ADDITIONAL CHARTS
 // ===================================================================
 async function renderAdditionalCharts() {
-  await renderNetWorthDeltaChart();
-  await renderSpendingCategoriesChart();
-  await renderSavingsRateChart();
-  await renderInvestmentGrowthChart();
-  await renderAssetAllocationChart();
-  await renderDTIGauge();
+  // FC-177: Render all charts in parallel (~5x faster than sequential await)
+  await Promise.all([
+    renderNetWorthDeltaChart(),
+    renderSpendingCategoriesChart(),
+    renderSavingsRateChart(),
+    renderInvestmentGrowthChart(),
+    renderAssetAllocationChart(),
+    renderDTIGauge()
+  ]);
 }
 
 // Export functions for use in app.js

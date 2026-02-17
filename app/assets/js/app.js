@@ -147,7 +147,7 @@ function getNextDate(currentDate, frequency) {
   return nextDate;
 }
 function getThemeColors() {
-  const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+  const currentTheme = document.documentElement.getAttribute('data-bs-theme') || document.body.getAttribute('data-theme') || 'dark';
   
   if (currentTheme === 'light') {
     return {
@@ -4047,7 +4047,7 @@ function setupThemeToggle() {
   
   // Function to update the label text based on current theme
   function updateThemeLabel() {
-    const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || document.body.getAttribute('data-theme') || 'dark';
     if (themeSwitchLabel) {
       if (currentTheme === 'dark') {
         themeSwitchLabel.innerHTML = '🌙 Dark Mode';
@@ -4060,6 +4060,7 @@ function setupThemeToggle() {
   // Function to set theme
   function setTheme(theme) {
     document.body.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-bs-theme', theme);
     localStorage.setItem('theme', theme);
     
     // Update checkbox state to match theme

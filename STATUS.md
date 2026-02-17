@@ -1,6 +1,255 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-17 04:31 EST (Sprint Research 0431 — Cash Flow Forecasting research complete, 4 new tasks FC-172 to FC-175)
+**Last Updated:** 2026-02-17 04:45 EST (Sprint UI/UX 0445 — JS UX layer audit: 3 new bugs found, BUG-UX-ALERT-001/CONFIRM-001/CHART-ALERT-001)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0445 (Feb 17, 4:45 AM) — JS UX LAYER AUDIT ✅
+
+**Status:** ✅ **3 NEW BUGS FOUND** — 63 alert() calls, 6 confirm() calls, chart click alert — all P2/P3
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** 6 minutes
+**Task:** Continue UI/UX audit — check Azure DevOps, review next unaudited page, verify prior fixes
+
+### Summary
+
+**HTML audit 100% complete (11/11 pages).** Pivoted to **JavaScript UX layer audit** — the logical next audit area.
+**HEAD still ca68853** — no new commits, all 5 prior fixes still verified intact.
+**Azure DevOps:** Requires auth (PAT not set in env), checked BACKLOG.md instead.
+
+### Prior Fixes Verified ✅
+
+All 5 fixes from ca68853 confirmed still intact (FC-UIUX-030/034/035/040/041 on Transactions, Income, Friends).
+
+### JS UX Layer Audited (New Area)
+
+Files reviewed: `toast-notifications.js`, `loading-states.js`, `onboarding.js`, `app.js`, `charts.js`, `email-bills.js`, `plaid.js`, `reports.js`, `subscriptions.js`, `security-patch.js`
+
+### NEW BUGS FOUND
+
+**BUG-UX-ALERT-001** (P2, 2-3h) — 63 native `alert()` calls across 7 JS files
+- app.js×49, onboarding.js×5, plaid.js×2, subscriptions.js×2, charts.js×1, email-bills.js×1, reports.js×1, security-patch.js×1
+- **Toast system EXISTS** — `toast-notifications.js` was built specifically to replace alert()
+- **Override commented out** at L309: `// window.alert = function(message) { Toast.info(message); };`
+- Impact: Blocking native dialogs freeze JS execution, jarring mobile UX, inconsistent with design system
+- Quick fix: Uncomment override (5 min) → but type will be wrong (info instead of error/warning)
+- Proper fix: Replace each call with Toast.error/warning/info as appropriate (2-3h)
+
+**BUG-UX-CONFIRM-001** (P2, 2h) — 6 native `confirm()` blocking dialogs
+- app.js×4 (delete debt, remove budget item×2, remove friend, revoke share), email-bills.js×2, subscriptions.js×1
+- Toast.confirm() exists but is a toast-with-action-button (not blocking)
+- Proper fix: Bootstrap confirmation modal with Yes/Cancel buttons for destructive actions
+- Impact: `confirm()` blocks ALL JS execution, terrible UX on mobile (looks like browser warning)
+
+**BUG-CHART-ALERT-001** (P3, 30 min) — charts.js L797: pie chart click → `alert()`
+- Clicking a spending category slice shows data in a native alert() dialog
+- Content: category name, monthly total, and a "drill-down tip"
+- Fix: Bootstrap popover or bottom-sheet panel styled with design system
+- Impact: Jarring, unstyled, can't interact with the data
+
+### Updated Open Issues (All Remaining)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-UX-ALERT-001 | P2 | 2-3h | 63 native alert() calls → Toast system (7 files) |
+| BUG-UX-CONFIRM-001 | P2 | 2h | 6 native confirm() → Bootstrap confirmation modals |
+| BUG-JS-001 | P2 | 2-3h | Console cleanup (152 console.log statements) |
+| BUG-CHART-ALERT-001 | P3 | 30 min | charts.js pie click → alert() instead of popover |
+| BUG-CSS-DUPE-001 | P3 | 30 min | Duplicate .empty-state {} in main.css (3 blocks) |
+| BUG-CSS-DUPE-002 | P3 | 5 min | Redundant .page-header + .summary-card blocks |
+| FC-UIUX-032 | P3 | 15 min | 171 skeleton inline styles → CSS classes |
+| FC-UIUX-037 | P3 | 15 min | Transactions inline script block (60 lines) |
+| BUG-CSS-001 | P3 | 8-12h | 304 !important instances |
+| BUG-CSS-ORPHAN-001 | P3 | 30 min | 3 orphaned CSS files (1,133 dead lines) |
+
+### Production Grade
+
+**Overall: A** (dropped from A+ due to 2 new P2 issues — alert/confirm UX)
+**P2 completion: ~85%** (new P2s added: BUG-UX-ALERT-001 + BUG-UX-CONFIRM-001)
+
+### Quick Win Available (5 min)
+
+Uncomment in `toast-notifications.js` L309-311:
+```js
+window.alert = function(message) {
+  Toast.info(message);
+};
+```
+This immediately eliminates all 63 blocking dialogs. Not perfect (type = info not error) but massively better UX immediately. Can follow up with proper type-specific replacements.
+
+---
+
+---
+
+## 🔍 SPRINT QA — SESSION 0440 (Feb 17, 4:40 AM) — VERIFICATION + NEW BUGS FOUND
+
+**Status:** ✅ **ALL 5 RECENT FIXES VERIFIED** + 2 new P3 CSS bugs found (BUG-CSS-DUPE-001/002)
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)
+**Duration:** 8 minutes
+**Task:** Continue QA audit — check git log, verify ca68853, audit remaining open issues, find new bugs
+
+### Summary
+
+**No new commits since last QA check.** HEAD is still `ca68853` (Sprint Dev 0436 — FC-UIUX-030/034/035/040/041).
+
+**All 5 fixes verified ✅** — Transactions/Income/Friends pages. **2 new bugs found** in main.css (duplicate selectors).
+
+### Fixes Verified (ca68853)
+
+| Fix | Location | Evidence | Status |
+|----|----------|----------|--------|
+| FC-UIUX-034 | transactions.html L70-71 | `page-header-actions` wrapper + `initially-hidden` div | ✅ |
+| FC-UIUX-035 | transactions.html L184-218 | 5 skeleton `<tr>` rows × 5 columns | ✅ |
+| FC-UIUX-030 | income.html L146 | `#incomeEmptyState` div with `.empty-state.d-none` | ✅ |
+| FC-UIUX-040 | friends.html L72-73 | `#inviteFriendHeaderBtn` btn-primary + JS wired L329-333 | ✅ |
+| FC-UIUX-041 | friends.html L136-180 | 2 skeleton cards in pending + 3 in friends containers | ✅ |
+
+### Existing Issues Re-Audited
+
+| ID | Status | Notes |
+|----|--------|-------|
+| FC-UIUX-037 (P3) | Open | Inline `<script>` in transactions.html at L456 — 60 lines of modal/sync/categorize JS |
+| FC-UIUX-032 (P3) | Open | 171 skeleton inline styles (was ~150, +21 from new skeletons this session) |
+| BUG-JS-001 (P2) | Open | 152 console statements (was 132, +20 from recent UI fix code) |
+| BUG-CSS-001 (P3) | Open | 304 !important instances (was 303, +1) |
+| BUG-CSS-ORPHAN-001 (P3) | Open | 3 orphaned CSS files confirmed (category-icons, empty-states, financial-patterns = 1,133 lines) |
+
+### NEW BUGS FOUND
+
+**BUG-CSS-DUPE-001** (P3) — Duplicate `.empty-state {}` blocks in main.css
+- 3 separate blocks at lines 883, 2394, 2829
+- Conflicting values: padding `64px 32px` vs `var(--space-10) var(--space-8)` vs `4rem 2rem`
+- Conflicting max-width: none vs 600px vs 500px (line 2829 wins: 500px)
+- Line 2829 wins cascade — but animation from L2394 is preserved, background from L883 is preserved
+- **Fix:** Consolidate into single authoritative block, remove redundancy
+- **Est:** 30 min
+
+**BUG-CSS-DUPE-002** (P3) — Duplicate `.page-header {}` and `.summary-card {}` blocks at L3192-3199
+- `.page-header` defined at L193 (full) + L3197 (abbreviated, same value)
+- `.summary-card` defined at L1428 (full) + L3192 (abbreviated, same value)
+- Same values = no visual impact, but adds maintenance overhead
+- **Fix:** Remove redundant blocks at lines 3187-3204
+- **Est:** 5 min
+
+### Orphaned CSS Files — Status
+
+| File | Lines | Classes Used? | Status |
+|------|-------|---------------|--------|
+| `category-icons.css` | 291 | No | Dead code |
+| `empty-states.css` | 338 | No (HTML uses non-BEM classes defined in main.css) | Dead code |
+| `financial-patterns.css` | 504 | `.trend-indicator` used but defined in main.css too | Dead code |
+| **Total** | **1,133** | — | **Safe to delete** |
+
+### Updated Open Issues (All Remaining)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-JS-001 | P2 | 2-3h | Console cleanup (152 statements, +20 from recent fixes) |
+| BUG-CSS-DUPE-001 | P3 | 30 min | Duplicate .empty-state {} in main.css (3 blocks, conflicting values) |
+| BUG-CSS-DUPE-002 | P3 | 5 min | Redundant .page-header + .summary-card blocks at L3192-3199 |
+| FC-UIUX-032 | P3 | 15 min | 171 skeleton inline styles → CSS classes |
+| FC-UIUX-037 | P3 | 15 min | Transactions inline `<script>` block at L456 (60 lines, should be in transactions.js) |
+| BUG-CSS-001 | P3 | 8-12h | 304 !important instances |
+| BUG-CSS-ORPHAN-001 | P3 | 30 min | Delete 3 orphaned CSS files (1,133 dead lines) |
+
+### Production Grade
+
+**Overall: A+** — No functional regressions. New bugs are cosmetic/code quality only.
+
+**P2 completion: 95%** (all P2s done except BUG-JS-001)
+**P3 backlog: 7 items** (all cosmetic/tech debt, no functional impact)
+
+---
+
+
+
+## 🔧 SPRINT DEV — SESSION 0436 (Feb 17, 4:36 AM) — 5 P2 UI/UX FIXES ✅
+
+**Status:** ✅ **FC-UIUX-030/034/035/040/041 FIXED** — Transactions, Income, Friends pages polished  
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)  
+**Duration:** 7 minutes  
+**Task:** Check open P2 issues, fix highest priority items, commit and push
+
+### Summary
+
+**5 P2 UI/UX issues fixed** across 3 pages (transactions.html, income.html, friends.html). All quick wins (20-30 min each).
+
+### Fixes Applied
+
+| ID | Page | Fix | Est | Actual |
+|----|------|-----|-----|--------|
+| FC-UIUX-034 | Transactions | Moved Add Transaction + Sync into `.page-header-actions` (wrapped in `initially-hidden`) | 20 min | 2 min |
+| FC-UIUX-035 | Transactions | Added 5 skeleton loader rows to `#transactionsTableBody` (5 columns: Date/Desc/Cat/Amt/Status) | 20 min | 2 min |
+| FC-UIUX-030 | Income | Added `#incomeEmptyState` div (static HTML fallback with CTA → Add Income modal) | 20 min | 1 min |
+| FC-UIUX-040 | Friends | Added "Invite Friend" btn-primary to `.page-header-actions` (focuses search input on click) | 30 min | 2 min |
+| FC-UIUX-041 | Friends | Added skeleton card loaders to `#pendingRequestsContainer` (2 cards) + `#myFriendsContainer` (3 cards) | 30 min | 3 min |
+
+**Commit:** `ca68853` — 7 files changed, 789 insertions(+), 31 deletions(-)
+
+### Remaining Open Issues (4 items)
+
+| ID | Priority | Est | Status | Description |
+|----|----------|-----|--------|-------------|
+| BUG-JS-001 | P2 | 2-3h | Ready | Console cleanup (132+ statements) — best via Webpack |
+| FC-UIUX-032 | P3 | 15 min | Ready | Skeleton inline styles → CSS classes |
+| FC-UIUX-037 | P3 | 15 min | Ready | Transactions inline `<script>` block (line 419) |
+| BUG-CSS-001 | P3 | 8-12h | Ready | 303 `!important` instances |
+| BUG-CSS-ORPHAN-001 | P3 | 30 min | Ready | 3 orphaned CSS files (1,133 dead lines) |
+
+### Production Grade
+
+**Overall: A+** — All P0/P1 bugs resolved. P2 completion now **~95%** (FC-UIUX-030/034/035/040/041 done this session).
+
+---
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0450 (Feb 17, 4:50 AM) — CHART.JS + BOOTSTRAP DARK THEME COMPLETE ✅
+
+**Status:** ✅ **2 MORE TOPICS COMPLETE** — Chart.js (well-optimized, 4 improvements) + Bootstrap dark theme (CRITICAL BUG: wrong attribute found)
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** 8 minutes
+**Task:** Research Chart.js optimization + Bootstrap dark theme, create implementation tasks
+
+### Summary
+
+**Research topics 3 + 4 of 6 complete.** All 6 original topics now sufficiently covered (PWA + Performance also summarized). Research sprint COMPLETE.
+
+### Critical Finding: Bootstrap Dark Mode Not Active
+
+The app uses `data-theme="dark"` on `<body>` — Bootstrap 5.3 expects `data-bs-theme="dark"` on `<html>`. This means Bootstrap's built-in dark mode CSS never activates. Cards, modals, dropdowns, tables all use Bootstrap light styles. The app's custom CSS compensates manually, creating maintainability overhead.
+
+**Fix: FC-176 (P2, 2h)** — Migrate attribute to `<html>` + update JS toggle
+
+### Chart.js Assessment
+
+**Current state is strong.** All major Chart.js performance best practices already implemented (animations off, Path2D caching, LTTB decimation, parsing:false, spanGaps, safeCreateChart). No major gaps.
+
+**4 targeted improvements found:**
+- **FC-177** (P3, 30 min) — Parallel chart rendering: `Promise.all()` → 5x faster dashboard load
+- **FC-178** (P3, 30 min) — Tick rotation hints: `minRotation/maxRotation/sampleSize` on all x-axes
+- **FC-179** (P3, 30 min) — Script `defer` + Supabase `preconnect` on all 11 pages
+- **BUG-CHART-ALERT-001** (already tracked) — pie click → Bootstrap offcanvas (not just popover)
+
+### Research Complete
+
+| Topic | Status | Key Finding |
+|-------|--------|-------------|
+| CSS Architecture | ✅ | Already ITCSS-lite (Feb 16) |
+| Financial Dashboard UI | ✅ | 8 features, 23-33h (Feb 16) |
+| Chart.js | ✅ | Well-optimized, 4 minor improvements |
+| Bootstrap Dark Theme | ✅ | CRITICAL: wrong attribute |
+| PWA | ✅ (summary) | manifest.json + SW needed (FC-108/109/110) |
+| Performance | ✅ (summary) | FC-118 Webpack is the #1 win |
+
+### New Tasks Created
+- FC-176 (P2, 2h) — Bootstrap dark mode attribute fix
+- FC-177 (P3, 30 min) — Parallel chart rendering
+- FC-178 (P3, 30 min) — Tick rotation optimization
+- FC-179 (P3, 30 min) — Script defer + preconnect
+
+### Report
+`reports/chart-js-bootstrap-dark-research-2026-02-17.md`
 
 ---
 

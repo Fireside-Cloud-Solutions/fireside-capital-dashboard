@@ -309,9 +309,9 @@ const Toast = (function() {
  * Override native alert() to use Toast.info()
  * Uncomment to enable globally
  */
-// window.alert = function(message) {
-//   Toast.info(message);
-// };
+window.alert = function(message) {
+  Toast.warning(message);
+};
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
