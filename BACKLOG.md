@@ -248,7 +248,8 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 
 | BUG-SKEL-001 | Bug | P2 | XS | Done | **Skeleton loaders stay visible after .loading removed** - .summary-card:not(.loading) .skeleton-loader had no display:none CSS rule — skeleton and value both visible simultaneously on Bills, Income, and all summary-card pages. Fixed: added CSS rule in main.css (Sprint QA 0420, 2026-02-17, commit f21804c) |
 | BUG-SIGNUP-BTN-GLOBAL | Bug | P2 | XS | Done | **Sign Up CTA uses btn-secondary across all 11 pages** - Primary onboarding action should be btn-primary. Fixed across all pages: assets, bills, budget, debts, friends, income, index, investments, reports, settings, transactions (Sprint QA 0420, 2026-02-17, commit f21804c) |
-### EPIC-002: Mobile Application
+
+| BUG-CSS-ORPHAN-001 | Chore | P3 | XS | Ready | **3 orphaned CSS files not linked in any HTML** - financial-patterns.css (504 lines), category-icons.css (291 lines, references Lucide icons not in project), empty-states.css (338 lines, uses BEM naming mismatched from actual HTML classes). Total: 1,133 lines of dead CSS. Fix: delete or link correctly. (Sprint QA 0420, 2026-02-17) |### EPIC-002: Mobile Application
 
 | ID | Type | Priority | Size | Status | Title |
 |----|------|----------|------|--------|-------|
