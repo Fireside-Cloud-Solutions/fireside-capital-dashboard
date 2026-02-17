@@ -2939,6 +2939,11 @@ async function loadAndRenderBudget() {
     tbody.appendChild(emptyRow);
   }
 
+  // FC-182: Render Budget vs Actuals card for the selected month
+  if (typeof renderBudgetVsActuals === 'function') {
+    renderBudgetVsActuals('bvaCardBody', monthString);
+  }
+
   // --- NEW FIX #2: The corrected event listener ---
   document.querySelectorAll('.assigned-input').forEach(input => {
     input.addEventListener('change', async (e) => {
