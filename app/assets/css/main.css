@@ -2376,17 +2376,6 @@ main {
   animation: fadeInUp 0.4s ease;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* =================================================================
    EMPTY STATE COMPONENT - Modern, Brand-Aligned
    ================================================================= */
@@ -2436,18 +2425,6 @@ main {
 .empty-state .btn {
   margin-top: var(--space-2);
 }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 
 /* Mobile responsive empty states */
 @media (max-width: 575.98px) {

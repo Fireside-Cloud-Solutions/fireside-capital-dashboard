@@ -308,70 +308,6 @@ const EmptyState = {
   }
 };
 
-// ===== CONFIRMATION DIALOG =====
-const ConfirmDialog = {
-  show(options = {}) {
-    const {
-      title = 'Confirm Action',
-      message = 'Are you sure you want to proceed?',
-      confirmText = 'Confirm',
-      cancelText = 'Cancel',
-      confirmClass = 'btn-danger',
-      onConfirm = () => {},
-      onCancel = () => {}
-    } = options;
-    
-    return new Promise((resolve) => {
-      const modalId = `confirmModal-${Date.now()}`;
-      const modalHtml = `
-        <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">${title}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p>${message}</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${cancelText}</button>
-                <button type="button" class="btn ${confirmClass}" id="${modalId}-confirm">${confirmText}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      document.body.insertAdjacentHTML('beforeend', modalHtml);
-      
-      const modalElement = document.getElementById(modalId);
-      const modal = new bootstrap.Modal(modalElement);
-      
-      const confirmBtn = document.getElementById(`${modalId}-confirm`);
-      confirmBtn.addEventListener('click', () => {
-        onConfirm();
-        resolve(true);
-        modal.hide();
-      });
-      
-      modalElement.addEventListener('hidden.bs.modal', () => {
-        if (!confirmBtn.dataset.confirmed) {
-          onCancel();
-          resolve(false);
-        }
-        modalElement.remove();
-      });
-      
-      confirmBtn.addEventListener('click', () => {
-        confirmBtn.dataset.confirmed = 'true';
-      });
-      
-      modal.show();
-    });
-  }
-};
-
 // ===== DEBOUNCE UTILITY =====
 function debounce(func, wait = 300) {
   let timeout;
@@ -430,7 +366,6 @@ if (typeof window !== 'undefined') {
   window.LoadingState = LoadingState;
   window.FormValidation = FormValidation;
   window.EmptyState = EmptyState;
-  window.ConfirmDialog = ConfirmDialog;
   window.debounce = debounce;
   window.formatCurrencyInput = formatCurrencyInput;
   window.preventDoubleSubmit = preventDoubleSubmit;
