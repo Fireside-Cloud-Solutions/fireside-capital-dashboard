@@ -212,30 +212,6 @@ function initializeTooltips() {
   });
 }
 
-// ===== CONFIRMATION BEFORE DELETE =====
-function setupDeleteConfirmations() {
-  // Find all delete buttons
-  document.querySelectorAll('[onclick*="delete"], .btn-danger[data-bs-toggle="modal"]').forEach(btn => {
-    const originalOnclick = btn.onclick;
-    btn.onclick = async function(e) {
-      e.preventDefault();
-      
-      const itemName = btn.dataset.itemName || 'this item';
-      const confirmed = await ConfirmDialog.show({
-        title: 'Confirm Deletion',
-        message: `Are you sure you want to delete ${itemName}? This action cannot be undone.`,
-        confirmText: 'Delete',
-        cancelText: 'Cancel',
-        confirmClass: 'btn-danger'
-      });
-      
-      if (confirmed && originalOnclick) {
-        originalOnclick.call(this, e);
-      }
-    };
-  });
-}
-
 // ===== RESPONSIVE TABLE WRAPPER =====
 function makeTablesResponsive() {
   document.querySelectorAll('table:not(.table-responsive table)').forEach(table => {

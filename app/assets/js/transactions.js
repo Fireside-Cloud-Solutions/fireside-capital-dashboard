@@ -1,5 +1,11 @@
 // transactions.js - Transaction Management Module
 
+// Plaid Express server URL — configured for dev (localhost:3000)
+// Override by setting window.PLAID_SERVER_URL before this script loads (e.g., from server config)
+const PLAID_SERVER_URL = (typeof window.PLAID_SERVER_URL !== 'undefined')
+  ? window.PLAID_SERVER_URL
+  : 'http://localhost:3000';
+
 // Standard categories
 const CATEGORIES = [
   'dining',
@@ -85,8 +91,8 @@ async function syncTransactions() {
       return;
     }
     
-    // Fetch from backend
-    const response = await fetch('http://localhost:3000/api/transactions/sync', {
+    // Fetch from backend (PLAID_SERVER_URL defaults to localhost:3000 for dev)
+    const response = await fetch(`${PLAID_SERVER_URL}/api/transactions/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accessToken })

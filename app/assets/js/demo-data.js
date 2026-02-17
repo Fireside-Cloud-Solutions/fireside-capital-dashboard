@@ -278,3 +278,18 @@ if (document.readyState === 'loading') {
 } else {
   initDemoBanner();
 }
+
+// Event delegation for demo-related actions (avoids inline onclick, CSP-compliant)
+document.addEventListener('click', function(e) {
+  const target = e.target.closest('[data-action]');
+  if (!target) return;
+
+  const action = target.dataset.action;
+  if (action === 'disable-demo') {
+    e.preventDefault();
+    disableDemoMode();
+  } else if (action === 'enable-demo') {
+    e.preventDefault();
+    enableDemoMode();
+  }
+});

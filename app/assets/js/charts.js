@@ -287,7 +287,7 @@ async function renderNetWorthChart() {
           grid: { color: theme.grid }
         },
         x: {
-          ticks: { color: theme.text },
+          ticks: { color: theme.text, maxRotation: 45, minRotation: 0, autoSkip: true },
           grid: { display: false }
         }
       }
@@ -398,7 +398,7 @@ async function generateMonthlyCashFlowChart() {
       scales: {
         x: {
           stacked: false,
-          ticks: { color: theme.text },
+          ticks: { color: theme.text, maxRotation: 45, minRotation: 0, autoSkip: true },
           grid: { display: false }
         },
         y: {
@@ -488,7 +488,7 @@ async function renderNetWorthDeltaChart() {
           grid: { color: theme.grid }
         },
         x: {
-          ticks: { color: theme.text },
+          ticks: { color: theme.text, maxRotation: 45, minRotation: 0, autoSkip: true },
           grid: { display: false }
         }
       }
@@ -601,7 +601,7 @@ async function renderSavingsRateChart() {
           grid: { color: theme.grid }
         },
         x: {
-          ticks: { color: theme.text },
+          ticks: { color: theme.text, maxRotation: 45, minRotation: 0, autoSkip: true },
           grid: { display: false }
         }
       }
@@ -700,7 +700,7 @@ async function renderInvestmentGrowthChart() {
           grid: { color: theme.grid }
         },
         x: {
-          ticks: { color: theme.text },
+          ticks: { color: theme.text, maxRotation: 45, minRotation: 0, autoSkip: true },
           grid: { display: false }
         }
       }

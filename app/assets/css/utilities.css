@@ -231,6 +231,9 @@
 /* Onboarding progress bar width */
 .progress-bar-width-0 { width: 0%; }
 
+/* Thin progress bar for compact layouts (e.g., Budget vs Actuals rows) */
+.progress-thin { height: 8px; }
+
 /* Dynamic width set by JavaScript - just provide base styling */
 .onboarding-progress-bar {
   height: 4px;

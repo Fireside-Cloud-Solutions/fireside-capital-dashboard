@@ -190,6 +190,10 @@ async function renderBudgetVsActuals(containerId, month = null) {
          <a href="settings.html">Add budgets in Settings →</a></p>`;
 
   container.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <span class="text-muted small">${monthLabel}</span>
+      <a href="settings.html" class="text-muted small">Edit Budgets →</a>
+    </div>
     <div class="row mb-4 text-center">
       <div class="col-4">
         <div class="fs-4 fw-bold">${bvaFormatCurrency(totals.budget)}</div>
@@ -248,9 +252,9 @@ function renderBVACategoryRow(item) {
           ${varLabel}
         </span>
       </div>
-      <div class="progress" style="height: 8px;" role="progressbar"
-           aria-valuenow="${progressWidth}" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar bg-${barColor}" style="width: ${progressWidth}%"></div>
+      <div class="progress progress-thin" role="progressbar"
+           aria-valuenow="${progressWidth}" aria-valuemin="0" aria-valuemax="150">
+        <div class="progress-bar bg-${barColor}" style="width: ${Math.min(progressWidth, 100)}%"></div>
       </div>
     </div>`;
 }

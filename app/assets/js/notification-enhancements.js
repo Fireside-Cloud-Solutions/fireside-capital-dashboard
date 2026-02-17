@@ -87,35 +87,6 @@
     }
   };
 
-  // ===== ENHANCED NOTIFICATION RENDERING =====
-  function enhanceNotificationItem(li, notif) {
-    // Add data attribute for easy targeting
-    li.setAttribute('data-notification-id', notif.id);
-    
-    // Add unread class if notification is unread
-    if (!notif.is_read) {
-      li.classList.add('unread');
-    }
-
-    // Add smooth transition
-    li.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-
-    // Add category badge if configured
-    const category = NOTIFICATION_CONFIG.categories[notif.type] || NOTIFICATION_CONFIG.categories['system'];
-    
-    // Check if notification has a dismiss button, if not add one
-    if (!li.querySelector('.btn-dismiss')) {
-      const dismissBtn = document.createElement('button');
-      dismissBtn.className = 'btn btn-sm btn-link btn-dismiss';
-      dismissBtn.setAttribute('aria-label', 'Dismiss notification');
-      dismissBtn.onclick = (e) => dismissNotification(notif.id, e);
-      dismissBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-      li.appendChild(dismissBtn);
-    }
-
-    return li;
-  }
-
   // ===== KEYBOARD NAVIGATION =====
   function initKeyboardNavigation() {
     const dropdown = document.getElementById('notificationList');
@@ -377,8 +348,6 @@
     }
 
     // Initialize enhancements
-    console.log('[Notification Enhancements] Initializing...');
-    
     initKeyboardNavigation();
     enhanceExistingSystem();
     renderEmptyState();
@@ -389,7 +358,6 @@
       bell.setAttribute('aria-label', 'View notifications');
     }
 
-    console.log('[Notification Enhancements] Ready');
   }
 
   // ===== HELPER: HTML ESCAPE =====

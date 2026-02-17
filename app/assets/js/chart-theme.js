@@ -174,10 +174,12 @@
   Chart.defaults.aspectRatio = 2; // Default 2:1 (width:height)
 
   // ===== ANIMATION =====
-  Chart.defaults.animation.duration = 400;
-  Chart.defaults.animation.easing = 'easeOutQuart';
+  // Financial dashboards disable animations for faster perceived performance.
+  // chart-theme.js also sets Chart.defaults.animation = false globally (L41).
+  // Per-chart overrides can re-enable if needed (e.g., onboarding tour).
+  Chart.defaults.animation = false;
 
-  // Respect reduced motion preference
+  // Always respect reduced motion preference regardless of per-chart overrides
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Chart.defaults.animation = false;
   }
