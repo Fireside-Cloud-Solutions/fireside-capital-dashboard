@@ -115,6 +115,33 @@
       </div>
 
       <div id="dataContainer" class="data-hidden">
+
+        <!-- Income KPI Summary Cards (FC-UIUX-029) -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="summary-card loading">
+              <h6>Monthly Income</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 120px; height: 32px;"></div>
+              <h4 id="incomeMonthlyTotal" class="d-none">$0.00</h4>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="summary-card loading">
+              <h6>Annual Income</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 130px; height: 32px;"></div>
+              <h4 id="incomeAnnualTotal" class="d-none">$0.00</h4>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-12 col-12">
+            <div class="summary-card loading">
+              <h6>Next Paycheck</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 110px; height: 32px;"></div>
+              <h4 id="incomeNextPayAmount" class="d-none">—</h4>
+              <small id="incomeNextPayDate" class="text-muted d-none"></small>
+            </div>
+          </div>
+        </div>
+
         <div class="table-card">
           <div class="table-responsive">
             <table class="table align-middle mb-0">

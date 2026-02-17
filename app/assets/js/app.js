@@ -2198,6 +2198,67 @@ function renderIncome() {
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteIncome('${escapeAttribute(i.id)}', '${escapeAttribute(i.name)}')" aria-label="Delete ${escapeAttribute(i.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
+
+  // FC-UIUX-029: Income KPI Summary Cards
+  const monthlyMultipliers = {
+    'weekly': 52 / 12,
+    'bi-weekly': 26 / 12,
+    'semi-monthly': 2,
+    'monthly': 1,
+    'quarterly': 1 / 3,
+    'annually': 1 / 12
+  };
+
+  let totalMonthly = 0;
+  income.forEach(i => {
+    const multiplier = monthlyMultipliers[i.frequency] || 1;
+    totalMonthly += (parseFloat(i.amount) || 0) * multiplier;
+  });
+  const totalAnnual = totalMonthly * 12;
+
+  // Next Paycheck — soonest future nextDueDate
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let nextPayIncome = null;
+  income.forEach(i => {
+    if (i.nextDueDate) {
+      const d = new Date(i.nextDueDate);
+      if (d >= today && (!nextPayIncome || d < new Date(nextPayIncome.nextDueDate))) {
+        nextPayIncome = i;
+      }
+    }
+  });
+
+  if (document.getElementById('incomeMonthlyTotal')) {
+    const el = document.getElementById('incomeMonthlyTotal');
+    el.textContent = formatCurrency(totalMonthly);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  if (document.getElementById('incomeAnnualTotal')) {
+    const el = document.getElementById('incomeAnnualTotal');
+    el.textContent = formatCurrency(totalAnnual);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  if (document.getElementById('incomeNextPayAmount')) {
+    const el = document.getElementById('incomeNextPayAmount');
+    const dateEl = document.getElementById('incomeNextPayDate');
+    if (nextPayIncome) {
+      el.textContent = formatCurrency(nextPayIncome.amount);
+      if (dateEl) {
+        dateEl.textContent = formatDate(nextPayIncome.nextDueDate);
+        dateEl.classList.remove('d-none');
+      }
+    } else {
+      el.textContent = '—';
+    }
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
 }
 function openIncomeModal(id = null) {
   editIncomeId = id;
