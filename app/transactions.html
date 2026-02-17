@@ -68,6 +68,14 @@
       <div class="page-header">
         <h2>Transactions</h2>
         <div class="page-header-actions">
+          <div id="pageActions" class="initially-hidden">
+            <button id="addTransactionBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal" aria-label="Add manual transaction">
+              <i class="bi bi-plus-circle me-2"></i> Add Transaction
+            </button>
+            <button id="syncTransactionsBtn" class="btn btn-outline-secondary ms-2" aria-label="Sync transactions from bank">
+              <i class="bi bi-arrow-repeat me-2"></i> Sync from Bank
+            </button>
+          </div>
         </div>
         <div>
           <div id="loggedOutState">
@@ -111,18 +119,12 @@
 
       <div id="dataContainer" class="data-hidden">
 
-        <!-- Sync Button -->
+        <!-- Utility Actions -->
         <div class="mb-4">
-          <button id="syncTransactionsBtn" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-repeat me-2"></i> Sync from Bank
-          </button>
-          <button id="addTransactionBtn" class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-            <i class="bi bi-plus-circle me-2"></i> Add Transaction
-          </button>
-          <button id="autoCategorizeBtn" class="btn btn-outline-secondary ms-2">
+          <button id="autoCategorizeBtn" class="btn btn-outline-secondary">
             <i class="bi bi-tags me-2"></i> Auto-Categorize Uncategorized
           </button>
-          <small class="text-muted ms-2">Last synced: <span id="lastSyncTime">Never</span></small>
+          <small class="text-muted ms-3">Last synced: <span id="lastSyncTime">Never</span></small>
         </div>
 
         <!-- Filters -->
@@ -179,7 +181,42 @@
                   </tr>
                 </thead>
                 <tbody id="transactionsTableBody">
-                  <!-- Populated by transactions.js -->
+                  <!-- Skeleton loaders (hidden when data loads) -->
+                  <tr class="skeleton-row">
+                    <td><div class="skeleton-loader skeleton-line" style="width: 85px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 180px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 120px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 75px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                  </tr>
+                  <tr class="skeleton-row">
+                    <td><div class="skeleton-loader skeleton-line" style="width: 85px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 200px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 70px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                  </tr>
+                  <tr class="skeleton-row">
+                    <td><div class="skeleton-loader skeleton-line" style="width: 85px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 160px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 130px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 75px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                  </tr>
+                  <tr class="skeleton-row">
+                    <td><div class="skeleton-loader skeleton-line" style="width: 85px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 190px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 110px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                  </tr>
+                  <tr class="skeleton-row">
+                    <td><div class="skeleton-loader skeleton-line" style="width: 85px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 150px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 95px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 75px;"></div></td>
+                    <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -440,7 +477,7 @@
       // Load transactions on page load
       await renderTransactionsTable();
       
-      // Sync button
+      // Sync button (now in page-header-actions)
       document.getElementById('syncTransactionsBtn').addEventListener('click', async (e) => {
         e.target.disabled = true;
         e.target.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Syncing...';

@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant  
 **Owner:** Matt Hubacher  
-**Last Updated:** 2026-02-17 04:05 EST (Sprint UI/UX Final Audit: Income + Transactions + Friends audited, 16 new items FC-UIUX-029 through FC-UIUX-044 — AUDIT 100% COMPLETE 11/11 pages)
+**Last Updated:** 2026-02-17 04:31 EST (Sprint Research: Cash Flow Forecasting research complete — 4 new items FC-172 to FC-175 added — see reports/cash-flow-forecasting-research-2026-02-17.md)
 
 ---
 
@@ -246,10 +246,14 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-UIUX-043 | Bug | P3 | XS | Done | **Friends H2 title mismatch** — H2 says "Friends & Connections", sidebar says "Friends" — should match (1 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
 | FC-UIUX-044 | Bug | P3 | XS | Done | **Friends empty states use inline SVG icons** — 3 empty state icon sections use raw SVG instead of Bootstrap Icons like all other pages (5 min) — Sprint UI/UX Audit (Session 0405, 2026-02-17) — see reports/UI-UX-AUDIT-FINAL-2026-02-17-0405.md |
 
-| BUG-SKEL-001 | Bug | P2 | XS | Done | **Skeleton loaders stay visible after .loading removed** - .summary-card:not(.loading) .skeleton-loader had no display:none CSS rule � skeleton and value both visible simultaneously on Bills, Income, and all summary-card pages. Fixed: added CSS rule in main.css (Sprint QA 0420, 2026-02-17, commit f21804c) |
+| BUG-SKEL-001 | Bug | P2 | XS | Done | **Skeleton loaders stay visible after .loading removed** - .summary-card:not(.loading) .skeleton-loader had no display:none CSS rule � skeleton and value both visible simultaneously on Bills, Income, and all summary-card pages. Fixed: added CSS rule in main.css (Sprint QA 0420, 2026-02-17, commit f21804c) |
 | BUG-SIGNUP-BTN-GLOBAL | Bug | P2 | XS | Done | **Sign Up CTA uses btn-secondary across all 11 pages** - Primary onboarding action should be btn-primary. Fixed across all pages: assets, bills, budget, debts, friends, income, index, investments, reports, settings, transactions (Sprint QA 0420, 2026-02-17, commit f21804c) |
 
-| BUG-CSS-ORPHAN-001 | Chore | P3 | XS | Ready | **3 orphaned CSS files not linked in any HTML** - financial-patterns.css (504 lines), category-icons.css (291 lines, references Lucide icons not in project), empty-states.css (338 lines, uses BEM naming mismatched from actual HTML classes). Total: 1,133 lines of dead CSS. Fix: delete or link correctly. (Sprint QA 0420, 2026-02-17) |### EPIC-002: Mobile Application
+| BUG-CSS-ORPHAN-001 | Chore | P3 | XS | Ready | **3 orphaned CSS files not linked in any HTML** - financial-patterns.css (504 lines), category-icons.css (291 lines, references Lucide icons not in project), empty-states.css (338 lines, uses BEM naming mismatched from actual HTML classes). Total: 1,133 lines of dead CSS. Fix: delete or link correctly. (Sprint QA 0420, 2026-02-17) |
+| FC-172 | Feature | P1 | S | Ready | **Cash Flow Projection Engine** — Implement `cash-flow.js` with `generateCashFlowProjection()`, `getOccurrences()`, `advanceByFrequency()`. Handles all 8 frequencies (daily → annual), month-end edge cases, parallel inflow/outflow ledger. Unit-testable. Powers FC-173. (2-3h) — Sprint Research 2026-02-17 — see reports/cash-flow-forecasting-research-2026-02-17.md |
+| FC-173 | Feature | P1 | L | Ready | **Operational Dashboard Page** — Build `operations.html` + `operations.js` with: cash flow line chart (30/60/90d toggle), bills aging widget (3 buckets: ≤7d/8-30d/31-60d), budget vs. actuals horizontal bar chart, Safe to Spend KPI, upcoming 14-day transactions list. Depends on FC-172. (5-6h) — Sprint Research 2026-02-17 — see reports/cash-flow-forecasting-research-2026-02-17.md |
+| FC-174 | Feature | P2 | XS | Ready | **Safety Buffer Setting** — Add `safety_buffer` field to settings table (default $500). User-configurable threshold for Safe to Spend calculation and low-balance alerts. Show in Settings page as part of FC-UIUX-023 expansion. (30 min) — Sprint Research 2026-02-17 |
+| FC-175 | Feature | P2 | XS | Ready | **Current Balance Manual Entry** — Add `current_balance` field to settings table. Quick-entry modal on Operations page for users without Plaid production. Required starting point for cash flow projections (FC-172/173). (45 min) — Sprint Research 2026-02-17 |### EPIC-002: Mobile Application
 
 | ID | Type | Priority | Size | Status | Title |
 |----|------|----------|------|--------|-------|

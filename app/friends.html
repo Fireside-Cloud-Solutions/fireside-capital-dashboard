@@ -68,6 +68,11 @@
       <div class="page-header">
         <h2>Friends & Connections</h2>
         <div class="page-header-actions">
+          <div id="pageActions" class="initially-hidden">
+            <button class="btn btn-primary" id="inviteFriendHeaderBtn" aria-label="Invite a friend to Fireside Capital">
+              <i class="bi bi-person-plus me-2"></i> Invite Friend
+            </button>
+          </div>
         </div>
         <div>
           <div id="loggedOutState">
@@ -128,14 +133,21 @@
         <div id="pendingRequestsSection">
           <h4 class="mb-3"><i class="bi bi-inbox me-2 icon-warning"></i>Pending Requests</h4>
           <div id="pendingRequestsContainer" class="row g-3 mb-4">
-            <div class="col-12">
-              <div class="empty-state" data-empty-state="pending-requests">
-                <i class="bi bi-inbox empty-state-icon"></i>
-                <h3 class="empty-state-title">No pending requests</h3>
-                <p class="empty-state-text">When someone sends you a friend request, it will appear here.</p>
-                <button class="btn btn-primary" data-action="focus-friend-search">
-                  <i class="bi bi-search me-1"></i> Search for Friends
-                </button>
+            <!-- Skeleton loaders (replaced by JS when data loads) -->
+            <div class="col-md-6 col-lg-4 skeleton-row">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="skeleton-loader skeleton-line mb-2" style="width: 130px;"></div>
+                  <div class="skeleton-loader skeleton-line" style="width: 160px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4 skeleton-row">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="skeleton-loader skeleton-line mb-2" style="width: 110px;"></div>
+                  <div class="skeleton-loader skeleton-line" style="width: 150px;"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -144,14 +156,29 @@
         <!-- My Friends -->
         <h4 class="mb-3"><i class="bi bi-people-fill me-2 icon-success"></i>My Friends</h4>
         <div id="myFriendsContainer" class="row g-3 mb-4">
-          <div class="col-12">
-            <div class="empty-state" data-empty-state="my-friends">
-              <i class="bi bi-people empty-state-icon"></i>
-              <h3 class="empty-state-title">No friends yet</h3>
-              <p class="empty-state-text">Search for friends by username or email to start connecting and sharing expenses.</p>
-              <button class="btn btn-primary" data-action="focus-friend-search">
-                <i class="bi bi-search me-1"></i> Find Friends
-              </button>
+          <!-- Skeleton loaders (replaced by JS when data loads) -->
+          <div class="col-md-6 col-lg-4 skeleton-row">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="skeleton-loader skeleton-line mb-2" style="width: 140px;"></div>
+                <div class="skeleton-loader skeleton-line" style="width: 170px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 skeleton-row">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="skeleton-loader skeleton-line mb-2" style="width: 120px;"></div>
+                <div class="skeleton-loader skeleton-line" style="width: 155px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 skeleton-row">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="skeleton-loader skeleton-line mb-2" style="width: 135px;"></div>
+                <div class="skeleton-loader skeleton-line" style="width: 165px;"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -298,6 +325,21 @@
   <script src="assets/js/notification-enhancements.js" defer></script>
   <script src="assets/js/loading-states.js" defer></script>
   <script src="assets/js/plaid.js" defer></script>
+  <script>
+    // Wire up Invite Friend header button → scrolls to and focuses the search input
+    document.addEventListener('DOMContentLoaded', () => {
+      const inviteBtn = document.getElementById('inviteFriendHeaderBtn');
+      if (inviteBtn) {
+        inviteBtn.addEventListener('click', () => {
+          const searchInput = document.getElementById('friendSearchInput');
+          if (searchInput) {
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            searchInput.focus();
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
 

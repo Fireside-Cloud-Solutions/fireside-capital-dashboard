@@ -142,6 +142,16 @@
           </div>
         </div>
 
+        <!-- Static empty state (shown by JS when no income exists) -->
+        <div id="incomeEmptyState" class="empty-state d-none">
+          <i class="bi bi-cash-stack empty-state-icon"></i>
+          <h3>No Income Sources Yet</h3>
+          <p>Track your salary, freelance income, and other earnings to see your complete financial picture.</p>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomeModal" aria-label="Add your first income source">
+            <i class="bi bi-plus-circle me-2"></i> Add Your First Income Source
+          </button>
+        </div>
+
         <div class="table-card">
           <div class="table-responsive">
             <table class="table align-middle mb-0">

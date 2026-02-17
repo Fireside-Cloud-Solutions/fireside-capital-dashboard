@@ -1,6 +1,97 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-17 04:20 EST (Sprint QA 0420 — 11 fixes committed, verified commit 1b38a90, 2 new bugs found and fixed)
+**Last Updated:** 2026-02-17 04:31 EST (Sprint Research 0431 — Cash Flow Forecasting research complete, 4 new tasks FC-172 to FC-175)
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0431 (Feb 17, 4:31 AM) — CASH FLOW FORECASTING COMPLETE ✅
+
+**Status:** ✅ **NEW RESEARCH TOPIC COMPLETE** — Cash Flow Forecasting algorithm + implementation guide for FC-164 Operational Dashboard  
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)  
+**Duration:** 10 minutes  
+**Task:** Continue research backlog — all 6 original topics done, pivoted to cash flow forecasting
+
+### Summary
+
+All 6 original research topics (CSS Architecture, Financial Dashboard UI, Chart.js, Bootstrap Dark Theme, PWA, Performance) were completed by Feb 16. This session pivoted to **Cash Flow Forecasting** — the implementation detail needed to unblock FC-164 (Operational Dashboard, P1, 8-12h).
+
+### Key Findings
+
+1. **Algorithm is simple** — 100 lines of vanilla JS, day-by-day ledger from existing Supabase tables
+2. **All data already exists** — bills + income + debts tables have everything needed
+3. **Only new DB field needed** — `current_balance` in settings table (FC-175, 45 min)
+4. **"Safe to Spend" is the killer feature** — lowest balance in next 14 days minus safety buffer
+5. **8 frequencies handled** — daily, weekly, bi-weekly, monthly, bi-monthly, quarterly, semi-annual, annual
+6. **Month-end edge cases** — use `setMonth()` not fixed-day arithmetic
+
+### 4 New Tasks Created
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-172 | P1 | 2-3h | Cash Flow Projection Engine (cash-flow.js) |
+| FC-173 | P1 | 5-6h | Operational Dashboard Page (operations.html) |
+| FC-174 | P2 | 30 min | Safety Buffer setting in Settings |
+| FC-175 | P2 | 45 min | Current Balance manual entry |
+
+**Total: ~8.5-10.5h** — within original FC-164 estimate
+
+### Report
+`reports/cash-flow-forecasting-research-2026-02-17.md` — Full algorithm + code examples
+
+### Discord
+2 messages posted to #dashboard (1473251501391609939, 1473251568106082304)
+
+---
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0428 (Feb 17, 4:28 AM) — VERIFICATION ROUND ✅
+
+**Status:** ✅ **11 PRIOR FIXES VERIFIED CORRECT** — Audit 100% complete (no new pages). 9 open issues remain (5 P2, 4 P3)
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** 8 minutes
+**Task:** Continue UI/UX audit (all pages done), verify prior recommendations, check for new issues
+
+### Summary
+
+**Mission:** Sprint UI/UX check — audit 100% complete, verify all fixes from last session (f21804c + 1b38a90)
+**Result:** ✅ **ALL 11 FIXES VERIFIED CORRECT** — No regressions, no new commits since 4:25 AM
+
+### Prior Fixes Verified ✅
+
+| Fix | Evidence |
+|-----|----------|
+| FC-UIUX-029 — Income KPI cards | income.html lines 119-136: 3x `.summary-card.loading` present |
+| BUG-SKEL-001 — Skeleton CSS hide rule | main.css L2762: `.summary-card:not(.loading) .skeleton-loader { display: none !important; }` |
+| BUG-SIGNUP-BTN — Sign Up btn-primary site-wide | All 11 pages: `class="btn btn-primary"` on Sign Up confirmed |
+| FC-UIUX-039 — Friends empty state CTAs | friends.html: btn-primary on all 3 empty state buttons |
+| FC-UIUX-042/043/044 — Friends Search + title + BI icons | friends.html: all confirmed |
+| FC-UIUX-031 — Income modal field order | income.html: Frequency before Next Payment Date |
+| FC-UIUX-033/036/038 — Sync/Apply Filters buttons | transactions.html: confirmed correct |
+
+### Open Issues (9 Remaining)
+
+**P2 — 6 items:**
+| ID | Priority | Est | Status | Description |
+|----|----------|-----|--------|-------------|
+| FC-UIUX-030 | P2 | 20 min | Ready | Income — no static HTML empty-state fallback |
+| FC-UIUX-034 | P2 | 20 min | Ready | Transactions — action buttons outside `.page-header-actions` |
+| FC-UIUX-035 | P2 | 20 min | Ready | Transactions — no skeleton loaders in table |
+| FC-UIUX-040 | P2 | 30 min | Ready | Friends — `.page-header-actions` empty (needs Add Friend btn) |
+| FC-UIUX-041 | P2 | 30 min | Ready | Friends — no skeleton loaders |
+| BUG-JS-001 | P2 | 2-3h | Ready | Console cleanup (132+ statements) |
+
+**P3 — 4 items:**
+| ID | Priority | Est | Status | Description |
+|----|----------|-----|--------|-------------|
+| FC-UIUX-032 | P3 | 15 min | Ready | Skeleton inline styles → CSS classes |
+| FC-UIUX-037 | P3 | 15 min | Ready | Transactions inline `<script>` block (line 419) |
+| BUG-CSS-001 | P3 | 8-12h | Ready | 303 `!important` instances |
+| BUG-CSS-ORPHAN-001 | P3 | 30 min | Ready | 3 orphaned CSS files (1,133 dead lines) |
+
+### Recommendation
+**Spawn Builder** for FC-UIUX-030/034/035/040/041 (~2h total — all P2 UI issues).
+BUG-JS-001 best handled via Webpack (FC-118 TerserPlugin auto-strips console.log).
 
 ---
 
