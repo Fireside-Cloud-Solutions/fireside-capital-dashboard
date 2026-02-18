@@ -280,8 +280,8 @@ function renderPendingBillsList() {
     })
     .join('');
 
-  // Attach event listeners
-  attachBillCardEventListeners();
+  // Event listeners are handled via delegation on #emailReviewList (set up once in initEmailBillsEventListeners)
+  // No per-render listener attachment needed.
 }
 
 /**
@@ -299,54 +299,11 @@ function getConfidenceBadge(confidence) {
 }
 
 /**
- * Attach event listeners to bill cards.
+ * REMOVED: attachBillCardEventListeners() was called after every renderPendingBillsList()
+ * re-render, accumulating N×M duplicate listeners on each call.
+ * Replaced with a single delegated listener on #emailReviewList
+ * (wired once in initEmailBillsEventListeners). BUG-UIUX-BILLS-LISTENER-REBIND-001.
  */
-function attachBillCardEventListeners() {
-  // Checkboxes
-  document.querySelectorAll('.bill-checkbox').forEach((checkbox) => {
-    checkbox.addEventListener('change', (e) => {
-      const billId = e.target.value;
-      if (e.target.checked) {
-        selectedBillIds.add(billId);
-      } else {
-        selectedBillIds.delete(billId);
-      }
-      updateBillCardSelection(billId, e.target.checked);
-    });
-  });
-
-  // Approve buttons
-  document.querySelectorAll('.approve-bill-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const billId = e.currentTarget.dataset.billId;
-      approveBill(billId);
-    });
-  });
-
-  // Reject buttons
-  document.querySelectorAll('.reject-bill-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const billId = e.currentTarget.dataset.billId;
-      rejectBill(billId);
-    });
-  });
-
-  // Edit buttons
-  document.querySelectorAll('.edit-bill-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const billId = e.currentTarget.dataset.billId;
-      editBill(billId);
-    });
-  });
-
-  // Category changes
-  document.querySelectorAll('.bill-category').forEach((select) => {
-    select.addEventListener('change', (e) => {
-      const billId = e.currentTarget.dataset.billId;
-      updateBillCategory(billId, e.target.value);
-    });
-  });
-}
 
 /**
  * Update visual selection state of a bill card.
@@ -378,9 +335,9 @@ async function approveBill(billId) {
       name: bill.vendor,
       type: bill.category,
       amount: bill.amount,
-      nextDueDate: bill.due_date,
+      next_due_date: bill.due_date,
       frequency: 'monthly', // Default frequency
-      isFinancing: false,
+      is_financing: false,
     });
 
     if (insertError) throw insertError;
@@ -603,6 +560,44 @@ function initEmailBillsEventListeners() {
   const reviewModal = document.getElementById('emailReviewModal');
   if (reviewModal) {
     reviewModal.addEventListener('show.bs.modal', populateEmailReviewModal);
+  }
+
+  // --- Delegated listeners for dynamically-rendered bill cards ---
+  // Single handler on the list container; avoids duplicate listeners on every re-render.
+  // BUG-UIUX-BILLS-LISTENER-REBIND-001
+  const reviewList = document.getElementById('emailReviewList');
+  if (reviewList) {
+    // Checkbox toggle
+    reviewList.addEventListener('change', (e) => {
+      const checkbox = e.target.closest('.bill-checkbox');
+      if (!checkbox) return;
+      const billId = checkbox.value;
+      if (checkbox.checked) {
+        selectedBillIds.add(billId);
+      } else {
+        selectedBillIds.delete(billId);
+      }
+      updateBillCardSelection(billId, checkbox.checked);
+    });
+
+    // Category select
+    reviewList.addEventListener('change', (e) => {
+      const select = e.target.closest('.bill-category');
+      if (!select) return;
+      updateBillCategory(select.dataset.billId, select.value);
+    });
+
+    // Approve / Reject / Edit buttons
+    reviewList.addEventListener('click', (e) => {
+      const approveBtn = e.target.closest('.approve-bill-btn');
+      if (approveBtn) { approveBill(approveBtn.dataset.billId); return; }
+
+      const rejectBtn = e.target.closest('.reject-bill-btn');
+      if (rejectBtn) { rejectBill(rejectBtn.dataset.billId); return; }
+
+      const editBtn = e.target.closest('.edit-bill-btn');
+      if (editBtn) { editBill(editBtn.dataset.billId); return; }
+    });
   }
 
   // Batch action buttons
