@@ -235,7 +235,9 @@ function showOnboardingWizard() {
   currentOnboardingStep = 1;
   showOnboardingStep(1);
   
-  // Show the modal
+  // Show the modal — dispose any existing instance first so static backdrop + keyboard:false options are applied fresh
+  const existingInstance = bootstrap.Modal.getInstance(modalEl);
+  if (existingInstance) existingInstance.dispose();
   const onboardingModal = new bootstrap.Modal(modalEl, {
     backdrop: 'static', // Prevent clicking outside to close
     keyboard: false     // Prevent ESC key from closing
@@ -258,8 +260,8 @@ function resumeOnboardingIfPending() {
     // Re-open onboarding modal at the pending step
     setTimeout(() => {
       showOnboardingStep(stepToResume);
-      const onboardingModal = new bootstrap.Modal(document.getElementById('onboardingModal'));
-      onboardingModal.show();
+      // getOrCreateInstance: safe re-open after external modal closed; no options needed here
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('onboardingModal')).show();
     }, 300); // Small delay for smooth transition
   }
 }

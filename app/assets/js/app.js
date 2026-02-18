@@ -2133,8 +2133,8 @@ function showSharedBillDeleteWarning(id, name) {
     await deleteBillConfirmed();
   };
   
-  // Show the warning modal
-  const modal = new bootstrap.Modal(document.getElementById('sharedBillDeleteWarningModal'));
+  // Show the warning modal — getOrCreateInstance prevents duplicate Modal instances on repeat calls
+  const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sharedBillDeleteWarningModal'));
   modal.show();
 }
 
