@@ -1,5 +1,80 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-18 06:51 EST (Sprint UI/UX 0651 — BILLS + EMAIL-BILLS DEEP AUDIT, 7 BUGS FIXED, commit 8d4546f)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0651 (Feb 18, 6:51 AM) — BILLS.HTML + EMAIL-BILLS.JS DEEP AUDIT ✅
+
+**Status:** ✅ **COMMIT 8d4546f — 7 BUGS FIXED**
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~5 minutes
+**Task:** Continue UI/UX audit — verify prior recs, deep audit bills.html + email-bills.js, create work items
+
+### Prior Recommendations Verified
+
+| Fix | Status |
+|-----|--------|
+| FC-UIUX-050 — Cash flow chart negative-balance indicator | ✅ FIXED (commit f87399c, verified in QA 0641) |
+| BUG-UIUX-OPS-HEADING-SEMANTIC-001 — `<h6>` semantic section titles | ✅ FIXED (347acab) |
+| BUG-UIUX-OPS-BUCKET-CHEV-001 — chevron rotation on expand | ✅ FIXED (347acab) |
+| BUG-UIUX-OPS-DANGER-BORDER-SEPARATOR-001 — border-secondary-subtle on bg-danger | ✅ FIXED (347acab) |
+
+### Quick Fixes Applied (commit `8d4546f`)
+
+| ID | Priority | Fix | File |
+|----|----------|-----|------|
+| BUG-UIUX-BILLS-TOAST-SHADOW-001 | **P2** | `email-bills.js` had local `showToast()` that called `alert()` — shadowed the real global from toast-notifications.js. Removed local override entirely. | email-bills.js |
+| BUG-UIUX-BILLS-TABLE-MISMATCH-001 | **P2** | `loadPendingEmailBills()` queried `bills` table for `status='pending'` — but `storePendingBills()` inserts into `pending_bills` table. Data was never found. Fixed: query `pending_bills`. | email-bills.js |
+| BUG-UIUX-BILLS-EDIT-PROMPT-001 | **P2** | `editBill()` used `prompt()` (blocking native dialog, unstyled, mobile-hostile). Replaced with pre-fill of `#addBillModal` + modal show. | email-bills.js |
+| BUG-UIUX-BILLS-MODAL-INSTANCE-002 | **P3** | `new bootstrap.Modal()` in `scanEmailForBills()` → `getOrCreateInstance()` | email-bills.js |
+| BUG-UIUX-BILLS-INLINE-SCRIPT-001 | **P3** | Removed inline `<script>` block with `setTimeout(500)` race condition. Added `dataLoaded` event listener in email-bills.js for proper auth-safe self-init. | bills.html, email-bills.js |
+| BUG-UIUX-BILLS-MODAL-CANCEL-001 | **P2** | `#addBillModal` footer had only Save button — no Cancel/Close. Users were trapped. Added `btn-outline-secondary` Cancel button. | bills.html |
+| BUG-UIUX-BILLS-SCAN-BTN-001 | **P3** | "Scan Email for Bills" used `btn-secondary` (filled blue) — competed visually with "Add Bill" `btn-primary`. Changed to `btn-outline-secondary`. | bills.html |
+| BUG-UIUX-BILLS-INLINE-STYLE-001 | **P3** | `#emailReviewEmpty` icon had `style="font-size: 3rem;"` inline. Replaced with `.empty-state-icon` CSS class. | bills.html |
+| BUG-UIUX-BUDGET-ARIA-001 | **P2** | `#generateBudgetStatus` span had no `role="status"` or `aria-live="polite"` — screen readers couldn't announce budget generation feedback. Fixed. | budget.html |
+| BUG-UIUX-CSS-STALE-0218-001 | **P3** | CSS version strings `v=20260217` on both bills.html and budget.html — components.css + utilities.css modified on 2/18. Updated to `v=20260218`. | bills.html, budget.html |
+
+### Audit Focus: bills.html + email-bills.js
+
+**bills.html review (all sections):**
+
+| Check | Result |
+|-------|--------|
+| Navigation (12 sidebar links) | ✅ Correct, Operations present, Bills active |
+| Demo banner pattern | ✅ data-action="disable-demo" |
+| Semantic headings | ✅ h4 for section titles |
+| Skeleton rows (3 rows) | ✅ Present in billTableBody |
+| Summary cards (3 cards at col-xl-3) | ⚠️ 3 cards leave blank XL column — FC-UIUX-051 |
+| Modal footers (Cancel button) | ✅ FIXED (8d4546f) |
+| Inline script block | ✅ FIXED (8d4546f) |
+| Button hierarchy | ✅ FIXED (8d4546f) |
+| CSS version strings | ✅ FIXED (8d4546f) |
+
+**email-bills.js review:**
+
+| Check | Result |
+|-------|--------|
+| showToast shadow | ✅ FIXED (8d4546f) |
+| pending_bills table mismatch | ✅ FIXED (8d4546f) |
+| prompt() in editBill() | ✅ FIXED (8d4546f) |
+| Modal.getOrCreateInstance | ✅ FIXED (8d4546f) |
+| dataLoaded self-init | ✅ FIXED (8d4546f) |
+| Inline event listeners on bill cards | ⚠️ renderPendingBillsList() re-attaches listeners on every re-render — BUG-UIUX-BILLS-LISTENER-REBIND-001 |
+| approveBill() uses bills.insert() with camelCase column names | ⚠️ `nextDueDate` / `isFinancing` — DB schema uses snake_case. BUG-UIUX-BILLS-APPROVE-SCHEMA-001 |
+
+### New Work Items Created
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-UIUX-051 | P3 | 15 min | bills.html 3-column XL layout — 3 summary cards at col-xl-3 leaves blank quarter-column at XL. Add a 4th stat card (e.g., "Next Due" or "Avg Monthly" display) or change to col-xl-4 |
+| BUG-UIUX-BILLS-LISTENER-REBIND-001 | P3 | 15 min | `renderPendingBillsList()` calls `attachBillCardEventListeners()` every re-render → duplicate listeners on re-render. Fix: use event delegation on `#emailReviewList` instead |
+| BUG-UIUX-BILLS-APPROVE-SCHEMA-001 | **P2** | 30 min | `approveBill()` inserts with camelCase `nextDueDate` and `isFinancing` — DB bills schema uses snake_case `next_due_date` and `is_financing`. Approval will silently fail schema validation. Fix: convert to snake_case |
+
+### Production Grade
+
+**Overall: A** — 10 bugs fixed across email-bills.js + bills.html + budget.html. Two new medium-priority bugs found in `approveBill()` that will break Gmail import approval when that feature ships. Added to backlog.
+
 **Last Updated:** 2026-02-18 06:41 EST (Sprint QA 0641 — 5 COMMITS VERIFIED, 4 BUGS FIXED + 1 P1 CACHE BUG CAUGHT, commit c5f8e48)
 
 ---
