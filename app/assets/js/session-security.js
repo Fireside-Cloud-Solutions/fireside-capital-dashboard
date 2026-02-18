@@ -57,6 +57,10 @@ class SessionSecurityManager {
   }
 
   startSessionMonitoring() {
+    // BUG-POLISH-DBLINT-001 (partial fix pt2): Guard against double-start.
+    // init() fires getSession() → startMonitoring [1], then onAuthStateChange(SIGNED_IN)
+    // fires onLogin() → startMonitoring [2] on every page reload. Second call is a no-op.
+    if (this.isActive) return;
     this.isActive = true;
     this.sessionStartTime = Date.now();
     this.lastActivity = Date.now();
@@ -132,7 +136,7 @@ class SessionSecurityManager {
             <strong>Session expiring soon!</strong>
             <p class="mb-0 small">You'll be logged out in <span id="sessionWarningTime">${minutesRemaining}</span> minute(s) due to inactivity.</p>
           </div>
-          <button type="button" class="btn-close" onclick="sessionSecurity.hideSessionWarning()"></button>
+          <button type="button" class="btn-close" data-action="dismiss-session-warning" aria-label="Close"></button>
         </div>
       `;
       document.body.appendChild(banner);
@@ -362,9 +366,13 @@ class SessionSecurityManager {
 window.SessionSecurityManager = SessionSecurityManager;
 
 // Event delegation for dynamically-injected session UI (replaces inline onclick)
+// BUG-SECURITY-INLINE-002: logout modal "Log In Again" button
+// BUG-SECURITY-INLINE-003: session warning banner dismiss button
 document.addEventListener('click', (e) => {
   const action = e.target.closest('[data-action]')?.dataset.action;
   if (action === 'reload-page') {
     location.reload();
+  } else if (action === 'dismiss-session-warning') {
+    window.sessionSecurity?.hideSessionWarning();
   }
 });
