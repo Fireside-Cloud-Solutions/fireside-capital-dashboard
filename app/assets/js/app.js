@@ -2513,7 +2513,13 @@ function updateCategoryBudgetTotal() {
   document.querySelectorAll('.category-budget-input').forEach(input => {
     total += parseFloat(input.value) || 0;
   });
-  totalEl.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mo';
+  if (total === 0) {
+    totalEl.textContent = 'Nothing budgeted yet — fill in your limits above';
+    totalEl.className = 'text-muted small fst-italic';
+  } else {
+    totalEl.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mo';
+    totalEl.className = 'fw-bold text-success';
+  }
 }
 
 async function renderAdditionalCharts() {
