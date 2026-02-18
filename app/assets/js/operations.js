@@ -96,8 +96,14 @@ function normalizeIncomeToMonthly(income) {
 function opsGetBills() {
   const demo = typeof isDemoMode === 'function' && isDemoMode();
   const bills = demo ? (DEMO_DATA.bills || []) : (window.bills || []);
-  // Exclude already-paid one-time bills
-  return bills.filter(b => b.status !== 'inactive' && !b.is_paid);
+  // Exclude already-paid one-time bills and paid-off/cancelled financing (BUG-OPS-PAIDOFF-BILLS-001)
+  // Matches app.js filter logic (lines 2906-2911) which also excludes paid_off + cancelled
+  return bills.filter(b =>
+    b.status !== 'inactive' &&
+    b.status !== 'paid_off' &&
+    b.status !== 'cancelled' &&
+    !b.is_paid
+  );
 }
 
 /**
