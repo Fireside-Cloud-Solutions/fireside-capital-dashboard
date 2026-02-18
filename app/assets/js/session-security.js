@@ -211,7 +211,7 @@ class SessionSecurityManager {
               <p>${message}</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-action="reload-page">
                 <i class="bi bi-box-arrow-in-right me-1"></i>Log In Again
               </button>
             </div>
@@ -221,7 +221,7 @@ class SessionSecurityManager {
     `;
     
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = new bootstrap.Modal(document.getElementById('sessionTimeoutModal'));
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionTimeoutModal'));
     modal.show();
   }
 
@@ -360,3 +360,11 @@ class SessionSecurityManager {
 
 // Export for global use
 window.SessionSecurityManager = SessionSecurityManager;
+
+// Event delegation for dynamically-injected session UI (replaces inline onclick)
+document.addEventListener('click', (e) => {
+  const action = e.target.closest('[data-action]')?.dataset.action;
+  if (action === 'reload-page') {
+    location.reload();
+  }
+});

@@ -240,5 +240,4 @@ if (document.readyState === 'loading') {
   initializePolishEnhancements();
 }
 
-// Also run after the main app initializes
-setTimeout(initializePolishEnhancements, 1000);
+// Note: deferred execution above is sufficient; no setTimeout re-invocation needed.

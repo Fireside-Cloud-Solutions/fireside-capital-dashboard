@@ -127,7 +127,7 @@ async function withDatabaseRateLimit(operation, fn, button = null) {
     showRateLimitError(operation, config.windowMinutes);
     
     // Disable button temporarily if provided
-    if (button) {
+    if (button && typeof disableButtonTemporarily === 'function') {
       const waitMs = config.windowMinutes * 60 * 1000;
       disableButtonTemporarily(button, Math.min(waitMs, 10000), button.innerHTML);
     }
@@ -169,7 +169,7 @@ async function withHybridRateLimit(clientLimiterKey, dbOperation, fn, button = n
     document.body.appendChild(alert);
     setTimeout(() => alert.remove(), 3000);
     
-    if (button) {
+    if (button && typeof disableButtonTemporarily === 'function') {
       disableButtonTemporarily(button, remainingMs, button.innerHTML);
     }
     
