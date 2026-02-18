@@ -169,28 +169,96 @@
 
       <div id="dataContainer" class="data-hidden">
 
-        <!-- Safe to Spend KPI — FC-173 -->
-        <div id="safeToSpend" class="row mb-4">
-          <div class="col-12">
-            <div class="table-card p-4 text-center py-5">
-              <i class="bi bi-activity display-4 text-primary mb-3 d-block"></i>
-              <h4 class="mb-2">Operations Dashboard</h4>
-              <p class="text-muted mb-0">Real-time cash flow, bills aging, and budget vs actuals — coming in the next build.</p>
+        <!-- ── Row 1: Safe to Spend + Cash Flow Chart ─────────── -->
+        <div class="row g-3 mb-3">
+
+          <!-- Safe to Spend KPI -->
+          <div class="col-12 col-md-4 col-xl-3">
+            <div id="safeToSpend" class="h-100">
+              <div class="card h-100">
+                <div class="card-body d-flex align-items-center justify-content-center">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading…</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Cash Flow Chart — FC-173 -->
-        <div id="cashFlowChart" class="row mb-4"></div>
+          <!-- Cash Flow Chart -->
+          <div class="col-12 col-md-8 col-xl-9">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="ops-card-header">
+                  <p class="ops-card-title"><i class="bi bi-graph-up me-1"></i> Cash Flow Projection</p>
+                  <span class="text-muted small" id="cashFlowSubtitle">Next 30 days</span>
+                </div>
+                <div id="cashFlowChartContainer">
+                  <canvas id="cashFlowCanvas" aria-label="Cash flow projection chart" role="img"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.row 1 -->
 
-        <!-- Bills Aging — FC-173 -->
-        <div id="billsAging" class="row mb-4"></div>
+        <!-- ── Row 2: Bills Aging + Budget vs Actuals ──────────── -->
+        <div class="row g-3 mb-3">
 
-        <!-- Budget vs Actuals Horizontal — FC-173 -->
-        <div id="bvaHorizontal" class="row mb-4"></div>
+          <!-- Bills Aging Widget -->
+          <div class="col-12 col-md-5 col-xl-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <p class="ops-card-title"><i class="bi bi-clock-history me-1"></i> Bills Aging</p>
+                <div id="billsAging">
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading…</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <!-- Upcoming Transactions — FC-173 -->
-        <div id="upcomingTx" class="row mb-4"></div>
+          <!-- Budget vs Actuals -->
+          <div class="col-12 col-md-7 col-xl-8">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="ops-card-header">
+                  <p class="ops-card-title"><i class="bi bi-bar-chart-line me-1"></i> Budget vs Actuals</p>
+                  <select class="form-select form-select-sm" id="bvaMonthSelect" aria-label="Select month" style="min-width:160px">
+                    <!-- Populated by operations.js -->
+                  </select>
+                </div>
+                <div id="bvaHorizontal">
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading…</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.row 2 -->
+
+        <!-- ── Row 3: Upcoming 14-Day List ────────────────────── -->
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+                <p class="ops-card-title"><i class="bi bi-calendar2-week me-1"></i> Upcoming — Next 14 Days</p>
+                <div id="upcomingTx">
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading…</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.row 3 -->
 
       </div>
 
@@ -297,6 +365,10 @@
   <script src="assets/js/realtime.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/event-handlers.js"></script>
+
+  <!-- Operations-specific (defer) -->
+  <script src="assets/js/budget-actuals.js" defer></script>
+  <script src="assets/js/operations.js" defer></script>
 
   <!-- NON-CRITICAL SCRIPTS: Defer for performance -->
   <script src="assets/js/rate-limiter.js" defer></script>
