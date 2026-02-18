@@ -19,6 +19,8 @@
 const OPS_SAFETY_BUFFER = 500;
 let opsCashFlowChart = null;
 let opsCurrentDays = 30;
+let opsLastRefreshed = null;          // FC-UIUX-049: data-freshness tracking
+let _opsTimestampInterval = null;     // FC-UIUX-049: periodic "X min ago" updater
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -38,6 +40,32 @@ function opsEscape(str) {
   const d = document.createElement('div');
   d.textContent = String(str == null ? '' : str);
   return d.innerHTML;
+}
+
+/**
+ * FC-UIUX-049: Format a Date as a human-readable "X min ago" string.
+ * Falls back to "just now" for < 60s, and "HH:MM" for > 60 min.
+ */
+function opsFormatTimeAgo(date) {
+  if (!date) return '';
+  const diffMs  = Date.now() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffSec < 60)  return 'just now';
+  if (diffMin === 1) return '1 min ago';
+  if (diffMin < 60)  return `${diffMin} min ago`;
+  // > 1 hour: show HH:MM
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+/**
+ * FC-UIUX-049: Update only the "Updated …" text nodes without re-rendering sections.
+ * Called by the 30-second interval ticker.
+ */
+function opsTickTimestamps() {
+  if (!opsLastRefreshed) return;
+  const label = document.getElementById('safeToSpendUpdated');
+  if (label) label.textContent = `Updated ${opsFormatTimeAgo(opsLastRefreshed)}`;
 }
 
 /**
@@ -193,6 +221,12 @@ function renderSafeToSpend(data) {
             <span>−${opsFormatCurrency(bufferAmount)}</span>
           </div>
         </div>
+        <!-- FC-UIUX-049: data-freshness stamp -->
+        <div class="mt-2 pt-2 border-top border-secondary-subtle">
+          <small id="safeToSpendUpdated" class="text-muted fst-italic">
+            ${opsLastRefreshed ? `Updated ${opsFormatTimeAgo(opsLastRefreshed)}` : ''}
+          </small>
+        </div>
       </div>
     </div>`;
 }
@@ -319,9 +353,14 @@ async function renderCashFlowChart(days = 30) {
   const canvas = document.getElementById('cashFlowCanvas');
   if (!canvas) return;
 
-  // Update subtitle label
+  // Update subtitle label — FC-UIUX-049: include "as of HH:MM" when data is fresh
   const subtitle = document.getElementById('cashFlowSubtitle');
-  if (subtitle) subtitle.textContent = `Next ${days} days`;
+  if (subtitle) {
+    const timeStr = opsLastRefreshed
+      ? opsLastRefreshed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      : '';
+    subtitle.textContent = timeStr ? `Next ${days} days · as of ${timeStr}` : `Next ${days} days`;
+  }
 
   try {
     await opsLoadChartJs();
@@ -761,6 +800,7 @@ function waitForAppData() {
 async function initOperations() {
   try {
     // ── 1. Safe to Spend ──────────────────────────────────────────
+    opsLastRefreshed = new Date(); // FC-UIUX-049: stamp before first render
     const safeData = await calculateSafeToSpend();
     renderSafeToSpend(safeData);
 
@@ -780,6 +820,10 @@ async function initOperations() {
     updateRealtimeBadge();
     setInterval(updateRealtimeBadge, 5000);
 
+    // ── FC-UIUX-049: 30s ticker for "Updated X min ago" ──────────
+    if (_opsTimestampInterval) clearInterval(_opsTimestampInterval);
+    _opsTimestampInterval = setInterval(opsTickTimestamps, 30_000);
+
     // ── Cash flow time-range toggle ───────────────────────────────
     document.querySelectorAll('#cashFlowToggle button').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -793,6 +837,7 @@ async function initOperations() {
     // ── Realtime subscriptions ────────────────────────────────────
     if (typeof FiresideRealtime !== 'undefined' && typeof FiresideRealtime.on === 'function') {
       FiresideRealtime.on('bill:update', async () => {
+        opsLastRefreshed = new Date(); // FC-UIUX-049
         renderBillsAging();
         renderUpcomingList();
         const fresh = await calculateSafeToSpend();
@@ -801,6 +846,7 @@ async function initOperations() {
       });
 
       FiresideRealtime.on('transaction:insert', () => {
+        opsLastRefreshed = new Date(); // FC-UIUX-049
         renderUpcomingList();
       });
     }
