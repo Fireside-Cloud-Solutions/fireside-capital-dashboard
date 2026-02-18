@@ -1,4 +1,4 @@
-// ===== DEBUG UTILITY =====
+﻿// ===== DEBUG UTILITY =====
 // Debug mode disabled in production
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
@@ -2788,7 +2788,9 @@ async function loadAndRenderBudget() {
     allBudgetRecords.filter(a => a.suppressed).map(a => a.item_id)
   );
 
-  const totalIncome = (window.income || []).reduce((sum, i) => sum + getRaw(i.amount), 0);
+  // BUG-BUDGET-INCOME-NORMALIZE-001: Normalize to monthly — raw amount is wrong for
+  // bi-weekly/weekly/annual income (e.g. bi-weekly $3,569 → $7,733/mo, not $3,569/mo).
+  const totalIncome = (window.income || []).reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
   const totalAssigned = Object.values(budgetAssignments).reduce((sum, amount) => sum + getRaw(amount), 0);
   const remainingToBudget = totalIncome - totalAssigned;
 
@@ -3041,8 +3043,8 @@ async function loadAndRenderBudget() {
 
       await saveBudgetAssignment(itemId, assignedAmount, itemType);
 
-
-      const totalIncome = (window.income || []).reduce((sum, i) => sum + getRaw(i.amount), 0);
+      // BUG-BUDGET-INCOME-NORMALIZE-001: Normalize to monthly — matches budget header calculation
+      const totalIncome = (window.income || []).reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
       const allAssignedInputs = Array.from(document.querySelectorAll('.assigned-input'));
       const newTotalAssigned = allAssignedInputs.reduce((sum, currentInput) => sum + getRaw(currentInput.value), 0);
       const newRemainingToBudget = totalIncome - newTotalAssigned;
@@ -4178,7 +4180,7 @@ function setupThemeToggle() {
     
     // Update checkbox state to match theme
     if (themeSwitch) {
-      themeSwitch.checked = (theme === 'light');
+      themeSwitch.checked = (theme === 'dark'); // BUG-THEME-TOGGLE-UX-001: checked=dark (was inverted)
     }
     
     updateThemeLabel();
@@ -4198,7 +4200,7 @@ function setupThemeToggle() {
   
   // Listen for toggle changes
   themeSwitch.addEventListener('change', function() {
-    const newTheme = this.checked ? 'light' : 'dark';
+    const newTheme = this.checked ? 'dark' : 'light'; // BUG-THEME-TOGGLE-UX-001
     setTheme(newTheme);
   });
   

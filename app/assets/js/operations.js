@@ -556,14 +556,20 @@ function renderBillsAging() {
 
   // Event delegation for toggle — CSP-compliant, no inline onclick
   // Also updates aria-expanded for screen reader accessibility (BUG-OPS-BILLS-ARIA-001)
-  el.addEventListener('click', (e) => {
-    const bucket = e.target.closest('[data-action="toggle-bucket"]');
-    if (!bucket) return;
-    const list = bucket.querySelector('.bills-bucket-list');
-    if (!list) return;
-    const expanded = list.classList.toggle('expanded');
-    bucket.setAttribute('aria-expanded', expanded);
-  });
+  // BUG-OPS-BILLS-LISTENER-LEAK-001: Guard against adding a new listener on every re-render.
+  // renderBillsAging() is called on init AND on realtime bill:update events. Without the guard,
+  // each call stacks another listener; N clicks per user click breaks toggle open/close.
+  if (!el.dataset.bucketListenerAttached) {
+    el.dataset.bucketListenerAttached = 'true';
+    el.addEventListener('click', (e) => {
+      const bucket = e.target.closest('[data-action="toggle-bucket"]');
+      if (!bucket) return;
+      const list = bucket.querySelector('.bills-bucket-list');
+      if (!list) return;
+      const expanded = list.classList.toggle('expanded');
+      bucket.setAttribute('aria-expanded', expanded);
+    });
+  }
 }
 
 // ─── Section 4: Budget vs Actuals ────────────────────────────────────────────

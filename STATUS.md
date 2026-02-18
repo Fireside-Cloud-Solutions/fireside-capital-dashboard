@@ -1,5 +1,81 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-18 06:12 EST (Sprint Research 0612 — AZURE FUNCTIONS ARCHITECTURE RESEARCHED, 3 NEW TASKS CREATED, FC-207 UPGRADED)
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0612 (Feb 18, 6:12 AM) — AZURE FUNCTIONS ARCHITECTURE ✅
+
+**Status:** ✅ **RESEARCH COMPLETE** — Critical constraint discovered, 3 new tasks, FC-207 upgraded
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** ~5 minutes
+**Topic:** Azure Functions Architecture — backend layer for Plaid + Gmail + scheduled sync
+
+### Critical Finding: SWA Functions = HTTP-Only
+
+**Root constraint:** Azure Static Web Apps managed functions **only support HTTP triggers**. Timer/cron triggers are blocked by the platform. This impacts:
+- ❌ EMAIL-016 (Gmail background sync) — was designed as timer trigger. **Revised to HTTP trigger called by GitHub Actions cron.**
+- ❌ Daily net worth snapshots — **Revised to Supabase pg_cron** (no external call needed — all data in DB)
+
+### Architecture Designed
+
+| Component | Detail |
+|-----------|--------|
+| Folder | `api/src/functions/` — one file per endpoint |
+| Shared utils | `api/src/shared/auth.js` (JWT verify) + `supabase.js` (client factories) |
+| Auth model | `verifySupabaseToken()` calls `supabase.auth.getUser(token)` — server-validated, not just JWT decode. Catches revoked sessions. |
+| Service role | `getServiceClient()` — bypasses RLS, used only for Plaid access_token storage and webhook processing |
+| User-scoped | `getUserClient(token)` — respects RLS, used for all user-initiated operations |
+| Local dev | `swa start app --api-location api` via Static Web Apps CLI |
+| Timer triggers | SWA: HTTP endpoint + GitHub Actions `schedule:` OR Supabase `pg_cron` |
+
+### New Tasks Created (3)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-207 (upgraded) | P1 (was P2) | 30 min | `api/` boilerplate upgraded: includes `shared/auth.js` JWT verification pattern + `shared/supabase.js` client factories |
+| AZ-SECRETS-001 | P1 | 15 min (Matt) | Configure Azure SWA environment variables + GitHub Actions secrets |
+| FC-SNAP-001 | P2 | 30 min | Daily net worth snapshot via Supabase pg_cron (zero external deps) |
+
+### EMAIL-016 Revision
+
+Timer trigger → **HTTP trigger** called by GitHub Actions `schedule:` cron. Pattern: `POST /api/gmail-sync-trigger` with service auth. Avoids need for linked standalone Azure Functions app.
+
+### Implementation Order (Complete Backend Stack)
+```
+AZ-SECRETS-001 (Matt: set env vars in Azure portal)
+→ FC-207 (api/ boilerplate + shared/auth.js + shared/supabase.js)
+→ FC-202 (plaid_items DB migration) → FC-203 → FC-204 → FC-205 (Plaid functions)
+→ EMAIL-013 (bills email fields migration) → EMAIL-011 → EMAIL-012 → EMAIL-016 (Gmail)
+→ FC-SNAP-001 (pg_cron snapshots)
+```
+
+### Report
+`reports/azure-functions-architecture-research-2026-02-18.md` — Full folder structure, auth.js code, supabase.js code, host.json, package.json, local.settings.json template, timer trigger alternatives
+
+### Research Backlog Status — ALL 14 TOPICS COMPLETE ✅
+
+| Session | Topic | Status |
+|---------|-------|--------|
+| Feb 16 | CSS Architecture | ✅ Done |
+| Feb 16 | Financial Dashboard UI Patterns | ✅ Done |
+| 0450 | Chart.js | ✅ Done |
+| 0450 | Bootstrap Dark Theme | ✅ Done |
+| Feb 13 | PWA | ✅ Done |
+| Feb 13 | Performance | ✅ Done |
+| 0431 | Cash Flow Forecasting | ✅ Done |
+| 0535 | Budget vs Actuals + Demo Mode | ✅ Done |
+| 0635 | Webpack Build Pipeline | ✅ Done |
+| 0657 | Supabase Advanced Query Patterns | ✅ Done |
+| 0751 (Feb 17) | Smart Categorization + Realtime | ✅ Done |
+| 0433 (Feb 18) | Plaid Production Integration | ✅ Done |
+| 0511 (Feb 18) | Gmail Bill Parsing | ✅ Done |
+| **0612 (Feb 18)** | **Azure Functions Architecture** | ✅ **Done** |
+
+**Next research cycle:** React Native Expo deep-dive (MOB-002 scaffold — existing Feb 9 report is strategy; need implementation specifics)
+
+---
+
 **Last Updated:** 2026-02-18 06:06 EST (Sprint UI/UX 0606 — 3 PRIOR FIXES VERIFIED, 3 NEW BUGS FIXED, 1 WORK ITEM CREATED, commit 347acab)
 
 ---
