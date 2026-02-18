@@ -1,6 +1,57 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-18 06:00 EST (Sprint QA 0600 — 6 COMMITS VERIFIED, 3 NEW BUGS FOUND & FIXED, commit 54e8d59)
+**Last Updated:** 2026-02-18 06:06 EST (Sprint UI/UX 0606 — 3 PRIOR FIXES VERIFIED, 3 NEW BUGS FIXED, 1 WORK ITEM CREATED, commit 347acab)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0606 (Feb 18, 6:06 AM) — DEEP AUDIT + 3 QUICK FIXES ✅
+
+**Status:** ✅ **COMMIT 347acab — 3 BUGS FIXED + FC-UIUX-050 CREATED**
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~5 minutes
+**Task:** Continue UI/UX audit — verify prior recommendations, find new issues, create work items
+
+### Prior Recommendations Verified (3/3 ✅)
+
+| Fix | Status |
+|-----|--------|
+| BUG-OPS-FRESHNESS-STAMP-DANGER-001 — `text-muted` invisible on bg-danger card | ✅ FIXED (54e8d59) — `opacity-75` for danger state |
+| BUG-OPS-HR-BORDERCLASS-001 — `border-white-50` invalid Bootstrap 5 utility | ✅ FIXED (54e8d59) — `border-white border-opacity-25` |
+| BUG-OPS-DEAD-CSS-DANGER-001 — dead `.safe-to-spend-danger` CSS rule | ✅ FIXED (54e8d59) — removed with comment explaining correct approach |
+
+### Quick Fixes Applied (commit `347acab`)
+
+| ID | Priority | Fix | Files |
+|----|----------|-----|-------|
+| BUG-UIUX-OPS-DANGER-BORDER-SEPARATOR-001 | P3 | `border-secondary-subtle` (invisible on bg-danger) → `border-white border-opacity-25` for danger state on freshness timestamp separator div | operations.js |
+| BUG-UIUX-OPS-BUCKET-CHEV-001 | P3 | Bills aging bucket chevron `bi-chevron-down` didn't rotate on expand. Added CSS: `.bills-bucket[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); transition: transform 0.2s ease; }` | components.css |
+| BUG-UIUX-OPS-HEADING-SEMANTIC-001 | P2 | 4 section titles used `<p class="ops-card-title">` — not semantic headings. Screen readers can't navigate to sections. Changed all 4 to `<h6>`. Also fixed "Upcoming - Next 14 Days" to "Upcoming — Next 14 Days" (em-dash) | operations.html |
+
+### New Work Item Created
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-UIUX-050 | P2 | 1.5h | Cash flow chart zero-line indicator + negative segment coloring — when projected balance dips below $0, line continues blue with no warning. Fix: y=0 annotation line + `segment.borderColor` callback for red segments below zero |
+
+### Audit Focus: Operations Dashboard Deep Review
+
+**operations.js reviewed (all 5 sections):**
+
+| Section | State | Notes |
+|---------|-------|-------|
+| Safe to Spend KPI | ✅ | All 3 states (danger/warning/positive) render correctly after 54e8d59 fixes |
+| Cash Flow Chart | ⚠️ | FC-UIUX-050: no zero-line or segment recolor when balance < 0 |
+| Bills Aging Widget | ✅ | 3 buckets correct, aria-expanded, chevron rotation now fixed (347acab) |
+| Budget vs Actuals | ✅ | Delegates to renderBudgetVsActuals() — waiting on migration 006 |
+| Upcoming 14 Days | ✅ | Running balance, income-before-bills sort, Today badge — clean |
+
+**operations.html structure:** All 4 section titles now `<h6>` not `<p>`. Nav/auth/modals consistent with all other pages. Dark theme attrs consistent (`data-bs-theme="dark"` on html, `data-theme="dark"` on body).
+
+### Production Grade
+
+**Overall: A+** — All prior session fixes verified. 3 new edge case issues found and fixed. Single open work item FC-UIUX-050 (cash flow negative balance UX). P1 migration blocker still pending Matt.
+
+---
 
 ---
 
