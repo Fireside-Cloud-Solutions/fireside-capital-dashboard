@@ -7,25 +7,25 @@
     {
       "route": "/assets/css/*",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=86400, must-revalidate"
       }
     },
     {
       "route": "/assets/js/*",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=86400, must-revalidate"
       }
     },
     {
       "route": "/assets/images/*",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=604800, must-revalidate"
       }
     },
     {
       "route": "/assets/icons/*",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=604800, must-revalidate"
       }
     },
     {
