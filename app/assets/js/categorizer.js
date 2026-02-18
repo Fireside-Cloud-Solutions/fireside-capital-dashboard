@@ -326,7 +326,7 @@ async function checkLearnedPattern(merchantName) {
       .from('transaction_category_patterns')
       .select('*')
       .eq('user_id', user.data.user.id)
-      .ilike('merchant_pattern', `%${pattern}%`)
+      .eq('merchant_pattern', pattern)  // exact match — consistent with batch .in() path
       .order('confidence', { ascending: false })
       .limit(1);
 

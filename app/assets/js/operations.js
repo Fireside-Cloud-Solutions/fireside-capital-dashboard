@@ -1,352 +1,397 @@
 /**
- * operations.js — Fireside Capital
- * Operations Dashboard: Cash Flow Command Center
+ * operations.js — FC-173: Operations Dashboard
  *
+ * Cash flow command center for Fireside Capital.
  * Sections:
- *   1. Safe to Spend KPI
- *   2. Cash Flow Projection Chart (30/60/90d)
- *   3. Bills Aging Widget (3 buckets, expandable)
- *   4. Budget vs Actuals (wired to budget-actuals.js)
- *   5. Upcoming 14-Day List with running balance
+ *   1. Safe to Spend KPI (#safeToSpend)
+ *   2. Cash Flow Chart (#cashFlowCanvas)  [Chart.js line chart]
+ *   3. Bills Aging Widget (#billsAging)   [3 expandable buckets]
+ *   4. Budget vs Actuals (#bvaHorizontal) [delegates to budget-actuals.js]
+ *   5. Upcoming 14-Day List (#upcomingTx)
  *
- * Depends on: app.js (window.bills, window.income, sb, formatCurrency, getCurrentUser)
- *             budget-actuals.js (renderBudgetVsActuals)
- *             realtime.js (FiresideRealtime)
- *             demo-data.js (isDemoMode, DEMO_DATA)
- *
- * FC-173 | Priority: P1
+ * Depends on: app.js, demo-data.js, budget-actuals.js, realtime.js
  */
 
 'use strict';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Module State ─────────────────────────────────────────────────────────────
 
-const OPS_SAFETY_BUFFER = 500;        // Always subtract $500 as safety buffer
-const OPS_UPCOMING_DAYS = 14;         // Upcoming list window
-const OPS_STATUS_POLL_MS = 5000;      // Realtime badge poll interval
+const OPS_SAFETY_BUFFER = 500;
+let opsCashFlowChart = null;
+let opsCurrentDays = 30;
 
-let opsCashFlowChart = null;          // Chart.js instance
-let opsCashFlowDays = 30;             // Active toggle state
-let opsStatusInterval = null;         // Realtime badge poll timer
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Get bills array — live or demo.
+ * Format a number as currency, falling back to Intl if app.js formatCurrency is unavailable.
  */
-function opsBills() {
-  if (typeof isDemoMode === 'function' && isDemoMode()) {
-    return (typeof DEMO_DATA !== 'undefined' && DEMO_DATA.bills) ? DEMO_DATA.bills : [];
-  }
-  return window.bills || [];
-}
-
-/**
- * Get income array — live or demo.
- */
-function opsIncome() {
-  if (typeof isDemoMode === 'function' && isDemoMode()) {
-    return (typeof DEMO_DATA !== 'undefined' && DEMO_DATA.income) ? DEMO_DATA.income : [];
-  }
-  return window.income || [];
-}
-
-/**
- * Format currency — delegates to app.js formatCurrency if available.
- */
-function opsFmt(amount) {
+function opsFormatCurrency(amount) {
   if (typeof formatCurrency === 'function') return formatCurrency(amount);
-  return '$' + parseFloat(amount || 0).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
 }
 
 /**
- * Get today as a JS Date (midnight local).
+ * Safely escape HTML to prevent XSS.
  */
-function opsToday() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
+function opsEscape(str) {
+  if (typeof escapeHtml === 'function') return escapeHtml(str);
+  const d = document.createElement('div');
+  d.textContent = String(str == null ? '' : str);
+  return d.innerHTML;
 }
 
 /**
- * Format a date as "Feb 18".
+ * Get the day-of-month a bill is due.
+ * Real data uses `due_date` (integer); DEMO_DATA uses `due_day`.
  */
-function opsFmtDate(d) {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+function getBillDueDay(bill) {
+  return parseInt(bill.due_date || bill.due_day || 1, 10);
 }
 
 /**
- * Calculate monthly income estimate from income array.
- * Normalises all frequencies to monthly.
+ * Normalize any income frequency to a monthly dollar amount.
  */
-function opsMonthlyIncome(incomeArr) {
-  return (incomeArr || []).reduce((sum, inc) => {
-    const amt = parseFloat(inc.amount) || 0;
-    switch ((inc.frequency || '').toLowerCase()) {
-      case 'weekly':     return sum + amt * 4.333;
-      case 'bi-weekly':
-      case 'biweekly':   return sum + amt * 2.167;
-      case 'semi-monthly':
-      case 'semimonthly': return sum + amt * 2;
-      case 'annually':
-      case 'yearly':     return sum + amt / 12;
-      default:           return sum + amt; // monthly
-    }
-  }, 0);
-}
-
-/**
- * Convert a bill's due_date (day-of-month integer) to the next
- * occurrence on or after `from` date. Returns a JS Date.
- */
-function opsNextDueDate(dayOfMonth, from) {
-  const ref = from || opsToday();
-  const d = new Date(ref.getFullYear(), ref.getMonth(), dayOfMonth);
-  if (d < ref) {
-    // Roll to next month
-    d.setMonth(d.getMonth() + 1);
+function normalizeIncomeToMonthly(income) {
+  const amount = parseFloat(income.amount) || 0;
+  switch ((income.frequency || '').toLowerCase()) {
+    case 'weekly':    return (amount * 52) / 12;
+    case 'bi-weekly': return (amount * 26) / 12;
+    case 'monthly':   return amount;
+    case 'annually':  return amount / 12;
+    default:          return amount;
   }
-  return d;
 }
 
 /**
- * Days until a date from today.
+ * Return the active bills array — demo or live.
  */
-function opsDaysUntil(date) {
-  const today = opsToday();
-  const diff = date - today;
-  return Math.round(diff / (1000 * 60 * 60 * 24));
+function opsGetBills() {
+  const demo = typeof isDemoMode === 'function' && isDemoMode();
+  const bills = demo ? (DEMO_DATA.bills || []) : (window.bills || []);
+  // Exclude already-paid one-time bills
+  return bills.filter(b => b.status !== 'inactive' && !b.is_paid);
 }
 
-// ─── 1. Safe to Spend ─────────────────────────────────────────────────────────
+/**
+ * Return the income array — demo or live.
+ */
+function opsGetIncome() {
+  const demo = typeof isDemoMode === 'function' && isDemoMode();
+  return demo ? (DEMO_DATA.income || []) : (window.income || []);
+}
 
 /**
- * Calculate Safe to Spend.
- * Formula: Monthly Income − Bills due ≤7 days − $500 safety buffer
- * (We use monthly income as a proxy for "available balance" until Plaid balance is wired.)
+ * How many days until a bill is due next.
+ * Uses the due_date day-of-month, checks this month then next month.
  */
-function calculateSafeToSpend() {
-  const bills   = opsBills();
-  const income  = opsIncome();
+function daysUntilBillDue(bill) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const monthlyIncome = opsMonthlyIncome(income);
-  const today = opsToday();
+  const dueDay = getBillDueDay(bill);
+  const thisMonthDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
+  let daysUntil = Math.round((thisMonthDue - today) / 864e5);
+
+  if (daysUntil < 0) {
+    // Due date this month has already passed — look at next month
+    const nextMonthDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
+    daysUntil = Math.round((nextMonthDue - today) / 864e5);
+  }
+  return daysUntil;
+}
+
+// ─── Section 1: Safe to Spend ─────────────────────────────────────────────────
+
+/**
+ * Calculate the Safe to Spend amount.
+ * Formula: Monthly Income − Bills due ≤7 days − Safety Buffer ($500)
+ * @returns {{ safeAmount, balance, billsDue7d, billsDue7dTotal, bufferAmount, state }}
+ */
+async function calculateSafeToSpend() {
+  const bills  = opsGetBills();
+  const income = opsGetIncome();
+
+  // Estimated available balance = sum of normalized monthly income
+  const balance = income.reduce((sum, inc) => sum + normalizeIncomeToMonthly(inc), 0);
 
   // Bills due within 7 days
-  const bills7d = bills.filter(b => {
-    if (b.is_paid) return false;
-    const due = opsNextDueDate(parseInt(b.due_date) || 1, today);
-    return opsDaysUntil(due) <= 7;
+  const billsDue7d = bills.filter(b => {
+    const d = daysUntilBillDue(b);
+    return d >= 0 && d <= 7;
   });
-  const bills7dTotal = bills7d.reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
+  const billsDue7dTotal = billsDue7d.reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
 
-  const safeAmount = monthlyIncome - bills7dTotal - OPS_SAFETY_BUFFER;
+  const safeAmount = balance - billsDue7dTotal - OPS_SAFETY_BUFFER;
 
   let state;
-  if (safeAmount < 0)    state = 'danger';
+  if (safeAmount < 0)        state = 'danger';
   else if (safeAmount < 1000) state = 'warning';
-  else                   state = 'positive';
+  else                        state = 'positive';
 
-  return {
-    safeAmount,
-    monthlyIncome,
-    bills7dTotal,
-    bills7dCount: bills7d.length,
-    bufferAmount: OPS_SAFETY_BUFFER,
-    state
-  };
+  return { safeAmount, balance, billsDue7d, billsDue7dTotal, bufferAmount: OPS_SAFETY_BUFFER, state };
 }
 
-function renderSafeToSpend() {
-  const card    = document.getElementById('safeToSpend');
-  const skel    = document.getElementById('safeToSpendSkeleton');
-  const content = document.getElementById('safeToSpendContent');
-  const amtEl   = document.getElementById('safeToSpendAmount');
-  const iconEl  = document.getElementById('safeToSpendIcon');
-  const brkEl   = document.getElementById('safeToSpendBreakdown');
-  if (!card) return;
+/**
+ * Render the Safe to Spend KPI card into #safeToSpend.
+ */
+function renderSafeToSpend(data) {
+  const el = document.getElementById('safeToSpend');
+  if (!el) return;
 
-  const data = calculateSafeToSpend();
+  const { safeAmount, balance, billsDue7d, billsDue7dTotal, bufferAmount, state } = data;
 
-  // Update card state class
-  card.classList.remove('safe-to-spend-positive', 'safe-to-spend-warning', 'safe-to-spend-danger');
-  card.classList.add(`safe-to-spend-${data.state}`);
+  // Base card classes
+  let cardClass = 'card h-100';
+  let stateClass = '';
+  let amountClass = 'display-6 fw-bold mb-2';
+  let icon = '';
+  let subtextMuted = 'text-muted';
+  let hrClass = '';
 
-  // Icon + colour
-  if (data.state === 'danger') {
-    iconEl.className = 'bi bi-exclamation-triangle-fill fs-4 text-danger';
-    amtEl.className  = 'safe-amount-value text-danger';
-  } else if (data.state === 'warning') {
-    iconEl.className = 'bi bi-exclamation-circle-fill fs-4 text-warning';
-    amtEl.className  = 'safe-amount-value text-warning';
+  if (state === 'danger') {
+    cardClass += ' bg-danger text-white';
+    icon = '<i class="bi bi-exclamation-triangle me-2"></i>';
+    subtextMuted = 'opacity-75';
+    hrClass = 'border-white-50 opacity-25';
+  } else if (state === 'warning') {
+    stateClass = 'safe-to-spend-warning';
+    amountClass += ' fw-bold';
+    // Use amber/warning color inline
   } else {
-    iconEl.className = 'bi bi-shield-check-fill fs-4 text-success';
-    amtEl.className  = 'safe-amount-value text-success';
+    stateClass = 'safe-to-spend-positive';
+    amountClass += ' text-success';
   }
 
-  amtEl.textContent = opsFmt(Math.max(data.safeAmount, 0));
+  const amountStyle = state === 'warning' ? 'color:#f44e24' : '';
 
-  brkEl.innerHTML = `
-    <span title="Estimated monthly income">${opsFmt(data.monthlyIncome)} income</span>
-    &minus; <span title="Bills due within 7 days (${data.bills7dCount} bill${data.bills7dCount !== 1 ? 's' : ''})">${opsFmt(data.bills7dTotal)} due&nbsp;≤7d</span>
-    &minus; <span title="Safety buffer">${opsFmt(data.bufferAmount)} buffer</span>
-    ${data.safeAmount < 0 ? '<br><strong class="text-danger">⚠ Negative — cash crunch incoming</strong>' : ''}
-  `;
+  const billsList = billsDue7d.length > 0
+    ? billsDue7d.map(b =>
+        `<span class="badge ${state === 'danger' ? 'bg-light text-danger' : 'bg-danger-subtle text-danger'} me-1 mb-1">${opsEscape(b.name)}</span>`
+      ).join('')
+    : '';
 
-  skel.classList.add('d-none');
-  content.classList.remove('d-none');
+  el.innerHTML = `
+    <div class="${cardClass} ${stateClass}">
+      <div class="card-body d-flex flex-column">
+        <h6 class="card-subtitle mb-3 ${state === 'danger' ? subtextMuted : 'text-muted'} small text-uppercase fw-semibold letter-spacing-wide">
+          ${icon}Safe to Spend
+        </h6>
+        <div class="${amountClass}" style="${amountStyle}">${opsFormatCurrency(safeAmount)}</div>
+        ${billsList ? `<div class="mb-2">${billsList}</div>` : ''}
+        <hr class="${hrClass}">
+        <div class="small ${state === 'danger' ? subtextMuted : 'text-muted'} mt-auto">
+          <div class="d-flex justify-content-between mb-1">
+            <span>Est. Monthly Income</span>
+            <span class="${state !== 'danger' ? 'text-success' : ''}">+${opsFormatCurrency(balance)}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span>Bills ≤7 days <span class="badge bg-${state === 'danger' ? 'light text-danger' : 'danger'} ms-1">${billsDue7d.length}</span></span>
+            <span>−${opsFormatCurrency(billsDue7dTotal)}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Safety Buffer</span>
+            <span>−${opsFormatCurrency(bufferAmount)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
 }
 
-// ─── 2. Cash Flow Chart ───────────────────────────────────────────────────────
+// ─── Section 2: Cash Flow Chart ───────────────────────────────────────────────
 
 /**
  * Build a day-by-day cash flow projection.
- * Returns { labels, balanceData, incomePoints, expensePoints }
+ * Places income and bill events on their expected dates.
+ * @param {number} days  - Number of days to project (30 | 60 | 90)
+ * @returns {{ labels, balanceData, events }}
  */
-function buildCashFlowProjection(days) {
-  const bills  = opsBills();
-  const income = opsIncome();
-  const today  = opsToday();
+function buildCashFlowProjection(days = 30) {
+  const bills  = opsGetBills();
+  const income = opsGetIncome();
 
-  // Estimate starting balance as monthly income * 0.5 (mid-cycle proxy)
-  let balance = opsMonthlyIncome(income) * 0.5;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const labels        = [];
-  const balanceData   = [];
-  const incomePoints  = [];
-  const expensePoints = [];
+  // Starting balance = estimated monthly income
+  let runningBalance = income.reduce((sum, inc) => sum + normalizeIncomeToMonthly(inc), 0);
 
-  for (let i = 0; i < days; i++) {
-    const day = new Date(today);
-    day.setDate(today.getDate() + i);
+  const labels      = [];
+  const balanceData = [];
+  const events      = [];  // { day, type: 'income'|'bill', amount, name }
 
-    labels.push(opsFmtDate(day));
+  // ── Build income schedule ──────────────────────────────────────
+  income.forEach(inc => {
+    const freq   = (inc.frequency || '').toLowerCase();
+    const amount = parseFloat(inc.amount) || 0;
+    const name   = inc.name || inc.source || 'Income';
 
-    // Income events: check each income source for its pay date
-    income.forEach(inc => {
-      const amt = parseFloat(inc.amount) || 0;
-      const freq = (inc.frequency || '').toLowerCase();
-
-      let hits = false;
-      switch (freq) {
-        case 'weekly':
-          hits = (i % 7 === 0) && i > 0;
-          break;
-        case 'bi-weekly':
-        case 'biweekly':
-          hits = (i % 14 === 0) && i > 0;
-          break;
-        case 'monthly':
-          // Assume 1st or 15th — use due_date if available, else 1st
-          const payDay = parseInt(inc.pay_date) || 1;
-          hits = day.getDate() === payDay;
-          break;
-        default:
-          hits = false;
+    if (freq === 'monthly') {
+      // Hit on a specific day of month
+      let targetDay = 1;
+      if (inc.next_date) {
+        targetDay = new Date(inc.next_date + 'T00:00:00').getDate();
       }
-
-      if (hits) {
-        balance += amt;
-        incomePoints.push({ x: i, y: balance, label: inc.name, amount: amt });
+      for (let d = 0; d <= days; d++) {
+        const dt = new Date(today);
+        dt.setDate(today.getDate() + d);
+        if (dt.getDate() === targetDay) {
+          events.push({ day: d, type: 'income', amount, name });
+        }
       }
-    });
+    } else {
+      // Periodic: weekly, bi-weekly, annually
+      const intervalDays = freq === 'weekly' ? 7 : freq === 'bi-weekly' ? 14 : 365;
+      const anchor = inc.next_date ? new Date(inc.next_date + 'T00:00:00') : new Date(today);
 
-    // Bill events: check each bill's due_date
-    bills.forEach(b => {
-      if (b.is_paid) return;
-      const dueDay = parseInt(b.due_date) || 1;
-      if (day.getDate() === dueDay) {
-        const amt = parseFloat(b.amount) || 0;
-        balance -= amt;
-        expensePoints.push({ x: i, y: balance, label: b.name, amount: amt });
+      for (let d = 0; d <= days; d++) {
+        const dt = new Date(today);
+        dt.setDate(today.getDate() + d);
+        const diff = Math.round((dt - anchor) / 864e5);
+        if (diff >= 0 && diff % intervalDays === 0) {
+          events.push({ day: d, type: 'income', amount, name });
+        }
       }
-    });
+    }
+  });
 
-    balanceData.push(parseFloat(balance.toFixed(2)));
+  // ── Build bill schedule ────────────────────────────────────────
+  bills.forEach(bill => {
+    const dueDay = getBillDueDay(bill);
+    const amount = parseFloat(bill.amount) || 0;
+    const name   = bill.name || 'Bill';
+
+    for (let d = 0; d <= days; d++) {
+      const dt = new Date(today);
+      dt.setDate(today.getDate() + d);
+      if (dt.getDate() === dueDay) {
+        events.push({ day: d, type: 'bill', amount, name });
+      }
+    }
+  });
+
+  // ── Build day-by-day balance ────────────────────────────────────
+  for (let d = 0; d <= days; d++) {
+    const dt = new Date(today);
+    dt.setDate(today.getDate() + d);
+
+    labels.push(dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+    // Apply events for this day
+    events
+      .filter(e => e.day === d)
+      .forEach(e => {
+        runningBalance += e.type === 'income' ? e.amount : -e.amount;
+      });
+
+    balanceData.push(parseFloat(runningBalance.toFixed(2)));
   }
 
-  return { labels, balanceData, incomePoints, expensePoints };
+  return { labels, balanceData, events };
 }
 
-function renderCashFlowChart(days) {
-  const skel    = document.getElementById('cashFlowSkeleton');
-  const canvas  = document.getElementById('cashFlowChart');
+/**
+ * Load Chart.js from CDN (fallback if LazyLoader not available).
+ */
+async function opsLoadChartJs() {
+  if (typeof Chart !== 'undefined') return; // already loaded
+
+  // Try LazyLoader first (from app.js)
+  if (typeof window.LazyLoader !== 'undefined' && window.LazyLoader.loadCharts) {
+    await window.LazyLoader.loadCharts();
+    return;
+  }
+
+  // Fallback: load directly from CDN
+  await new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    script.onload  = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Render (or re-render) the cash flow Chart.js line chart.
+ * @param {number} days
+ */
+async function renderCashFlowChart(days = 30) {
+  const canvas = document.getElementById('cashFlowCanvas');
   if (!canvas) return;
 
-  const proj = buildCashFlowProjection(days);
+  // Update subtitle label
+  const subtitle = document.getElementById('cashFlowSubtitle');
+  if (subtitle) subtitle.textContent = `Next ${days} days`;
 
+  try {
+    await opsLoadChartJs();
+  } catch (err) {
+    console.warn('[Operations] Chart.js failed to load:', err);
+    const container = document.getElementById('cashFlowChartContainer');
+    if (container) {
+      container.innerHTML = '<p class="text-muted text-center py-4">Chart unavailable</p>';
+    }
+    return;
+  }
+
+  const { labels, balanceData, events } = buildCashFlowProjection(days);
+
+  // Point styling — green for income days, red for bill days
+  const pointColors = labels.map((_, i) => {
+    const dayEvents = events.filter(e => e.day === i);
+    if (dayEvents.some(e => e.type === 'income')) return '#81b900';
+    if (dayEvents.some(e => e.type === 'bill'))   return '#dc3545';
+    return 'rgba(0,0,0,0)';
+  });
+
+  const pointRadii = labels.map((_, i) =>
+    events.some(e => e.day === i) ? 6 : 0
+  );
+  const pointHoverRadii = labels.map((_, i) =>
+    events.some(e => e.day === i) ? 9 : 4
+  );
+
+  // Destroy previous chart before re-rendering
   if (opsCashFlowChart) {
     opsCashFlowChart.destroy();
     opsCashFlowChart = null;
   }
 
-  // Build event annotation datasets (dots on income/expense dates)
-  const incomeScatter = proj.incomePoints.map(p => ({ x: p.x, y: p.y }));
-  const expenseScatter = proj.expensePoints.map(p => ({ x: p.x, y: p.y }));
-
   opsCashFlowChart = new Chart(canvas, {
     type: 'line',
     data: {
-      labels: proj.labels,
-      datasets: [
-        {
-          label: 'Projected Balance',
-          data: proj.balanceData,
-          borderColor: '#01a4ef',
-          backgroundColor: 'rgba(1,164,239,0.08)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.3,
-          pointRadius: 0,
-          pointHoverRadius: 4
-        },
-        {
-          label: 'Income Event',
-          data: incomeScatter,
-          type: 'scatter',
-          backgroundColor: '#81b900',
-          borderColor: '#81b900',
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          showLine: false,
-          parsing: false
-        },
-        {
-          label: 'Bill Event',
-          data: expenseScatter,
-          type: 'scatter',
-          backgroundColor: '#dc3545',
-          borderColor: '#dc3545',
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          showLine: false,
-          parsing: false
-        }
-      ]
+      labels,
+      datasets: [{
+        label: 'Projected Balance',
+        data: balanceData,
+        borderColor: '#01a4ef',
+        backgroundColor: 'rgba(1, 164, 239, 0.08)',
+        fill: true,
+        tension: 0.35,
+        pointBackgroundColor: pointColors,
+        pointBorderColor: pointColors,
+        pointRadius: pointRadii,
+        pointHoverRadius: pointHoverRadii
+      }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 400 },
       plugins: {
-        legend: {
-          display: true,
-          labels: {
-            color: '#aaa',
-            font: { size: 11 },
-            boxWidth: 10
-          }
-        },
+        legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => {
-              if (ctx.dataset.label === 'Projected Balance') {
-                return ` Balance: ${opsFmt(ctx.parsed.y)}`;
-              }
-              return ` ${ctx.dataset.label}: ${opsFmt(ctx.parsed.y)}`;
+            label(ctx) {
+              return `Balance: ${opsFormatCurrency(ctx.raw)}`;
+            },
+            afterBody(ctxArr) {
+              const idx = ctxArr[0].dataIndex;
+              const dayEvents = events.filter(e => e.day === idx);
+              if (!dayEvents.length) return [];
+              return dayEvents.map(e =>
+                `${e.type === 'income' ? '▲ In' : '▼ Out'}: ${opsEscape(e.name)} ${opsFormatCurrency(e.amount)}`
+              );
             }
           }
         }
@@ -354,372 +399,406 @@ function renderCashFlowChart(days) {
       scales: {
         x: {
           ticks: {
-            color: '#888',
-            maxTicksLimit: 10,
-            font: { size: 10 }
+            maxTicksLimit: Math.min(10, days),
+            color: '#adb5bd',
+            font: { size: 11 }
           },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+          grid: { color: 'rgba(255,255,255,0.04)' }
         },
         y: {
           ticks: {
-            color: '#888',
-            font: { size: 10 },
-            callback: (v) => opsFmt(v)
+            color: '#adb5bd',
+            font: { size: 11 },
+            callback: v => opsFormatCurrency(v)
           },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+          grid: { color: 'rgba(255,255,255,0.04)' }
         }
       }
     }
   });
-
-  skel.classList.add('d-none');
-  canvas.classList.remove('d-none');
 }
 
-// ─── 3. Bills Aging ───────────────────────────────────────────────────────────
-
-function renderBillsAging() {
-  const skel    = document.getElementById('billsAgingSkeleton');
-  const content = document.getElementById('billsAgingContent');
-  if (!content) return;
-
-  const bills = opsBills();
-  const today = opsToday();
-
-  const buckets = [
-    { key: 'red',    label: 'Due within 7 days',  minDays: 0,  maxDays: 7,  colorClass: 'danger',  icon: 'bi-circle-fill text-danger',  items: [] },
-    { key: 'amber',  label: 'Due in 8–30 days',   minDays: 8,  maxDays: 30, colorClass: 'warning', icon: 'bi-circle-fill text-warning', items: [] },
-    { key: 'green',  label: 'Due in 31–60 days',  minDays: 31, maxDays: 60, colorClass: 'success', icon: 'bi-circle-fill text-success', items: [] }
-  ];
-
-  bills.forEach(b => {
-    if (b.is_paid) return;
-    const dueDate = opsNextDueDate(parseInt(b.due_date) || 1, today);
-    const days    = opsDaysUntil(dueDate);
-    const bucket  = buckets.find(bk => days >= bk.minDays && days <= bk.maxDays);
-    if (bucket) {
-      bucket.items.push({ ...b, daysUntil: days, nextDue: dueDate });
-    }
-  });
-
-  if (bills.length === 0) {
-    content.innerHTML = `
-      <div class="empty-state py-4 text-center">
-        <i class="bi bi-receipt fs-2 text-muted d-block mb-2"></i>
-        <p class="text-muted">No bills tracked yet.</p>
-        <a href="bills.html" class="btn btn-sm btn-primary">Add Bills</a>
-      </div>`;
-  } else {
-    content.innerHTML = buckets.map((bk, idx) => {
-      const total = bk.items.reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
-      const isEmpty = bk.items.length === 0;
-      const itemsHtml = isEmpty ? '' : bk.items.map(b => `
-        <div class="bills-bucket-item">
-          <span>${b.name || 'Bill'}</span>
-          <span class="d-flex align-items-center gap-3">
-            <small class="text-muted">${opsFmtDate(b.nextDue)} (${b.daysUntil}d)</small>
-            <strong>${opsFmt(b.amount)}</strong>
-          </span>
-        </div>`).join('');
-
-      return `
-        <div class="bills-bucket border rounded" data-bucket-idx="${idx}" role="button" aria-expanded="false">
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="d-flex align-items-center gap-2">
-              <i class="bi bi-circle-fill ${bk.colorClass === 'danger' ? 'text-danger' : bk.colorClass === 'warning' ? 'text-warning' : 'text-success'}" style="font-size:0.6rem"></i>
-              <span class="fw-medium">${bk.label}</span>
-              <span class="badge bg-secondary">${bk.items.length}</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-              <strong class="text-${bk.colorClass}">${opsFmt(total)}</strong>
-              <i class="bi bi-chevron-down text-muted" style="font-size:0.75rem;transition:transform 0.2s" id="chevron-${idx}"></i>
-            </span>
-          </div>
-          <div class="bills-bucket-list" id="bucket-list-${idx}">
-            ${isEmpty
-              ? '<p class="text-muted small mb-0 pt-2">No bills in this window.</p>'
-              : itemsHtml}
-          </div>
-        </div>`;
-    }).join('');
-
-    // Attach toggle handlers
-    content.querySelectorAll('[data-bucket-idx]').forEach(el => {
-      el.addEventListener('click', () => {
-        const idx  = el.dataset.bucketIdx;
-        const list = document.getElementById(`bucket-list-${idx}`);
-        const chev = document.getElementById(`chevron-${idx}`);
-        const open = list.classList.toggle('expanded');
-        el.setAttribute('aria-expanded', open);
-        if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
-      });
-    });
-  }
-
-  skel.classList.add('d-none');
-  content.classList.remove('d-none');
-}
-
-// ─── 4. Budget vs Actuals ────────────────────────────────────────────────────
+// ─── Section 3: Bills Aging Widget ───────────────────────────────────────────
 
 /**
- * Populate the BVA month selector with current + 3 prior months.
+ * Render the 3-bucket bills aging widget into #billsAging.
+ * Buckets: ≤7 days (danger), 8–30 days (warning), 31–60 days (success).
  */
-function populateBvaMonthSelect() {
-  const sel = document.getElementById('bvaMonthSelect');
-  if (!sel) return;
+function renderBillsAging() {
+  const el = document.getElementById('billsAging');
+  if (!el) return;
 
+  const bills = opsGetBills();
+
+  if (bills.length === 0) {
+    el.innerHTML = `
+      <div class="text-center py-4 text-muted">
+        <i class="bi bi-receipt fs-2 mb-2 d-block opacity-50"></i>
+        <p class="mb-0">No active bills found.</p>
+        <a href="bills.html" class="btn btn-sm btn-outline-primary mt-2">Add Bills</a>
+      </div>`;
+    return;
+  }
+
+  // Categorise bills
+  const urgent   = bills.filter(b => { const d = daysUntilBillDue(b); return d >= 0 && d <= 7; });
+  const soon     = bills.filter(b => { const d = daysUntilBillDue(b); return d > 7  && d <= 30; });
+  const upcoming = bills.filter(b => { const d = daysUntilBillDue(b); return d > 30 && d <= 60; });
+
+  /**
+   * Build one collapsible bucket card.
+   */
+  function makeBucket(bucketBills, variant, label, emoji) {
+    const total = bucketBills.reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
+    const bucketId = `bucket-${variant}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+    const rows = bucketBills.length > 0
+      ? bucketBills.map(b => {
+          const d = daysUntilBillDue(b);
+          return `
+            <div class="d-flex justify-content-between align-items-center py-2 px-1 border-bottom border-secondary border-opacity-25">
+              <div>
+                <span class="fw-medium small">${opsEscape(b.name)}</span>
+                <span class="text-muted ms-2 small">due in ${d}d</span>
+              </div>
+              <span class="text-${variant} fw-semibold small">${opsFormatCurrency(b.amount)}</span>
+            </div>`;
+        }).join('')
+      : '<p class="text-muted small mb-0 py-2 ps-1">No bills in this range</p>';
+
+    return `
+      <div class="bills-bucket card border mb-2 border-${variant} border-opacity-25"
+           onclick="this.querySelector('.bills-bucket-list').classList.toggle('expanded')"
+           role="button"
+           aria-expanded="false"
+           aria-label="${label} — ${bucketBills.length} bills totalling ${opsFormatCurrency(total)}">
+        <div class="card-body py-2 px-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-${variant} rounded-pill">${bucketBills.length}</span>
+              <span class="fw-medium small">${emoji} ${label}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold text-${variant}">${opsFormatCurrency(total)}</span>
+              <i class="bi bi-chevron-down text-muted small"></i>
+            </div>
+          </div>
+          <div class="bills-bucket-list">
+            ${rows}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  el.innerHTML = `
+    ${makeBucket(urgent,   'danger',  'Due ≤7 days',   '🔴')}
+    ${makeBucket(soon,     'warning', 'Due 8–30 days',  '🟡')}
+    ${makeBucket(upcoming, 'success', 'Due 31–60 days', '🟢')}`;
+}
+
+// ─── Section 4: Budget vs Actuals ────────────────────────────────────────────
+
+/**
+ * Populate the month selector dropdown with current + prev 3 months.
+ */
+function buildBvaMonthOptions() {
+  const select = document.getElementById('bvaMonthSelect');
+  if (!select) return;
+
+  select.innerHTML = ''; // clear any existing options
   const now = new Date();
-  sel.innerHTML = '';
+
   for (let i = 0; i < 4; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const val   = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const opt   = document.createElement('option');
-    opt.value   = val;
+    opt.value       = val;
     opt.textContent = label;
     if (i === 0) opt.selected = true;
-    sel.appendChild(opt);
-  }
-
-  sel.addEventListener('change', () => {
-    if (typeof renderBudgetVsActuals === 'function') {
-      renderBudgetVsActuals('bvaHorizontal', sel.value);
-    }
-  });
-}
-
-async function renderBvaSection() {
-  populateBvaMonthSelect();
-  const sel = document.getElementById('bvaMonthSelect');
-  const month = sel ? sel.value : null;
-  if (typeof renderBudgetVsActuals === 'function') {
-    await renderBudgetVsActuals('bvaHorizontal', month);
-  } else {
-    const container = document.getElementById('bvaHorizontal');
-    if (container) {
-      container.innerHTML = `<p class="text-muted text-center py-3">Budget data unavailable. <a href="settings.html">Set up budgets →</a></p>`;
-    }
+    select.appendChild(opt);
   }
 }
 
-// ─── 5. Upcoming 14-Day List ──────────────────────────────────────────────────
+/**
+ * Wire up the Budget vs Actuals section — populate month picker, call renderer.
+ */
+function initBudgetVsActuals() {
+  if (typeof renderBudgetVsActuals !== 'function') {
+    // budget-actuals.js not ready yet — retry after a brief delay
+    setTimeout(initBudgetVsActuals, 500);
+    return;
+  }
 
+  buildBvaMonthOptions();
+
+  const select = document.getElementById('bvaMonthSelect');
+  const selectedMonth = select ? select.value : null;
+
+  renderBudgetVsActuals('bvaHorizontal', selectedMonth);
+
+  if (select) {
+    select.addEventListener('change', () => {
+      renderBudgetVsActuals('bvaHorizontal', select.value || null);
+    });
+  }
+}
+
+// ─── Section 5: Upcoming 14-Day List ─────────────────────────────────────────
+
+/**
+ * Build the projected event list for the next 14 days and render into #upcomingTx.
+ * Shows a running balance column.
+ */
 function renderUpcomingList() {
-  const skel    = document.getElementById('upcomingTxSkeleton');
-  const content = document.getElementById('upcomingTxContent');
-  const list    = document.getElementById('upcomingTxList');
-  const rangeEl = document.getElementById('upcomingDateRange');
-  if (!list) return;
+  const el = document.getElementById('upcomingTx');
+  if (!el) return;
 
-  const bills  = opsBills();
-  const income = opsIncome();
-  const today  = opsToday();
+  const bills  = opsGetBills();
+  const income = opsGetIncome();
 
-  // Build events for next 14 days
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Starting balance = estimated monthly income
+  let runningBalance = income.reduce((sum, inc) => sum + normalizeIncomeToMonthly(inc), 0);
+
   const events = [];
 
-  // Income events
+  // ── Collect income events ──────────────────────────────────────
   income.forEach(inc => {
-    const amt  = parseFloat(inc.amount) || 0;
-    const freq = (inc.frequency || '').toLowerCase();
+    const freq   = (inc.frequency || '').toLowerCase();
+    const amount = parseFloat(inc.amount) || 0;
+    const name   = inc.name || inc.source || 'Income';
 
-    for (let i = 0; i <= OPS_UPCOMING_DAYS; i++) {
-      const day = new Date(today);
-      day.setDate(today.getDate() + i);
-
+    for (let d = 0; d <= 14; d++) {
+      const dt = new Date(today);
+      dt.setDate(today.getDate() + d);
       let hits = false;
-      switch (freq) {
-        case 'weekly':     hits = (i % 7 === 0) && i > 0; break;
-        case 'bi-weekly':
-        case 'biweekly':   hits = (i % 14 === 0) && i > 0; break;
-        case 'monthly': {
-          const payDay = parseInt(inc.pay_date) || 1;
-          hits = day.getDate() === payDay;
-          break;
-        }
+
+      if (freq === 'monthly') {
+        const targetDay = inc.next_date ? new Date(inc.next_date + 'T00:00:00').getDate() : 1;
+        hits = dt.getDate() === targetDay;
+      } else if (freq === 'weekly' || freq === 'bi-weekly') {
+        const anchor   = inc.next_date ? new Date(inc.next_date + 'T00:00:00') : new Date(today);
+        const interval = freq === 'weekly' ? 7 : 14;
+        const diff     = Math.round((dt - anchor) / 864e5);
+        hits = diff >= 0 && diff % interval === 0;
       }
 
       if (hits) {
-        events.push({ date: day, name: inc.name || 'Income', amount: amt, type: 'income' });
+        events.push({ date: new Date(dt), amount, name, type: 'income' });
       }
     }
   });
 
-  // Bill events
-  bills.forEach(b => {
-    if (b.is_paid) return;
-    const dueDay = parseInt(b.due_date) || 1;
-    const amt    = parseFloat(b.amount) || 0;
+  // ── Collect bill events ────────────────────────────────────────
+  bills.forEach(bill => {
+    const dueDay = getBillDueDay(bill);
+    const amount = parseFloat(bill.amount) || 0;
+    const name   = bill.name || 'Bill';
 
-    for (let i = 0; i <= OPS_UPCOMING_DAYS; i++) {
-      const day = new Date(today);
-      day.setDate(today.getDate() + i);
-      if (day.getDate() === dueDay) {
-        events.push({ date: day, name: b.name || 'Bill', amount: amt, type: 'expense' });
+    for (let d = 0; d <= 14; d++) {
+      const dt = new Date(today);
+      dt.setDate(today.getDate() + d);
+      if (dt.getDate() === dueDay) {
+        events.push({ date: new Date(dt), amount, name, type: 'bill' });
       }
     }
   });
 
-  // Sort chronologically
-  events.sort((a, b) => a.date - b.date);
-
-  if (rangeEl) {
-    const end = new Date(today);
-    end.setDate(today.getDate() + OPS_UPCOMING_DAYS);
-    rangeEl.textContent = `${opsFmtDate(today)} – ${opsFmtDate(end)}`;
-  }
-
-  // Build running balance
-  let balance = opsMonthlyIncome(income) * 0.5;
+  // Sort chronologically (earliest first, income before bills on same day)
+  events.sort((a, b) => {
+    const timeDiff = a.date - b.date;
+    if (timeDiff !== 0) return timeDiff;
+    // On same day: income first
+    if (a.type === 'income' && b.type !== 'income') return -1;
+    if (b.type === 'income' && a.type !== 'income') return  1;
+    return 0;
+  });
 
   if (events.length === 0) {
-    list.innerHTML = `<p class="text-muted text-center py-3">No income or bill events in the next ${OPS_UPCOMING_DAYS} days.</p>`;
-  } else {
-    list.innerHTML = events.map(ev => {
-      if (ev.type === 'income') balance += ev.amount;
-      else                      balance -= ev.amount;
-
-      const amtLabel   = ev.type === 'income'
-        ? `<span class="upcoming-amount text-success">+${opsFmt(ev.amount)}</span>`
-        : `<span class="upcoming-amount text-danger">&minus;${opsFmt(ev.amount)}</span>`;
-      const balColor   = balance < 0 ? 'text-danger' : balance < 500 ? 'text-warning' : 'text-muted';
-
-      return `
-        <div class="upcoming-item ${ev.type === 'income' ? 'income-row' : 'expense-row'}">
-          <span class="upcoming-date">${opsFmtDate(ev.date)}</span>
-          <span class="upcoming-name">${ev.name}</span>
-          ${amtLabel}
-          <span class="upcoming-balance ${balColor}">${opsFmt(balance)}</span>
-        </div>`;
-    }).join('');
+    el.innerHTML = `
+      <div class="text-center py-4 text-muted">
+        <i class="bi bi-calendar-check fs-2 mb-2 d-block opacity-50"></i>
+        <p class="mb-0">No scheduled events in the next 14 days.</p>
+        <div class="mt-2">
+          <a href="bills.html" class="btn btn-sm btn-outline-secondary me-2">Add Bills</a>
+          <a href="income.html" class="btn btn-sm btn-outline-secondary">Add Income</a>
+        </div>
+      </div>`;
+    return;
   }
 
-  skel.classList.add('d-none');
-  content.classList.remove('d-none');
+  // ── Build rows with running balance ───────────────────────────
+  const rows = events.map(evt => {
+    if (evt.type === 'income') {
+      runningBalance += evt.amount;
+    } else {
+      runningBalance -= evt.amount;
+    }
+
+    const isIncome  = evt.type === 'income';
+    const dateLabel = evt.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const isToday   = evt.date.getTime() === today.getTime();
+
+    const amountHtml = isIncome
+      ? `<span class="text-success fw-bold">+${opsFormatCurrency(evt.amount)}</span>`
+      : `<span class="text-danger fw-bold">−${opsFormatCurrency(evt.amount)}</span>`;
+
+    const balanceColor = runningBalance < 0 ? 'text-danger' : runningBalance < 500 ? 'text-warning' : 'text-muted';
+    const todayBadge   = isToday ? '<span class="badge bg-primary ms-2">Today</span>' : '';
+
+    return `
+      <div class="upcoming-item ${isIncome ? 'income' : 'expense'} d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-25">
+        <div class="d-flex align-items-center gap-3">
+          <i class="bi ${isIncome ? 'bi-arrow-down-circle text-success' : 'bi-arrow-up-circle text-danger'} fs-5"></i>
+          <div>
+            <div class="fw-medium small">${opsEscape(evt.name)}${todayBadge}</div>
+            <div class="text-muted" style="font-size:0.78rem">${dateLabel}</div>
+          </div>
+        </div>
+        <div class="text-end">
+          <div>${amountHtml}</div>
+          <div class="upcoming-balance ${balanceColor}" style="font-size:0.78rem">${opsFormatCurrency(runningBalance)}</div>
+        </div>
+      </div>`;
+  });
+
+  el.innerHTML = `
+    <div class="d-flex justify-content-between text-muted border-bottom border-secondary border-opacity-25 pb-2 mb-1 px-3" style="font-size:0.78rem">
+      <span>Event / Date</span>
+      <span>Amount · Running Balance</span>
+    </div>
+    ${rows.join('')}`;
 }
 
 // ─── Realtime Status Badge ────────────────────────────────────────────────────
 
+/**
+ * Poll FiresideRealtime.status() and update the badge every 5 seconds.
+ */
 function updateRealtimeBadge() {
   const badge = document.getElementById('realtimeStatus');
   if (!badge) return;
 
   if (typeof FiresideRealtime === 'undefined') {
-    badge.className = 'badge bg-secondary';
-    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Offline';
+    badge.className = 'badge bg-secondary ms-2';
+    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Unavailable';
     return;
   }
 
-  const st = FiresideRealtime.status();
+  const status = (typeof FiresideRealtime.status === 'function')
+    ? FiresideRealtime.status()
+    : 'unknown';
 
-  if (st.isSubscribed) {
-    badge.className = 'badge bg-success';
+  if (status === 'connected' || status === 'live' || status === 'open') {
+    badge.className = 'badge bg-success ms-2';
     badge.innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Live';
-  } else if (st.retryCount > 0 && st.retryCount < st.maxRetries) {
-    badge.className = 'badge bg-warning text-dark';
+  } else if (status === 'reconnecting' || status === 'connecting') {
+    badge.className = 'badge bg-warning text-dark ms-2';
     badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Reconnecting...';
-  } else if (st.retryCount >= st.maxRetries) {
-    badge.className = 'badge bg-danger';
-    badge.innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Offline';
   } else {
-    badge.className = 'badge bg-secondary';
-    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Connecting...';
+    badge.className = 'badge bg-danger ms-2';
+    badge.innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Offline';
   }
 }
 
-// ─── Cash Flow Toggle ─────────────────────────────────────────────────────────
-
-function initCashFlowToggle() {
-  const group = document.getElementById('cashFlowToggle');
-  if (!group) return;
-
-  group.querySelectorAll('button[data-days]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      opsCashFlowDays = parseInt(btn.dataset.days);
-      renderCashFlowChart(opsCashFlowDays);
-    });
-  });
-}
-
-// ─── Page Init ────────────────────────────────────────────────────────────────
+// ─── Page Initialisation ─────────────────────────────────────────────────────
 
 /**
- * Wait for app.js to finish loading data (bills + income).
- * app.js sets window.bills and window.income when data is ready.
- * We poll until they're available or timeout after 8 seconds.
+ * Wait for window.bills to be populated by app.js.
+ * Returns a Promise that resolves when data is ready or after a timeout.
  */
-function waitForAppData(timeoutMs = 8000) {
-  return new Promise((resolve) => {
-    // If demo mode, data is synchronously available
+function waitForAppData() {
+  return new Promise(resolve => {
+    // Demo mode has data immediately
     if (typeof isDemoMode === 'function' && isDemoMode()) {
-      return resolve();
+      resolve();
+      return;
     }
 
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const ready = Array.isArray(window.bills) && Array.isArray(window.income);
-      if (ready || Date.now() - start > timeoutMs) {
-        clearInterval(interval);
+    // Data already populated
+    if (window.bills !== undefined) {
+      resolve();
+      return;
+    }
+
+    // Listen for the custom 'dataLoaded' event fired by app.js
+    document.addEventListener('dataLoaded', () => resolve(), { once: true });
+
+    // Fallback poll — up to 6 seconds
+    let attempts = 0;
+    const poll = setInterval(() => {
+      attempts++;
+      if (window.bills !== undefined || attempts >= 30) {
+        clearInterval(poll);
         resolve();
       }
-    }, 100);
+    }, 200);
   });
 }
 
+/**
+ * Main entry point for the Operations Dashboard.
+ */
 async function initOperations() {
-  // Wire up UI interactions immediately
-  initCashFlowToggle();
+  try {
+    // ── 1. Safe to Spend ──────────────────────────────────────────
+    const safeData = await calculateSafeToSpend();
+    renderSafeToSpend(safeData);
 
-  // Start realtime badge polling
-  updateRealtimeBadge();
-  opsStatusInterval = setInterval(updateRealtimeBadge, OPS_STATUS_POLL_MS);
+    // ── 2. Cash Flow Chart ────────────────────────────────────────
+    await renderCashFlowChart(opsCurrentDays);
 
-  // Wait for data
-  await waitForAppData();
+    // ── 3. Bills Aging ────────────────────────────────────────────
+    renderBillsAging();
 
-  // Render all 5 sections
-  try { renderSafeToSpend();   } catch (e) { console.error('[Ops] Safe to Spend error:', e); }
-  try { renderCashFlowChart(opsCashFlowDays); } catch (e) { console.error('[Ops] Cash flow chart error:', e); }
-  try { renderBillsAging();    } catch (e) { console.error('[Ops] Bills aging error:', e); }
-  try { renderUpcomingList();  } catch (e) { console.error('[Ops] Upcoming list error:', e); }
-  try { await renderBvaSection(); } catch (e) { console.error('[Ops] BvA error:', e); }
+    // ── 4. Budget vs Actuals ──────────────────────────────────────
+    initBudgetVsActuals();
 
-  // Subscribe to realtime (no-op in demo mode)
-  if (typeof FiresideRealtime !== 'undefined') {
-    try {
-      await FiresideRealtime.subscribe();
-      updateRealtimeBadge();
+    // ── 5. Upcoming 14-Day List ───────────────────────────────────
+    renderUpcomingList();
 
-      // Live refresh on realtime events
-      FiresideRealtime.on('bill:update', () => {
-        renderSafeToSpend();
+    // ── Realtime badge ────────────────────────────────────────────
+    updateRealtimeBadge();
+    setInterval(updateRealtimeBadge, 5000);
+
+    // ── Cash flow time-range toggle ───────────────────────────────
+    document.querySelectorAll('#cashFlowToggle button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('#cashFlowToggle button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        opsCurrentDays = parseInt(btn.dataset.days, 10);
+        await renderCashFlowChart(opsCurrentDays);
+      });
+    });
+
+    // ── Realtime subscriptions ────────────────────────────────────
+    if (typeof FiresideRealtime !== 'undefined' && typeof FiresideRealtime.on === 'function') {
+      FiresideRealtime.on('bill:update', async () => {
         renderBillsAging();
-        renderCashFlowChart(opsCashFlowDays);
+        renderUpcomingList();
+        const fresh = await calculateSafeToSpend();
+        renderSafeToSpend(fresh);
+        await renderCashFlowChart(opsCurrentDays);
+      });
+
+      FiresideRealtime.on('transaction:insert', () => {
         renderUpcomingList();
       });
-      FiresideRealtime.on('transaction:insert', () => {
-        // Could refresh BvA if we want live spending updates
-      });
-      FiresideRealtime.on('snapshot:insert', () => {
-        // Future: could update balance estimate
-      });
-    } catch (e) {
-      console.warn('[Ops] Realtime subscribe error:', e);
+    }
+
+  } catch (err) {
+    console.error('[Operations] Initialisation error:', err);
+    if (typeof showToast === 'function') {
+      showToast('Error loading the Operations dashboard. Please refresh.', 'danger');
     }
   }
 }
 
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-  if (opsStatusInterval) clearInterval(opsStatusInterval);
+// ── Bootstrap: wait for DOM + app data, then init ─────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  await waitForAppData();
+  await initOperations();
 });
-
-// Boot when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initOperations);
-} else {
-  initOperations();
-}

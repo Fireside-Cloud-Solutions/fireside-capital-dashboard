@@ -284,15 +284,17 @@ const FiresideRealtime = (() => {
     clearTimeout(retryTimer);
     retryTimer = null;
 
-    if (channel && hasSb()) {
+    const savedChannel = channel;
+    channel = null;      // Null first — prevents CLOSED event from scheduling spurious retry
+    isSubscribed = false;
+
+    if (savedChannel && hasSb()) {
       try {
-        await sb.removeChannel(channel);
+        await sb.removeChannel(savedChannel);
       } catch (err) {
         // Non-fatal — channel may already be gone
       }
     }
-    channel = null;
-    isSubscribed = false;
   }
 
   /**
