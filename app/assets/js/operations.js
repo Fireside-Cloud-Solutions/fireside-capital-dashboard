@@ -400,6 +400,9 @@ async function renderCashFlowChart(days = 30) {
     opsCashFlowChart = null;
   }
 
+  // FC-UIUX-050: Determine if any projected balance dips below $0 (for negative-balance styling)
+  const hasNegative = balanceData.some(v => v < 0);
+
   opsCashFlowChart = new Chart(canvas, {
     type: 'line',
     data: {
@@ -407,14 +410,23 @@ async function renderCashFlowChart(days = 30) {
       datasets: [{
         label: 'Projected Balance',
         data: balanceData,
-        borderColor: '#01a4ef',
+        borderColor: '#01a4ef',            // base color; overridden per-segment when negative
         backgroundColor: 'rgba(1, 164, 239, 0.08)',
         fill: true,
         tension: 0.35,
         pointBackgroundColor: pointColors,
         pointBorderColor: pointColors,
         pointRadius: pointRadii,
-        pointHoverRadius: pointHoverRadii
+        pointHoverRadius: pointHoverRadii,
+        // FC-UIUX-050: Color each line segment red when either endpoint is below $0
+        segment: hasNegative ? {
+          borderColor: ctx =>
+            (ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0) ? '#dc3545' : '#01a4ef',
+          backgroundColor: ctx =>
+            (ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0)
+              ? 'rgba(220, 53, 69, 0.08)'
+              : 'rgba(1, 164, 239, 0.08)'
+        } : undefined
       }]
     },
     options: {
@@ -454,7 +466,11 @@ async function renderCashFlowChart(days = 30) {
             font: { size: 11 },
             callback: v => opsFormatCurrency(v)
           },
-          grid: { color: 'rgba(255,255,255,0.04)' }
+          // FC-UIUX-050: Highlight the y=0 baseline so negative-balance dips are visually clear
+          grid: {
+            color: ctx => ctx.tick.value === 0 ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.04)',
+            lineWidth: ctx => ctx.tick.value === 0 ? 2 : 1
+          }
         }
       }
     }
