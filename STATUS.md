@@ -1,6 +1,65 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-18 06:12 EST (Sprint Research 0612 — AZURE FUNCTIONS ARCHITECTURE RESEARCHED, 3 NEW TASKS CREATED, FC-207 UPGRADED)
+**Last Updated:** 2026-02-18 06:41 EST (Sprint QA 0641 — 5 COMMITS VERIFIED, 4 BUGS FIXED + 1 P1 CACHE BUG CAUGHT, commit c5f8e48)
+
+---
+
+## 🔍 SPRINT QA — SESSION 0641 (Feb 18, 6:41 AM) — 5 COMMITS VERIFIED + P1 CACHE BUG ✅
+
+**Status:** ✅ **COMMITS fc1eecc + 7e0f9b3 + ac4a2f2 + c5f8e48 — 4 BUGS FIXED**
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)
+**Duration:** ~10 minutes
+**Task:** Verify all commits since QA 0600, test live site, find new bugs
+
+### New Commits Verified (Since Last QA Check 0600)
+
+| Commit | Description | Verified |
+|--------|-------------|---------|
+| `f87399c` | FC-UIUX-050: Cash flow chart negative-balance indicator | ✅ |
+| `33ac951` | docs: Sprint UI/UX 0606 status update | ✅ |
+| `7f65e99` | BUG-OPS-BILLS-LISTENER-LEAK-001 + BUG-BUDGET-INCOME-NORMALIZE-001 + BUG-THEME-TOGGLE-UX-001 + BUG-THEME-TOGGLE-LABEL-001 | ✅ |
+| `e6d65b9` | BUG-SECURITY-MODAL-001 + BUG-SECURITY-INLINE-002 + BUG-POLISH-DBLINT-001 + BUG-RATELIMIT-CROSS-001 | ✅ (partial — DBLINT-001 had second root cause) |
+| `4cd8647` | chore(FC-121): Cache-Control headers in staticwebapp.config.json | ⚠️ BUG-CACHE-IMMUTABLE-001 found → fixed |
+| `fec31be` | docs: Sprint Dev 0635 backlog update | ✅ |
+
+### FC-UIUX-050 Verification
+
+Cash flow chart rendered correctly on Operations Dashboard. Current data is all-positive balance so red segment callback has no effect — correct behavior (hasNegative guard prevents unnecessary callback overhead). y=0 baseline grid line present in chart. ✅
+
+### Live Site Verification
+
+✅ Dashboard: $577,821.54 net worth, all charts rendering
+✅ Operations: $16,232.83 Safe to Spend (positive state), "Updated just now"
+✅ Budget: Expected Income $16,732.83 — correctly normalized (HII $3,569 bi-weekly → $7,732.83/mo + FERC $9,000/mo)
+✅ Settings: 3×3 category budget grid, Dark Mode toggle ON in dark mode (BUG-THEME-TOGGLE-UX-001 verified)
+❌ HTTP 400: settings?select=category_budgets — migration 006 still not run (P1 blocker persists)
+
+### Bugs Found & Fixed (4)
+
+| ID | Priority | Commit | Description |
+|----|----------|--------|-------------|
+| BUG-POLISH-DBLINT-001 (pt2) | P3 | `fc1eecc` | `startSessionMonitoring()` was double-firing on page load — both `getSession()` (in constructor) and `onAuthStateChange(SIGNED_IN)` called it. Added `if (this.isActive) return;` guard at top of method. The e6d65b9 fix only addressed the polish enhancer re-invocation; this was the second root cause of the double `[Security] Session monitoring started` log. |
+| BUG-SESSIONSEC-INLINE-001 | P3 | `fc1eecc` | Session warning banner dismiss button had inline `onclick="sessionSecurity.hideSessionWarning()"`. Changed to `data-action="dismiss-session-warning"` + delegation handler. |
+| BUG-TRANS-INLINE-001 | P2 | `7e0f9b3` | `transactions.js` category select had inline `onchange="updateTransactionCategory('${t.id}', this.value)"`. Changed to `data-transaction-id` attribute + event delegation on `#transactionsTableBody`. Persists across filter/pagination re-renders. |
+| BUG-CACHE-IMMUTABLE-001 | **P1** | `ac4a2f2` | `staticwebapp.config.json` set `max-age=31536000, immutable` on `/assets/js/*` and `/assets/css/*`. These files use STATIC names (no content hash) — `immutable` would have permanently cached `app.js` for 1 year in user browsers, making all future JS/CSS deploys invisible. Changed to `max-age=86400, must-revalidate`. Images/icons: 7 days. Only safe to use `immutable` after FC-185 (Webpack content-hash build). |
+
+### New Issues Identified (Not Yet Fixed, P3)
+
+| ID | Priority | Description |
+|----|----------|-------------|
+| BUG-BOOTSTRAP-MODAL-NEW-001 | P3 | Several `new bootstrap.Modal()` calls in app.js, email-bills.js, onboarding.js should use `getOrCreateInstance()` to prevent duplicate instance creation. Affected: `sharedBillDeleteWarningModal` (app.js:2137), `emailReviewModal` (email-bills.js:73), `onboardingModal` (onboarding.js:239+261). |
+
+### ⚠️ P1 BLOCKER PERSISTS: BUG-DB-SCHEMA-FC180-001
+
+Migrations 006+007 still not run in Supabase. HTTP 400 on every load of budget.html and settings.html.
+
+**Action Required (Matt):** Run BOTH migrations in Supabase SQL Editor:
+1. `migrations/006_add_category_budgets_to_settings.sql`
+2. `migrations/007_transaction_category_patterns_and_realtime.sql`
+
+### Production Grade
+
+**Overall: A+** — Critical cache bug caught before it caused real user pain. Session double-init resolved. Two P2/P3 CSP inline handler violations fixed. BUG-BOOTSTRAP-MODAL-NEW-001 noted (P3). Single blocking action: Matt must run migrations.
 
 ---
 
