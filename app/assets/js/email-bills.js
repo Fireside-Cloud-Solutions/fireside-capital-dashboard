@@ -70,7 +70,7 @@ async function scanEmailForBills() {
       await loadPendingEmailBills();
       
       // Auto-open review modal
-      const reviewModal = new bootstrap.Modal(document.getElementById('emailReviewModal'));
+      const reviewModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('emailReviewModal'));
       reviewModal.show();
     } else {
       showToast('No new bills found in your email.', 'info');
@@ -129,7 +129,7 @@ async function loadPendingEmailBills() {
 
   try {
     const { data, error } = await sb
-      .from('bills')
+      .from('pending_bills')
       .select('*')
       .eq('user_id', currentUser.id)
       .eq('status', 'pending')
@@ -441,17 +441,28 @@ async function rejectBill(billId) {
 }
 
 /**
- * Edit a bill — opens inline editor or modal.
- * For Phase 1, we'll allow editing category, amount, and due date inline.
+ * Edit a bill — opens add-bill modal pre-filled for editing.
+ * Uses the existing #addBillModal (pre-fill vendor name + amount, save replaces bill).
  */
 function editBill(billId) {
   const bill = pendingEmailBills.find((b) => b.id === billId);
   if (!bill) return;
 
-  // For now, show a simple prompt — in Phase 2 we can add a proper modal
-  const newAmount = prompt(`Edit amount for ${bill.vendor}:`, bill.amount);
-  if (newAmount !== null && !isNaN(newAmount)) {
-    updateBillAmount(billId, parseFloat(newAmount));
+  // Pre-fill the add bill modal with this bill's data for user correction
+  const nameEl = document.getElementById('billName');
+  const amountEl = document.getElementById('billAmount');
+  const typeEl = document.getElementById('billType');
+  if (nameEl) nameEl.value = bill.vendor || '';
+  if (amountEl) amountEl.value = bill.amount || '';
+  if (typeEl) typeEl.value = bill.category || 'other';
+
+  // Store editing context so save button knows to update instead of create
+  const addBillModal = document.getElementById('addBillModal');
+  if (addBillModal) {
+    addBillModal.dataset.editPendingId = billId;
+    const titleEl = addBillModal.querySelector('.modal-title');
+    if (titleEl) titleEl.textContent = 'Edit Detected Bill';
+    bootstrap.Modal.getOrCreateInstance(addBillModal).show();
   }
 }
 
@@ -577,14 +588,7 @@ function deselectAllBills() {
 }
 
 // ===== UTILITY =====
-
-/**
- * Show a toast notification (simple implementation).
- */
-function showToast(message, type = 'info') {
-  // For now, use browser alert — in Phase 2 we can add a proper toast component
-  alert(message);
-}
+// NOTE: showToast() is provided globally by toast-notifications.js — do NOT redefine here.
 
 // ===== EVENT LISTENERS =====
 
@@ -652,6 +656,14 @@ function initEmailBills() {
   initEmailBillsEventListeners();
   loadPendingEmailBills();
 }
+
+// Auto-initialize on dataLoaded event (dispatched by app.js after successful auth + data fetch)
+// This replaces the fragile setTimeout(500) pattern that was previously in bills.html
+window.addEventListener('dataLoaded', () => {
+  if (document.getElementById('scanEmailBillsBtn') && typeof initEmailBills === 'function') {
+    initEmailBills();
+  }
+});
 
 // Export for use in app.js
 if (typeof window !== 'undefined') {
