@@ -124,7 +124,7 @@
           </div>
           <!-- Realtime connection status -->
           <span id="realtimeStatus" class="badge bg-secondary ms-2">
-            <i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Connecting...
+            <i class="bi bi-circle-fill me-1 realtime-dot"></i> Connecting...
           </span>
         </div>
         <div>
@@ -226,7 +226,7 @@
               <div class="card-body">
                 <div class="ops-card-header">
                   <p class="ops-card-title"><i class="bi bi-bar-chart-line me-1"></i> Budget vs Actuals</p>
-                  <select class="form-select form-select-sm" id="bvaMonthSelect" aria-label="Select month" style="min-width:160px">
+                  <select class="form-select form-select-sm bva-month-select" id="bvaMonthSelect" aria-label="Select month">
                     <!-- Populated by operations.js -->
                   </select>
                 </div>
@@ -274,11 +274,11 @@
               <form id="loginForm" novalidate>
                 <div class="mb-3">
                   <label for="loginEmail" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required autocomplete="username" autocomplete="username">
+                  <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required autocomplete="username">
                 </div>
                 <div class="mb-3">
                   <label for="loginPassword" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password" autocomplete="current-password">
+                  <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password">
                   <div class="mt-2">
                     <a href="#" class="small text-decoration-none" id="forgotPasswordLink">Forgot password?</a>
                   </div>
@@ -303,15 +303,15 @@
               <form id="signupForm" novalidate>
                 <div class="mb-3">
                   <label for="signupEmail" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="signupEmail" placeholder="you@example.com" required autocomplete="username" autocomplete="email">
+                  <input type="email" class="form-control" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
                 </div>
                 <div class="mb-3">
                   <label for="signupPassword" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="signupPassword" minlength="6" required autocomplete="new-password" autocomplete="new-password">
+                  <input type="password" class="form-control" id="signupPassword" minlength="6" required autocomplete="new-password">
                 </div>
                 <div class="mb-3">
                   <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
-                  <input type="password" class="form-control" id="signupConfirmPassword" minlength="6" required autocomplete="new-password" autocomplete="new-password">
+                  <input type="password" class="form-control" id="signupConfirmPassword" minlength="6" required autocomplete="new-password">
                 </div>
                 <div class="d-grid">
                   <button type="submit" class="btn btn-primary" id="signupBtn">Create Account</button>
@@ -355,7 +355,7 @@
   <!-- CRITICAL SCRIPTS: Synchronous for early execution -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <!-- Plaid SDK intentionally omitted — Operations page has no Plaid UI flows (BUG-UIUX-OPS-PLAID-SCRIPT-001) -->
   <script src="assets/js/csrf.js"></script>
   <script src="assets/js/security-utils.js"></script>
   <script src="assets/js/session-security.js"></script>
@@ -378,6 +378,6 @@
   <script src="assets/js/app-polish-enhancements.js" defer></script>
   <script src="assets/js/notification-enhancements.js" defer></script>
   <script src="assets/js/loading-states.js" defer></script>
-  <script src="assets/js/plaid.js" defer></script>
+  <!-- plaid.js intentionally omitted — see BUG-UIUX-OPS-PLAID-SCRIPT-001 -->
 </body>
 </html>

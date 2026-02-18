@@ -352,3 +352,7 @@
     font-size: 1.625rem; /* 26px */
   }
 }
+
+/* -- Operations Dashboard utilities (BUG-UIUX-OPS-INLINE-002) -- */
+.realtime-dot { font-size: 0.5rem; }
+.bva-month-select { min-width: 160px; }
