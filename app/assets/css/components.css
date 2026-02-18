@@ -1563,3 +1563,36 @@ tbody.loading {
 .ops-toolbar {
   flex-wrap: wrap;
 }
+
+/* Override main.css mobile btn-group stacking for ops toolbar (BUG-UIUX-OPS-MOBILE-TOOLBAR-001) */
+/* The cash-flow 30d/60d/90d toggle must stay horizontal on all screen sizes */
+.ops-toolbar .btn-group {
+  flex-direction: row !important;
+  width: auto !important;
+}
+.ops-toolbar .btn-group .btn {
+  width: auto !important;
+  margin-bottom: 0 !important;
+}
+
+/* Safe to Spend KPI: responsive amount sizing (BUG-UIUX-OPS-KPI-WRAP-001) */
+/* display-6 (2.5rem) wraps on col-md-4 narrow cards at desktop breakpoints */
+#safeToSpend .display-6 {
+  font-size: clamp(1.4rem, 3.5vw, 2.5rem);
+  white-space: nowrap;
+}
+
+/* Safe to Spend warning state: amber value (BUG-UIUX-OPS-INLINE-005) */
+/* Replaces inline style="${amountStyle}" in renderSafeToSpend() */
+.safe-to-spend-warning .safe-amount-value {
+  color: #f44e24;
+}
+
+/* Upcoming transactions list: meta text sizing (BUG-UIUX-OPS-INLINE-004) */
+/* Replaces inline style="font-size:0.78rem" in renderUpcomingList() */
+.upcoming-item .upcoming-meta {
+  font-size: 0.78rem;
+}
+.upcoming-header-row {
+  font-size: 0.78rem;
+}

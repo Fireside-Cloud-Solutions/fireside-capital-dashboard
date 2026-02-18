@@ -184,13 +184,11 @@ function renderSafeToSpend(data) {
   } else if (state === 'warning') {
     stateClass = 'safe-to-spend-warning';
     amountClass += ' fw-bold';
-    // Use amber/warning color inline
+    // Color applied via .safe-to-spend-warning .safe-amount-value in components.css (BUG-UIUX-OPS-INLINE-005)
   } else {
     stateClass = 'safe-to-spend-positive';
     amountClass += ' text-success';
   }
-
-  const amountStyle = state === 'warning' ? 'color:#f44e24' : '';
 
   const billsList = billsDue7d.length > 0
     ? billsDue7d.map(b =>
@@ -204,7 +202,7 @@ function renderSafeToSpend(data) {
         <h6 class="card-subtitle mb-3 ${state === 'danger' ? subtextMuted : 'text-muted'} small text-uppercase fw-semibold letter-spacing-wide">
           ${icon}Safe to Spend
         </h6>
-        <div class="${amountClass}" style="${amountStyle}">${opsFormatCurrency(safeAmount)}</div>
+        <div class="${amountClass} safe-amount-value">${opsFormatCurrency(safeAmount)}</div>
         ${billsList ? `<div class="mb-2">${billsList}</div>` : ''}
         <hr class="${hrClass}">
         <div class="small ${state === 'danger' ? subtextMuted : 'text-muted'} mt-auto">
@@ -705,18 +703,18 @@ function renderUpcomingList() {
           <i class="bi ${isIncome ? 'bi-arrow-down-circle text-success' : 'bi-arrow-up-circle text-danger'} fs-5"></i>
           <div>
             <div class="fw-medium small">${opsEscape(evt.name)}${todayBadge}</div>
-            <div class="text-muted" style="font-size:0.78rem">${dateLabel}</div>
+            <div class="text-muted upcoming-meta">${dateLabel}</div>
           </div>
         </div>
         <div class="text-end">
           <div>${amountHtml}</div>
-          <div class="upcoming-balance ${balanceColor}" style="font-size:0.78rem">${opsFormatCurrency(runningBalance)}</div>
+          <div class="upcoming-balance upcoming-meta ${balanceColor}">${opsFormatCurrency(runningBalance)}</div>
         </div>
       </div>`;
   });
 
   el.innerHTML = `
-    <div class="d-flex justify-content-between text-muted border-bottom border-secondary border-opacity-25 pb-2 mb-1 px-3" style="font-size:0.78rem">
+    <div class="d-flex justify-content-between text-muted border-bottom border-secondary border-opacity-25 pb-2 mb-1 px-3 upcoming-header-row">
       <span>Event / Date</span>
       <span>Amount · Running Balance</span>
     </div>
@@ -732,9 +730,10 @@ function updateRealtimeBadge() {
   const badge = document.getElementById('realtimeStatus');
   if (!badge) return;
 
+  // .realtime-dot class (font-size:0.5rem) defined in utilities.css (BUG-UIUX-OPS-INLINE-003)
   if (typeof FiresideRealtime === 'undefined') {
     badge.className = 'badge bg-secondary ms-2';
-    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Unavailable';
+    badge.innerHTML = '<i class="bi bi-circle me-1 realtime-dot"></i> Unavailable';
     return;
   }
 
@@ -746,16 +745,16 @@ function updateRealtimeBadge() {
 
   if (!statusObj) {
     badge.className = 'badge bg-secondary ms-2';
-    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Unavailable';
+    badge.innerHTML = '<i class="bi bi-circle me-1 realtime-dot"></i> Unavailable';
   } else if (statusObj.isSubscribed && statusObj.channelActive) {
     badge.className = 'badge bg-success ms-2';
-    badge.innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Live';
+    badge.innerHTML = '<i class="bi bi-circle-fill me-1 realtime-dot"></i> Live';
   } else if (statusObj.retryCount > 0 && statusObj.retryCount < statusObj.maxRetries) {
     badge.className = 'badge bg-warning text-dark ms-2';
-    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Reconnecting...';
+    badge.innerHTML = '<i class="bi bi-circle me-1 realtime-dot"></i> Reconnecting...';
   } else {
     badge.className = 'badge bg-danger ms-2';
-    badge.innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Offline';
+    badge.innerHTML = '<i class="bi bi-circle-fill me-1 realtime-dot"></i> Offline';
   }
 }
 

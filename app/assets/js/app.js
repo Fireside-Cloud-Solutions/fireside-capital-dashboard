@@ -2528,6 +2528,8 @@ function updateCategoryBudgetTotal() {
 
 async function renderAdditionalCharts() {
   if (!currentUser) return;
+  // Only run on pages that have dashboard chart canvases (BUG-OPS-APPJS-CHART-WARN-001)
+  if (!document.getElementById('netWorthDeltaChart')) return;
 
   // Fetch all necessary data (expanded selects for per-month calculations)
   const [snapshotsRes, billsRes, debtsRes, incomeRes, investmentsRes, assetsRes] = await Promise.all([
