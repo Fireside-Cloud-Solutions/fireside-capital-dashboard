@@ -329,15 +329,15 @@ async function approveBill(billId) {
   if (!bill) return;
 
   try {
-    // Insert into bills table
+    // Insert into bills table — DB uses camelCase column names as defined in migration.sql
+    // nextDueDate matches "nextDueDate" date column; is_financing is NOT a DB column (computed field only)
     const { error: insertError } = await sb.from('bills').insert({
       user_id: currentUser.id,
       name: bill.vendor,
       type: bill.category,
       amount: bill.amount,
-      next_due_date: bill.due_date,
-      frequency: 'monthly', // Default frequency
-      is_financing: false,
+      nextDueDate: bill.due_date || null,  // DB column: "nextDueDate" — camelCase per migration.sql
+      frequency: bill.frequency || 'monthly', // Use detected frequency if available
     });
 
     if (insertError) throw insertError;
