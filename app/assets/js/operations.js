@@ -186,7 +186,7 @@ function renderSafeToSpend(data) {
     cardClass += ' bg-danger text-white';
     icon = '<i class="bi bi-exclamation-triangle me-2"></i>';
     subtextMuted = 'opacity-75';
-    hrClass = 'border-white-50 opacity-25';
+    hrClass = 'border-white border-opacity-25';
   } else if (state === 'warning') {
     stateClass = 'safe-to-spend-warning';
     amountClass += ' fw-bold';
@@ -227,7 +227,7 @@ function renderSafeToSpend(data) {
         </div>
         <!-- FC-UIUX-049: data-freshness stamp -->
         <div class="mt-2 pt-2 border-top border-secondary-subtle">
-          <small id="safeToSpendUpdated" class="text-muted fst-italic">
+          <small id="safeToSpendUpdated" class="${state === 'danger' ? 'opacity-75' : 'text-muted'} fst-italic">
             ${opsLastRefreshed ? `Updated ${opsFormatTimeAgo(opsLastRefreshed)}` : ''}
           </small>
         </div>

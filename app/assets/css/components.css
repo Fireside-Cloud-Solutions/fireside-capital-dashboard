@@ -1523,9 +1523,9 @@ tbody.loading {
    ================================================================= */
 
 /* Safe to Spend states */
+/* danger state uses Bootstrap bg-danger text-white directly (no custom class needed) */
 .safe-to-spend-positive { border-left: 4px solid #81b900; }
 .safe-to-spend-warning  { border-left: 4px solid #f44e24; }
-.safe-to-spend-danger   { border-left: 4px solid #dc3545; background: rgba(220,53,69,0.1); }
 
 /* Bills aging buckets */
 .bills-bucket { cursor: pointer; transition: background 0.15s; }
