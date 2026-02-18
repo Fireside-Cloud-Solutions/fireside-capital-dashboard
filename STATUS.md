@@ -1,5 +1,219 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-18 05:17 EST (Sprint Dev 0517 — BUG-UIUX-OPS-STYLE-BLOCK-001 + BUG-UIUX-OPS-MOBILE-HEADER-001 + FC-UIUX-049 DONE)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0517 (Feb 18, 5:17 AM) — 2 P2 UI BUGS FIXED ✅
+
+**Status:** ✅ **COMMIT 1fdd208 — OPS STYLE BLOCK → CSS + MOBILE HEADER FIXED**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~5 minutes
+**Task:** Highest-priority open dev items from #qa and #ui-ux — 2 P2 bugs
+
+### Bugs Fixed (commit `1fdd208`)
+
+| ID | Priority | Description | Fix |
+|----|----------|-------------|-----|
+| BUG-UIUX-OPS-STYLE-BLOCK-001 | P2 | ~60-line `<style>` block in operations.html `<head>` weakening CSP (`style-src 'unsafe-inline'`) | Removed inline block. All 8 rule sets moved to `components.css` under `/* OPERATIONS DASHBOARD */` section |
+| BUG-UIUX-OPS-MOBILE-HEADER-001 | P2 | page-header had 3 sibling divs (h2 · toggle+badge · auth) → overflow/wrap at 375px mobile | Moved cash flow toggle + realtime badge out of `page-header-actions` into new `.ops-toolbar` div at top of `#dataContainer`. Page header now standard 2-col (title + auth) |
+
+### Files Changed
+- `operations.html` — removed `<style>` block + page-header-actions; added `.ops-toolbar` above Row 1
+- `assets/css/components.css` — appended Operations Dashboard section (47 lines)
+
+### Also Shipped This Session: FC-UIUX-049 (commit `9be8122`)
+
+| Feature | Detail |
+|---------|--------|
+| `opsLastRefreshed` state var | Stamped on init + realtime bill:update + transaction:insert events |
+| `opsFormatTimeAgo()` helper | "just now" / "N min ago" / "H:MM AM/PM" depending on elapsed time |
+| `opsTickTimestamps()` | Lightweight DOM patch (no re-render) every 30s |
+| Safe to Spend card footer | `<small id="safeToSpendUpdated">Updated X min ago</small>` |
+| Cash flow subtitle | `"Next 30 days · as of 5:17 AM"` format |
+| 30s interval ticker | Started after init, clears/restarts on re-init |
+
+### Open Items
+- P1 blocker still waiting Matt: run migrations 006+007 in Supabase SQL Editor
+- All P2/P3 UI/UX items from BACKLOG.md are now addressed
+
+---
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0511 (Feb 18, 5:11 AM) — GMAIL BILL PARSING ✅
+
+**Status:** ✅ **RESEARCH COMPLETE** — Full architecture designed, 7 new tasks created
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** ~5 minutes
+**Topic:** EMAIL-002 — Gmail Bill Parsing (next highest-priority unresearched topic — P1)
+
+### Critical Finding: Client-Side MVP is Viable
+
+**Root insight:** Gmail API can be called entirely client-side for Azure Static Web Apps using Google Identity Services (GIS) token model. No Azure Function required for the MVP "Import from Gmail" button. Background sync needs a server-side function but that's post-MVP.
+
+### Architecture: Two-Phase Plan
+
+| Phase | Approach | Delivery |
+|-------|----------|----------|
+| **MVP** | Client-side GIS token model. User clicks "Import from Gmail" → OAuth popup → JS scans Gmail → preview modal → import to Supabase | EMAIL-011 through EMAIL-015 |
+| **Post-MVP** | Azure Function `/api/gmail-sync`. Stores refresh token in Supabase, daily timer trigger, background auto-import | EMAIL-016 |
+
+### OAuth Implementation
+
+| Component | Detail |
+|-----------|--------|
+| Library | `https://accounts.google.com/gsi/client` (Google Identity Services) |
+| Scope | `gmail.readonly` only — minimum required, no write access |
+| Token storage | **Memory only** — never localStorage (XSS protection) |
+| Token lifetime | ~1 hour — `requestAccessToken()` re-triggers on expiry |
+| Client ID | Requires Google Cloud Console setup (EMAIL-010 — Matt TODO) |
+
+### Gmail Search Query (bill detection)
+```
+subject:(bill OR invoice OR statement OR "payment due" OR "amount due" OR "past due")
+-subject:("order confirmation" OR "shipped" OR "delivered" OR "receipt")
+newer_than:90d
+```
+Returns ~20-50 messages for typical user. Two-pass approach:
+1. `messages.get` with `format=metadata` for all results (fast, no body download)
+2. `messages.get` with `format=full` only for confirmed bill candidates (≤20)
+
+### bill-parser.js Architecture
+
+| Layer | Function | Detail |
+|-------|----------|--------|
+| Body decoder | `decodeBody(data)` | base64url → UTF-8 (Gmail API uses URL-safe base64) |
+| Text extractor | `extractText(payload)` | Recursive MIME tree walk for text/plain + text/html |
+| Amount extractor | `extractAmount(text)` | 7 regex patterns, priority-ordered, sanity-checked $1-$50k |
+| Date extractor | `extractDueDate(text)` | 5 regex patterns, validates date is future within 12 months |
+| Company extractor | `extractCompany(from)` | 50+ domain → name map (AT&T, Netflix, Chase, etc.) |
+| Classifier | `isBillEmail(subject, from)` | Positive/negative signals filter, removes order confirmations |
+| Confidence score | 0-100 | amount=+50pts, dueDate=+30pts, bill keyword in subject=+20pts |
+
+### Database Changes
+
+Migration 009 adds to `bills` table:
+- `source TEXT` ('manual' | 'email' | 'plaid')
+- `external_id TEXT` (Gmail message ID for dedup)
+- `email_from TEXT`, `email_subject TEXT`, `email_detected_at TIMESTAMPTZ`
+- UNIQUE INDEX on `(user_id, external_id)` — prevents double-imports
+
+### New Tasks Created (7)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| EMAIL-010 | P1 | 1h | ⚠️ Matt TODO: Google Cloud Console setup |
+| EMAIL-011 | P1 | 2h | `gmail-connector.js` — GIS OAuth + Gmail API calls |
+| EMAIL-012 | P1 | 3h | `bill-parser.js` — regex extraction engine + classifier |
+| EMAIL-013 | P1 | 30m | Supabase migration 009: bills table email fields |
+| EMAIL-014 | P1 | 2h | Bills page UI: import button + preview modal |
+| EMAIL-015 | P1 | 1h | Dedup logic + Supabase upsert flow |
+| EMAIL-016 | P2 | 4h | Azure Function background sync (post-MVP) |
+
+### Implementation Order
+```
+EMAIL-010 (Matt: Google Cloud) → EMAIL-013 (DB migration)
+→ EMAIL-011 (gmail-connector.js) → EMAIL-012 (bill-parser.js)
+→ EMAIL-014 + EMAIL-015 (UI + import logic)
+→ EMAIL-016 (background sync — post-MVP)
+```
+**Estimated:** ~9.5h agent work + ~1h Matt's Google Cloud time
+
+### Report
+`reports/gmail-bill-parsing-research-2026-02-18.md` — Full code: `gmail-connector.js`, `bill-parser.js`, preview modal HTML, Supabase migration, dedup logic
+
+### Research Backlog Status — ALL ORIGINAL TOPICS COMPLETE + EXPANDING ✅
+
+| Session | Topic | Status |
+|---------|-------|--------|
+| Feb 16 | CSS Architecture | ✅ Done |
+| Feb 16 | Financial Dashboard UI Patterns | ✅ Done |
+| 0450 | Chart.js | ✅ Done |
+| 0450 | Bootstrap Dark Theme | ✅ Done |
+| Feb 13 | PWA | ✅ Done |
+| Feb 13 | Performance | ✅ Done |
+| 0431 | Cash Flow Forecasting | ✅ Done |
+| 0535 | Budget vs Actuals + Demo Mode | ✅ Done |
+| 0635 | Webpack Build Pipeline | ✅ Done |
+| 0657 | Supabase Advanced Query Patterns | ✅ Done |
+| 0751 (Feb 17) | Smart Categorization + Realtime | ✅ Done |
+| 0433 (Feb 18) | Plaid Production Integration | ✅ Done |
+| **0511 (Feb 18)** | **Gmail Bill Parsing** | ✅ **Done** |
+
+**Next research cycle:** React Native Expo (EPIC-002 mobile scaffold) — MOB-002 is next unresearched P2
+
+---
+
+**Last Updated:** 2026-02-18 05:06 EST (Sprint UI/UX 0506 — operations.html AUDIT, 7 PRIOR FIXES VERIFIED, 5 NEW ISSUES, 2 QUICK FIXES COMMITTED)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0506 (Feb 18, 5:06 AM) — OPERATIONS.HTML DEEP-DIVE ✅
+
+**Status:** ✅ **7 PRIOR FIXES VERIFIED — 5 NEW ISSUES — 2 QUICK FIXES (bc2a648)**
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~5 minutes
+**Task:** Verify prior recommendations, audit operations.html design, create work items
+
+### Prior Recommendations Verified (7/7 ✅)
+
+| Issue | Status |
+|-------|--------|
+| BUG-UIUX-DEMOBANNER-ONCLICK-001 — inline onclick all 11 pages | ✅ FIXED (commit 3b9bf81 — all pages use data-action="disable-demo") |
+| BUG-UIUX-FC180-DUAL-SAVE-001 — two disconnected Save buttons | ✅ FIXED (single "Save All Settings" btn confirmed in settings.html) |
+| BUG-UIUX-NAV-OPS-001 — Operations missing from all navs | ✅ FIXED (commit 3237d46 — confirmed live) |
+| BUG-UIUX-FC180-ODD-GRID-001 — 9-cat grid "Other" stranded | ✅ FIXED (commit 1ee139b) |
+| BUG-UIUX-FC180-ZERO-HINT-001 — no $0 helper text | ✅ FIXED (commit 1ee139b) |
+| BUG-UIUX-FC182-TITLE-001 — "Spending vs Budget" wrong title | ✅ FIXED (commit 1ee139b) |
+| BUG-OPS-REALTIME-STATUS-TYPE-001 — badge always "Offline" | ✅ FIXED (commit 8a3c0db) |
+
+### Quick Fixes Applied (commit bc2a648)
+
+| ID | Fix | Files |
+|----|-----|-------|
+| BUG-UIUX-OPS-PLAID-SCRIPT-001 | Removed Plaid SDK + plaid.js from operations.html (unnecessary ~100KB script load) | operations.html |
+| BUG-UIUX-OPS-INLINE-002 | Moved `font-size:0.5rem` + `min-width:160px` inline styles to utilities.css as `.realtime-dot` + `.bva-month-select` | operations.html, utilities.css |
+
+### New Issues Found (5 — 0 P1 · 2 P2 · 3 P3)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-UIUX-OPS-STYLE-BLOCK-001 | P2 | 30 min | ~60 lines of `<style>` block in operations.html `<head>` (8 rule sets). Move to components.css. Requires `style-src 'unsafe-inline'` CSP, weakening security posture. |
+| BUG-UIUX-OPS-MOBILE-HEADER-001 | P2 | 30 min | page-header has 3 sibling divs (h2, cash-flow toggle + realtime badge, user auth). Will overflow/wrap at 375px mobile. Move toggle+badge into page content area (above Row 1). |
+| FC-UIUX-049 | P2 | 2h | No data-freshness timestamp on Operations Dashboard. Add "Updated X min ago" under Safe to Spend KPI + "as of HH:MM" on cash flow chart subtitle. Track `lastRefreshed` in operations.js. |
+| BUG-UIUX-OPS-PLAID-SCRIPT-001 | P3 | 5 min | ✅ FIXED (bc2a648) |
+| BUG-UIUX-OPS-INLINE-002 | P3 | 10 min | ✅ FIXED (bc2a648) |
+
+### operations.html Audit Scorecard
+
+| Check | Result |
+|-------|--------|
+| Navigation (all 12 sidebar links) | ✅ Correct order, Operations active |
+| Demo banner pattern | ✅ data-action="disable-demo" |
+| Accessible canvas (aria-label + role) | ✅ Present |
+| Spinner skeleton on all 4 sections | ✅ Present |
+| Realtime badge wired | ✅ Fixed (8a3c0db) |
+| BvA month select aria-label | ✅ Present |
+| Row layout (3 rows: 4+8, 5+7, 12) | ✅ Solid grid |
+| Inline style block in head | ❌ ~60 lines — BUG-UIUX-OPS-STYLE-BLOCK-001 (open) |
+| Mobile header 3-column overflow | ❌ BUG-UIUX-OPS-MOBILE-HEADER-001 (open) |
+| Data freshness indicators | ❌ None — FC-UIUX-049 (open) |
+
+**Page Grade: A−** — Solid structure. Minor CSP and mobile header issues.
+
+### Audit Phase Status — FULLY COMPLETE
+
+| Area | Status |
+|------|--------|
+| HTML pages (12/12 incl. operations.html) | ✅ COMPLETE |
+| CSS files (9/9) | ✅ COMPLETE |
+| JS files (28/28) | ✅ COMPLETE |
+| Feature design reviews | ✅ COMPLETE |
+| operations.html deep-dive | ✅ COMPLETE (this session) |
+
+---
+
 **Last Updated:** 2026-02-18 05:00 EST (Sprint QA 0500 — FC-173 VERIFIED, 4 BUGS FIXED, 1 P1 BLOCKER PERSISTS)
 
 ---
