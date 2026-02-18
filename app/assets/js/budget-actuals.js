@@ -12,7 +12,7 @@
  *   - Over 100% of budget  → status: 'over'    (red)
  *   - No budget set        → status: 'unbudgeted'
  *
- * Depends on: app.js (for `sb`, `getCurrentUser`), demo-data.js (for isDemoMode/DEMO_DATA)
+ * Depends on: data-layer.js (DataLayer — routes demo/live automatically), demo-data.js (isDemoMode)
  */
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -47,43 +47,18 @@ async function calculateBudgetVsActuals(month = null) {
   let budgets = {};
   let transactions = [];
 
-  if (typeof isDemoMode === 'function' && isDemoMode()) {
-    // ── Demo mode: use DEMO_DATA ──────────────────────────────────────────
-    budgets = (DEMO_DATA.settings && DEMO_DATA.settings.category_budgets) || {};
-    const allTxns = DEMO_DATA.transactions || [];
-    transactions = allTxns.filter(t =>
-      t.date && t.date.startsWith(targetMonth) && t.category !== 'income'
-    );
-  } else {
-    // ── Live mode: query Supabase ─────────────────────────────────────────
-    if (typeof sb === 'undefined') return null;
+  // ── Route through DataLayer (handles demo/live automatically) ────────────
+  if (typeof DataLayer === 'undefined') return null;
 
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return null;
+  const settingsResult = await DataLayer.getSettings();
+  budgets = settingsResult.data?.category_budgets || {};
 
-    // Fetch category budgets from settings table
-    const { data: settingsData } = await sb
-      .from('settings')
-      .select('category_budgets')
-      .eq('user_id', user.id)
-      .single();
+  const startDate = `${targetMonth}-01`;
+  const endDate = bvaGetLastDayOfMonth(targetMonth);
 
-    budgets = settingsData?.category_budgets || {};
-
-    // Fetch transactions for the month
-    const startDate = `${targetMonth}-01`;
-    const endDate = bvaGetLastDayOfMonth(targetMonth);
-
-    const { data: txnData } = await sb
-      .from('transactions')
-      .select('category, amount')
-      .eq('user_id', user.id)
-      .gte('date', startDate)
-      .lte('date', endDate)
-      .neq('category', 'income');
-
-    transactions = txnData || [];
-  }
+  const txnResult = await DataLayer.getTransactions({ startDate, endDate });
+  // Exclude income-category entries (same rule as before)
+  transactions = (txnResult.data || []).filter(t => t.category !== 'income');
 
   // ── Sum actuals by category ───────────────────────────────────────────────
   const actuals = {};
