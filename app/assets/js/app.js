@@ -4042,10 +4042,14 @@ function init() {
   document.getElementById('saveBillBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBill(); });
   document.getElementById('saveIncomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveIncome(); });
   document.getElementById('saveBudgetItemBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBudgetItem(); });
-  document.getElementById('saveSettingsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveSettings(); });
+  // saveSettingsBtn removed — consolidated into saveBudgetsBtn ("Save All Settings")
 
-  // FC-180: Save category budgets button
-  document.getElementById('saveBudgetsBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveCategoryBudgets(); });
+  // FC-180 + BUG-UIUX-FC180-DUAL-SAVE-001: Unified save — one button saves emergency fund goal + category budgets
+  document.getElementById('saveBudgetsBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await saveSettings();
+    await saveCategoryBudgets();
+  });
 
   // FC-180: Live total preview on any budget input change
   document.getElementById('categoryBudgetsGrid')?.addEventListener('input', () => { updateCategoryBudgetTotal(); });

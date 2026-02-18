@@ -154,12 +154,7 @@
                                 <small id="emergencyGoalHelp" class="text-muted mt-1 d-block">Recommended: 3-6 months of expenses ($5,000 - $50,000 typical range)</small>
                             </div>
                         </div>
-                        <div class="mt-4 d-flex align-items-center gap-3">
-                            <button class="btn btn-primary" id="saveSettingsBtn">
-                              <i class="bi bi-check-lg"></i> Save Settings
-                            </button>
-                            <span id="settingsStatus"></span>
-                        </div>
+                        <span id="settingsStatus" class="d-none"></span>
                     </div>
                 </div>
 
@@ -268,13 +263,13 @@
                         <div class="mt-3 p-3 rounded budget-total-preview">
                           <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small">Monthly Budget Total</span>
-                            <span class="fw-bold" id="categoryBudgetTotal">$0.00 / mo</span>
+                            <span class="text-muted small fst-italic" id="categoryBudgetTotal">Nothing budgeted yet — fill in your limits above</span>
                           </div>
                         </div>
 
                         <div class="mt-4 d-flex align-items-center gap-3">
                             <button class="btn btn-primary" id="saveBudgetsBtn">
-                              <i class="bi bi-check-lg"></i> Save Budgets
+                              <i class="bi bi-check-lg"></i> Save All Settings
                             </button>
                             <span id="budgetSettingsStatus"></span>
                         </div>
