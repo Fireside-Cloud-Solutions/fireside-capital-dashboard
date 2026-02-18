@@ -226,7 +226,7 @@ function renderSafeToSpend(data) {
           </div>
         </div>
         <!-- FC-UIUX-049: data-freshness stamp -->
-        <div class="mt-2 pt-2 border-top border-secondary-subtle">
+        <div class="mt-2 pt-2 border-top ${state === 'danger' ? 'border-white border-opacity-25' : 'border-secondary-subtle'}">
           <small id="safeToSpendUpdated" class="${state === 'danger' ? 'opacity-75' : 'text-muted'} fst-italic">
             ${opsLastRefreshed ? `Updated ${opsFormatTimeAgo(opsLastRefreshed)}` : ''}
           </small>

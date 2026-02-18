@@ -1,5 +1,55 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-18 06:00 EST (Sprint QA 0600 — 6 COMMITS VERIFIED, 3 NEW BUGS FOUND & FIXED, commit 54e8d59)
+
+---
+
+## 🔍 SPRINT QA — SESSION 0600 (Feb 18, 6:00 AM) — 6 COMMITS VERIFIED, 3 BUGS FIXED ✅
+
+**Status:** ✅ **COMMIT 54e8d59 — 3 DANGER-STATE BUGS FIXED**
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)
+**Duration:** ~6 minutes
+**Task:** Verify all commits since last QA check (0500), test live site, find new bugs
+
+### New Commits Verified (Since Last QA Check 0500)
+
+| Commit | Description | Verified |
+|--------|-------------|---------|
+| `9be8122` | FC-UIUX-049: data-freshness timestamps on Operations Dashboard | ✅ |
+| `ca5995a` | docs: Sprint Dev 0517 status update | ✅ |
+| `be73753` | BUG-UIUX-OPS-MOBILE-TOOLBAR-001 + KPI-WRAP-001 + APPJS-CHART-WARN-001 + 3x inline style removals | ✅ |
+| `21d0be9` | BUG-UIUX-OPS-KPI-WRAP-001 refinement — cap display-6 at 1.9rem | ✅ |
+| `3f29d2d` | BUG-UIUX-OPS-UPCOMING-HEADER-MOBILE-001 — hide header on xs | ✅ |
+| `1391506` | BUG-OPS-PAIDOFF-BILLS-001 — filter paid_off/cancelled from opsGetBills() | ✅ |
+
+### Live Site Verification
+
+✅ Operations Dashboard: $16,232.83 Safe to Spend, "Updated just now", "Next 30 days · as of 6:00 AM"
+✅ 30d/60d/90d toolbar stays horizontal, no wrapping
+✅ Bills Aging: 0 urgent / 18 soon ($6,135.21) / 0 upcoming — paid_off filter working (was $6,343.83, ~$208 paid_off bill removed)
+✅ Cash Flow Chart rendering correctly with income/bill events
+✅ Upcoming 14-Day list rendering with running balance
+✅ Dashboard: clean, $577,821.54 net worth, all 9 charts rendering
+✅ "Operations" link in sidebar navigation present and active on ops page
+❌ HTTP 400: settings?select=category_budgets — migration 006 still not run (P1 blocker persists)
+
+### Bugs Found & Fixed (commit `54e8d59`)
+
+| ID | Priority | Description | Fix |
+|----|----------|-------------|-----|
+| BUG-OPS-FRESHNESS-STAMP-DANGER-001 | P3 | `#safeToSpendUpdated` hardcoded `text-muted` class — renders grey/invisible on `bg-danger text-white` card | Changed to `${state === 'danger' ? 'opacity-75' : 'text-muted'}` |
+| BUG-OPS-HR-BORDERCLASS-001 | P3 | `border-white-50` is not a Bootstrap 5 utility (should be `border-white border-opacity-25`) — HR in danger state wouldn't render white | Fixed class names |
+| BUG-OPS-DEAD-CSS-DANGER-001 | P4 | `.safe-to-spend-danger` CSS rule in components.css was dead — `stateClass` never set to this in JS; danger state uses `bg-danger text-white` directly | Removed dead rule, added comment |
+
+### Azure DevOps
+`AZURE_DEVOPS_PAT` not set in environment — unable to query. Work items tracked in BACKLOG.md.
+
+### Production Grade
+
+**Overall: A+** — Operations Dashboard fully functional and clean. All 6 new commits verified. 3 danger-state edge case bugs fixed. Single blocking action: Matt must run migrations 006+007.
+
+---
+
 **Last Updated:** 2026-02-18 05:17 EST (Sprint Dev 0517 — BUG-UIUX-OPS-STYLE-BLOCK-001 + BUG-UIUX-OPS-MOBILE-HEADER-001 + FC-UIUX-049 DONE)
 
 ---

@@ -1532,6 +1532,9 @@ tbody.loading {
 .bills-bucket:hover { background: rgba(255,255,255,0.05); }
 .bills-bucket-list { display: none; padding-top: 4px; }
 .bills-bucket-list.expanded { display: block; }
+/* Rotate chevron on expand (BUG-UIUX-OPS-BUCKET-CHEV-001) */
+.bills-bucket .bi-chevron-down { transition: transform 0.2s ease; }
+.bills-bucket[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); }
 
 /* Upcoming transactions list */
 .upcoming-item { border-left: 3px solid transparent; padding: 8px 12px; }
