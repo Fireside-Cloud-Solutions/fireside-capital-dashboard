@@ -205,7 +205,7 @@ async function renderTransactionsTable(filters = {}) {
       <td>${new Date(t.date).toLocaleDateString()}</td>
       <td>${escapeHtml(t.merchant_name || t.name)}</td>
       <td>
-        <select class="form-select form-select-sm" onchange="updateTransactionCategory('${t.id}', this.value)">
+        <select class="form-select form-select-sm" data-transaction-id="${t.id}">
           ${CATEGORIES.map(cat => `
             <option value="${cat}" ${t.category === cat ? 'selected' : ''}>${cat}</option>
           `).join('')}
@@ -360,6 +360,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       console.log('[Transactions] Initializing page...');
       await renderTransactionsTable();
+
+      // BUG-TRANS-INLINE-001: Event delegation for category select (replaces inline onchange).
+      // Delegated to tbody so it works even after re-renders (filter/pagination).
+      const tbody = document.getElementById('transactionsTableBody');
+      if (tbody) {
+        tbody.addEventListener('change', (e) => {
+          const select = e.target.closest('select[data-transaction-id]');
+          if (select) {
+            updateTransactionCategory(select.dataset.transactionId, select.value);
+          }
+        });
+      }
       console.log('[Transactions] Page initialized successfully');
       
       // Set up pagination event listeners
