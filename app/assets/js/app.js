@@ -812,6 +812,10 @@ async function fetchAllDataFromSupabase(forceRefresh = false) {
       });
 
       debugLog("FETCH: Data fetch successful for all tables.");
+
+      // Notify operations.js (and any other deferred scripts) that app data is ready.
+      // waitForAppData() in operations.js listens for this event.
+      document.dispatchEvent(new CustomEvent('dataLoaded'));
   } catch (error) {
       console.error("Error during data fetch:", error);
       alert("A critical error occurred while fetching your data. Please check the console.");

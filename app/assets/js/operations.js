@@ -468,9 +468,9 @@ function renderBillsAging() {
 
     return `
       <div class="bills-bucket card border mb-2 border-${variant} border-opacity-25"
-           onclick="this.querySelector('.bills-bucket-list').classList.toggle('expanded')"
            role="button"
            aria-expanded="false"
+           data-action="toggle-bucket"
            aria-label="${label} — ${bucketBills.length} bills totalling ${opsFormatCurrency(total)}">
         <div class="card-body py-2 px-3">
           <div class="d-flex justify-content-between align-items-center">
@@ -494,6 +494,17 @@ function renderBillsAging() {
     ${makeBucket(urgent,   'danger',  'Due ≤7 days',   '🔴')}
     ${makeBucket(soon,     'warning', 'Due 8–30 days',  '🟡')}
     ${makeBucket(upcoming, 'success', 'Due 31–60 days', '🟢')}`;
+
+  // Event delegation for toggle — CSP-compliant, no inline onclick
+  // Also updates aria-expanded for screen reader accessibility (BUG-OPS-BILLS-ARIA-001)
+  el.addEventListener('click', (e) => {
+    const bucket = e.target.closest('[data-action="toggle-bucket"]');
+    if (!bucket) return;
+    const list = bucket.querySelector('.bills-bucket-list');
+    if (!list) return;
+    const expanded = list.classList.toggle('expanded');
+    bucket.setAttribute('aria-expanded', expanded);
+  });
 }
 
 // ─── Section 4: Budget vs Actuals ────────────────────────────────────────────
@@ -688,14 +699,19 @@ function updateRealtimeBadge() {
     return;
   }
 
-  const status = (typeof FiresideRealtime.status === 'function')
+  // FiresideRealtime.status() returns an object {isSubscribed, retryCount, channelActive, ...}
+  // NOT a string — check properties directly (BUG-OPS-REALTIME-STATUS-TYPE-001)
+  const statusObj = (typeof FiresideRealtime.status === 'function')
     ? FiresideRealtime.status()
-    : 'unknown';
+    : null;
 
-  if (status === 'connected' || status === 'live' || status === 'open') {
+  if (!statusObj) {
+    badge.className = 'badge bg-secondary ms-2';
+    badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Unavailable';
+  } else if (statusObj.isSubscribed && statusObj.channelActive) {
     badge.className = 'badge bg-success ms-2';
     badge.innerHTML = '<i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Live';
-  } else if (status === 'reconnecting' || status === 'connecting') {
+  } else if (statusObj.retryCount > 0 && statusObj.retryCount < statusObj.maxRetries) {
     badge.className = 'badge bg-warning text-dark ms-2';
     badge.innerHTML = '<i class="bi bi-circle me-1" style="font-size:0.5rem"></i> Reconnecting...';
   } else {
