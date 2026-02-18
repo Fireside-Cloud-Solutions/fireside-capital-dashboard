@@ -29,6 +29,44 @@
   <link rel="stylesheet" href="assets/css/accessibility.css?v=20260217" />
   <link rel="stylesheet" href="assets/css/logged-out-cta.css?v=20260217" />
   <link rel="stylesheet" href="assets/css/critical.css?v=20260217" />
+
+  <style>
+    /* ── Safe to Spend states ───────────────────────────────────── */
+    .safe-to-spend-positive { border-left: 4px solid #81b900; }
+    .safe-to-spend-warning  { border-left: 4px solid #f44e24; }
+    .safe-to-spend-danger   { border-left: 4px solid #dc3545; background: rgba(220,53,69,0.1); }
+
+    /* ── Bills aging buckets ────────────────────────────────────── */
+    .bills-bucket { cursor: pointer; transition: background 0.15s; }
+    .bills-bucket:hover { background: rgba(255,255,255,0.05); }
+    .bills-bucket-list { display: none; padding-top: 4px; }
+    .bills-bucket-list.expanded { display: block; }
+
+    /* ── Upcoming list ──────────────────────────────────────────── */
+    .upcoming-item { border-left: 3px solid transparent; padding: 8px 12px; }
+    .upcoming-item.income  { border-color: #81b900; }
+    .upcoming-item.expense { border-color: #dc3545; }
+    .upcoming-balance { font-variant-numeric: tabular-nums; }
+
+    /* ── Cash flow chart container ──────────────────────────────── */
+    #cashFlowChartContainer { position: relative; height: 280px; }
+
+    /* ── Section label ──────────────────────────────────────────── */
+    .ops-card-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--bs-secondary-color, #adb5bd);
+      margin: 0 0 1rem 0;
+    }
+    .ops-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 <body data-theme="dark">
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -76,8 +114,19 @@
   </div>
 
       <div class="page-header">
-        <h2>Operations Dashboard</h2>
-        <div class="page-header-actions"></div>
+        <h2><i class="bi bi-activity me-2 text-primary"></i> Operations</h2>
+        <div class="page-header-actions">
+          <!-- Cash flow time range toggle -->
+          <div class="btn-group" id="cashFlowToggle" role="group" aria-label="Cash flow time range">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" data-days="30">30d</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-days="60">60d</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-days="90">90d</button>
+          </div>
+          <!-- Realtime connection status -->
+          <span id="realtimeStatus" class="badge bg-secondary ms-2">
+            <i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i> Connecting...
+          </span>
+        </div>
         <div>
           <div id="loggedOutState">
             <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
@@ -157,11 +206,11 @@
               <form id="loginForm" novalidate>
                 <div class="mb-3">
                   <label for="loginEmail" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required autocomplete="username">
+                  <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required autocomplete="username" autocomplete="username">
                 </div>
                 <div class="mb-3">
                   <label for="loginPassword" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password">
+                  <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password" autocomplete="current-password">
                   <div class="mt-2">
                     <a href="#" class="small text-decoration-none" id="forgotPasswordLink">Forgot password?</a>
                   </div>
@@ -186,15 +235,15 @@
               <form id="signupForm" novalidate>
                 <div class="mb-3">
                   <label for="signupEmail" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="signupEmail" placeholder="you@example.com" required autocomplete="username">
+                  <input type="email" class="form-control" id="signupEmail" placeholder="you@example.com" required autocomplete="username" autocomplete="email">
                 </div>
                 <div class="mb-3">
                   <label for="signupPassword" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="signupPassword" minlength="6" required autocomplete="new-password">
+                  <input type="password" class="form-control" id="signupPassword" minlength="6" required autocomplete="new-password" autocomplete="new-password">
                 </div>
                 <div class="mb-3">
                   <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
-                  <input type="password" class="form-control" id="signupConfirmPassword" minlength="6" required autocomplete="new-password">
+                  <input type="password" class="form-control" id="signupConfirmPassword" minlength="6" required autocomplete="new-password" autocomplete="new-password">
                 </div>
                 <div class="d-grid">
                   <button type="submit" class="btn btn-primary" id="signupBtn">Create Account</button>
@@ -216,11 +265,11 @@
               <form id="resetPasswordForm" novalidate>
                 <div class="mb-3">
                   <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
-                  <input type="password" class="form-control" id="newPassword" minlength="6" required>
+                  <input type="password" class="form-control" id="newPassword" minlength="6" required autocomplete="new-password">
                 </div>
                 <div class="mb-3">
                   <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-                  <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required>
+                  <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required autocomplete="new-password">
                 </div>
                 <div class="d-flex gap-2">
                   <button type="submit" class="btn btn-primary" id="resetPasswordBtn">Update Password</button>
