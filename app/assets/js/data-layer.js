@@ -61,7 +61,7 @@ const DataLayer = {
     return await sb.from('bills')
       .select('*')
       .eq('user_id', user.id)
-      .order('due_day', { ascending: true });
+      .order('nextDueDate', { ascending: true });
   },
 
   async getDebts() {

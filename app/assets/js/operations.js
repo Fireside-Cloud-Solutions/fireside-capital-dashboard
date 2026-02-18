@@ -70,9 +70,15 @@ function opsTickTimestamps() {
 
 /**
  * Get the day-of-month a bill is due.
- * Real data uses `due_date` (integer); DEMO_DATA uses `due_day`.
+ * Live DB bills use `nextDueDate` (ISO date string) — extract day-of-month.
+ * DEMO_DATA uses `due_day` integer. `due_date` integer is a legacy fallback.
+ * BUG-OPS-BILL-DUEDAY-001
  */
 function getBillDueDay(bill) {
+  if (bill.nextDueDate) {
+    const d = new Date(bill.nextDueDate + 'T00:00:00');
+    if (!isNaN(d.getTime())) return d.getDate();
+  }
   return parseInt(bill.due_date || bill.due_day || 1, 10);
 }
 
@@ -116,18 +122,41 @@ function opsGetIncome() {
 
 /**
  * How many days until a bill is due next.
- * Uses the due_date day-of-month, checks this month then next month.
+ * Prefers nextDueDate (full ISO date) for live data; falls back to day-of-month for DEMO_DATA.
+ * BUG-OPS-BILL-DUEDAY-001 — was defaulting to day 1 for all live bills.
  */
 function daysUntilBillDue(bill) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // Live data path: nextDueDate is an ISO date string ('YYYY-MM-DD')
+  if (bill.nextDueDate) {
+    const dueDate = new Date(bill.nextDueDate + 'T00:00:00');
+    if (!isNaN(dueDate.getTime())) {
+      let days = Math.round((dueDate - today) / 864e5);
+      if (days >= 0) return days;
+      // nextDueDate is stale (payment was made, field not yet updated) — roll forward
+      const freq = (bill.frequency || 'monthly').toLowerCase();
+      const rolled = new Date(dueDate);
+      if (freq === 'annually') {
+        while (rolled < today) rolled.setFullYear(rolled.getFullYear() + 1);
+      } else if (freq === 'weekly') {
+        while (rolled < today) rolled.setDate(rolled.getDate() + 7);
+      } else if (freq === 'bi-weekly') {
+        while (rolled < today) rolled.setDate(rolled.getDate() + 14);
+      } else {
+        // monthly (default)
+        while (rolled < today) rolled.setMonth(rolled.getMonth() + 1);
+      }
+      return Math.round((rolled - today) / 864e5);
+    }
+  }
+
+  // DEMO_DATA fallback: reconstruct from day-of-month integer
   const dueDay = getBillDueDay(bill);
   const thisMonthDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
   let daysUntil = Math.round((thisMonthDue - today) / 864e5);
-
   if (daysUntil < 0) {
-    // Due date this month has already passed — look at next month
     const nextMonthDue = new Date(today.getFullYear(), today.getMonth() + 1, dueDay);
     daysUntil = Math.round((nextMonthDue - today) / 864e5);
   }

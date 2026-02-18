@@ -585,10 +585,12 @@ async function login(email, password) {
       return;
     }
 
-    // Record successful login
+    // Record successful login — onLogin() is NOT called here to avoid double-firing.
+    // onAuthStateChange(SIGNED_IN) in init() already calls sessionSecurity.onLogin().
+    // BUG-SESSION-DOUBLE-FIRE-001 fix: single source of truth for session start.
     if (sessionSecurity) {
       sessionSecurity.recordLoginAttempt(true, email);
-      sessionSecurity.onLogin();
+      // DO NOT call sessionSecurity.onLogin() here — onAuthStateChange(SIGNED_IN) handles it
     }
 
     showAuthAlert('loginAlert', '✅ Login successful!', 'success');
@@ -3637,9 +3639,13 @@ async function updateDashboardCards() {
     const income = window.income || [];
     
     const totalAssets = assets.reduce((sum, a) => sum + (getRaw(a.value) || 0), 0);
+    // BUG-DASHBOARD-NETWORTH-OVERSTATEMENT-001: Asset loans (mortgage, car loans) are stored
+    // in assets.loan and must be subtracted from net worth. Previously only debts table was
+    // subtracted, causing net worth to be overstated by the sum of all asset loans.
+    const totalAssetLoans = assets.reduce((sum, a) => sum + (getRaw(a.loan) || 0), 0);
     const totalInvestments = investments.reduce((sum, i) => sum + (getRaw(i.value) || 0), 0);
     const totalDebts = debts.reduce((sum, d) => sum + (getRaw(d.amount) || 0), 0);
-    const netWorth = (totalAssets + totalInvestments) - totalDebts;
+    const netWorth = (totalAssets + totalInvestments) - (totalDebts + totalAssetLoans);
 
     // Calculate monthly bills total (accounting for frequency and shared bills)
     const monthlyBills = bills.reduce((sum, bill) => {
