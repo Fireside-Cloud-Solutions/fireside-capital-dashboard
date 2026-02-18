@@ -1599,3 +1599,9 @@ tbody.loading {
 .upcoming-header-row {
   font-size: 0.78rem;
 }
+/* Hide upcoming column headers on xs: "Amount · Running Balance" wraps at 375px (BUG-UIUX-OPS-UPCOMING-HEADER-MOBILE-001) */
+@media (max-width: 575px) {
+  .upcoming-header-row {
+    display: none;
+  }
+}
