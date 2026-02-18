@@ -1516,3 +1516,50 @@ tbody.loading {
   font-size: var(--text-h5);
   text-transform: none;
 }
+
+/* =================================================================
+   OPERATIONS DASHBOARD — BUG-UIUX-OPS-STYLE-BLOCK-001
+   Moved from inline <style> block in operations.html
+   ================================================================= */
+
+/* Safe to Spend states */
+.safe-to-spend-positive { border-left: 4px solid #81b900; }
+.safe-to-spend-warning  { border-left: 4px solid #f44e24; }
+.safe-to-spend-danger   { border-left: 4px solid #dc3545; background: rgba(220,53,69,0.1); }
+
+/* Bills aging buckets */
+.bills-bucket { cursor: pointer; transition: background 0.15s; }
+.bills-bucket:hover { background: rgba(255,255,255,0.05); }
+.bills-bucket-list { display: none; padding-top: 4px; }
+.bills-bucket-list.expanded { display: block; }
+
+/* Upcoming transactions list */
+.upcoming-item { border-left: 3px solid transparent; padding: 8px 12px; }
+.upcoming-item.income  { border-color: #81b900; }
+.upcoming-item.expense { border-color: #dc3545; }
+.upcoming-balance { font-variant-numeric: tabular-nums; }
+
+/* Cash flow chart container */
+#cashFlowChartContainer { position: relative; height: 280px; }
+
+/* Section label */
+.ops-card-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color, #adb5bd);
+  margin: 0 0 1rem 0;
+}
+.ops-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Ops toolbar — BUG-UIUX-OPS-MOBILE-HEADER-001 */
+/* Keeps page-header to 2 cols (title + auth); toolbar lives in content area */
+.ops-toolbar {
+  flex-wrap: wrap;
+}
