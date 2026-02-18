@@ -1576,10 +1576,13 @@ tbody.loading {
 }
 
 /* Safe to Spend KPI: responsive amount sizing (BUG-UIUX-OPS-KPI-WRAP-001) */
-/* display-6 (2.5rem) wraps on col-md-4 narrow cards at desktop breakpoints */
+/* display-6 (2.5rem) wraps/overflows on col-md-4 narrow cards (~240px).    */
+/* Cap at 1.9rem so $16,232.83 stays on one line at all desktop breakpoints. */
 #safeToSpend .display-6 {
-  font-size: clamp(1.4rem, 3.5vw, 2.5rem);
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Safe to Spend warning state: amber value (BUG-UIUX-OPS-INLINE-005) */
