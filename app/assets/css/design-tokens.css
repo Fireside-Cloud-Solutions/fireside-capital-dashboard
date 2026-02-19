@@ -95,6 +95,22 @@
   --color-info-bg: rgba(1, 164, 239, 0.12);
 
   /* -----------------------------------------------------------------
+     COLORS — Financial Semantic
+     Used for positive/negative value display throughout the dashboard
+     ----------------------------------------------------------------- */
+  --color-financial-positive: #81b900;              /* Gains, income, positive delta */
+  --color-financial-positive-bg: rgba(129, 185, 0, 0.12);
+  --color-financial-positive-text: #a3d400;         /* Lighter green for dark bg text */
+  --color-financial-negative: #e53e3e;              /* Losses, expenses, negative delta */
+  --color-financial-negative-bg: rgba(229, 62, 62, 0.12);
+  --color-financial-negative-text: #fc8181;         /* Lighter red for dark bg text */
+  --color-financial-neutral: #01a4ef;               /* Neutral/informational values */
+  --color-financial-neutral-bg: rgba(1, 164, 239, 0.12);
+  --color-financial-neutral-text: #63b3ed;          /* Lighter blue for dark bg text */
+  --color-financial-warning: #f6ad55;               /* Approaching limit warnings */
+  --color-financial-warning-bg: rgba(246, 173, 85, 0.12);
+
+  /* -----------------------------------------------------------------
      COLORS — Overlay & Scrim
      ----------------------------------------------------------------- */
   --color-overlay: rgba(15, 15, 15, 0.80);
@@ -289,6 +305,23 @@
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --focus-ring: var(--focus-ring-width) solid var(--focus-ring-color);
+
+  /* -----------------------------------------------------------------
+     COLORS — Financial Semantic
+     Positive/negative/neutral value display throughout the dashboard.
+     Text variants are tuned for dark-on-dark readability.
+     ----------------------------------------------------------------- */
+  --color-financial-positive:       #81b900;               /* Gains, income, positive deltas */
+  --color-financial-positive-bg:    rgba(129, 185, 0, 0.12);
+  --color-financial-positive-text:  #a3d400;               /* Lighter green for dark bg text */
+  --color-financial-negative:       #e53e3e;               /* Losses, expenses, negative deltas */
+  --color-financial-negative-bg:    rgba(229, 62, 62, 0.12);
+  --color-financial-negative-text:  #fc8181;               /* Lighter red for dark bg text */
+  --color-financial-neutral:        #01a4ef;               /* Neutral / informational values */
+  --color-financial-neutral-bg:     rgba(1, 164, 239, 0.12);
+  --color-financial-neutral-text:   #63b3ed;               /* Lighter blue for dark bg text */
+  --color-financial-warning:        #f6ad55;               /* Approaching limit warnings */
+  --color-financial-warning-bg:     rgba(246, 173, 85, 0.12);
 }
 
 /* ===================================================================
@@ -321,4 +354,134 @@
     --duration-slower: 0ms;
     --duration-entrance: 0ms;
   }
+}
+
+/* ===================================================================
+   LIGHT MODE — CSS Variable Overrides
+   Activated by Bootstrap's data-bs-theme="light" on <html>
+   =================================================================== */
+[data-bs-theme="light"] {
+  /* Backgrounds */
+  --color-bg-1: #f4f6f9;           /* Page base — soft off-white */
+  --color-bg-2: #ffffff;           /* Elevated surface — pure white cards */
+  --color-bg-3: #eef1f5;           /* Active surface — inputs, hover */
+  --color-bg-1-rgb: 244, 246, 249;
+  --color-bg-2-rgb: 255, 255, 255;
+  --color-bg-3-rgb: 238, 241, 245;
+  --color-bg-editorial: #f8f9fb;
+
+  /* Text */
+  --color-text-primary: #1a1e27;   /* Main content */
+  --color-text-secondary: #4a5568; /* Supporting */
+  --color-text-tertiary: #718096;  /* Captions, metadata */
+  --color-text-on-brand: #ffffff;  /* Text ON colored buttons */
+
+  /* Borders */
+  --color-border-subtle: #e2e8f0;
+  --color-border-default: #cbd5e1;
+  --color-border-strong: #94a3b8;
+
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.50);
+  --color-overlay-light: rgba(0, 0, 0, 0.30);
+
+  /* Adjusted brand for light backgrounds */
+  --color-primary-hover: #e04420;  /* Slightly darker orange on light */
+  --color-primary-light: rgba(244, 78, 36, 0.10);
+  --color-secondary-light: rgba(1, 164, 239, 0.10);
+  --color-accent-light: rgba(129, 185, 0, 0.10);
+  --color-tertiary-light: rgba(74, 74, 74, 0.10);
+
+  /* Semantic — adjusted bg tints for light mode */
+  --color-success-bg: rgba(129, 185, 0, 0.10);
+  --color-warning-bg: rgba(255, 193, 7, 0.15);
+  --color-danger-bg: rgba(220, 53, 69, 0.10);
+  --color-error-bg: rgba(220, 53, 69, 0.10);
+  --color-info-bg: rgba(1, 164, 239, 0.10);
+
+  /* Financial semantic — adjusted for light backgrounds */
+  --color-financial-positive-text: #4a7c00;  /* Darker green on light bg */
+  --color-financial-negative-text: #c53030;  /* Darker red on light bg */
+  --color-financial-neutral-text: #0073a8;   /* Darker blue on light bg */
+  --color-financial-warning: #d69e2e;
+
+  /* Shadows — lighter for bright mode */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.08), 0 8px 10px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-floating: 0 12px 28px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ===================================================================
+   BOOTSTRAP DARK MODE — Brand Overrides
+   Ensures Bootstrap components use Fireside brand colors in dark mode
+   =================================================================== */
+[data-bs-theme="dark"] {
+  --bs-body-bg:                    var(--color-bg-1);
+  --bs-body-color:                 var(--color-text-primary);
+  --bs-secondary-color:            var(--color-text-secondary);
+  --bs-tertiary-color:             var(--color-text-tertiary);
+  --bs-border-color:               var(--color-border-default);
+  --bs-border-color-translucent:   rgba(255, 255, 255, 0.10);
+  --bs-card-bg:                    var(--color-bg-2);
+  --bs-card-border-color:          var(--color-border-subtle);
+  --bs-modal-bg:                   var(--color-bg-2);
+  --bs-modal-border-color:         var(--color-border-default);
+  --bs-dropdown-bg:                var(--color-bg-2);
+  --bs-dropdown-border-color:      var(--color-border-default);
+  --bs-dropdown-link-color:        var(--color-text-primary);
+  --bs-dropdown-link-hover-bg:     var(--color-bg-3);
+  --bs-input-bg:                   var(--color-bg-3);
+  --bs-input-border-color:         var(--color-border-default);
+  --bs-input-color:                var(--color-text-primary);
+  --bs-table-bg:                   var(--color-bg-2);
+  --bs-table-striped-bg:           var(--color-bg-3);
+  --bs-table-border-color:         var(--color-border-subtle);
+  --bs-table-color:                var(--color-text-primary);
+  --bs-link-color:                 var(--color-secondary);
+  --bs-link-hover-color:           var(--color-secondary-hover);
+  --bs-success:                    var(--color-success);
+  --bs-danger:                     var(--color-danger);
+  --bs-warning:                    var(--color-warning);
+  --bs-info:                       var(--color-info);
+  --bs-primary:                    var(--color-primary);
+  --bs-secondary:                  var(--color-secondary);
+}
+
+/* ===================================================================
+   BOOTSTRAP LIGHT MODE — Brand Overrides
+   =================================================================== */
+[data-bs-theme="light"] {
+  --bs-body-bg:                    var(--color-bg-1);
+  --bs-body-color:                 var(--color-text-primary);
+  --bs-secondary-color:            var(--color-text-secondary);
+  --bs-tertiary-color:             var(--color-text-tertiary);
+  --bs-border-color:               var(--color-border-default);
+  --bs-border-color-translucent:   rgba(0, 0, 0, 0.10);
+  --bs-card-bg:                    var(--color-bg-2);
+  --bs-card-border-color:          var(--color-border-subtle);
+  --bs-modal-bg:                   var(--color-bg-2);
+  --bs-modal-border-color:         var(--color-border-default);
+  --bs-dropdown-bg:                var(--color-bg-2);
+  --bs-dropdown-border-color:      var(--color-border-default);
+  --bs-dropdown-link-color:        var(--color-text-primary);
+  --bs-dropdown-link-hover-bg:     var(--color-bg-3);
+  --bs-input-bg:                   var(--color-bg-2);
+  --bs-input-border-color:         var(--color-border-default);
+  --bs-input-color:                var(--color-text-primary);
+  --bs-table-bg:                   var(--color-bg-2);
+  --bs-table-striped-bg:           var(--color-bg-3);
+  --bs-table-border-color:         var(--color-border-subtle);
+  --bs-table-color:                var(--color-text-primary);
+  --bs-link-color:                 var(--color-secondary);
+  --bs-link-hover-color:           var(--color-secondary-hover);
+  --bs-success:                    var(--color-success);
+  --bs-danger:                     var(--color-danger);
+  --bs-warning:                    var(--color-warning);
+  --bs-info:                       var(--color-info);
+  --bs-primary:                    var(--color-primary);
+  --bs-secondary:                  var(--color-secondary);
 }

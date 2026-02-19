@@ -298,24 +298,38 @@
    */
   const THEME_PALETTES = {
     dark: {
-      textPrimary:    '#e9ecef',
-      textSecondary:  '#adb5bd',
-      textTertiary:   '#6c757d',
-      gridColor:      'rgba(255, 255, 255, 0.08)',
-      borderColor:    'rgba(255, 255, 255, 0.12)',
-      tooltipBg:      'rgba(33, 37, 41, 0.97)',
-      tooltipTitle:   '#ffffff',
-      tooltipBody:    '#ced4da',
+      textPrimary:     '#f0f0f0',              // --color-text-primary dark
+      textSecondary:   '#b0b0b0',              // --color-text-secondary dark
+      textTertiary:    '#999999',              // --color-text-tertiary dark
+      gridColor:       'rgba(255, 255, 255, 0.06)',
+      borderColor:     'rgba(255, 255, 255, 0.10)',
+      tooltipBg:       'rgba(26, 26, 26, 0.97)', // --color-bg-2 dark
+      tooltipTitle:    '#f0f0f0',
+      tooltipBody:     '#b0b0b0',
+      // Financial data series colors
+      positive:        '#a3d400',              // --color-financial-positive-text dark
+      negative:        '#fc8181',              // --color-financial-negative-text dark
+      neutral:         '#63b3ed',              // --color-financial-neutral-text dark
+      primarySeries:   '#01a4ef',              // Brand blue — net worth line
+      secondarySeries: '#f44e24',              // Brand orange — expenses
+      tertiarySeries:  '#81b900',              // Brand green — income
     },
     light: {
-      textPrimary:    '#212529',
-      textSecondary:  '#495057',
-      textTertiary:   '#6c757d',
-      gridColor:      'rgba(0, 0, 0, 0.07)',
-      borderColor:    'rgba(0, 0, 0, 0.12)',
-      tooltipBg:      'rgba(255, 255, 255, 0.97)',
-      tooltipTitle:   '#212529',
-      tooltipBody:    '#495057',
+      textPrimary:     '#1a1e27',              // --color-text-primary light
+      textSecondary:   '#4a5568',              // --color-text-secondary light
+      textTertiary:    '#718096',              // --color-text-tertiary light
+      gridColor:       'rgba(0, 0, 0, 0.06)',
+      borderColor:     'rgba(0, 0, 0, 0.10)',
+      tooltipBg:       'rgba(255, 255, 255, 0.97)',
+      tooltipTitle:    '#1a1e27',
+      tooltipBody:     '#4a5568',
+      // Financial data series colors
+      positive:        '#4a7c00',              // --color-financial-positive-text light
+      negative:        '#c53030',              // --color-financial-negative-text light
+      neutral:         '#0073a8',              // --color-financial-neutral-text light
+      primarySeries:   '#0190d4',              // Brand blue — slightly deeper for light bg
+      secondarySeries: '#e04420',              // Brand orange — slightly deeper for light bg
+      tertiarySeries:  '#6aa300',              // Brand green — slightly deeper for light bg
     }
   };
 
