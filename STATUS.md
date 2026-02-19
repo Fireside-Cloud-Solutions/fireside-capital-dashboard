@@ -1,6 +1,29 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 06:35 EST (Sprint Dev 0635 — FC-094 DONE, commit a928d89)
+**Last Updated:** 2026-02-19 06:55 EST (Sprint Dev 0655 — FC-087 IN PROGRESS via builder-fc087-chart-skeletons)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0655 (Feb 19, 6:55 AM) — FC-087 CHART SKELETONS 🔄
+
+**Status:** 🔄 **IN PROGRESS — Builder sub-agent running**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Work In Progress
+
+| Item | Status | Notes |
+|------|--------|-------|
+| FC-087 | 🔄 Running | Content-aware chart skeleton loaders — builder-fc087-chart-skeletons spawned |
+
+### FC-087 Plan
+
+Add CSS modifier classes + CSS rules to make chart skeletons visually match their chart type:
+- `.chart-skeleton--line` → rising area silhouette (net worth, savings rate, investment growth)
+- `.chart-skeleton--bar` → vertical bar columns (cash flow, net worth delta)
+- `.chart-skeleton--doughnut` → centered ring (spending categories, DTI gauge)
+- `.chart-skeleton--pie` → filled circle (asset allocation)
+
+Files: `app/assets/css/components.css`, `app/index.html`, `app/reports.html`
 
 ---
 

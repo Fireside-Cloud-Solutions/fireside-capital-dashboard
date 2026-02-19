@@ -1202,6 +1202,114 @@ body[data-theme="light"] .card.loading::after {
   opacity: 0.15; /* FC-UIUX-009: Reduced from 0.3 for less distracting loading states (matches Linear 0.1, Stripe 0.15 patterns) */
 }
 
+/* ── CONTENT-AWARE CHART SKELETONS (FC-087) ──────────────────────────────── */
+
+/* BAR CHART SKELETON: vertical columns at varying heights */
+.chart-skeleton--bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to top, var(--color-bg-3) 65%, transparent 65%),
+    linear-gradient(to top, var(--color-bg-3) 45%, transparent 45%),
+    linear-gradient(to top, var(--color-bg-3) 80%, transparent 80%),
+    linear-gradient(to top, var(--color-bg-3) 55%, transparent 55%),
+    linear-gradient(to top, var(--color-bg-3) 70%, transparent 70%),
+    linear-gradient(to top, var(--color-bg-3) 40%, transparent 40%),
+    linear-gradient(to top, var(--color-bg-3) 60%, transparent 60%),
+    linear-gradient(to top, var(--color-bg-3) 75%, transparent 75%),
+    linear-gradient(to top, var(--color-bg-3) 50%, transparent 50%),
+    linear-gradient(to top, var(--color-bg-3) 85%, transparent 85%),
+    linear-gradient(to top, var(--color-bg-3) 45%, transparent 45%),
+    linear-gradient(to top, var(--color-bg-3) 65%, transparent 65%);
+  background-size: calc(100% / 12) 100%;
+  background-position:
+    calc(0 * 100% / 11) 100%, calc(1 * 100% / 11) 100%, calc(2 * 100% / 11) 100%,
+    calc(3 * 100% / 11) 100%, calc(4 * 100% / 11) 100%, calc(5 * 100% / 11) 100%,
+    calc(6 * 100% / 11) 100%, calc(7 * 100% / 11) 100%, calc(8 * 100% / 11) 100%,
+    calc(9 * 100% / 11) 100%, calc(10 * 100% / 11) 100%, calc(11 * 100% / 11) 100%;
+  background-repeat: no-repeat;
+  opacity: 0.35;
+  margin: 10% 5% 8%;
+  border-radius: 4px;
+}
+
+/* LINE CHART SKELETON: rising jagged silhouette */
+.chart-skeleton--line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(
+    0% 100%,
+    0% 70%,
+    8% 65%,
+    16% 55%,
+    24% 60%,
+    32% 45%,
+    40% 50%,
+    48% 35%,
+    56% 40%,
+    64% 25%,
+    72% 30%,
+    80% 20%,
+    88% 25%,
+    100% 15%,
+    100% 100%
+  );
+  background: var(--color-bg-3);
+  opacity: 0.3;
+  margin: 5% 5% 8%;
+  border-radius: 0 0 4px 4px;
+}
+
+/* DOUGHNUT SKELETON: centered ring */
+.chart-skeleton--doughnut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  animation: none;
+}
+
+.chart-skeleton--doughnut::before {
+  display: none; /* Remove grid lines on circular skeletons */
+}
+
+.chart-skeleton--doughnut::after {
+  content: '';
+  width: min(55%, 160px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 28px solid var(--color-bg-3);
+  opacity: 0.5;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* PIE SKELETON: filled circle */
+.chart-skeleton--pie {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  animation: none;
+}
+
+.chart-skeleton--pie::before {
+  display: none;
+}
+
+.chart-skeleton--pie::after {
+  content: '';
+  width: min(55%, 160px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-bg-3);
+  opacity: 0.45;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
 /* Hide actual canvas while skeleton is showing */
 .loading .chart-wrapper canvas {
   display: none;
