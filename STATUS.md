@@ -1,6 +1,59 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 05:15 EST (Sprint Dev 0515 — BUG-MOB-BILLS-FREQ-001 FIXED, MOB-013 DELEGATED TO BUILDER)
+**Last Updated:** 2026-02-19 05:35 EST (Sprint Dev 0535 — MOB-013 VERIFIED ✅, MOB-014 COMPLETE, 3 BUGS FIXED)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0535 (Feb 19, 5:35 AM) — MOB-014 CHART UPGRADE + 3 BUGS ✅
+
+**Status:** ✅ **COMMITS 8f17725 + 3416476 + b9cbca3 — MOB-014 + CLEANUP SHIPPED**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~5 minutes
+
+### Work Done
+
+| Item | Status | Commit | Notes |
+|------|--------|--------|-------|
+| MOB-013 CRUD screens | ✅ Verified complete | f768040 + b9963c3 | Done in prior session |
+| MOB-014 Chart upgrade | ✅ Done | 8f17725 | Builder agent |
+| BUG-MOB-CHARTKIT-CLEANUP-001 | ✅ Fixed | 3416476 | Removed chart-kit from package.json |
+| BUG-MOB-DARKMODE-LEGACY-THEME-001 | ✅ Fixed | b9cbca3 | LoginScreen input was white in dark app |
+| BUG-BOOTSTRAP-MODAL-NEW-001 | ✅ Verified resolved | — | Already correct in app.js/onboarding.js |
+| FC-156 Supabase preconnect | ✅ Verified complete | — | All 12 pages already had it |
+
+### MOB-014 Details (commit 8f17725)
+
+| Change | Detail |
+|--------|--------|
+| Library | `react-native-chart-kit` → `react-native-gifted-charts` |
+| LineChart | Area chart with Fireside blue (`#01a4ef`), curved, grid lines, empty state fallback |
+| PieChart | Donut with center label showing net cash flow (green/red), custom legend below |
+| Theme | Migrated from legacy `theme.*` compat to new `colors`/`spacing`/`radius`/`typography` tokens |
+| Dark mode | Card backgrounds now `#1a1a1a` (was white `#ffffff` — light mode artifact) |
+
+### #qa / #ui-ux / #research Channel Status
+No new bugs since Feb 18. All 3 dev channels clean.
+
+### Open Mobile Tasks
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| MOB-016 | P3 | 1h | Demo mode for mobile |
+
+### Open Web Tasks (P2, Ready)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-086 | P2 | S | Add MoM deltas to stat cards |
+| FC-087 | P2 | M | Skeleton loaders for all charts |
+| FC-094 | P2 | S | Pre-parse chart data timestamps |
+| FC-095 | P2 | M | createOptimizedChart() factory |
+| FC-100 | P2 | M | Bootstrap 5.3 color mode toggle |
+| FC-134 | P2 | XS | Bug: Transactions filter mobile layout |
+| FC-137 | P2 | S | Skeleton loaders Debts page |
+| FC-138 | P2 | XS | Empty state HTML Debts page |
+| FC-140 | P2 | S | Skeleton loaders Income page |
+| FC-141 | P2 | XS | Empty state HTML Income page |
 
 ---
 
