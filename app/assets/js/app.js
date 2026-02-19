@@ -1683,7 +1683,7 @@ function renderBills() {
       const dueTxt = daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `${daysUntil}d`;
       nextDueAmountEl.textContent = formatCurrency(next.amount);
       nextDueAmountEl.style.color = daysUntil <= 3 ? 'var(--color-danger)' : daysUntil <= 7 ? 'var(--color-warning)' : '';
-      nextDueNameEl.textContent = `${escapeHtml(next.name)} · ${dueTxt}`;
+      nextDueNameEl.textContent = `${next.name} · ${dueTxt}`;
     } else {
       nextDueAmountEl.textContent = '—';
       nextDueNameEl.textContent = 'No upcoming bills';
