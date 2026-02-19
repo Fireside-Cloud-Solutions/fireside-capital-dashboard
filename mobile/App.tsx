@@ -1,13 +1,106 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, ActivityIndicator, StyleSheet, AppState, Platform } from 'react-native';
+import type { AppStateStatus } from 'react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { onlineManager, focusManager } from '@tanstack/react-query';
+import NetInfo from '@react-native-community/netinfo';
+import { Ionicons } from '@expo/vector-icons';
+
 import { supabase } from './src/services/supabase';
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
-import { theme } from './src/styles/theme';
+import AssetsScreen from './src/screens/AssetsScreen';
+import BillsScreen from './src/screens/BillsScreen';
+import BudgetScreen from './src/screens/BudgetScreen';
+import MoreScreen from './src/screens/MoreScreen';
+import { colors } from './src/styles/theme';
+
+// ─── TanStack Query online detection (mobile loses connection) ────────
+onlineManager.setEventListener((setOnline) => {
+  return NetInfo.addEventListener((state) => {
+    setOnline(!!state.isConnected);
+  });
+});
+
+// ─── Focus detection (refresh stale queries on app foreground) ────────
+function onAppStateChange(status: AppStateStatus) {
+  if (Platform.OS !== 'web') {
+    focusManager.setFocused(status === 'active');
+  }
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 2,
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
+    },
+  },
+});
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const darkNavTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: colors.primary,
+    background: colors.background,
+    card: colors.backgroundCard,
+    text: colors.text,
+    border: colors.border,
+    notification: colors.cta,
+  },
+};
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: colors.backgroundCard,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          paddingBottom: 4,
+          height: 60,
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '500' as const },
+        tabBarIcon: ({ focused, color, size }) => {
+          const iconMap: Record<string, [string, string]> = {
+            Dashboard: ['speedometer', 'speedometer-outline'],
+            Assets: ['home', 'home-outline'],
+            Bills: ['receipt', 'receipt-outline'],
+            Budget: ['pie-chart', 'pie-chart-outline'],
+            More: ['ellipsis-horizontal-circle', 'ellipsis-horizontal-circle-outline'],
+          };
+          const [active, inactive] = iconMap[route.name] ?? ['apps', 'apps-outline'];
+          return (
+            <Ionicons
+              name={(focused ? active : inactive) as any}
+              size={22}
+              color={color}
+            />
+          );
+        },
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Assets" component={AssetsScreen} />
+      <Tab.Screen name="Bills" component={BillsScreen} />
+      <Tab.Screen name="Budget" component={BudgetScreen} />
+      <Tab.Screen name="More" component={MoreScreen} />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,16 +109,16 @@ export default function App() {
   useEffect(() => {
     checkSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth event:', event);
-        setIsAuthenticated(!!session);
-        setIsLoading(false);
-      }
-    );
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    });
+
+    const appStateSub = AppState.addEventListener('change', onAppStateChange);
 
     return () => {
       authListener?.subscription.unsubscribe();
+      appStateSub.remove();
     };
   }, []);
 
@@ -33,8 +126,7 @@ export default function App() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
-    } catch (error) {
-      console.error('Error checking session:', error);
+    } catch {
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
@@ -44,25 +136,23 @@ export default function App() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.colors.background },
-          animation: 'slide_from_right',
-        }}
-        initialRouteName={isAuthenticated ? 'Dashboard' : 'Login'}
-      >
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer theme={darkNavTheme}>
+        <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+          {isAuthenticated ? (
+            <Stack.Screen name="Main" component={MainTabs} />
+          ) : (
+            <Stack.Screen name="Login" component={LoginScreen} />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
 
@@ -71,6 +161,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
 });
