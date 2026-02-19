@@ -1,29 +1,75 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 06:55 EST (Sprint Dev 0655 — FC-087 IN PROGRESS via builder-fc087-chart-skeletons)
+**Last Updated:** 2026-02-19 07:15 EST (Sprint Dev 0715 — FC-100/101/104 IN PROGRESS, FC-176 CLOSED)
 
 ---
 
-## 🔧 SPRINT DEV — SESSION 0655 (Feb 19, 6:55 AM) — FC-087 CHART SKELETONS 🔄
+## 🔧 SPRINT DEV — SESSION 0715 (Feb 19, 7:15 AM) — FC-100/101/104 DARK MODE TOGGLE 🔄
 
-**Status:** 🔄 **IN PROGRESS — Builder sub-agent running**
+**Status:** 🔄 **BUILDER RUNNING** — `builder-fc100-dark-mode-toggle`
 **Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
 
-### Work In Progress
+### Situation Assessment
 
-| Item | Status | Notes |
-|------|--------|-------|
-| FC-087 | 🔄 Running | Content-aware chart skeleton loaders — builder-fc087-chart-skeletons spawned |
+| Check | Result |
+|-------|--------|
+| #qa / #ui-ux / #research | ✅ No new bugs since 0655 |
+| FC-176 (Bootstrap wrong attr) | ✅ Already done — all 12 pages have `data-bs-theme="dark"` on `<html>` |
+| Next #dashboard callout | FC-095 + FC-100 |
 
-### FC-087 Plan
+### Work This Session
 
-Add CSS modifier classes + CSS rules to make chart skeletons visually match their chart type:
-- `.chart-skeleton--line` → rising area silhouette (net worth, savings rate, investment growth)
-- `.chart-skeleton--bar` → vertical bar columns (cash flow, net worth delta)
-- `.chart-skeleton--doughnut` → centered ring (spending categories, DTI gauge)
-- `.chart-skeleton--pie` → filled circle (asset allocation)
+**Selected:** FC-100 + FC-101 + FC-104 (Bootstrap dark mode toggle + FOUC prevention)
 
-Files: `app/assets/css/components.css`, `app/index.html`, `app/reports.html`
+| Item | Description | Status |
+|------|-------------|--------|
+| FC-176 | Bootstrap dark mode wrong attribute | ✅ Already done — closed |
+| FC-104 | FOUC prevention inline script in `<head>` of all 12 pages | 🔄 Builder running |
+| FC-101 | `#themeSwitch` sidebar toggle on 10 missing pages | 🔄 Builder running |
+| FC-100 | `setupThemeToggle()` OS preference detection | 🔄 Builder running |
+
+### Next P2 Ready Items (After This Session)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-095 | P2 | M | createOptimizedChart() factory |
+| FC-102 | P2 | M | Custom financial dashboard dark mode color overrides |
+| FC-103 | P2 | M | Chart.js MutationObserver for theme changes |
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0655 (Feb 19, 6:55 AM) — FC-087 CHART SKELETONS ✅
+
+**Status:** ✅ **COMMIT 5402849 — 1 ITEM DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Work Done
+
+| Item | Status | Commit | Notes |
+|------|--------|--------|-------|
+| FC-087 | ✅ Done | 5402849 | Content-aware chart skeleton loaders shipped |
+
+### FC-087 Details
+
+Added 4 CSS modifier classes + applied to 13 skeleton divs across 2 pages:
+
+| Class | Pattern | Charts |
+|-------|---------|--------|
+| `.chart-skeleton--line` | `clip-path` area silhouette (rising from 70% down to 15%) | Net Worth, Savings Rate, Investment Growth (index + reports) |
+| `.chart-skeleton--bar` | 12 vertical bars via `background-image: linear-gradient(to top, …)` | Cash Flow, Net Worth Delta (index + reports monthlyCashFlow) |
+| `.chart-skeleton--doughnut` | Centered ring via `border: 28px solid var(--color-bg-3)` + `border-radius: 50%` | Spending Categories, DTI Gauge |
+| `.chart-skeleton--pie` | Filled circle via `background: var(--color-bg-3)` + `border-radius: 50%` | Asset Allocation |
+
+Emergency Fund Progress skeleton left as plain gray box (it's a progress bar, not a canvas chart).
+CSS version strings updated to `?v=20260219` on both HTML files.
+
+### Next P2 Ready Items
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-095 | P2 | M | createOptimizedChart() factory |
+| FC-100 | P2 | M | Bootstrap 5.3 color mode toggle |
+| FC-101 | P2 | S | Theme toggle button in navbar |
 
 ---
 

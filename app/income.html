@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
+  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Income</title>
   <meta name="description" content="Track your income sources, paychecks, freelance earnings, and revenue streams. Monitor your earnings and income stability over time.">
   
@@ -65,6 +69,12 @@
         <a href="reports.html"><i class="bi bi-graph-up-arrow me-2"></i> Reports</a>
         <a href="#" data-action="open-plaid-link" class="auth-required"><i class="bi bi-bank2 me-2"></i> Connect a New Account</a>
         <a href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a>
+      </div>
+      <div class="theme-toggle">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="themeSwitch" />
+          <label class="form-check-label" for="themeSwitch">Dark Mode</label>
+        </div>
       </div>
     </div>
 

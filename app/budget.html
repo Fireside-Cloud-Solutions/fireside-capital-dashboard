@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+    <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
     <title>Fireside Capital - Budget</title>
     <meta name="description" content="Plan your monthly budget and track spending by category. Set spending limits and monitor your budget progress in real-time.">
     

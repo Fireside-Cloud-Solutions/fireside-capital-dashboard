@@ -4200,34 +4200,27 @@ if (document.getElementById('budgetAssignmentTable')) {
 function setupThemeToggle() {
   const themeSwitch = document.getElementById('themeSwitch');
   const themeSwitchLabel = document.querySelector('label[for="themeSwitch"]');
-  
+
   if (!themeSwitch) return;
-  
+
   // Function to update the label text based on current theme
   function updateThemeLabel() {
-    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || document.body.getAttribute('data-theme') || 'dark';
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
     if (themeSwitchLabel) {
-      if (currentTheme === 'dark') {
-        themeSwitchLabel.innerHTML = '🌙 Dark Mode';
-      } else {
-        themeSwitchLabel.innerHTML = '☀️ Light Mode';
-      }
+      themeSwitchLabel.innerHTML = currentTheme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode';
+    }
+    if (themeSwitch) {
+      themeSwitch.checked = (currentTheme === 'dark');
     }
   }
-  
+
   // Function to set theme
   function setTheme(theme) {
     document.body.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-bs-theme', theme);
     localStorage.setItem('theme', theme);
-    
-    // Update checkbox state to match theme
-    if (themeSwitch) {
-      themeSwitch.checked = (theme === 'dark'); // BUG-THEME-TOGGLE-UX-001: checked=dark (was inverted)
-    }
-    
     updateThemeLabel();
-    
+
     // Refresh charts if they exist to apply new theme colors
     if (typeof renderNetWorthChart === 'function' && document.getElementById('netWorthTimelineChart')) {
       renderNetWorthChart();
@@ -4236,18 +4229,28 @@ function setupThemeToggle() {
       generateMonthlyCashFlowChart();
     }
   }
-  
-  // Load saved theme or default to dark
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  setTheme(savedTheme);
-  
+
+  // Load saved theme, then OS preference, then default dark
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    setTheme(savedTheme);
+  } else {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    setTheme(prefersDark.matches ? 'dark' : 'light');
+  }
+
   // Listen for toggle changes
   themeSwitch.addEventListener('change', function() {
-    const newTheme = this.checked ? 'dark' : 'light'; // BUG-THEME-TOGGLE-UX-001
-    setTheme(newTheme);
+    setTheme(this.checked ? 'dark' : 'light');
   });
-  
-  // Update label on initial load
+
+  // Listen for OS preference changes (only when no saved preference)
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (!localStorage.getItem('theme')) {
+      setTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+
   updateThemeLabel();
 }
 
