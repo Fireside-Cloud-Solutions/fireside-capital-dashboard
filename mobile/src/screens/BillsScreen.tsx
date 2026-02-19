@@ -27,12 +27,17 @@ const getUrgencyLabel = (days: number) => {
 
 export default function BillsScreen() {
   const { data: bills, isLoading } = useBills();
-  const totalMonthly = (bills ?? []).reduce((s, b) => {
-    if (b.frequency === 'monthly') return s + (b.amount ?? 0);
-    if (b.frequency === 'bi-weekly') return s + ((b.amount ?? 0) * 26) / 12;
-    if (b.frequency === 'annually') return s + (b.amount ?? 0) / 12;
-    return s + (b.amount ?? 0);
-  }, 0);
+  const normalizeToMonthly = (amount: number, freq: string | null) => {
+    switch (freq) {
+      case 'monthly': return amount;
+      case 'bi-weekly': return (amount * 26) / 12;
+      case 'weekly': return (amount * 52) / 12;
+      case 'annually': return amount / 12;
+      case 'quarterly': return amount / 3;
+      default: return amount;
+    }
+  };
+  const totalMonthly = (bills ?? []).reduce((s, b) => s + normalizeToMonthly(b.amount ?? 0, b.frequency), 0);
 
   return (
     <View style={styles.container}>
