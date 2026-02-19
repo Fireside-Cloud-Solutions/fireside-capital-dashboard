@@ -167,8 +167,8 @@ function createTooltip(stop, stopIndex) {
     </div>
     <p class="tour-tooltip-description">${escapeHtml(stop.description)}</p>
     <div class="tour-tooltip-actions">
-      ${!isLastStop ? `<button class="btn btn-sm btn-outline-secondary" onclick="skipTour()">Skip Tour</button>` : ''}
-      <button class="btn btn-sm btn-primary" onclick="${isLastStop ? 'finishTour()' : 'nextTourStop()'}">
+      ${!isLastStop ? `<button class="btn btn-sm btn-outline-secondary" data-action="skip-tour">Skip Tour</button>` : ''}
+      <button class="btn btn-sm btn-primary" data-action="${isLastStop ? 'finish-tour' : 'next-tour-stop'}">
         ${isLastStop ? 'Finish Tour' : 'Next'}
       </button>
     </div>
@@ -241,3 +241,15 @@ if (typeof escapeHtml === 'undefined') {
     return div.innerHTML;
   }
 }
+
+// ===== EVENT DELEGATION FOR TOUR BUTTONS (BUG-TOUR-INLINE-001) =====
+// Replaces inline onclick handlers with delegated listeners — CSP compliant
+document.addEventListener('click', function (e) {
+  const action = e.target.closest('[data-action]')?.dataset?.action;
+  if (!action) return;
+  switch (action) {
+    case 'skip-tour':         skipTour();      break;
+    case 'next-tour-stop':    nextTourStop();  break;
+    case 'finish-tour':       finishTour();    break;
+  }
+});
