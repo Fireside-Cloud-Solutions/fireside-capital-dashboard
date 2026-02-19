@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { supabase } from '../services/supabase';
-import { theme } from '../styles/theme';
+import { theme, colors } from '../styles/theme';
 
 export default function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   input: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.backgroundInput, // dark theme: #2a2a2a (was theme.colors.white — light mode artifact)
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.sm,
