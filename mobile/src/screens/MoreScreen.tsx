@@ -7,10 +7,8 @@ import { colors, spacing, typography } from '../styles/theme';
 import { supabase } from '../services/supabase';
 
 type RootStackParamList = {
-  Main: undefined;
   Debts: undefined;
   Income: undefined;
-  Login: undefined;
 };
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
@@ -29,26 +27,9 @@ export default function MoreScreen() {
   };
 
   const items: MoreItem[] = [
-    {
-      icon: 'trending-down-outline',
-      label: 'Debts',
-      onPress: () => navigation.navigate('Debts'),
-    },
-    {
-      icon: 'wallet-outline',
-      label: 'Income',
-      onPress: () => navigation.navigate('Income'),
-    },
-    {
-      icon: 'settings-outline',
-      label: 'Settings',
-      onPress: () => {},
-    },
-    {
-      icon: 'log-out-outline',
-      label: 'Sign Out',
-      onPress: handleLogout,
-    },
+    { icon: 'trending-down-outline', label: 'Debts', onPress: () => navigation.navigate('Debts') },
+    { icon: 'wallet-outline', label: 'Income', onPress: () => navigation.navigate('Income') },
+    { icon: 'log-out-outline', label: 'Sign Out', onPress: handleLogout },
   ];
 
   return (
