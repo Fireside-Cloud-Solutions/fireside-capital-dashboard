@@ -27,7 +27,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "app"           # App source files location
-          api_location: ""              # No API - using Supabase backend
+          api_location: "api"           # FC-207: Azure Functions backend (Plaid, Gmail, webhooks)
           output_location: ""           # Empty for skip_app_build
           skip_app_build: true          # Skip build - deploy static files as-is
           

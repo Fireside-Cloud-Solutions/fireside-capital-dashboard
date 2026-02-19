@@ -17,6 +17,10 @@ memory/credentials.md
 # Temp scripts
 check-deploy.ps1
 
+# Azure Functions local config (contains secrets — never commit)
+api/local.settings.json
+api/node_modules/
+
 # IDE
 .vscode/
 .idea/

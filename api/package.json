@@ -1,0 +1,23 @@
+{
+  "name": "fireside-capital-api",
+  "version": "1.0.0",
+  "description": "Azure Functions API backend for Fireside Capital — Plaid integration, Gmail sync, webhook receivers",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "func start",
+    "build": "echo 'No build step for Node.js functions'",
+    "test": "jest --passWithNoTests"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0",
+    "@supabase/supabase-js": "^2.49.1",
+    "plaid": "^29.0.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
