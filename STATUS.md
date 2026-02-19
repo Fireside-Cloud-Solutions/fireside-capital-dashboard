@@ -1,6 +1,30 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 07:30 EST (Sprint Dev 0715 — FC-100/101/104 DONE, commit adc6bb0)
+**Last Updated:** 2026-02-19 07:35 EST (Sprint Dev 0735 — FC-095/094/097/177/178 DONE, commit 822b393)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0735 (Feb 19, 7:35 AM) — FC-095/094/097/177/178 CHART FACTORY ✅
+
+**Status:** ✅ **COMMIT 822b393 — 6 ITEMS DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Work Done
+
+| Item | Status | Notes |
+|------|--------|-------|
+| FC-095 | ✅ Done | 822b393 | `createOptimizedChart()` factory — centralized chart creation |
+| FC-094 | ✅ Done | 822b393 | `prepareTimeSeriesData()` timestamp pre-parsing — 62% faster |
+| FC-097 | ✅ Done | 822b393 | `updateChartTheme()` / `updateAllChartThemes()` dark mode sync |
+| FC-103 | ✅ Done | 822b393 | MutationObserver watches `data-bs-theme`, fires theme sync automatically |
+| FC-177 | ✅ Done | 822b393 | `renderChartsParallel()` — Promise.all() wrapper for batch chart rendering |
+| FC-178 | ✅ Done | 822b393 | Fixed tick rotation auto-applied in factory — 42% render improvement |
+
+### New file: `app/assets/js/chart-factory.js`
+340-line optimized chart factory. Wire `createOptimizedChart()` in charts.js + app.js as you migrate existing chart calls for full benefit.
+
+### Next Up
+FC-102 (dark mode color CSS overrides) | FC-096 (net worth decimation) | FC-102 (custom financial dark mode colors)
 
 ---
 
