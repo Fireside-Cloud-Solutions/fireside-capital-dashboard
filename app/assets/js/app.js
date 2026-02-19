@@ -1665,6 +1665,31 @@ function renderBills() {
     const card = el.closest('.summary-card');
     if (card) card.classList.remove('loading');
   }
+
+  // FC-UIUX-051: Next Due card — soonest upcoming bill by nextDueDate
+  const nextDueAmountEl = document.getElementById('billsNextDueAmount');
+  const nextDueNameEl = document.getElementById('billsNextDueName');
+  if (nextDueAmountEl && nextDueNameEl) {
+    const now = new Date();
+    const upcoming = activeBills
+      .filter(b => b.nextDueDate)
+      .sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
+    const next = upcoming[0];
+    if (next) {
+      const daysUntil = Math.ceil((new Date(next.nextDueDate).getTime() - now.getTime()) / 86400000);
+      const dueTxt = daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `${daysUntil}d`;
+      nextDueAmountEl.textContent = formatCurrency(next.amount);
+      nextDueAmountEl.style.color = daysUntil <= 3 ? 'var(--color-danger)' : daysUntil <= 7 ? 'var(--color-warning)' : '';
+      nextDueNameEl.textContent = `${escapeHtml(next.name)} · ${dueTxt}`;
+    } else {
+      nextDueAmountEl.textContent = '—';
+      nextDueNameEl.textContent = 'No upcoming bills';
+    }
+    nextDueAmountEl.classList.remove('d-none');
+    nextDueNameEl.classList.remove('d-none');
+    const card = nextDueAmountEl.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
 }
 // Render financing cards on the Debts page (moved from Bills page)
 function renderFinancingCards() {
