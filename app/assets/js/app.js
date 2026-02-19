@@ -3587,11 +3587,11 @@ async function calculateAndDisplayTrends(currentValues) {
   const el = (id) => document.getElementById(id);
   
   if (lastMonthSnapshot) {
-    // Net Worth trend
+    // Net Worth trend — column is camelCase 'netWorth' (matches snapshots table schema)
     if (el('netWorthTrend')) {
       el('netWorthTrend').innerHTML = getTrendHTML(
         currentValues.netWorth,
-        getRaw(lastMonthSnapshot.net_worth),
+        getRaw(lastMonthSnapshot.netWorth),
         false
       );
       el('netWorthTrend').classList.remove('d-none');
@@ -3602,7 +3602,7 @@ async function calculateAndDisplayTrends(currentValues) {
     if (assetsTrendEl) {
       assetsTrendEl.innerHTML = getTrendHTML(
         currentValues.totalAssets,
-        getRaw(lastMonthSnapshot.total_assets),
+        getRaw(lastMonthSnapshot.totalAssets),
         false
       );
       assetsTrendEl.classList.remove('d-none');
@@ -3613,7 +3613,7 @@ async function calculateAndDisplayTrends(currentValues) {
     if (investmentsTrendEl) {
       investmentsTrendEl.innerHTML = getTrendHTML(
         currentValues.totalInvestments,
-        getRaw(lastMonthSnapshot.total_investments),
+        getRaw(lastMonthSnapshot.totalInvestments),
         false
       );
       investmentsTrendEl.classList.remove('d-none');
@@ -3624,7 +3624,7 @@ async function calculateAndDisplayTrends(currentValues) {
     if (debtsTrendEl) {
       debtsTrendEl.innerHTML = getTrendHTML(
         currentValues.totalDebts,
-        getRaw(lastMonthSnapshot.total_debts),
+        getRaw(lastMonthSnapshot.totalDebts),
         true
       );
       debtsTrendEl.classList.remove('d-none');
@@ -3799,10 +3799,19 @@ async function updateDashboardCards() {
       monthlyIncome
     });
 
-    // Save snapshot
+    // Save snapshot — includes all financial totals for MoM trend calculations (FC-086)
     const today = new Date().toISOString().split('T')[0];
     const { error } = await sb.from('snapshots').upsert(
-      { date: today, netWorth, user_id: currentUser.id }, 
+      { 
+        date: today, 
+        netWorth, 
+        totalAssets, 
+        totalInvestments, 
+        totalDebts, 
+        monthlyBills, 
+        monthlyIncome,
+        user_id: currentUser.id 
+      }, 
       { onConflict: 'date,user_id' }
     );
     if (error) console.error("Error saving snapshot:", error);
