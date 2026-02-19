@@ -321,18 +321,39 @@ function buildCashFlowProjection(days = 30) {
     }
   });
 
-  // ── Build bill schedule ────────────────────────────────────────
+  // ── Build bill schedule (BUG-OPS-CASHFLOW-BILL-FREQ-001 fix) ──
+  // Use frequency-aware scheduling: weekly/bi-weekly/annual bills use
+  // nextDueDate as anchor + interval, not a simple day-of-month match.
   bills.forEach(bill => {
-    const dueDay = getBillDueDay(bill);
     const amount = parseFloat(bill.amount) || 0;
     const name   = bill.name || 'Bill';
+    const freq   = (bill.frequency || 'monthly').toLowerCase();
 
-    for (let d = 0; d <= days; d++) {
-      const dt = new Date(today);
-      dt.setDate(today.getDate() + d);
-      if (dt.getDate() === dueDay) {
-        events.push({ day: d, type: 'bill', amount, name });
+    if (bill.nextDueDate) {
+      const anchor = new Date(bill.nextDueDate + 'T00:00:00');
+      if (!isNaN(anchor.getTime())) {
+        if (freq === 'monthly') {
+          const targetDay = anchor.getDate();
+          for (let d = 0; d <= days; d++) {
+            const dt = new Date(today); dt.setDate(today.getDate() + d);
+            if (dt.getDate() === targetDay) events.push({ day: d, type: 'bill', amount, name });
+          }
+        } else {
+          const intervalDays = freq === 'weekly' ? 7 : freq === 'bi-weekly' ? 14 : 365;
+          for (let d = 0; d <= days; d++) {
+            const dt = new Date(today); dt.setDate(today.getDate() + d);
+            const diff = Math.round((dt - anchor) / 864e5);
+            if (diff >= 0 && diff % intervalDays === 0) events.push({ day: d, type: 'bill', amount, name });
+          }
+        }
+        return;
       }
+    }
+    // DEMO_DATA fallback: day-of-month only
+    const dueDay = getBillDueDay(bill);
+    for (let d = 0; d <= days; d++) {
+      const dt = new Date(today); dt.setDate(today.getDate() + d);
+      if (dt.getDate() === dueDay) events.push({ day: d, type: 'bill', amount, name });
     }
   });
 
@@ -697,18 +718,37 @@ function renderUpcomingList() {
     }
   });
 
-  // ── Collect bill events ────────────────────────────────────────
+  // ── Collect bill events (BUG-OPS-CASHFLOW-BILL-FREQ-001 fix) ──
   bills.forEach(bill => {
-    const dueDay = getBillDueDay(bill);
     const amount = parseFloat(bill.amount) || 0;
     const name   = bill.name || 'Bill';
+    const freq   = (bill.frequency || 'monthly').toLowerCase();
 
-    for (let d = 0; d <= 14; d++) {
-      const dt = new Date(today);
-      dt.setDate(today.getDate() + d);
-      if (dt.getDate() === dueDay) {
-        events.push({ date: new Date(dt), amount, name, type: 'bill' });
+    if (bill.nextDueDate) {
+      const anchor = new Date(bill.nextDueDate + 'T00:00:00');
+      if (!isNaN(anchor.getTime())) {
+        if (freq === 'monthly') {
+          const targetDay = anchor.getDate();
+          for (let d = 0; d <= 14; d++) {
+            const dt = new Date(today); dt.setDate(today.getDate() + d);
+            if (dt.getDate() === targetDay) events.push({ date: new Date(dt), amount, name, type: 'bill' });
+          }
+        } else {
+          const intervalDays = freq === 'weekly' ? 7 : freq === 'bi-weekly' ? 14 : 365;
+          for (let d = 0; d <= 14; d++) {
+            const dt = new Date(today); dt.setDate(today.getDate() + d);
+            const diff = Math.round((dt - anchor) / 864e5);
+            if (diff >= 0 && diff % intervalDays === 0) events.push({ date: new Date(dt), amount, name, type: 'bill' });
+          }
+        }
+        return;
       }
+    }
+    // DEMO_DATA fallback: day-of-month only
+    const dueDay = getBillDueDay(bill);
+    for (let d = 0; d <= 14; d++) {
+      const dt = new Date(today); dt.setDate(today.getDate() + d);
+      if (dt.getDate() === dueDay) events.push({ date: new Date(dt), amount, name, type: 'bill' });
     }
   });
 
