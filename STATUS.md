@@ -1,12 +1,12 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 07:15 EST (Sprint Dev 0715 — FC-100/101/104 IN PROGRESS, FC-176 CLOSED)
+**Last Updated:** 2026-02-19 07:30 EST (Sprint Dev 0715 — FC-100/101/104 DONE, commit adc6bb0)
 
 ---
 
-## 🔧 SPRINT DEV — SESSION 0715 (Feb 19, 7:15 AM) — FC-100/101/104 DARK MODE TOGGLE 🔄
+## 🔧 SPRINT DEV — SESSION 0715 (Feb 19, 7:15 AM) — FC-100/101/104 DARK MODE TOGGLE ✅
 
-**Status:** 🔄 **BUILDER RUNNING** — `builder-fc100-dark-mode-toggle`
+**Status:** ✅ **COMMIT adc6bb0 — 3 ITEMS DONE**
 **Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
 
 ### Situation Assessment
@@ -14,21 +14,27 @@
 | Check | Result |
 |-------|--------|
 | #qa / #ui-ux / #research | ✅ No new bugs since 0655 |
-| FC-176 (Bootstrap wrong attr) | ✅ Already done — all 12 pages have `data-bs-theme="dark"` on `<html>` |
+| FC-176 (Bootstrap wrong attr) | ✅ Already done — all 12 pages have `data-bs-theme="dark"` on `<html>` — closed |
 | Next #dashboard callout | FC-095 + FC-100 |
 
-### Work This Session
+### Work Done
 
-**Selected:** FC-100 + FC-101 + FC-104 (Bootstrap dark mode toggle + FOUC prevention)
+| Item | Status | Notes |
+|------|--------|-------|
+| FC-176 | ✅ Closed | Already resolved — all 12 pages confirmed correct |
+| FC-104 | ✅ Done | adc6bb0 | FOUC prevention inline script in `<head>` of all 12 pages |
+| FC-101 | ✅ Done | adc6bb0 | `#themeSwitch` sidebar toggle added to 10 missing pages (all 12 now have it) |
+| FC-100 | ✅ Done | adc6bb0 | `setupThemeToggle()` updated: OS preference detection + localStorage persistence |
 
-| Item | Description | Status |
-|------|-------------|--------|
-| FC-176 | Bootstrap dark mode wrong attribute | ✅ Already done — closed |
-| FC-104 | FOUC prevention inline script in `<head>` of all 12 pages | 🔄 Builder running |
-| FC-101 | `#themeSwitch` sidebar toggle on 10 missing pages | 🔄 Builder running |
-| FC-100 | `setupThemeToggle()` OS preference detection | 🔄 Builder running |
+### Details — commit adc6bb0
 
-### Next P2 Ready Items (After This Session)
+| Change | Description |
+|--------|-------------|
+| FC-104 | `<script>(function(){var t=localStorage.getItem('theme')||'dark';...}());</script>` in `<head>` — reads localStorage before CSS renders, eliminates FOUC for light-mode users |
+| FC-101 | `.theme-toggle > .form-check.form-switch#themeSwitch` added to sidebar on index/assets/bills/debts/friends/income/investments/operations/reports/transactions (was only on budget+settings) |
+| FC-100 | `setupThemeToggle()` now: reads OS preference if no localStorage value, listens for OS preference change events (updates theme only when no manual preference saved) |
+
+### Next P2 Ready Items
 
 | ID | Priority | Est | Description |
 |----|----------|-----|-------------|
