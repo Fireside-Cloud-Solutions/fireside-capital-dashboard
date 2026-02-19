@@ -89,8 +89,10 @@ function normalizeIncomeToMonthly(income) {
   const amount = parseFloat(income.amount) || 0;
   switch ((income.frequency || '').toLowerCase()) {
     case 'weekly':    return (amount * 52) / 12;
-    case 'bi-weekly': return (amount * 26) / 12;
+    case 'bi-weekly':
+    case 'biweekly':  return (amount * 26) / 12;
     case 'monthly':   return amount;
+    case 'quarterly': return amount / 3;
     case 'annually':  return amount / 12;
     default:          return amount;
   }
@@ -307,7 +309,7 @@ function buildCashFlowProjection(days = 30) {
       }
     } else {
       // Periodic: weekly, bi-weekly, annually
-      const intervalDays = freq === 'weekly' ? 7 : freq === 'bi-weekly' ? 14 : 365;
+      const intervalDays = freq === 'weekly' ? 7 : (freq === 'bi-weekly' || freq === 'biweekly') ? 14 : freq === 'quarterly' ? 91 : 365;
       const anchor = inc.next_date ? new Date(inc.next_date + 'T00:00:00') : new Date(today);
 
       for (let d = 0; d <= days; d++) {
@@ -339,7 +341,7 @@ function buildCashFlowProjection(days = 30) {
             if (dt.getDate() === targetDay) events.push({ day: d, type: 'bill', amount, name });
           }
         } else {
-          const intervalDays = freq === 'weekly' ? 7 : freq === 'bi-weekly' ? 14 : 365;
+          const intervalDays = freq === 'weekly' ? 7 : (freq === 'bi-weekly' || freq === 'biweekly') ? 14 : freq === 'quarterly' ? 91 : 365;
           for (let d = 0; d <= days; d++) {
             const dt = new Date(today); dt.setDate(today.getDate() + d);
             const diff = Math.round((dt - anchor) / 864e5);
@@ -734,7 +736,7 @@ function renderUpcomingList() {
             if (dt.getDate() === targetDay) events.push({ date: new Date(dt), amount, name, type: 'bill' });
           }
         } else {
-          const intervalDays = freq === 'weekly' ? 7 : freq === 'bi-weekly' ? 14 : 365;
+          const intervalDays = freq === 'weekly' ? 7 : (freq === 'bi-weekly' || freq === 'biweekly') ? 14 : freq === 'quarterly' ? 91 : 365;
           for (let d = 0; d <= 14; d++) {
             const dt = new Date(today); dt.setDate(today.getDate() + d);
             const diff = Math.round((dt - anchor) / 864e5);

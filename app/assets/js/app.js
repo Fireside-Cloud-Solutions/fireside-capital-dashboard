@@ -1671,12 +1671,15 @@ function renderBills() {
   const nextDueNameEl = document.getElementById('billsNextDueName');
   if (nextDueAmountEl && nextDueNameEl) {
     const now = new Date();
+    const todayMidnight = new Date(now); todayMidnight.setHours(0, 0, 0, 0);
+    // BUG-NEXTDUE-CARD-OVERDUE-001: filter to today-or-future only; overdue bills
+    // would produce negative daysUntil and confusing "-5d" label in the card.
     const upcoming = activeBills
-      .filter(b => b.nextDueDate)
+      .filter(b => b.nextDueDate && new Date(b.nextDueDate + 'T00:00:00') >= todayMidnight)
       .sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
     const next = upcoming[0];
     if (next) {
-      const daysUntil = Math.ceil((new Date(next.nextDueDate).getTime() - now.getTime()) / 86400000);
+      const daysUntil = Math.ceil((new Date(next.nextDueDate + 'T00:00:00').getTime() - todayMidnight.getTime()) / 86400000);
       const dueTxt = daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `${daysUntil}d`;
       nextDueAmountEl.textContent = formatCurrency(next.amount);
       nextDueAmountEl.style.color = daysUntil <= 3 ? 'var(--color-danger)' : daysUntil <= 7 ? 'var(--color-warning)' : '';
