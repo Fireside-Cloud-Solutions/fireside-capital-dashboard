@@ -1,6 +1,28 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 07:35 EST (Sprint Dev 0735 — FC-095/094/097/177/178 DONE, commit 822b393)
+**Last Updated:** 2026-02-19 07:55 EST (Sprint Dev 0755 — FC-102 DONE, commit 1fd857c)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0755 (Feb 19, 7:55 AM) — FC-102 DARK MODE COLOR OVERRIDES ✅
+
+**Status:** ✅ **COMMIT 1fd857c — FC-102 DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Work Done
+
+| Item | Status | Notes |
+|------|--------|-------|
+| FC-102 | ✅ Done | 1fd857c | Dark mode financial color overrides — full color system both themes |
+
+### Files Changed
+- `assets/css/design-tokens.css` — `[data-bs-theme="light"]` CSS variable block (backgrounds, text, borders, shadows); `--color-financial-*` semantic tokens added to `:root`; `[data-bs-theme="dark"]` + `[data-bs-theme="light"]` Bootstrap `--bs-*` variable bridges (+~180 lines)
+- `assets/js/chart-factory.js` — THEME_PALETTES updated with Fireside brand colors (orange/blue/green series) + financial positive/negative/neutral colors for both themes
+- `assets/css/main.css` — 59 `body[data-theme='light']` selectors patched to also fire as `[data-bs-theme="light"] body` for Bootstrap's new toggle system
+- All 12 HTML pages — `design-tokens.css?v=20260219` + `main.css?v=20260219` version bumps
+
+### Next Up
+FC-096 (net worth chart decimation wire-up) | FC-172 (Cash Flow Projection Engine, P1) | FC-188 (npm build pipeline, P1)
 
 ---
 

@@ -1,4 +1,4 @@
-# BACKLOG.md - Product Backlog
+﻿# BACKLOG.md - Product Backlog
 
 **Product:** Fireside Capital → Fireside Personal Assistant
 **Owner:** Matt Hubacher
@@ -127,7 +127,7 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | FC-099 | Chore | P3 | S | Backlog | **Write Chart.js performance testing suite** - Benchmark rendering times for 100/500/1k/5k/10k points, compare optimized vs unoptimized - see research/chartjs-optimization.md |
 | FC-100 | Feature | P2 | M | Done | **Add Bootstrap 5.3 color mode toggle** — FIXED commit adc6bb0 (2026-02-19). localStorage persistence + OS preference detection added to `setupThemeToggle()` in app.js. (Sprint Dev 0715, 2026-02-19) |
 | FC-101 | Feature | P2 | S | Done | **Create theme toggle button in navbar** — FIXED commit adc6bb0 (2026-02-19). `#themeSwitch` form-check-switch added to sidebar of all 12 HTML pages (was only on budget.html + settings.html). (Sprint Dev 0715, 2026-02-19) |
-| FC-102 | Chore | P2 | M | Ready | **Add custom financial dashboard color overrides** - Define dark mode colors for positive/negative values, brand colors, cards, charts - see research/bootstrap-dark-theme.md |
+| | FC-102 | Chore | P2 | M | Done | **Add custom financial dashboard color overrides** - FIXED commit 1fd857c (2026-02-19). Light mode CSS token overrides (`[data-bs-theme="light"]` block), Bootstrap `--bs-*` variable bridges (dark + light), financial semantic colors (`--color-financial-positive/negative/neutral`), chart THEME_PALETTES brand alignment. 59 main.css selectors patched for new toggle. (Sprint Dev 0755, 2026-02-19)
 | FC-103 | Feature | P2 | M | Done | **Update Chart.js to respond to theme changes** - FIXED commit 822b393 (2026-02-19). MutationObserver in chart-factory.js watches data-bs-theme on <html> and auto-fires updateAllChartThemes(). Works with existing setupThemeToggle() from adc6bb0. (Sprint Dev 0735, 2026-02-19) |
 | FC-104 | Chore | P2 | XS | Done | **Add inline theme script to prevent FOUC** — FIXED commit adc6bb0 (2026-02-19). Inline IIFE in `<head>` reads localStorage theme before CSS renders, eliminating dark→light flash on page load. Applied to all 12 HTML pages. (Sprint Dev 0715, 2026-02-19) |
 | FC-105 | Chore | P3 | S | Ready | **Test all pages in light/dark modes** - Visual regression testing for cards, charts, forms, modals, tables in both themes - see research/bootstrap-dark-theme.md |
