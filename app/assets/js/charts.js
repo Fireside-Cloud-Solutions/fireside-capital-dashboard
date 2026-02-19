@@ -471,6 +471,8 @@ async function renderNetWorthDeltaChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      parsing: false,
+      normalized: true,
       interaction: {
         mode: 'index',
         intersect: false
@@ -584,6 +586,8 @@ async function renderSavingsRateChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      parsing: false,
+      normalized: true,
       interaction: {
         mode: 'index',
         intersect: false
@@ -683,6 +687,8 @@ async function renderInvestmentGrowthChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      parsing: false,
+      normalized: true,
       interaction: {
         mode: 'index',
         intersect: false
