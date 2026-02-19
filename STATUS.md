@@ -1,5 +1,36 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-19 05:55 EST (Sprint Dev 0555 — FC-137+FC-138+FC-140+FC-141 DONE, commit 909449f)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0555 (Feb 19, 5:55 AM) — DEBTS + INCOME EMPTY STATES + SKELETONS ✅
+
+**Status:** ✅ **COMMIT 909449f — 4 ITEMS DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Work Done
+
+| Item | Status | Notes |
+|------|--------|-------|
+| FC-137 | ✅ Done | debts.html: 3→5 skeleton rows (added rows 4+5, 8 cols each) |
+| FC-138 | ✅ Done | debts.html: Added static `#debtEmptyState` div, CTA → `#addDebtModal` (no inline onclick) |
+| FC-140 | ✅ Done | income.html: 3→5 skeleton rows (added rows 4+5, 6 cols each) |
+| FC-141 | ✅ Done | income.html: Fixed `#incomeEmptyState` — `d-none` → `style="display:none"` so `showEmptyState()` can set `style.display='block'` without `!important` conflict |
+
+### Bug Discovered + Resolved During Audit
+`BUG-UIUX-BILLS-APPROVE-SCHEMA-001` (from STATUS 0651) was a false alarm — DB column is `nextDueDate` (camelCase), which matches app.js everywhere. Not a real bug; closed.
+
+### Next P2 Ready Items
+- FC-134 | P2 | XS | Transactions filter mobile layout
+- FC-086 | P2 | S | Add MoM deltas to stat cards
+- FC-087 | P2 | M | Skeleton loaders for all charts
+- FC-094 | P2 | S | Pre-parse chart data timestamps
+- FC-095 | P2 | M | createOptimizedChart() factory
+- FC-100 | P2 | M | Bootstrap 5.3 color mode toggle
+
+---
+
 **Last Updated:** 2026-02-19 05:35 EST (Sprint Dev 0535 — MOB-013 VERIFIED ✅, MOB-014 COMPLETE, 3 BUGS FIXED)
 
 ---
