@@ -1,6 +1,34 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 05:55 EST (Sprint Dev 0555 — FC-137+FC-138+FC-140+FC-141 DONE, commit 909449f)
+**Last Updated:** 2026-02-19 06:15 EST (Sprint Dev 0615 — FC-134+FC-086 DONE, commit ceb35f6)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0615 (Feb 19, 6:15 AM) — TRANSACTIONS FILTER MOBILE + MOM DELTAS ✅
+
+**Status:** ✅ **COMMIT ceb35f6 — 2 ITEMS DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Work Done
+
+| Item | Status | Notes |
+|------|--------|-------|
+| FC-134 | ✅ Done | transactions.html: From/To date filters now `col-6 col-md-4` (side-by-side on mobile). Category: `col-12 col-md-4`. Button strip: `d-flex flex-wrap gap-2 mt-3` (no `ms-2` spacer, wraps cleanly on 375px). |
+| FC-086 | ✅ Done | `calculateAndDisplayTrends()` read snake_case `net_worth`/`total_assets`/`total_investments`/`total_debts` from snapshots — but table stores camelCase. Fixed all 4 reads. Snapshot upsert now saves `totalAssets`, `totalInvestments`, `totalDebts`, `monthlyBills`, `monthlyIncome`. |
+| Migration 010 | ✅ Created | `migrations/010_snapshots_add_financial_columns.sql` — adds 5 new columns to snapshots table. Matt must run this in Supabase SQL Editor to activate full MoM trend display on all 4 stat cards. |
+
+### ⚠️ Matt Action Required (Migrations)
+1. `migrations/006_add_category_budgets_to_settings.sql` — fixes BvA HTTP 400
+2. `migrations/007_transaction_category_patterns_and_realtime.sql` — fixes Realtime WebSocket
+3. **`migrations/010_snapshots_add_financial_columns.sql` (NEW)** — enables full MoM deltas on Assets/Investments/Debts stat cards
+
+### Next P2 Ready Items
+- FC-087 | P2 | M | Skeleton loaders for all charts
+- FC-094 | P2 | S | Pre-parse chart data timestamps
+- FC-095 | P2 | M | createOptimizedChart() factory
+- FC-100 | P2 | M | Bootstrap 5.3 color mode toggle
+
+---
 
 ---
 
