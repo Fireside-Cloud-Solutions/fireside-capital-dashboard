@@ -2,29 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography } from '../styles/theme';
-import { useBills, useDeleteBill } from '../hooks/useFinancialData';
+import { useIncome, useDeleteIncome } from '../hooks/useFinancialData';
 
-const fmt = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-
-const getDaysUntilDue = (dueDate: string | null) => {
-  if (!dueDate) return 999;
-  const diff = new Date(dueDate).getTime() - new Date().getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-};
-
-const getUrgencyColor = (days: number) => {
-  if (days < 0) return colors.danger;
-  if (days <= 3) return colors.danger;
-  if (days <= 7) return colors.warning;
-  return colors.success;
-};
-
-const getUrgencyLabel = (days: number) => {
-  if (days < 0) return `${Math.abs(days)}d overdue`;
-  if (days === 0) return 'Due today';
-  if (days === 1) return 'Due tomorrow';
-  return `Due in ${days}d`;
-};
+const fmtCurrency = (n: number) => `$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
 const normalizeToMonthly = (amount: number, freq: string | null) => {
   switch (freq) {
@@ -37,23 +17,30 @@ const normalizeToMonthly = (amount: number, freq: string | null) => {
   }
 };
 
-export default function BillsScreen() {
-  const { data: bills, isLoading } = useBills();
-  const deleteBill = useDeleteBill();
+const FREQ_LABELS: Record<string, string> = {
+  monthly: 'Monthly',
+  'bi-weekly': 'Bi-weekly',
+  weekly: 'Weekly',
+  annually: 'Annual',
+  quarterly: 'Quarterly',
+};
 
-  const totalMonthly = (bills ?? []).reduce((s, b) => s + normalizeToMonthly(b.amount ?? 0, b.frequency), 0);
+export default function IncomeScreen() {
+  const { data: income, isLoading } = useIncome();
+  const deleteIncome = useDeleteIncome();
+
+  const totalMonthly = (income ?? []).reduce(
+    (s, i) => s + normalizeToMonthly(i.amount ?? 0, i.frequency),
+    0
+  );
 
   const handleDelete = (id: string, name: string) => {
     Alert.alert(
-      'Delete Bill',
+      'Delete Income Source',
       `Are you sure you want to delete "${name}"?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => deleteBill.mutate(id),
-        },
+        { text: 'Delete', style: 'destructive', onPress: () => deleteIncome.mutate(id) },
       ]
     );
   };
@@ -61,33 +48,49 @@ export default function BillsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Bills</Text>
-        <Text style={styles.headerSub}>{fmt(totalMonthly)}/mo</Text>
+        <View>
+          <Text style={styles.headerTitle}>Income</Text>
+          <Text style={styles.headerSub}>
+            {(income ?? []).length} source{(income ?? []).length !== 1 ? 's' : ''}
+          </Text>
+        </View>
+        <View style={styles.headerStats}>
+          <View style={styles.headerStat}>
+            <Text style={styles.headerStatLabel}>Monthly Total</Text>
+            <Text style={[styles.headerStatValue, { color: colors.success }]}>
+              {fmtCurrency(totalMonthly)}
+            </Text>
+          </View>
+        </View>
       </View>
 
       {isLoading ? (
         <ActivityIndicator style={{ marginTop: spacing.xl }} color={colors.primary} />
       ) : (
         <FlatList
-          data={bills ?? []}
+          data={income ?? []}
           keyExtractor={item => item.id}
           contentContainerStyle={{ padding: spacing.md, gap: spacing.sm }}
           renderItem={({ item }) => {
-            const days = getDaysUntilDue(item.nextDueDate);
-            const urgencyColor = getUrgencyColor(days);
+            const monthly = normalizeToMonthly(item.amount ?? 0, item.frequency);
             return (
               <View style={styles.card}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardName}>{item.name}</Text>
-                  <Text style={styles.cardFreq}>{item.frequency}</Text>
+                  {item.employer && (
+                    <Text style={styles.cardEmployer}>{item.employer}</Text>
+                  )}
+                  <Text style={styles.cardFreq}>
+                    {FREQ_LABELS[item.frequency ?? ''] ?? item.frequency}
+                  </Text>
                 </View>
                 <View style={styles.cardRight}>
-                  <Text style={styles.cardAmount}>{fmt(item.amount ?? 0)}</Text>
-                  <View style={[styles.badge, { backgroundColor: `${urgencyColor}20`, borderColor: urgencyColor }]}>
-                    <Text style={[styles.badgeText, { color: urgencyColor }]}>
-                      {getUrgencyLabel(days)}
-                    </Text>
-                  </View>
+                  <Text style={[styles.cardAmount, { color: colors.success }]}>
+                    {fmtCurrency(item.amount ?? 0)}
+                  </Text>
+                  {item.frequency !== 'monthly' && (
+                    <Text style={styles.cardMonthly}>{fmtCurrency(monthly)}/mo</Text>
+                  )}
                 </View>
                 <TouchableOpacity
                   style={styles.deleteBtn}
@@ -101,8 +104,8 @@ export default function BillsScreen() {
           }}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Ionicons name="receipt-outline" size={48} color={colors.textMuted} />
-              <Text style={styles.emptyText}>No active bills</Text>
+              <Ionicons name="wallet-outline" size={48} color={colors.textMuted} />
+              <Text style={styles.emptyText}>No income sources yet</Text>
             </View>
           }
         />
@@ -114,18 +117,20 @@ export default function BillsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: 56,
     paddingBottom: spacing.md,
     backgroundColor: colors.backgroundCard,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    gap: spacing.sm,
   },
   headerTitle: { fontSize: typography.xl, fontWeight: typography.bold, color: colors.text },
-  headerSub: { fontSize: typography.md, color: colors.textSecondary },
+  headerSub: { fontSize: typography.xs, color: colors.textMuted, marginTop: 2 },
+  headerStats: { flexDirection: 'row' },
+  headerStat: {},
+  headerStatLabel: { fontSize: typography.xs, color: colors.textMuted },
+  headerStatValue: { fontSize: typography.lg, fontWeight: typography.bold, color: colors.text },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -136,11 +141,11 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   cardName: { fontSize: typography.md, fontWeight: typography.semibold, color: colors.text },
-  cardFreq: { fontSize: typography.xs, color: colors.textMuted, textTransform: 'capitalize' },
+  cardEmployer: { fontSize: typography.xs, color: colors.textSecondary, marginTop: 2 },
+  cardFreq: { fontSize: typography.xs, color: colors.textMuted, marginTop: 2, textTransform: 'capitalize' },
   cardRight: { alignItems: 'flex-end', marginRight: spacing.sm },
-  cardAmount: { fontSize: typography.md, fontWeight: typography.bold, color: colors.text },
-  badge: { marginTop: 4, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 99, borderWidth: 1 },
-  badgeText: { fontSize: typography.xs, fontWeight: typography.semibold },
+  cardAmount: { fontSize: typography.md, fontWeight: typography.bold },
+  cardMonthly: { fontSize: typography.xs, color: colors.textMuted, marginTop: 2 },
   deleteBtn: { padding: 4 },
   emptyState: { alignItems: 'center', paddingTop: 64, gap: spacing.sm },
   emptyText: { color: colors.textMuted, fontSize: typography.md },

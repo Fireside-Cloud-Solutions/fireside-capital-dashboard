@@ -16,6 +16,8 @@ import AssetsScreen from './src/screens/AssetsScreen';
 import BillsScreen from './src/screens/BillsScreen';
 import BudgetScreen from './src/screens/BudgetScreen';
 import MoreScreen from './src/screens/MoreScreen';
+import DebtsScreen from './src/screens/DebtsScreen';
+import IncomeScreen from './src/screens/IncomeScreen';
 import { colors } from './src/styles/theme';
 
 // ─── TanStack Query online detection (mobile loses connection) ────────
@@ -146,7 +148,11 @@ export default function App() {
       <NavigationContainer theme={darkNavTheme}>
         <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
           {isAuthenticated ? (
-            <Stack.Screen name="Main" component={MainTabs} />
+            <>
+              <Stack.Screen name="Main" component={MainTabs} />
+              <Stack.Screen name="Debts" component={DebtsScreen} />
+              <Stack.Screen name="Income" component={IncomeScreen} />
+            </>
           ) : (
             <Stack.Screen name="Login" component={LoginScreen} />
           )}

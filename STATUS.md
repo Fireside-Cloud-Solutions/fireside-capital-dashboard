@@ -1,5 +1,37 @@
 # STATUS.md — Current Project State
 
+**Last Updated:** 2026-02-19 05:15 EST (Sprint Dev 0515 — BUG-MOB-BILLS-FREQ-001 FIXED, MOB-013 DELEGATED TO BUILDER)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0515 (Feb 19, 5:15 AM) — MOBILE FREQ BUG + MOB-013 DELEGATED ✅
+
+**Status:** ✅ **COMMIT 05689a8 — BILLS FREQ BUG FIXED | BUILDER RUNNING FOR MOB-013**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~5 minutes
+
+### Bug Fixed (commit `05689a8`)
+
+| ID | Priority | Description | Fix |
+|----|----------|-------------|-----|
+| BUG-MOB-BILLS-FREQ-001 | P2 | `BillsScreen.tsx` monthly total used 4-branch if-chain that missed `weekly` (should be × 52/12) and `quarterly` (should be ÷ 3) bill frequencies. A weekly $50 bill would show as $50/mo instead of correct $216.67/mo. | Replaced inline if-chain with `normalizeToMonthly()` switch covering all 5 frequency types — matches `useFinancialData.ts` logic exactly. |
+
+### Delegated Work
+
+| Task | Agent | Status |
+|------|-------|--------|
+| MOB-013 — CRUD list screens (Assets FlatList, BillsScreen delete, new DebtsScreen + IncomeScreen, MoreScreen nav wired) | Builder sub-agent `builder-mob-013-crud-screens` | 🔄 Running |
+
+### Open Mobile Tasks After MOB-013
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| MOB-014 | P2 | 1h | Upgrade charts to react-native-gifted-charts |
+| MOB-015 | ✅ Done | — | Bills urgency indicators (in BillsScreen) |
+| MOB-016 | P3 | 1h | Demo mode for mobile |
+
+---
+
 **Last Updated:** 2026-02-18 06:56 EST (Sprint Research 0656 — REACT NATIVE EXPO DEEP DIVE, 9 NEW TASKS)
 
 ---

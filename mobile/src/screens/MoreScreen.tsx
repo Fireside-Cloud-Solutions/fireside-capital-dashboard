@@ -1,8 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors, spacing, typography } from '../styles/theme';
 import { supabase } from '../services/supabase';
+
+type RootStackParamList = {
+  Main: undefined;
+  Debts: undefined;
+  Income: undefined;
+  Login: undefined;
+};
+
+type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 interface MoreItem {
   icon: string;
@@ -11,15 +22,33 @@ interface MoreItem {
 }
 
 export default function MoreScreen() {
+  const navigation = useNavigation<NavProp>();
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
   const items: MoreItem[] = [
-    { icon: 'trending-down-outline', label: 'Debts', onPress: () => {} },
-    { icon: 'wallet-outline', label: 'Income', onPress: () => {} },
-    { icon: 'settings-outline', label: 'Settings', onPress: () => {} },
-    { icon: 'log-out-outline', label: 'Sign Out', onPress: handleLogout },
+    {
+      icon: 'trending-down-outline',
+      label: 'Debts',
+      onPress: () => navigation.navigate('Debts'),
+    },
+    {
+      icon: 'wallet-outline',
+      label: 'Income',
+      onPress: () => navigation.navigate('Income'),
+    },
+    {
+      icon: 'settings-outline',
+      label: 'Settings',
+      onPress: () => {},
+    },
+    {
+      icon: 'log-out-outline',
+      label: 'Sign Out',
+      onPress: handleLogout,
+    },
   ];
 
   return (
@@ -43,14 +72,22 @@ export default function MoreScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
-    paddingHorizontal: spacing.lg, paddingTop: 56, paddingBottom: spacing.md,
-    backgroundColor: colors.backgroundCard, borderBottomWidth: 1, borderBottomColor: colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingTop: 56,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.backgroundCard,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   headerTitle: { fontSize: typography.xl, fontWeight: typography.bold, color: colors.text },
   list: { paddingTop: spacing.sm },
   row: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
     backgroundColor: colors.backgroundCard,
   },
   rowIcon: { marginRight: spacing.md },
