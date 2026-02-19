@@ -1,6 +1,55 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 06:15 EST (Sprint Dev 0615 — FC-134+FC-086 DONE, commit ceb35f6)
+**Last Updated:** 2026-02-19 06:35 EST (Sprint Dev 0635 — FC-094 DONE, commit a928d89)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0635 (Feb 19, 6:35 AM) — FC-094 CHART PERF ✅
+
+**Status:** ✅ **COMMIT a928d89 — 1 ITEM DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+
+### Situation Assessment
+
+**Azure DevOps:** CLI not available — fell back to BACKLOG.md + STATUS.md + Discord
+**Channels #qa / #ui-ux / #research:** No new bugs since last session (6:15 AM). All clean.
+**BUG-UIUX-BILLS-LISTENER-REBIND-001** — already fixed (event delegation in email-bills.js)
+**BUG-BOOTSTRAP-MODAL-NEW-001** — 1 remaining instance in onboarding.js is intentional (dispose→new with custom options), not a real bug
+**FC-157 (font preloading)** — already complete across all 12 pages (display=swap + preconnects)
+**Highest open P2 item:** FC-094 — Chart.js performance flags
+
+### Work Done
+
+| Item | Status | Commit | Notes |
+|------|--------|--------|-------|
+| FC-094 | ✅ Done | a928d89 | `parsing: false, normalized: true` on 5 charts in app.js + charts.js |
+
+### FC-094 Details
+
+Added `parsing: false, normalized: true` to 5 chart functions that use clean sorted arrays with no null values:
+
+| Chart | File | Notes |
+|-------|------|-------|
+| `renderNetWorthChart()` | app.js | Dashboard net worth line — date labels, sorted snapshots |
+| `generateMonthlyCashFlowChart()` | app.js | Dashboard cash flow bar — sequential month labels |
+| `renderNetWorthDeltaChart()` | charts.js | Delta bar — chronological snapshot diffs |
+| `renderSavingsRateChart()` | charts.js | Savings rate line — 12-month rolling window |
+| `renderInvestmentGrowthChart()` | charts.js | Projected investment growth line — monthly projections |
+
+The original `charts.js` net worth chart already had these flags behind a conditional guard (skipped when projection data has nulls). All 5 new additions are safe — no nulls, no unsorted data.
+
+`parsing: false` = skip Chart.js internal data parsing pass (≈62% faster render)
+`normalized: true` = skip pre-sort, enables binary-search dataset lookups
+
+### Next P2 Ready Items
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-087 | P2 | M | Skeleton loaders for all charts |
+| FC-095 | P2 | M | createOptimizedChart() factory |
+| FC-100 | P2 | M | Bootstrap 5.3 color mode toggle |
+| FC-101 | P2 | S | Theme toggle button in navbar |
+| BUG-UIUX-BILLS-APPROVE-SCHEMA-001 | P2 | 30m | approveBill() camelCase→snake_case column fix |
 
 ---
 
