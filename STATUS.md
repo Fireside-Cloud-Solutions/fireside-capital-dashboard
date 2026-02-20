@@ -1,6 +1,51 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 04:58 EST (Sprint UI/UX 0458 — Assets page audit, 5 bugs fixed, commit 6ac08e7)
+**Last Updated:** 2026-02-20 05:01 EST (Sprint Dev 0501 — Systemic FOUC bug fixed, 9 pages cleaned, commit af8bfd8)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0501 (Feb 20, 5:01 AM) — SYSTEMIC FOUC DUPLICATE FIX ✅
+
+**Status:** ✅ **COMMIT af8bfd8 — BUG-SYSTEMIC-FOUC-DUPLICATE-001 DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~3 minutes
+**Task:** Check Azure DevOps/Discord for work, pick highest priority item, fix it, commit, push
+
+### Work Done
+
+| Item | Status | Commit | Notes |
+|------|--------|--------|-------|
+| BUG-SYSTEMIC-FOUC-DUPLICATE-001 | ✅ Done | af8bfd8 | Removed duplicate FOUC prevention scripts from 9 pages using automated fix script |
+
+### Details
+
+**Problem:** FOUC (Flash of Unstyled Content) prevention script appeared TWICE in `<head>` on 10 of 12 HTML pages (dashboard already fixed in dadfe0e, budget/settings never had duplication).
+
+**Pages Fixed (9):**
+- assets.html
+- bills.html
+- debts.html
+- income.html
+- investments.html
+- transactions.html
+- reports.html
+- friends.html
+- operations.html
+
+**Impact:**
+- Removed ~4.5KB of duplicate code across site
+- Improved code quality (DRY principle)
+- Automated fix via `scripts/fix-fouc-duplication.ps1`
+
+### Next P1 Ready Items
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-173 | P1 | 5-6h | Operations Dashboard page (depends on FC-172 ✅ — now unblocked) |
+| FC-188 | P1 | 2h | npm build scripts (terser + cssnano) |
+| FC-193 | P1 | 1h | Deploy 5 Supabase RPCs for Ops Dashboard |
+| BUG-DASHBOARD-ARIA-LIVE-001 | P2 | 15min | Add aria-live regions to 6 dashboard stat cards |
+| BUG-DASHBOARD-HEADING-SEMANTIC-001 | P2 | 5min | Dashboard chart headings h5→h6 for consistency |
 
 ---
 
