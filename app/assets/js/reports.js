@@ -74,12 +74,38 @@ async function loadReportSummary(userId) {
       document.getElementById('reportDebts').textContent = '$0.00';
       document.getElementById('reportNetWorth').textContent = '$0.00';
     }
+    
+    // Remove loading class and show values
+    document.querySelectorAll('.summary-card.loading').forEach(card => {
+      card.classList.remove('loading');
+      const skeleton = card.querySelector('.skeleton-loader');
+      const value = card.querySelector('h4');
+      if (skeleton) skeleton.classList.add('d-none');
+      if (value) value.classList.remove('d-none');
+    });
   } catch (error) {
     console.error('[Reports] Error loading report summary:', error);
     // Keep default $0.00 values on error
     document.getElementById('reportInvestments').textContent = '$0.00';
     document.getElementById('reportDebts').textContent = '$0.00';
     document.getElementById('reportNetWorth').textContent = '$0.00';
+    
+    // Show empty state if error (likely no data)
+    showEmptyState();
+  }
+}
+
+// ===================================================================
+// SHOW EMPTY STATE
+// ===================================================================
+function showEmptyState() {
+  const dataContainer = document.getElementById('dataContainer');
+  const emptyState = document.getElementById('reportEmptyState');
+  
+  if (dataContainer && emptyState) {
+    dataContainer.style.display = 'none';
+    emptyState.style.display = 'block';
+    console.log('[Reports] Empty state displayed');
   }
 }
 
