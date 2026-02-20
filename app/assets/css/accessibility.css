@@ -183,21 +183,21 @@ small {
 }
 
 /* Light mode contrast fixes */
-body[data-theme='light'] .text-muted,
-body[data-theme='light'] .text-secondary,
-body[data-theme='light'] small {
+[data-bs-theme="light"] .text-muted,
+[data-bs-theme="light"] .text-secondary,
+[data-bs-theme="light"] small {
   color: #757575 !important; /* Darker for better contrast on light bg */
 }
 
-body[data-theme='light'] .table th {
+[data-bs-theme="light"] .table th {
   color: #666666 !important;
 }
 
-body[data-theme='light'] .form-label {
+[data-bs-theme="light"] .form-label {
   color: #666666 !important;
 }
 
-body[data-theme='light'] .form-control::placeholder {
+[data-bs-theme="light"] .form-control::placeholder {
   color: #888888;
 }
 
