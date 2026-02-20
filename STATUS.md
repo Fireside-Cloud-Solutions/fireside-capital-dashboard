@@ -1,6 +1,123 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 04:15 EST (Sprint Dev 0415 — FC-172 DONE, commit efd7f6b)
+**Last Updated:** 2026-02-20 04:28 EST (Sprint UI/UX 0428 — Budget page audit complete, 3 bugs fixed, commit cf82db1)
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0428 (Feb 20, 4:28 AM) — BUDGET PAGE AUDIT ✅
+
+**Status:** ✅ **COMMIT cf82db1 — 3 BUGS FIXED + 3 WORK ITEMS CREATED**
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~8 minutes
+**Task:** Continue UI/UX audit — budget.html deep review, verify prior recs
+
+### Quick Fixes Applied (commit `cf82db1`)
+
+| ID | Priority | Fix |
+|----|----------|-----|
+| BUG-UIUX-BUDGET-MONTH-ARIA-001 | P2 | `#currentMonth` h4 now has `role="status" aria-live="polite"` for screen reader announcements when month navigation changes |
+| BUG-UIUX-BUDGET-BVA-HEADING-001 | P3 | Budget vs Actuals section h5→h6 for semantic consistency (all other sections use h6) |
+| BUG-UIUX-CSS-STALE-0220-002 | P3 | CSS version strings updated to v=20260220 (6 files: components, responsive, utilities, accessibility, logged-out-cta, critical) |
+
+### New Work Items Created
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-UIUX-052 | P3 | 20min | Budget page 4-column XL layout — 4 summary cards at col-xl-3 leaves blank quarter-column. Add 5th card or change to col-xl-4 |
+| FC-UIUX-053 | P3 | 15min | Budget table skeleton — 3 rows inconsistent with other tables (5 rows standard). Add 2 more |
+| FC-UIUX-054 | P3 | 20min | Budget table empty state — Add static `#budgetEmptyState` div with CTA like bills/debts/income |
+
+### Audit Focus: budget.html
+
+**Sections reviewed:**
+- Page header (month navigation + Generate Budget + Add Item buttons)
+- 4 summary cards (Expected Income, Assigned, Spent, Remaining to Budget)
+- Budget assignment table (7 columns + skeleton)
+- Budget vs Actuals widget (FC-182, delegated to budget-actuals.js)
+- All modals (Add Budget Item, Login, Signup, Password Reset)
+
+**Overall: A** — Clean, functional, BVA widget rendering correctly. All accessibility issues fixed. 3 minor layout consistency items noted for future polish.
+
+### Pages Audited (UI/UX Sprint)
+- ✅ operations.html (Feb 18 0506/0606)
+- ✅ bills.html (Feb 18 0651)
+- ✅ budget.html (Feb 20 0428)
+
+**Next page:** assets.html or settings.html
+
+---
+
+## 🔍 SPRINT QA — SESSION 0420 (Feb 20, 4:20 AM) — CODE REVIEW AUDIT ✅
+
+**Status:** ⛔ **DEPLOYMENT BLOCKED** (P0) — Pivoted to code review audit  
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)  
+**Duration:** ~50 minutes
+
+### Critical Findings
+
+**BUG-DEPLOY-STALE-0220-001 (P0 Critical) — PERSISTS**  
+Live site still serving Feb 1, 2026 build (20 days stale). 529 commits undeployed. Cannot perform browser-based QA.  
+**Action required:** Matt must purge Azure CDN or restart Static Web App  
+**Evidence:** Console errors (cashFlowChart.destroy bug still present), missing all Feb 1-20 features
+
+### Code Review Audit Results
+
+**Files reviewed:** 41 (9 CSS + 32 JS)  
+**Overall grade:** B+ (well-structured, some optimizations needed)
+
+**Bugs found (3):**
+- **BUG-CODE-INNERHTML-0220-003** (P2) — 117 innerHTML uses, potential XSS risk (app.js: 55, operations.js: 12)
+- **BUG-CODE-IMPORTANT-0220-001** (P3) — 307 !important declarations (specificity issues)
+- **BUG-CODE-CONSOLE-0220-002** (P3) — 59 console.log statements left in production code
+
+**Optimization (1):**
+- **OPT-CODE-BUILD-0220-001** (P2) — No minification/bundling (32 JS files, 9 CSS files loaded separately)
+
+**Security strengths:**
+- ✅ NO eval() found
+- ✅ NO document.write() found
+- ✅ CSRF protection present
+- ✅ Rate limiting implemented
+- ✅ Session security monitoring
+
+### Migration Review Results
+
+**Migrations reviewed:** 6 files  
+**Issues found (2):**
+- **BUG-MIGRATION-NUMBERING-001** (P2) — Two files both named `001_*.sql` (onboarding + pending_bills)
+- **BUG-MIGRATION-MISSING-010** (P1) — `010_snapshots_add_financial_columns.sql` referenced but doesn't exist
+
+**Pending migrations (not applied):**
+1. **006_add_category_budgets_to_settings.sql** — BLOCKING budget page (HTTP 400)
+2. **007_transaction_category_patterns_and_realtime.sql** — BLOCKING categorization + realtime
+3. **010_snapshots_add_financial_columns.sql** — MISSING (needs creation), will enable MoM deltas
+
+### Reports Created
+
+1. `reports/qa-sprint-critical-deployment-0420.md` — Deployment failure evidence + fix steps
+2. `reports/qa-code-review-audit-0420.md` — 41 files reviewed, 3 bugs + 1 optimization
+3. `reports/qa-migration-review-0420.md` — Migration issues + execution order
+
+### BACKLOG Updates
+
+**Added:**
+- BUG-CODE-INNERHTML-0220-003 (P2 Medium)
+
+**Updated counts:**
+- BUG-JS-001: 151→59 console.log instances (revised count)
+- BUG-CSS-001: 289→307 !important instances (revised count)
+
+### Next Session
+
+**While deployment blocked:**
+- Accessibility audit (manual WCAG checks)
+- Performance analysis (Lighthouse audits on local build)
+- Documentation review
+
+**Once deployment fixed:**
+- Full browser-based functional testing
+- Visual regression testing
+- Verify all 32+ features from Feb 1-20
 
 ---
 
