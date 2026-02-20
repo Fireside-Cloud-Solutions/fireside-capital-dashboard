@@ -1,1097 +1,1239 @@
 # Financial Dashboard UI Patterns Research — Fireside Capital
-**Research Sprint:** February 12, 2026  
-**Focus:** Battle-tested UX patterns from leading fintech apps  
-**Status:** Complete ✅
+**Research Sprint**: February 20, 2026  
+**Status**: In Progress 🔄  
+**Priority**: High — Foundation for data visualization & UX
 
 ---
 
-## 📋 Executive Summary
+## Executive Summary
 
-Analyzed 50+ financial dashboards (Stripe, Plaid, Mint, Robinhood, Alture Funds, PayUp) and identified **12 high-impact patterns** that directly apply to Fireside Capital. This research translates fintech industry best practices into copy-paste-ready code.
+Research industry-standard UI patterns for personal finance dashboards to improve data visualization, user engagement, and decision-making. Financial dashboards must balance **information density** (show important data at a glance) with **usability** (avoid overwhelming users).
 
-**Key Insight:** Financial dashboards succeed when they **reduce cognitive load** while increasing **visual trust cues**. Users need to understand their financial situation in < 5 seconds.
+**Key Patterns to Implement**:
+- 📊 **Data Visualization Hierarchy** — Most important metrics front and center
+- 💰 **Net Worth Flow** — Visual timeline of wealth changes
+- 🎯 **Goal Tracking** — Progress bars with target dates
+- 🔔 **Smart Alerts** — Contextual warnings (budget exceeded, bill due)
+- 📈 **Trend Indicators** — Up/down arrows with percentage changes
+- 🗂️ **Category Pills** — Tag-based filtering for transactions
+- 📱 **Mobile-First Cards** — Responsive, touch-friendly components
 
 ---
 
-## 🏆 Top 12 Patterns (Prioritized)
+## Pattern 1: Metric Cards with Trends
 
-### Pattern 1: Progressive Disclosure (HIGHEST IMPACT)
-**Problem:** Information overload kills engagement  
-**Solution:** Show summary first, details on demand
+### Overview
+Large, scannable cards showing key financial metrics with trend indicators (↑/↓) and sparkline charts.
 
-#### Fireside Implementation
+**Used By**: Mint, Personal Capital, YNAB  
+**Purpose**: Quick status check ("Am I up or down this month?")
 
-**Before (current):**
+### Visual Example
+```
+┌─────────────────────────────────────┐
+│ Net Worth                      ↑ 3.2% │
+│ $127,350                             │
+│ +$4,050 this month                   │
+│ ▁▂▃▅▆█ (sparkline)                   │
+└─────────────────────────────────────┘
+```
+
+### Implementation
+
+**HTML** (`dashboard.html`):
 ```html
-<!-- All budget data visible at once -->
-<div class="budget-card">
-  <h3>Groceries</h3>
-  <p>Budget: $500</p>
-  <p>Spent: $342.18</p>
-  <p>Remaining: $157.82</p>
-  <p>Last 3 months avg: $478.23</p>
-  <p>% of income: 12.4%</p>
-  <!-- Too much detail upfront -->
+<div class="metric-card trend-up">
+  <div class="metric-header">
+    <span class="metric-label">Net Worth</span>
+    <span class="metric-trend">
+      <i class="bi bi-arrow-up"></i> 3.2%
+    </span>
+  </div>
+  <div class="metric-value">$127,350</div>
+  <div class="metric-change">+$4,050 this month</div>
+  <canvas id="sparkline-networth" class="metric-sparkline"></canvas>
 </div>
 ```
 
-**After (progressive):**
-```html
-<!-- Summary first -->
-<div class="budget-card expandable" data-budget-id="groceries">
-  <div class="budget-summary">
-    <div class="budget-label">
-      <i class="bi bi-basket"></i>
-      <span>Groceries</span>
-    </div>
-    <div class="budget-meter">
-      <div class="budget-progress" style="width: 68%"></div>
-    </div>
-    <div class="budget-status">
-      <span class="amount-spent">$342</span>
-      <span class="amount-total text-muted">/ $500</span>
-    </div>
-    <button class="btn-expand" aria-expanded="false">
-      <i class="bi bi-chevron-down"></i>
-    </button>
-  </div>
-  
-  <!-- Details hidden by default, shown on click -->
-  <div class="budget-details" hidden>
-    <div class="detail-row">
-      <span>Remaining</span>
-      <span class="amount-positive">$157.82</span>
-    </div>
-    <div class="detail-row">
-      <span>3-month average</span>
-      <span>$478.23</span>
-    </div>
-    <div class="detail-row">
-      <span>% of income</span>
-      <span>12.4%</span>
-    </div>
-    <div class="detail-row">
-      <span>Pace</span>
-      <span class="status-warning">On track to exceed by $42</span>
-    </div>
-  </div>
-</div>
-```
-
-**CSS:**
+**CSS** (`components/metric-cards.css`):
 ```css
-.budget-card {
-  background: var(--surface-1);
-  border-radius: var(--radius-2);
-  padding: var(--space-4);
-  transition: all 150ms ease;
-}
-
-.budget-summary {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr auto;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.budget-meter {
-  height: 8px;
-  background: var(--surface-3);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.budget-progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-secondary));
-  transition: width 300ms ease;
-}
-
-.budget-details {
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-subtle);
-  animation: slideDown 200ms ease;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-```
-
-**JavaScript:**
-```javascript
-// Add to app.js
-document.querySelectorAll('.budget-card.expandable').forEach(card => {
-  const expandBtn = card.querySelector('.btn-expand');
-  const details = card.querySelector('.budget-details');
-  
-  expandBtn.addEventListener('click', () => {
-    const isExpanded = expandBtn.getAttribute('aria-expanded') === 'true';
-    
-    expandBtn.setAttribute('aria-expanded', !isExpanded);
-    details.hidden = isExpanded;
-    expandBtn.querySelector('i').classList.toggle('bi-chevron-down');
-    expandBtn.querySelector('i').classList.toggle('bi-chevron-up');
-  });
-});
-```
-
-**Impact:** 40% less visual clutter, 2x faster scanning
-
----
-
-### Pattern 2: Status-First Design
-**Principle:** Users want to know "Am I okay?" BEFORE "What happened?"
-
-#### Net Worth Dashboard Implementation
-
-```html
-<div class="dashboard-hero">
-  <!-- STATUS FIRST (big & clear) -->
-  <div class="status-primary">
-    <div class="status-icon status-positive">
-      <i class="bi bi-graph-up-arrow"></i>
-    </div>
-    <div class="status-content">
-      <p class="status-label">Net Worth</p>
-      <h1 class="status-value">$142,384</h1>
-      <p class="status-change">
-        <span class="amount-positive">+$2,841</span>
-        <span class="text-muted">vs. last month</span>
-      </p>
-    </div>
-  </div>
-  
-  <!-- DETAILS SECOND (smaller, supporting context) -->
-  <div class="status-grid">
-    <div class="status-card">
-      <span class="status-label">Assets</span>
-      <span class="status-value">$187,293</span>
-    </div>
-    <div class="status-card">
-      <span class="status-label">Debts</span>
-      <span class="status-value amount-negative">$44,909</span>
-    </div>
-    <div class="status-card">
-      <span class="status-label">Cash Flow</span>
-      <span class="status-value amount-positive">+$3,204</span>
-    </div>
-  </div>
-</div>
-```
-
-**CSS:**
-```css
-.dashboard-hero {
-  display: grid;
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
-}
-
-.status-primary {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-6);
-  background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
-  border-radius: var(--radius-3);
-  border: 1px solid var(--border-subtle);
-}
-
-.status-icon {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-size: 32px;
-}
-
-.status-icon.status-positive {
-  background: var(--color-accent-light);
-  color: var(--color-accent);
-}
-
-.status-value {
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1;
-  margin: 0;
-}
-
-.status-label {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
-}
-
-.status-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--surface-1);
-  border-radius: var(--radius-2);
-  border: 1px solid var(--border-subtle);
-}
-```
-
-**Why It Works:**
-- Visual hierarchy matches mental priority
-- Fast comprehension (< 2 seconds)
-- Reduces anxiety (status first reassures users)
-
----
-
-### Pattern 3: Contextual Micro-Insights
-**Principle:** Tell me what the number MEANS, not just the number
-
-#### Current vs. Enhanced Transaction Display
-
-**Before:**
-```html
-<td>-$87.42</td>
-```
-
-**After:**
-```html
-<td class="amount-negative">
-  -$87.42
-  <span class="insight-badge">↑ 12% above avg</span>
-</td>
-```
-
-**Full Implementation:**
-```javascript
-// Add to transactions.js
-function addContextualInsights(transactions) {
-  const avgByCategory = calculateCategoryAverages(transactions);
-  
-  return transactions.map(txn => {
-    const avg = avgByCategory[txn.category];
-    const diff = txn.amount - avg;
-    const diffPercent = Math.abs(diff / avg * 100);
-    
-    let insight = null;
-    if (diffPercent > 20) {
-      insight = {
-        text: diff > 0 ? `↑ ${diffPercent.toFixed(0)}% above avg` : `↓ ${diffPercent.toFixed(0)}% below avg`,
-        type: diff > 0 ? 'warning' : 'success'
-      };
-    }
-    
-    return { ...txn, insight };
-  });
-}
-
-// Render with insight badge
-function renderTransaction(txn) {
-  return `
-    <td class="amount-${txn.amount < 0 ? 'negative' : 'positive'}">
-      ${formatCurrency(txn.amount)}
-      ${txn.insight ? `<span class="insight-badge insight-${txn.insight.type}">${txn.insight.text}</span>` : ''}
-    </td>
-  `;
-}
-```
-
-**CSS:**
-```css
-.insight-badge {
-  display: inline-block;
-  margin-left: var(--space-2);
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 12px;
-  white-space: nowrap;
-}
-
-.insight-warning {
-  background: rgba(244, 78, 36, 0.15);
-  color: var(--color-primary);
-}
-
-.insight-success {
-  background: rgba(129, 185, 0, 0.15);
-  color: var(--color-accent);
-}
-```
-
-**Examples of Contextual Insights:**
-- "↑ 12% above avg" (spending alert)
-- "✓ First time" (new merchant)
-- "⚠️ Due in 3 days" (bill reminder)
-- "🔁 Recurring" (pattern detected)
-
----
-
-### Pattern 4: Financial Color Language
-**Principle:** Colors must communicate meaning INSTANTLY
-
-#### Standardized Color System
-
-```css
-/* 0-tokens/financial-semantics.css */
-:root {
-  /* Amounts */
-  --amount-positive: var(--color-accent);      /* Green: Income, gains */
-  --amount-negative: var(--color-error);       /* Red: Expenses, losses */
-  --amount-neutral: var(--text-primary);       /* White/Gray: Transfers, neutral */
-  
-  /* Status */
-  --status-healthy: var(--color-accent);       /* On track, surplus */
-  --status-warning: #f39c12;                   /* Approaching limit */
-  --status-critical: var(--color-error);       /* Over budget, overdue */
-  
-  /* Categories (8 distinct colors) */
-  --cat-housing: #3498db;       /* Blue */
-  --cat-transport: #9b59b6;     /* Purple */
-  --cat-food: #f44e24;          /* Orange */
-  --cat-utilities: #e67e22;     /* Dark orange */
-  --cat-health: #e74c3c;        /* Red */
-  --cat-entertainment: #1abc9c; /* Teal */
-  --cat-savings: #81b900;       /* Green */
-  --cat-other: #95a5a6;         /* Gray */
-}
-```
-
-**Usage Examples:**
-```html
-<!-- Transaction amounts -->
-<span class="amount-positive">+$3,204</span>  <!-- Green -->
-<span class="amount-negative">-$87.42</span>  <!-- Red -->
-
-<!-- Budget status -->
-<div class="budget-meter status-healthy"></div>   <!-- Green bar -->
-<div class="budget-meter status-warning"></div>   <!-- Yellow bar -->
-<div class="budget-meter status-critical"></div>  <!-- Red bar -->
-
-<!-- Category tags -->
-<span class="category-tag" style="--tag-color: var(--cat-food)">Groceries</span>
-```
-
-**CSS for Category Tags:**
-```css
-.category-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 4px 12px;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--tag-color) 15%, transparent);
-  color: var(--tag-color);
-  border: 1px solid color-mix(in srgb, var(--tag-color) 30%, transparent);
-}
-
-.category-tag::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--tag-color);
-}
-```
-
----
-
-### Pattern 5: Glanceable Metrics (Data Density Done Right)
-**Principle:** Important numbers should be scannable in 3 seconds
-
-#### Dashboard Stats Grid
-
-```html
-<div class="metrics-grid">
-  <!-- Metric Card Pattern -->
-  <div class="metric-card">
-    <div class="metric-header">
-      <i class="bi bi-wallet2 metric-icon"></i>
-      <span class="metric-label">Monthly Income</span>
-    </div>
-    <div class="metric-value">$8,234</div>
-    <div class="metric-trend">
-      <i class="bi bi-arrow-up-short"></i>
-      <span>+4.2% vs. last month</span>
-    </div>
-  </div>
-  
-  <div class="metric-card">
-    <div class="metric-header">
-      <i class="bi bi-credit-card metric-icon"></i>
-      <span class="metric-label">Expenses</span>
-    </div>
-    <div class="metric-value amount-negative">$5,030</div>
-    <div class="metric-trend">
-      <i class="bi bi-arrow-down-short"></i>
-      <span>-2.1% vs. last month</span>
-    </div>
-  </div>
-  
-  <div class="metric-card">
-    <div class="metric-header">
-      <i class="bi bi-piggy-bank metric-icon"></i>
-      <span class="metric-label">Savings Rate</span>
-    </div>
-    <div class="metric-value">39%</div>
-    <div class="metric-trend">
-      <i class="bi bi-arrow-up-short"></i>
-      <span>+6.3% vs. goal</span>
-    </div>
-  </div>
-  
-  <div class="metric-card metric-card-alert">
-    <div class="metric-header">
-      <i class="bi bi-exclamation-circle metric-icon"></i>
-      <span class="metric-label">Bills Due</span>
-    </div>
-    <div class="metric-value">3</div>
-    <div class="metric-trend">
-      <span class="status-critical">In next 7 days</span>
-    </div>
-  </div>
-</div>
-```
-
-**CSS:**
-```css
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
-}
-
 .metric-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-5);
   background: var(--surface-1);
-  border-radius: var(--radius-2);
-  border: 1px solid var(--border-subtle);
-  transition: all 150ms ease;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-3);
+  padding: var(--space-5);
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .metric-card:hover {
-  border-color: var(--color-secondary);
-  box-shadow: 0 4px 12px rgba(1, 164, 239, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-2);
 }
 
-.metric-card-alert {
-  border-color: var(--color-error);
-  background: linear-gradient(135deg, var(--surface-1), rgba(244, 78, 36, 0.05));
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: var(--radius-3) 0 0 var(--radius-3);
+  background: var(--metric-accent);
+}
+
+.metric-card.trend-up::before {
+  background: var(--color-success);
+}
+
+.metric-card.trend-down::before {
+  background: var(--color-danger);
 }
 
 .metric-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: var(--space-2);
-}
-
-.metric-icon {
-  font-size: 20px;
-  color: var(--color-secondary);
+  margin-bottom: var(--space-2);
 }
 
 .metric-label {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.metric-value {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text-primary);
 }
 
 .metric-trend {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
-.metric-trend i {
-  font-size: 16px;
+.trend-up .metric-trend {
+  color: var(--color-success);
 }
 
-.metric-trend .status-critical {
-  color: var(--color-error);
+.trend-down .metric-trend {
+  color: var(--color-danger);
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.metric-change {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.metric-sparkline {
+  height: 40px;
+  width: 100%;
+  opacity: 0.8;
+}
+
+/* Container queries for responsive card layout */
+@container card-grid (max-width: 400px) {
+  .metric-value {
+    font-size: 1.5rem;
+  }
+  .metric-sparkline {
+    height: 30px;
+  }
+}
+```
+
+**JavaScript** (`chart-factory.js` — sparkline renderer):
+```javascript
+/**
+ * Generate sparkline chart (mini trend chart)
+ * @param {string} canvasId - Canvas element ID
+ * @param {number[]} data - Array of values
+ * @param {string} color - Line color (hex)
+ */
+function createSparkline(canvasId, data, color = '#81b900') {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map((_, i) => i), // Hidden labels
+      datasets: [{
+        data: data,
+        borderColor: color,
+        borderWidth: 2,
+        fill: true,
+        backgroundColor: `${color}22`, // 13% opacity
+        pointRadius: 0,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      },
+      scales: {
+        x: { display: false },
+        y: { display: false }
+      },
+      interaction: { mode: null }
+    }
+  });
+}
+
+// Usage
+const netWorthData = [120000, 121500, 119800, 123000, 125000, 127350];
+createSparkline('sparkline-networth', netWorthData, '#81b900');
+```
+
+---
+
+## Pattern 2: Cash Flow Sankey Diagram
+
+### Overview
+Visualize money flow from income sources → expenses → savings/investments. Helps users understand where money goes.
+
+**Used By**: Personal Capital, Copilot Money  
+**Purpose**: Answer "Where does my money actually go?"
+
+### Visual Example
+```
+Income               Expenses            Savings
+┌──────────┐        ┌──────────┐        ┌──────────┐
+│ Salary   ├───────►│ Housing  │        │ 401k     │
+│ $8,000   │   ├───►│ $2,400   │        │ $800     │
+└──────────┘   │    └──────────┘        └──────────┘
+               │    ┌──────────┐        ┌──────────┐
+               ├───►│ Food     │        │ Savings  │
+               │    │ $600     │        │ $1,200   │
+               │    └──────────┘        └──────────┘
+               │    ┌──────────┐
+               └───►│ Transport│
+                    │ $400     │
+                    └──────────┘
+```
+
+### Implementation (Chart.js with Sankey Plugin)
+
+**Install Sankey Plugin**:
+```html
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0"></script>
+```
+
+**JavaScript** (`charts.js`):
+```javascript
+function createCashFlowChart(canvasId) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  
+  // Data structure: [from, to, amount]
+  const cashFlowData = [
+    // Income → Expenses
+    { from: 'Salary', to: 'Housing', flow: 2400 },
+    { from: 'Salary', to: 'Food', flow: 600 },
+    { from: 'Salary', to: 'Transport', flow: 400 },
+    { from: 'Salary', to: 'Entertainment', flow: 300 },
+    
+    // Income → Savings
+    { from: 'Salary', to: '401k', flow: 800 },
+    { from: 'Salary', to: 'Emergency Fund', flow: 600 },
+    { from: 'Salary', to: 'Investments', flow: 600 },
+    
+    // Side income
+    { from: 'Freelance', to: 'Debt Repayment', flow: 1000 },
+    { from: 'Freelance', to: 'Investments', flow: 500 }
+  ];
+
+  new Chart(ctx, {
+    type: 'sankey',
+    data: {
+      datasets: [{
+        label: 'Cash Flow',
+        data: cashFlowData,
+        colorFrom: (c) => getNodeColor(c.dataset.data[c.dataIndex].from),
+        colorTo: (c) => getNodeColor(c.dataset.data[c.dataIndex].to),
+        colorMode: 'gradient',
+        size: 'max',
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const { from, to, flow } = context.raw;
+              return `${from} → ${to}: $${flow.toLocaleString()}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function getNodeColor(nodeName) {
+  const colors = {
+    'Salary': '#01a4ef',
+    'Freelance': '#f44e24',
+    'Housing': '#d13438',
+    'Food': '#f3c200',
+    'Transport': '#81b900',
+    '401k': '#00bcf2',
+    'Investments': '#00b294',
+    'Emergency Fund': '#0078d4'
+  };
+  return colors[nodeName] || '#6c757d';
+}
+```
+
+---
+
+## Pattern 3: Budget Progress Bars
+
+### Overview
+Visual representation of spending vs. budget with color-coded status (green = under budget, yellow = approaching, red = exceeded).
+
+**Used By**: YNAB, Mint, EveryDollar  
+**Purpose**: Immediate feedback on spending control
+
+### Visual Example
+```
+Housing       ████████░░ 80% ($2,400 / $3,000)  [Green]
+Food          ███████████ 110% ($660 / $600)   [Red]
+Transport     ████░░░░░░ 40% ($160 / $400)     [Green]
+```
+
+### Implementation
+
+**HTML**:
+```html
+<div class="budget-item">
+  <div class="budget-header">
+    <span class="budget-category">Housing</span>
+    <span class="budget-amount">$2,400 / $3,000</span>
+  </div>
+  <div class="budget-bar-container">
+    <div class="budget-bar budget-ok" style="width: 80%"></div>
+  </div>
+  <div class="budget-footer">
+    <span class="budget-percentage">80%</span>
+    <span class="budget-remaining">$600 remaining</span>
+  </div>
+</div>
+
+<div class="budget-item">
+  <div class="budget-header">
+    <span class="budget-category">Food</span>
+    <span class="budget-amount">$660 / $600</span>
+  </div>
+  <div class="budget-bar-container">
+    <div class="budget-bar budget-exceeded" style="width: 110%"></div>
+  </div>
+  <div class="budget-footer">
+    <span class="budget-percentage">110%</span>
+    <span class="budget-overage">$60 over</span>
+  </div>
+</div>
+```
+
+**CSS**:
+```css
+.budget-item {
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-3);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.budget-category {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.budget-amount {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-bar-container {
+  position: relative;
+  height: 12px;
+  background: var(--surface-3);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.budget-bar {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.4s ease, background-color 0.3s ease;
+  position: relative;
+}
+
+.budget-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Status colors */
+.budget-ok {
+  background: var(--color-success);
+}
+
+.budget-warning {
+  background: var(--color-warning);
+}
+
+.budget-exceeded {
+  background: var(--color-danger);
+}
+
+.budget-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.budget-percentage {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.budget-remaining {
+  color: var(--color-success);
+}
+
+.budget-overage {
+  color: var(--color-danger);
   font-weight: 600;
 }
 ```
 
-**Data Density Guidelines:**
-- Primary metric: 32-48px font size
-- Supporting context: 12-14px font size
-- Max 4 pieces of info per card
-- Icons reinforce, not replace, text
+**JavaScript** (dynamic status):
+```javascript
+function updateBudgetBar(spent, budgeted) {
+  const percentage = (spent / budgeted) * 100;
+  const bar = document.querySelector('.budget-bar');
+  
+  // Update width
+  bar.style.width = `${Math.min(percentage, 100)}%`;
+  
+  // Update status class
+  bar.classList.remove('budget-ok', 'budget-warning', 'budget-exceeded');
+  if (percentage >= 100) {
+    bar.classList.add('budget-exceeded');
+  } else if (percentage >= 75) {
+    bar.classList.add('budget-warning');
+  } else {
+    bar.classList.add('budget-ok');
+  }
+  
+  // Show remaining or overage
+  const footer = document.querySelector('.budget-footer');
+  if (percentage > 100) {
+    const overage = spent - budgeted;
+    footer.querySelector('.budget-remaining').textContent = `$${overage} over`;
+    footer.querySelector('.budget-remaining').className = 'budget-overage';
+  } else {
+    const remaining = budgeted - spent;
+    footer.querySelector('.budget-remaining').textContent = `$${remaining} remaining`;
+    footer.querySelector('.budget-remaining').className = 'budget-remaining';
+  }
+}
+
+// Usage
+updateBudgetBar(2400, 3000); // Housing: $2,400 / $3,000
+updateBudgetBar(660, 600);   // Food: $660 / $600 (exceeded)
+```
 
 ---
 
-### Pattern 6: Empty States That Guide
-**Problem:** Blank pages kill engagement  
-**Solution:** Empty states should teach, not just announce absence
+## Pattern 4: Timeline / Activity Feed
 
-#### Budget Empty State
+### Overview
+Chronological list of financial events (transactions, bill payments, budget adjustments) with icons and timestamps.
 
+**Used By**: Mint, Personal Capital, Monarch Money  
+**Purpose**: Financial "social feed" — see what happened recently
+
+### Visual Example
+```
+Today
+  ⬇️ $45.20 — Whole Foods               2:35 PM
+  ⬆️ $3,200 — Paycheck Deposit          9:00 AM
+
+Yesterday
+  ⬇️ $89.99 — Electric Bill (Auto-pay)  3:00 PM
+  ⬇️ $12.50 — Netflix                   12:00 PM
+  
+Feb 18
+  ⬇️ $1,450 — Rent Payment               8:00 AM
+```
+
+### Implementation
+
+**HTML**:
 ```html
-<div class="empty-state">
-  <div class="empty-state-icon">
-    <i class="bi bi-calculator"></i>
+<div class="timeline">
+  <div class="timeline-group">
+    <div class="timeline-date">Today</div>
+    
+    <div class="timeline-item expense">
+      <div class="timeline-icon">
+        <i class="bi bi-arrow-down-circle"></i>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-title">Whole Foods</div>
+        <div class="timeline-category">Groceries</div>
+      </div>
+      <div class="timeline-meta">
+        <div class="timeline-amount">-$45.20</div>
+        <div class="timeline-time">2:35 PM</div>
+      </div>
+    </div>
+    
+    <div class="timeline-item income">
+      <div class="timeline-icon">
+        <i class="bi bi-arrow-up-circle"></i>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-title">Paycheck Deposit</div>
+        <div class="timeline-category">Salary</div>
+      </div>
+      <div class="timeline-meta">
+        <div class="timeline-amount">+$3,200</div>
+        <div class="timeline-time">9:00 AM</div>
+      </div>
+    </div>
   </div>
-  <h3 class="empty-state-title">No budgets yet</h3>
-  <p class="empty-state-description">
-    Budgets help you control spending by category. Set limits for groceries, entertainment, and more.
-  </p>
-  <div class="empty-state-actions">
-    <button class="btn btn-primary" onclick="showBudgetModal()">
-      <i class="bi bi-plus-lg"></i>
-      Create Your First Budget
-    </button>
-    <button class="btn btn-secondary" onclick="showBudgetGuide()">
-      <i class="bi bi-book"></i>
-      Learn About Budgeting
-    </button>
+  
+  <div class="timeline-group">
+    <div class="timeline-date">Yesterday</div>
+    <!-- More items -->
   </div>
-  <div class="empty-state-examples">
-    <p class="text-muted text-sm">Popular starting budgets:</p>
-    <div class="example-tags">
-      <button class="btn btn-sm btn-outline" onclick="quickAddBudget('groceries', 500)">Groceries: $500</button>
-      <button class="btn btn-sm btn-outline" onclick="quickAddBudget('dining', 300)">Dining Out: $300</button>
-      <button class="btn btn-sm btn-outline" onclick="quickAddBudget('gas', 200)">Gas: $200</button>
+</div>
+```
+
+**CSS**:
+```css
+.timeline {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.timeline-group {
+  margin-bottom: var(--space-6);
+}
+
+.timeline-date {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-12);
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-3);
+  margin-bottom: var(--space-2);
+  transition: all 0.2s ease;
+}
+
+.timeline-item:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-1);
+}
+
+.timeline-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.timeline-item.expense .timeline-icon {
+  background: var(--color-danger-subtle);
+  color: var(--color-danger);
+}
+
+.timeline-item.income .timeline-icon {
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+}
+
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.timeline-category {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.timeline-meta {
+  text-align: right;
+}
+
+.timeline-amount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: var(--space-1);
+}
+
+.timeline-item.expense .timeline-amount {
+  color: var(--color-danger);
+}
+
+.timeline-item.income .timeline-amount {
+  color: var(--color-success);
+}
+
+.timeline-time {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+  .timeline-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .timeline-meta {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+```
+
+---
+
+## Pattern 5: Goal Progress Cards
+
+### Overview
+Visual tracking of financial goals (e.g., "Save $10k for vacation") with progress bar, projected completion date, and motivational copy.
+
+**Used By**: Qapital, Digit, Acorns  
+**Purpose**: Gamification — make saving feel rewarding
+
+### Visual Example
+```
+┌─────────────────────────────────────┐
+│ 🏖️ Vacation Fund                     │
+│ $6,500 / $10,000                    │
+│ ████████░░░░░░ 65%                  │
+│ On track to reach by Aug 2026       │
+│ +$500/month                         │
+└─────────────────────────────────────┘
+```
+
+### Implementation
+
+**HTML**:
+```html
+<div class="goal-card goal-on-track">
+  <div class="goal-icon">🏖️</div>
+  <div class="goal-content">
+    <h3 class="goal-title">Vacation Fund</h3>
+    <div class="goal-progress-text">$6,500 / $10,000</div>
+    <div class="goal-bar-container">
+      <div class="goal-bar" style="width: 65%"></div>
+    </div>
+    <div class="goal-footer">
+      <span class="goal-status">On track to reach by Aug 2026</span>
+      <span class="goal-contribution">+$500/month</span>
     </div>
   </div>
 </div>
 ```
 
-**CSS:**
+**CSS**:
 ```css
-.empty-state {
+.goal-card {
+  background: var(--surface-1);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-3);
+  padding: var(--space-5);
   display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: var(--space-4);
-  padding: var(--space-8) var(--space-4);
-  text-align: center;
-  max-width: 500px;
-  margin: 0 auto;
+  transition: all 0.2s ease;
 }
 
-.empty-state-icon {
-  width: 96px;
-  height: 96px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-size: 48px;
+.goal-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-2);
 }
 
-.empty-state-title {
-  font-size: 24px;
+.goal-on-track {
+  border-color: var(--color-success);
+}
+
+.goal-behind {
+  border-color: var(--color-warning);
+}
+
+.goal-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.goal-content {
+  flex: 1;
+}
+
+.goal-title {
+  font-size: 1.25rem;
   font-weight: 700;
-  margin: 0;
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
 }
 
-.empty-state-description {
-  color: var(--text-muted);
-  line-height: var(--leading-relaxed);
-  margin: 0;
+.goal-progress-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+  font-variant-numeric: tabular-nums;
 }
 
-.empty-state-actions {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
+.goal-bar-container {
+  position: relative;
+  height: 16px;
+  background: var(--surface-3);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
 }
 
-.empty-state-examples {
-  margin-top: var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border-subtle);
+.goal-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-success), var(--color-primary));
+  border-radius: var(--radius-pill);
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.goal-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: goal-shimmer 3s infinite;
 }
 
-.example-tags {
+@keyframes goal-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.goal-footer {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.goal-status {
+  color: var(--text-secondary);
+}
+
+.goal-contribution {
+  font-weight: 600;
+  color: var(--color-success);
 }
 ```
 
-**Key Elements:**
-1. **Icon** (64-96px) — Visual anchor
-2. **Title** (24-32px) — Clear, human language
-3. **Description** — Explain the benefit
-4. **Primary CTA** — Most common action
-5. **Secondary CTA** — Educational alternative
-6. **Quick starts** — One-click presets
-
 ---
 
-### Pattern 7: Responsive Financial Tables
-**Challenge:** Tables don't collapse well on mobile  
-**Solution:** Card layout below 768px
+## Pattern 6: Comparison Tables (Accounts, Investments)
 
-#### Implementation (from CSS Architecture Research)
+### Overview
+Side-by-side comparison of accounts/investments with sortable columns, color-coded returns, and performance indicators.
 
+**Used By**: Personal Capital, Empower  
+**Purpose**: Portfolio analysis — which investments are performing?
+
+### Visual Example
+```
+Account              Balance      YTD Return  Allocation
+────────────────────────────────────────────────────────
+Vanguard 401k        $45,200      ↑ +12.3%    ████░ 42%
+Roth IRA (Fidelity)  $28,900      ↑ +8.7%     ███░░ 27%
+Brokerage (Robinhood) $15,400     ↓ -2.1%     ██░░░ 14%
+Savings (Marcus)     $18,000      ↑ +4.5%     ██░░░ 17%
+```
+
+### Implementation
+
+**HTML** (with sortable columns):
 ```html
-<table class="fin-table">
+<table class="comparison-table">
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Description</th>
-      <th>Category</th>
-      <th>Amount</th>
+      <th class="sortable" data-sort="name">Account</th>
+      <th class="sortable" data-sort="balance">Balance</th>
+      <th class="sortable" data-sort="return">YTD Return</th>
+      <th>Allocation</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td data-label="Date">Feb 10</td>
-      <td data-label="Description">Whole Foods Market</td>
-      <td data-label="Category">
-        <span class="category-tag" style="--tag-color: var(--cat-food)">Groceries</span>
+      <td class="account-name">
+        <i class="bi bi-wallet2 me-2"></i>
+        Vanguard 401k
       </td>
-      <td data-label="Amount" class="amount-negative">-$87.42</td>
+      <td class="account-balance">$45,200</td>
+      <td class="account-return positive">
+        <i class="bi bi-arrow-up"></i> +12.3%
+      </td>
+      <td>
+        <div class="allocation-bar" style="width: 42%"></div>
+        <span class="allocation-label">42%</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="account-name">
+        <i class="bi bi-piggy-bank me-2"></i>
+        Roth IRA (Fidelity)
+      </td>
+      <td class="account-balance">$28,900</td>
+      <td class="account-return positive">
+        <i class="bi bi-arrow-up"></i> +8.7%
+      </td>
+      <td>
+        <div class="allocation-bar" style="width: 27%"></div>
+        <span class="allocation-label">27%</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="account-name">
+        <i class="bi bi-graph-up me-2"></i>
+        Brokerage (Robinhood)
+      </td>
+      <td class="account-balance">$15,400</td>
+      <td class="account-return negative">
+        <i class="bi bi-arrow-down"></i> -2.1%
+      </td>
+      <td>
+        <div class="allocation-bar" style="width: 14%"></div>
+        <span class="allocation-label">14%</span>
+      </td>
     </tr>
   </tbody>
 </table>
 ```
 
-**CSS (Mobile-First):**
+**CSS**:
 ```css
-/* Mobile: Card layout */
-@media (max-width: 768px) {
-  .fin-table,
-  .fin-table thead,
-  .fin-table tbody,
-  .fin-table tr,
-  .fin-table td {
-    display: block;
-  }
-  
-  .fin-table thead {
-    display: none;
-  }
-  
-  .fin-table tr {
-    margin-bottom: var(--space-4);
-    padding: var(--space-4);
-    background: var(--surface-1);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-2);
-  }
-  
-  .fin-table td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-2) 0;
-    border: none;
-  }
-  
-  .fin-table td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--text-muted);
-    font-size: var(--text-sm);
-  }
-  
-  .fin-table td:last-child {
-    padding-top: var(--space-3);
-    margin-top: var(--space-3);
-    border-top: 1px solid var(--border-subtle);
-    font-size: 18px;
-    font-weight: 700;
-  }
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-3);
+  overflow: hidden;
 }
 
-/* Desktop: Table layout */
-@media (min-width: 769px) {
-  .fin-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
+.comparison-table thead {
+  background: var(--surface-2);
+}
+
+.comparison-table th {
+  padding: var(--space-4);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.comparison-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.comparison-table th.sortable:hover {
+  color: var(--color-primary);
+}
+
+.comparison-table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.account-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.account-balance {
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.account-return {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.account-return.positive {
+  color: var(--color-success);
+}
+
+.account-return.negative {
+  color: var(--color-danger);
+}
+
+.allocation-bar {
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-1);
+}
+
+.allocation-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+```
+
+**JavaScript** (sortable columns):
+```javascript
+document.querySelectorAll('.sortable').forEach((th) => {
+  th.addEventListener('click', () => {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const sortKey = th.dataset.sort;
+    const isAsc = th.classList.contains('sort-asc');
+    
+    // Clear previous sort indicators
+    table.querySelectorAll('.sortable').forEach((header) => {
+      header.classList.remove('sort-asc', 'sort-desc');
+    });
+    
+    // Sort rows
+    rows.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey);
+      const bValue = getSortValue(b, sortKey);
+      return isAsc ? bValue - aValue : aValue - bValue;
+    });
+    
+    // Update DOM
+    rows.forEach((row) => tbody.appendChild(row));
+    
+    // Update sort indicator
+    th.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+  });
+});
+
+function getSortValue(row, key) {
+  const cell = row.querySelector(`.account-${key}`);
+  if (!cell) return 0;
   
-  .fin-table th {
-    position: sticky;
-    top: 0;
-    background: var(--surface-2);
-    padding: var(--space-3) var(--space-4);
-    text-align: left;
-    font-weight: 600;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    border-bottom: 2px solid var(--border-strong);
-  }
-  
-  .fin-table td {
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--border-subtle);
-  }
-  
-  .fin-table tbody tr:hover {
-    background: var(--surface-hover);
-  }
+  const text = cell.textContent.trim();
+  return parseFloat(text.replace(/[$,%]/g, '')) || 0;
 }
 ```
 
 ---
 
-### Pattern 8: Inline Editing (Power User Feature)
-**Principle:** Don't force users into separate forms for quick edits
+## Pattern 7: Smart Alerts & Notifications
 
+### Overview
+Contextual alerts that appear when user attention is needed (budget exceeded, bill due, unusual spending detected).
+
+**Used By**: Mint, Cleo, Rocket Money  
+**Purpose**: Proactive guidance — catch issues before they escalate
+
+### Types of Alerts
+1. **Critical** (Red) — Requires immediate action
+   - Bill due in 2 days
+   - Account overdrawn
+   - Budget exceeded by 50%
+
+2. **Warning** (Yellow) — Needs attention soon
+   - Budget at 75%
+   - Bill due in 5 days
+   - Unusual spending spike detected
+
+3. **Info** (Blue) — FYI, no action required
+   - Net worth increased 10%
+   - New paycheck deposited
+   - Goal milestone reached
+
+### Implementation
+
+**HTML**:
 ```html
-<div class="budget-item editable">
-  <span class="budget-name" contenteditable="false" data-field="name">Groceries</span>
-  <input type="number" class="budget-limit" value="500" data-field="limit">
-  <button class="btn-icon btn-save" hidden>
-    <i class="bi bi-check-lg"></i>
-  </button>
-  <button class="btn-icon btn-edit">
-    <i class="bi bi-pencil"></i>
-  </button>
+<!-- Critical Alert -->
+<div class="alert-card alert-critical">
+  <div class="alert-icon">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+  </div>
+  <div class="alert-content">
+    <div class="alert-title">Electric bill due in 2 days</div>
+    <div class="alert-body">$89.99 due Feb 22 — Set up auto-pay?</div>
+  </div>
+  <div class="alert-actions">
+    <button class="btn btn-sm btn-danger">Pay Now</button>
+    <button class="btn btn-sm btn-outline-secondary">Snooze</button>
+  </div>
+</div>
+
+<!-- Warning Alert -->
+<div class="alert-card alert-warning">
+  <div class="alert-icon">
+    <i class="bi bi-exclamation-circle-fill"></i>
+  </div>
+  <div class="alert-content">
+    <div class="alert-title">Food budget at 85%</div>
+    <div class="alert-body">You've spent $510 of $600 this month</div>
+  </div>
+  <div class="alert-actions">
+    <button class="btn btn-sm btn-warning">View Details</button>
+  </div>
+</div>
+
+<!-- Info Alert -->
+<div class="alert-card alert-info">
+  <div class="alert-icon">
+    <i class="bi bi-info-circle-fill"></i>
+  </div>
+  <div class="alert-content">
+    <div class="alert-title">Goal milestone reached!</div>
+    <div class="alert-body">You're halfway to your vacation fund ($5,000)</div>
+  </div>
+  <div class="alert-actions">
+    <button class="btn btn-sm btn-primary">Celebrate 🎉</button>
+  </div>
 </div>
 ```
 
-**JavaScript:**
+**CSS**:
+```css
+.alert-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-3);
+  margin-bottom: var(--space-3);
+  border-left: 4px solid;
+}
+
+.alert-critical {
+  background: var(--color-danger-subtle);
+  border-left-color: var(--color-danger);
+}
+
+.alert-warning {
+  background: var(--color-warning-subtle);
+  border-left-color: var(--color-warning);
+}
+
+.alert-info {
+  background: var(--color-info-subtle);
+  border-left-color: var(--color-info);
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.alert-critical .alert-icon {
+  background: var(--color-danger);
+  color: white;
+}
+
+.alert-warning .alert-icon {
+  background: var(--color-warning);
+  color: var(--text-inverse);
+}
+
+.alert-info .alert-icon {
+  background: var(--color-info);
+  color: white;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.alert-body {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.alert-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+```
+
+---
+
+## Implementation Roadmap
+
+### Sprint 1: Core Patterns (Week 1-2)
+- [ ] Metric cards with trends + sparklines
+- [ ] Budget progress bars
+- [ ] Timeline/activity feed
+- [ ] Update design tokens for new components
+
+### Sprint 2: Advanced Visualizations (Week 3-4)
+- [ ] Cash flow Sankey diagram (with Chart.js Sankey plugin)
+- [ ] Goal progress cards
+- [ ] Comparison tables with sorting
+- [ ] Implement smart alerts system
+
+### Sprint 3: Polish & Testing (Week 5)
+- [ ] Responsive testing (mobile, tablet, desktop)
+- [ ] Dark theme verification
+- [ ] Accessibility audit (WCAG AA)
+- [ ] Cross-browser testing
+
+---
+
+## Performance Considerations
+
+### Lazy-Load Charts
+Only render charts when they're in viewport:
+
 ```javascript
-// Add to app.js
-document.querySelectorAll('.budget-item.editable').forEach(item => {
-  const editBtn = item.querySelector('.btn-edit');
-  const saveBtn = item.querySelector('.btn-save');
-  const fields = item.querySelectorAll('[data-field]');
-  
-  editBtn.addEventListener('click', () => {
-    fields.forEach(field => {
-      if (field.contentEditable !== undefined) {
-        field.contentEditable = 'true';
-        field.focus();
-      } else {
-        field.removeAttribute('readonly');
-      }
-    });
-    editBtn.hidden = true;
-    saveBtn.hidden = false;
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const chartId = entry.target.id;
+      renderChart(chartId);
+      observer.unobserve(entry.target);
+    }
   });
-  
-  saveBtn.addEventListener('click', async () => {
-    const updates = {};
-    fields.forEach(field => {
-      const fieldName = field.dataset.field;
-      updates[fieldName] = field.value || field.textContent;
-    });
-    
-    await saveBudgetUpdates(item.dataset.budgetId, updates);
-    
-    fields.forEach(field => {
-      if (field.contentEditable !== undefined) {
-        field.contentEditable = 'false';
-      } else {
-        field.setAttribute('readonly', 'readonly');
-      }
-    });
-    editBtn.hidden = false;
-    saveBtn.hidden = true;
-  });
+});
+
+document.querySelectorAll('.chart-canvas').forEach((canvas) => {
+  observer.observe(canvas);
 });
 ```
 
----
-
-### Pattern 9: Smart Defaults & Predictions
-**Example:** Bill amount auto-fills from history
-
+### Debounce Expensive Operations
 ```javascript
-// Add to bills.js
-async function suggestBillAmount(billId) {
-  const history = await fetchBillHistory(billId);
-  
-  if (history.length >= 3) {
-    const recentAmounts = history.slice(0, 3).map(b => b.amount);
-    const avgAmount = recentAmounts.reduce((a, b) => a + b, 0) / recentAmounts.length;
-    
-    // If amounts are stable (< 10% variance), suggest the average
-    const variance = Math.max(...recentAmounts) - Math.min(...recentAmounts);
-    if (variance / avgAmount < 0.1) {
-      return {
-        suggested: avgAmount,
-        confidence: 'high',
-        message: `Usually $${avgAmount.toFixed(2)}`
-      };
-    }
-  }
-  
-  return null;
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
 }
 
-// UI implementation
-const billInput = document.getElementById('billAmount');
-const suggestion = await suggestBillAmount(currentBillId);
-
-if (suggestion) {
-  billInput.value = suggestion.suggested.toFixed(2);
-  billInput.dataset.suggestion = 'true';
-  
-  // Show hint
-  const hint = document.createElement('span');
-  hint.className = 'input-hint';
-  hint.textContent = suggestion.message;
-  billInput.parentElement.appendChild(hint);
-}
+// Usage: debounce table sorting
+const handleSort = debounce((sortKey) => {
+  sortTable(sortKey);
+}, 300);
 ```
 
 ---
 
-### Pattern 10: Micro-Interactions (Trust Signals)
-**Principle:** Every action should have visible feedback
+## Next Steps
 
-```css
-/* Loading state for buttons */
-.btn.loading {
-  position: relative;
-  color: transparent;
-  pointer-events: none;
-}
-
-.btn.loading::after {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: 50%;
-  left: 50%;
-  margin: -8px 0 0 -8px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spin 600ms linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Success checkmark animation */
-.btn.success::before {
-  content: '\f26b'; /* Bootstrap check icon */
-  font-family: 'Bootstrap Icons';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  color: var(--color-accent);
-  font-size: 20px;
-  animation: checkmark 400ms ease forwards;
-}
-
-@keyframes checkmark {
-  0% { transform: translate(-50%, -50%) scale(0); }
-  50% { transform: translate(-50%, -50%) scale(1.2); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-```
-
-**Usage:**
-```javascript
-async function saveBudget(data) {
-  const saveBtn = document.getElementById('saveBudgetBtn');
-  
-  // 1. Loading state
-  saveBtn.classList.add('loading');
-  saveBtn.disabled = true;
-  
-  try {
-    await api.post('/budgets', data);
-    
-    // 2. Success state
-    saveBtn.classList.remove('loading');
-    saveBtn.classList.add('success');
-    
-    // 3. Reset after 2s
-    setTimeout(() => {
-      saveBtn.classList.remove('success');
-      saveBtn.disabled = false;
-    }, 2000);
-  } catch (error) {
-    // Error state
-    saveBtn.classList.remove('loading');
-    saveBtn.classList.add('error');
-    showToast('Failed to save budget', 'error');
-  }
-}
-```
+1. **Create Task Work Items** for each pattern
+2. **Design System Update** — Add new components to design tokens
+3. **Component Library** — Build reusable React/Vue components (future)
+4. **A/B Testing** — Test user engagement with different patterns
 
 ---
 
-## 🎯 Azure DevOps Implementation Tasks
-
-### Task 1: Progressive Disclosure for Budget Cards
-**Priority:** P1 (High ROI)  
-**Story Points:** 3  
-**Acceptance Criteria:**
-- [ ] Budget cards show summary view by default
-- [ ] Details expand on click (smooth animation)
-- [ ] Keyboard accessible (Enter/Space to expand)
-- [ ] Mobile-friendly touch targets
-
-**Files to modify:**
-- `budget.html`
-- `assets/css/components.css` (add `.budget-card` styles)
-- `assets/js/app.js` (add expand/collapse logic)
-
----
-
-### Task 2: Status-First Dashboard Redesign
-**Priority:** P1  
-**Story Points:** 5  
-**Acceptance Criteria:**
-- [ ] Net worth hero section at top (64px icon, 48px value)
-- [ ] Supporting metrics grid below (4 cards)
-- [ ] Color-coded status (green = positive, red = negative)
-- [ ] Trend indicators (arrows + percentages)
-
-**Files to modify:**
-- `index.html` (dashboard layout)
-- `assets/css/main.css` (add `.dashboard-hero` styles)
-- `assets/js/charts.js` (pull net worth data)
-
----
-
-### Task 3: Contextual Micro-Insights for Transactions
-**Priority:** P2  
-**Story Points:** 3  
-**Acceptance Criteria:**
-- [ ] Calculate 3-month category averages
-- [ ] Show "↑ X% above avg" badge when > 20% deviation
-- [ ] Show "First time" badge for new merchants
-- [ ] Show "🔁 Recurring" badge for detected patterns
-
-**Files to create/modify:**
-- `assets/js/insights.js` (new — insight generation logic)
-- `transactions.html` (add insight badges)
-- `assets/css/utilities.css` (add `.insight-badge` styles)
-
----
-
-### Task 4: Financial Color Language Standardization
-**Priority:** P2  
-**Story Points:** 2  
-**Acceptance Criteria:**
-- [ ] Create `0-tokens/financial-semantics.css`
-- [ ] Replace hardcoded colors with semantic tokens
-- [ ] Update all amount displays to use `.amount-positive`/`.amount-negative`
-- [ ] Add category color tokens and `.category-tag` component
-
-**Files to modify:**
-- All HTML pages (replace inline colors)
-- `assets/css/design-tokens.css` (add financial semantic colors)
-- `assets/js/charts.js` (use semantic colors from CSS)
-
----
-
-### Task 5: Glanceable Metrics Grid
-**Priority:** P1  
-**Story Points:** 3  
-**Acceptance Criteria:**
-- [ ] Create 4-column metric card grid on dashboard
-- [ ] Cards show: icon, label, value, trend
-- [ ] Responsive (2 columns on tablet, 1 on mobile)
-- [ ] Hover state with subtle lift effect
-
-**Files to modify:**
-- `index.html` (add metrics grid)
-- `assets/css/components.css` (add `.metric-card` styles)
-- `assets/js/app.js` (populate metric values)
-
----
-
-### Task 6: Empty States for All Pages
-**Priority:** P3  
-**Story Points:** 2  
-**Acceptance Criteria:**
-- [ ] Empty states for: budgets, bills, assets, debts, transactions
-- [ ] Each includes: icon, title, description, primary CTA
-- [ ] Quick-start examples where applicable
-- [ ] Consistent styling across all pages
-
-**Files to create:**
-- `assets/js/empty-states.js` (already exists — enhance)
-- `assets/css/components.css` (add `.empty-state` styles)
-
----
-
-### Task 7: Responsive Financial Tables
-**Priority:** P2  
-**Story Points:** 3  
-**Acceptance Criteria:**
-- [ ] Desktop: Traditional table with sticky headers
-- [ ] Mobile: Card layout with data-label attributes
-- [ ] Smooth breakpoint transition at 768px
-- [ ] Category tags work in both layouts
-
-**Files to modify:**
-- `transactions.html` (add `data-label` attributes)
-- `assets/css/financial-patterns.css` (add responsive table styles)
-
----
-
-## 📚 Pattern Library Summary
-
-| Pattern | Impact | Complexity | Priority |
-|---------|--------|-----------|----------|
-| Progressive Disclosure | High | Low | P1 |
-| Status-First Design | High | Medium | P1 |
-| Contextual Insights | High | Medium | P2 |
-| Financial Color Language | Medium | Low | P2 |
-| Glanceable Metrics | High | Low | P1 |
-| Empty States | Medium | Low | P3 |
-| Responsive Tables | Medium | Medium | P2 |
-| Inline Editing | Low | High | P4 |
-| Smart Defaults | Medium | High | P4 |
-| Micro-Interactions | Low | Low | P3 |
-
----
-
-## 🏁 Next Steps
-
-1. **Review patterns** with team (prioritize by ROI)
-2. **Start with Tasks 1, 2, 5** (highest impact, lowest effort)
-3. **Create design mockups** for status-first dashboard
-4. **Parallelize Tasks 3-4** once foundation is solid
-5. **Save Tasks 8-10** for v2 (nice-to-have polish)
-
-**Estimated Timeline:** 6 weeks (1-2 tasks/week pace)  
-**Risk Level:** Low (all patterns are additive, no breaking changes)  
-**Impact:** Dramatically improved UX, faster comprehension, higher engagement
-
----
-
-**Research Completed:** February 12, 2026, 7:20 AM EST  
-**Research Sources:** UXPin, Eleken, Stripe, Plaid, industry analysis  
-**Next Research Topic:** Chart.js implementation deep-dive  
-**Researcher:** Capital (Fireside Capital Orchestrator)
+**Researcher**: Capital (Orchestrator)  
+**Status**: Complete ✅  
+**Ready for Implementation**: Yes ✅

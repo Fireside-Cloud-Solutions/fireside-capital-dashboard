@@ -1,761 +1,763 @@
-# Performance Optimization Research — Fireside Capital
-**Research Session:** Sprint Research 0715 (Feb 16, 2026)  
-**Agent:** Capital (Researcher)  
-**Duration:** 20 minutes  
-**Status:** ✅ COMPLETE
+# Performance Optimization Research — Fireside Capital Dashboard
+**Research Sprint**: February 20, 2026  
+**Status**: In Progress 🔄  
+**Priority**: High — Fast loading = better user experience
 
 ---
 
 ## Executive Summary
 
-**Goal:** Research and document performance optimization strategies for the Fireside Capital web application to achieve Google Core Web Vitals "Good" ratings (LCP < 2.5s, FID < 100ms, CLS < 0.1) and 90+ Lighthouse scores.
+Optimize Fireside Capital dashboard for **sub-2-second load times** on 3G connections and **instant interactions** on modern hardware. Financial dashboards need to feel responsive — users check balances frequently and expect immediate feedback.
 
-**Key Finding:** Modern web performance is NOT about micro-optimizations—it's about **delivery strategy** (code splitting, lazy loading, critical CSS), **measurement** (Core Web Vitals, RUM), and **continuous monitoring** (Lighthouse CI). The Fireside Capital app has good bones (Bootstrap, vanilla JS) but needs modern build tooling and strategic asset delivery.
+**Target Metrics** (Lighthouse):
+- ⚡ **First Contentful Paint (FCP)**: < 1.5s
+- 🎨 **Largest Contentful Paint (LCP)**: < 2.5s
+- 🔄 **Cumulative Layout Shift (CLS)**: < 0.1
+- ⏱️ **Time to Interactive (TTI)**: < 3.5s
+- 📊 **Total Blocking Time (TBT)**: < 300ms
 
-**Current State Assessment:**
-- ✅ No heavy framework overhead (vanilla JS, not React/Angular)
-- ✅ CDN delivery for third-party libraries (Bootstrap, Chart.js)
-- ⚠️ No code splitting or bundling (~20 separate script tags)
-- ⚠️ No critical CSS extraction (blocking render)
-- ⚠️ No Core Web Vitals monitoring
-- ⚠️ Charts render synchronously (blocking main thread)
-
-**The 3-Phase Performance Strategy:**
-1. **Measure** — Implement Core Web Vitals tracking, Lighthouse CI
-2. **Optimize** — Critical CSS, code splitting, lazy loading, caching
-3. **Monitor** — Real User Monitoring (RUM), performance budgets
-
-**Expected Impact:**
-- 40-60% faster First Contentful Paint (FCP)
-- 30-50% faster Largest Contentful Paint (LCP)
-- 50-70% reduction in Total Blocking Time (TBT)
-- 90+ Lighthouse Performance score (currently unknown)
+**Current Issues** (assumed based on typical SPAs):
+- ❌ Large CSS files loaded synchronously
+- ❌ Chart.js loads all charts on page load (even off-screen)
+- ❌ Bootstrap CSS includes unused components
+- ❌ No code splitting or lazy loading
+- ❌ Images not optimized (if any)
+- ❌ No service worker caching (addressed in PWA research)
 
 ---
 
-## Core Web Vitals (2024 Standards)
+## Strategy 1: Critical CSS Extraction
 
-### What Google Measures
+### Problem
+Loading all CSS upfront blocks rendering. Users wait for 100KB+ of CSS before seeing any content.
 
-| Metric | Good | Needs Work | Poor | What It Measures |
-|--------|------|------------|------|------------------|
-| **LCP** (Largest Contentful Paint) | < 2.5s | 2.5-4s | > 4s | Loading performance |
-| **FID** (First Input Delay) / **INP** (Interaction to Next Paint) | < 100ms / < 200ms | 100-300ms / 200-500ms | > 300ms / > 500ms | Interactivity |
-| **CLS** (Cumulative Layout Shift) | < 0.1 | 0.1-0.25 | > 0.25 | Visual stability |
+### Solution
+Extract and inline critical above-the-fold CSS in `<head>`, defer non-critical CSS loading.
 
-**Critical Context for Finance Apps:**
-- **Slow pages = lost users** — 53% of mobile users abandon sites that take > 3s to load (Google 2023)
-- **Performance = trust** — Finance apps MUST feel fast and responsive (perception of reliability)
-- **Mobile-first** — 44% of Fireside Capital users will access from mobile (industry avg)
+### Implementation
 
-### Fireside Capital Priorities
+**Step 1: Identify Critical CSS**
+Use Chrome DevTools Coverage tool:
+1. Open DevTools → More Tools → Coverage
+2. Reload Dashboard page
+3. Note which CSS rules are used for above-the-fold content
+4. Extract to `critical.css`
 
-**1. LCP Optimization (Highest Impact)**
-- Critical CSS inline in `<head>` (< 14KB for HTTP/2 initial congestion window)
-- Lazy load below-the-fold charts and images
-- Preconnect to Supabase API origin
-- Font preloading for Source Serif 4 + Inter
+**Step 2: Automate with Critical Package**
+```powershell
+# Install Critical package
+npm install --save-dev critical
 
-**2. INP Optimization (Interactivity)**
-- Yield to main thread during long tasks (chart rendering, table population)
-- Event listener delegation (not 1000 individual listeners)
-- Debounce search/filter inputs
-
-**3. CLS Optimization (Visual Stability)**
-- Explicit width/height on chart containers
-- Skeleton loaders with accurate dimensions
-- Font-display: swap for web fonts
-
----
-
-## The 6 High-Impact Optimizations
-
-### 1. Critical CSS Extraction + Inline
-
-**Problem:** Blocking CSS delays First Contentful Paint (FCP).  
-**Solution:** Extract above-the-fold CSS, inline in `<head>`, async-load rest.
-
-**Implementation:**
-```bash
-# Install Critical tool
-npm install critical --save-dev
-
-# Extract critical CSS for Dashboard
-npx critical app/index.html --inline --minify --width 1300 --height 900 \
-  --css app/assets/css/main.css \
-  --target app/index-optimized.html
+# Create extraction script
+node scripts/extract-critical-css.js
 ```
 
-**Result in HTML:**
-```html
-<head>
-  <!-- Critical CSS inlined (< 14KB) -->
-  <style>
-    /* Design tokens, auth state, typography */
-    :root { --color-primary: #01a4ef; ... }
-    .page-header { ... }
-    .stat-card { ... }
-  </style>
-  
-  <!-- Non-critical CSS loaded async -->
-  <link rel="preload" href="/assets/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="/assets/css/main.css"></noscript>
-</head>
-```
-
-**Impact:**
-- 40-60% faster FCP (1-2s → 0.4-0.8s)
-- +10-15 Lighthouse Performance score
-
-**Effort:** 2-3 hours (automate with build script)
-
----
-
-### 2. Code Splitting + Bundling (Webpack)
-
-**Problem:** 15-20 individual `<script>` tags = 15-20 HTTP requests, no minification, no tree-shaking.
-
-**Solution:** Webpack bundle with code splitting per page.
-
-**Implementation:**
+**`scripts/extract-critical-css.js`**:
 ```javascript
-// webpack.config.js
-module.exports = {
-  entry: {
-    // Core (loaded on all pages)
-    core: './app/assets/js/app.js',
-    
-    // Page-specific bundles
-    dashboard: './app/assets/js/dashboard.js',
-    assets: './app/assets/js/assets.js',
-    bills: './app/assets/js/bills.js',
-    // ... other pages
-  },
-  output: {
-    filename: '[name].[contenthash].js',
-    path: path.resolve(__dirname, 'app/dist'),
-    clean: true
-  },
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
-          priority: 10
-        }
-      }
+const critical = require('critical');
+const fs = require('fs');
+const path = require('path');
+
+const pages = ['dashboard.html', 'assets.html', 'bills.html', 'budget.html'];
+
+pages.forEach(async (page) => {
+  const { css, html } = await critical.generate({
+    base: 'app/',
+    src: page,
+    target: {
+      css: `app/assets/css/critical/${page.replace('.html', '')}.css`,
+      html: `app/dist/${page}`
     },
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          compress: { drop_console: true } // Remove console.log
+    width: 1300,
+    height: 900,
+    inline: true,
+    extract: true,
+    dimensions: [
+      { width: 375, height: 667 },   // Mobile
+      { width: 768, height: 1024 },  // Tablet
+      { width: 1920, height: 1080 }  // Desktop
+    ]
+  });
+
+  console.log(`✅ Critical CSS extracted for ${page}`);
+});
+```
+
+**Step 3: Update HTML Template**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fireside Capital — Dashboard</title>
+
+  <!-- CRITICAL CSS (inlined) -->
+  <style>
+    /* design-tokens.css */
+    :root { --color-primary: #01a4ef; /* ... */ }
+    
+    /* Base layout */
+    body { font-family: Inter, sans-serif; margin: 0; }
+    
+    /* Above-the-fold components */
+    .navbar { /* ... */ }
+    .metric-card { /* ... */ }
+  </style>
+
+  <!-- NON-CRITICAL CSS (deferred) -->
+  <link rel="preload" href="assets/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css"></noscript>
+
+  <!-- Defer Bootstrap (not needed for initial render) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"></noscript>
+</head>
+<body>
+  <!-- Content -->
+</body>
+</html>
+```
+
+**Expected Improvement**: FCP reduced by **40-60%** (from ~2.5s → ~1s)
+
+---
+
+## Strategy 2: Lazy-Load Charts (Intersection Observer)
+
+### Problem
+Chart.js renders all charts on page load, even if they're below the fold. Wastes CPU and blocks main thread.
+
+### Solution
+Only render charts when they enter the viewport using Intersection Observer API.
+
+### Implementation
+
+**`assets/js/lazy-charts.js`**:
+```javascript
+/**
+ * Lazy-load Chart.js charts when they enter viewport
+ */
+
+// Store chart configurations
+const chartConfigs = new Map();
+
+/**
+ * Register a chart for lazy loading
+ * @param {string} canvasId - Canvas element ID
+ * @param {Function} renderFunction - Function that creates the chart
+ */
+function registerLazyChart(canvasId, renderFunction) {
+  chartConfigs.set(canvasId, renderFunction);
+}
+
+/**
+ * Initialize Intersection Observer for lazy chart loading
+ */
+function initLazyCharts() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const canvasId = entry.target.id;
+          const renderFunction = chartConfigs.get(canvasId);
+          
+          if (renderFunction) {
+            console.log(`[LazyCharts] Rendering ${canvasId}`);
+            renderFunction();
+            chartConfigs.delete(canvasId); // Remove after rendering
+            observer.unobserve(entry.target); // Stop observing
+          }
         }
-      })
-    ]
-  },
-  module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
-      }
-    ]
-  },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css'
-    }),
-    new HtmlWebpackPlugin({
-      template: './app/index.html',
-      chunks: ['core', 'vendor', 'dashboard'],
-      filename: 'index.html'
-    })
-  ]
-};
+      });
+    },
+    {
+      root: null, // Viewport
+      rootMargin: '100px', // Start loading 100px before visible
+      threshold: 0.01
+    }
+  );
+
+  // Observe all registered chart canvases
+  chartConfigs.forEach((_, canvasId) => {
+    const canvas = document.getElementById(canvasId);
+    if (canvas) {
+      observer.observe(canvas);
+    }
+  });
+}
+
+// Usage example
+registerLazyChart('chart-net-worth', () => {
+  createNetWorthChart('chart-net-worth');
+});
+
+registerLazyChart('chart-spending-breakdown', () => {
+  createSpendingBreakdownChart('chart-spending-breakdown');
+});
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLazyCharts);
+} else {
+  initLazyCharts();
+}
 ```
 
-**Updated HTML:**
-```html
-<!-- Webpack auto-injects these with cache-busting hashes -->
-<script src="/dist/vendor.a3f2b8c9.js" defer></script>
-<script src="/dist/core.b7e4d1f6.js" defer></script>
-<script src="/dist/dashboard.c9a2e5f8.js" defer></script>
+**Update Chart Definitions** (`charts.js`):
+```javascript
+// OLD: Immediate rendering
+window.addEventListener('DOMContentLoaded', () => {
+  createNetWorthChart('chart-net-worth');
+  createSpendingBreakdownChart('chart-spending-breakdown');
+  createAssetAllocationChart('chart-asset-allocation');
+});
+
+// NEW: Lazy rendering
+window.addEventListener('DOMContentLoaded', () => {
+  registerLazyChart('chart-net-worth', () => createNetWorthChart('chart-net-worth'));
+  registerLazyChart('chart-spending-breakdown', () => createSpendingBreakdownChart('chart-spending-breakdown'));
+  registerLazyChart('chart-asset-allocation', () => createAssetAllocationChart('chart-asset-allocation'));
+  initLazyCharts();
+});
 ```
 
-**Impact:**
-- 50-70% reduction in JavaScript size (minification + tree-shaking)
-- 60-80% fewer HTTP requests (20 scripts → 3-4 bundles)
-- Automatic console.log removal for production
-- +15-25 Lighthouse Performance score
-
-**Effort:** 4-5 hours (setup + test all 11 pages)
+**Expected Improvement**: TTI reduced by **30-50%** (charts only render when needed)
 
 ---
 
-### 3. Async/Defer Script Loading
+## Strategy 3: Debounce Expensive Operations
 
-**Problem:** Synchronous scripts block HTML parsing.
+### Problem
+Real-time search/filter operations trigger expensive re-renders on every keystroke, blocking UI.
 
-**Solution:** Use `defer` for first-party scripts, `async` for third-party analytics.
+### Solution
+Debounce user input to reduce unnecessary calculations.
 
-**Implementation:**
-```html
-<!-- BEFORE: Blocking -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/app.js"></script>
+### Implementation
 
-<!-- AFTER: Non-blocking -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-<script src="/assets/js/app.js" defer></script>
+**`assets/js/debounce.js`**:
+```javascript
+/**
+ * Debounce function — delays execution until after wait period
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Delay in milliseconds
+ * @returns {Function} Debounced function
+ */
+function debounce(func, wait = 300) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func.apply(this, args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
-<!-- Third-party analytics (doesn't need DOM) -->
-<script src="https://www.googletagmanager.com/gtag/js?id=GA_ID" async></script>
+/**
+ * Throttle function — limits execution to once per period
+ * @param {Function} func - Function to throttle
+ * @param {number} limit - Minimum time between executions (ms)
+ * @returns {Function} Throttled function
+ */
+function throttle(func, limit = 300) {
+  let inThrottle;
+  return function executedFunction(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
 ```
 
-**Rules:**
-- `defer` — Download in parallel, execute in order AFTER DOM ready (perfect for our scripts)
-- `async` — Download + execute ASAP, no guaranteed order (analytics only)
-- Neither — Blocking (never use for non-critical scripts)
+**Usage Example** (search/filter):
+```javascript
+// Transaction search (debounced)
+const searchInput = document.getElementById('transaction-search');
+const searchTransactions = debounce((query) => {
+  console.log('[Search] Filtering transactions:', query);
+  const filtered = allTransactions.filter((tx) =>
+    tx.description.toLowerCase().includes(query.toLowerCase())
+  );
+  renderTransactionList(filtered);
+}, 300); // Wait 300ms after user stops typing
 
-**Impact:**
-- 30-50% faster DOM Content Loaded (DCL)
-- +5-10 Lighthouse Performance score
+searchInput.addEventListener('input', (e) => {
+  searchTransactions(e.target.value);
+});
 
-**Effort:** 1-2 hours (update all 11 HTML files)
+// Scroll event (throttled) — update sticky header
+const handleScroll = throttle(() => {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 100) {
+    navbar.classList.add('navbar-sticky');
+  } else {
+    navbar.classList.remove('navbar-sticky');
+  }
+}, 100); // Max once per 100ms
+
+window.addEventListener('scroll', handleScroll);
+```
+
+**Expected Improvement**: Reduces input lag from **200-500ms → <50ms**
 
 ---
 
-### 4. Image Optimization (WebP/AVIF + Lazy Loading)
+## Strategy 4: Code Splitting & Lazy Loading JS
 
-**Problem:** Large PNG/JPEG images slow LCP, waste bandwidth.
+### Problem
+Loading all JavaScript upfront (Chart.js, Bootstrap, Supabase client) delays interactivity.
 
-**Solution:** Convert to WebP/AVIF, use `loading="lazy"` for below-fold images.
+### Solution
+Split code into critical (navbar, theme toggle) and non-critical (charts, modals) bundles. Load non-critical code asynchronously.
 
-**Implementation:**
-```bash
-# Convert images to WebP (80-90% smaller than JPEG)
-npm install sharp --save-dev
-node scripts/convert-images.js  # Batch convert PNG/JPEG → WebP
+### Implementation
+
+**Option A: Dynamic Imports (Modern Browsers)**
+```javascript
+// Critical code (loaded immediately)
+import { initThemeToggle } from './theme-toggle.js';
+import { initNavbar } from './navbar.js';
+
+initThemeToggle();
+initNavbar();
+
+// Non-critical code (loaded when needed)
+document.addEventListener('DOMContentLoaded', async () => {
+  // Lazy-load Chart.js only if charts exist on page
+  if (document.querySelector('.chart-canvas')) {
+    const { createNetWorthChart } = await import('./charts.js');
+    createNetWorthChart('chart-net-worth');
+  }
+
+  // Lazy-load modal library only when modal is triggered
+  document.querySelector('[data-bs-toggle="modal"]')?.addEventListener('click', async () => {
+    await import('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js');
+  }, { once: true });
+});
 ```
 
-**HTML with picture element (fallback for old browsers):**
+**Option B: Script Tag with `defer` and `async`**
+```html
+<!-- Critical JS (defer = execute after DOM ready) -->
+<script src="assets/js/app.js" defer></script>
+
+<!-- Non-critical JS (async = load in background) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" async></script>
+```
+
+**Expected Improvement**: TBT reduced by **20-40%**
+
+---
+
+## Strategy 5: Image Optimization
+
+### Problem
+Unoptimized images (screenshots, icons, charts) slow down page load.
+
+### Solution
+- Convert images to WebP format (smaller than PNG/JPG)
+- Use `<picture>` element with responsive srcset
+- Lazy-load images below the fold
+
+### Implementation
+
+**Convert Images to WebP**:
+```powershell
+# Using ImageMagick
+magick convert dashboard-screenshot.png -quality 85 dashboard-screenshot.webp
+
+# Batch conversion
+Get-ChildItem -Path assets/images -Filter *.png | ForEach-Object {
+  $outputPath = $_.FullName -replace '.png', '.webp'
+  magick convert $_.FullName -quality 85 $outputPath
+}
+```
+
+**Responsive Images with `<picture>`**:
 ```html
 <picture>
-  <source srcset="/assets/images/logo.avif" type="image/avif">
-  <source srcset="/assets/images/logo.webp" type="image/webp">
-  <img src="/assets/images/logo.png" alt="Fireside Capital" loading="lazy" width="200" height="50">
+  <!-- Modern browsers: WebP -->
+  <source srcset="assets/images/dashboard-screenshot.webp" type="image/webp">
+  
+  <!-- Fallback: PNG -->
+  <img src="assets/images/dashboard-screenshot.png" 
+       alt="Dashboard screenshot" 
+       loading="lazy"
+       width="1200" 
+       height="800">
 </picture>
 ```
 
-**Lazy loading for below-fold content:**
+**Lazy-Load Images** (native):
 ```html
-<!-- Only load when user scrolls near -->
-<img src="/assets/images/chart-placeholder.webp" loading="lazy" alt="Net Worth Chart">
+<img src="assets/images/chart.png" 
+     alt="Chart" 
+     loading="lazy">
 ```
 
-**Impact:**
-- 70-85% smaller image file sizes (JPEG → WebP)
-- 50-70% faster LCP for image-heavy pages
-- +10-15 Lighthouse Performance score
-
-**Effort:** 2-3 hours (batch convert + update HTML)
+**Expected Improvement**: Reduces image payload by **40-70%**
 
 ---
 
-### 5. Caching Strategy (Cache-Control Headers)
+## Strategy 6: Reduce CSS Bloat (PurgeCSS)
 
-**Problem:** No explicit caching headers = repeat downloads on every visit.
+### Problem
+Bootstrap CSS includes thousands of unused classes, increasing file size from ~200KB → ~20KB.
 
-**Solution:** Azure Static Web Apps `staticwebapp.config.json` with Cache-Control headers.
+### Solution
+Use PurgeCSS to remove unused CSS classes from Bootstrap and custom stylesheets.
 
-**Implementation:**
-```json
-{
-  "routes": [
-    {
-      "route": "/assets/*",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "route": "/*.html",
-      "headers": {
-        "Cache-Control": "public, max-age=3600, must-revalidate"
-      }
-    },
-    {
-      "route": "/api/*",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate"
-      }
-    }
+### Implementation
+
+**Install PurgeCSS**:
+```powershell
+npm install --save-dev @fullhuman/postcss-purgecss
+```
+
+**Create PurgeCSS Config** (`purgecss.config.js`):
+```javascript
+module.exports = {
+  content: [
+    './app/**/*.html',
+    './app/assets/js/**/*.js'
   ],
-  "navigationFallback": {
-    "rewrite": "/index.html"
+  css: [
+    './app/assets/css/main.css',
+    './node_modules/bootstrap/dist/css/bootstrap.min.css'
+  ],
+  safelist: [
+    // Dynamically-added classes (keep these)
+    'show', 'active', 'modal-open', 'dropdown-menu', 'collapse',
+    /^bs-/, // Bootstrap dynamic classes
+    /^chart-/, // Chart.js classes
+    /^theme-/ // Theme toggle classes
+  ],
+  output: './app/assets/css/optimized/'
+};
+```
+
+**Run PurgeCSS**:
+```powershell
+npx purgecss --config purgecss.config.js
+```
+
+**Expected Improvement**: Reduces CSS from **200KB → 30KB** (85% reduction)
+
+---
+
+## Strategy 7: Prefetch/Preconnect Critical Resources
+
+### Problem
+DNS lookups and TLS handshakes for CDN resources (Bootstrap, Chart.js, Supabase) add latency.
+
+### Solution
+Use `<link rel="preconnect">` to establish early connections, `<link rel="dns-prefetch">` for DNS resolution.
+
+### Implementation
+
+**Add to `<head>`**:
+```html
+<!-- Preconnect to CDNs -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://qqtiofdqplwycnwplmen.supabase.co" crossorigin>
+
+<!-- DNS prefetch (fallback for older browsers) -->
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+
+<!-- Preload critical fonts -->
+<link rel="preload" href="assets/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/SourceSerif4-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+```
+
+**Expected Improvement**: Reduces time-to-first-byte by **100-300ms**
+
+---
+
+## Strategy 8: Virtual Scrolling for Long Lists
+
+### Problem
+Rendering 1,000+ transactions at once blocks main thread and causes jank.
+
+### Solution
+Only render visible rows (virtualization), dynamically add/remove items as user scrolls.
+
+### Implementation
+
+**Using `virtual-scroller` Library**:
+```html
+<script src="https://cdn.jsdelivr.net/npm/virtual-scroller@2.0.0/dist/virtual-scroller.min.js"></script>
+
+<div id="transaction-list"></div>
+
+<script>
+const transactions = [/* 1,000+ transactions */];
+
+const virtualScroller = new VirtualScroller({
+  container: document.getElementById('transaction-list'),
+  items: transactions,
+  itemHeight: 60, // Fixed height per row
+  renderItem: (transaction) => {
+    const row = document.createElement('div');
+    row.className = 'transaction-row';
+    row.innerHTML = `
+      <div class="tx-date">${transaction.date}</div>
+      <div class="tx-description">${transaction.description}</div>
+      <div class="tx-amount">${transaction.amount}</div>
+    `;
+    return row;
   }
-}
+});
+</script>
 ```
 
-**Cache-Control Breakdown:**
-- **Static assets** (`/assets/*`) — Cache for 1 year (immutable, use Webpack hashes for updates)
-- **HTML files** — Cache for 1 hour (short-lived, revalidate)
-- **API responses** — No caching (always fresh financial data)
-
-**Impact:**
-- 80-95% reduction in repeat visitor load time
-- Near-instant page loads for returning users
-- +10-15 Lighthouse Performance score
-
-**Effort:** 1 hour (create config file + test)
-
----
-
-### 6. Task Yielding (Long-Running JavaScript)
-
-**Problem:** Chart rendering + large table population blocks main thread (INP > 500ms).
-
-**Solution:** Break work into chunks, yield to browser between chunks.
-
-**Implementation:**
+**Custom Implementation** (lightweight):
 ```javascript
-// BEFORE: Blocking main thread
-function renderLargeTable(data) {
-  data.forEach(row => {
-    const tr = createTableRow(row);  // Expensive DOM operation
-    tbody.appendChild(tr);
-  });
-}
+function createVirtualList(container, items, itemHeight) {
+  const totalHeight = items.length * itemHeight;
+  const visibleCount = Math.ceil(container.clientHeight / itemHeight);
+  let scrollTop = 0;
 
-// AFTER: Yielding to main thread
-async function renderLargeTable(data) {
-  const chunkSize = 50;  // Render 50 rows at a time
-  
-  for (let i = 0; i < data.length; i += chunkSize) {
-    const chunk = data.slice(i, i + chunkSize);
+  // Create virtual container
+  const viewport = document.createElement('div');
+  viewport.style.height = `${totalHeight}px`;
+  viewport.style.position = 'relative';
+  container.appendChild(viewport);
+
+  function render() {
+    const startIndex = Math.floor(scrollTop / itemHeight);
+    const endIndex = startIndex + visibleCount + 1;
     
-    chunk.forEach(row => {
-      const tr = createTableRow(row);
-      tbody.appendChild(tr);
-    });
+    viewport.innerHTML = '';
     
-    // Yield to main thread (allow user interactions)
-    await yieldToMainThread();
-  }
-}
-
-// Utility: Yield control back to browser
-function yieldToMainThread() {
-  return new Promise(resolve => {
-    setTimeout(resolve, 0);  // Next microtask
-  });
-}
-```
-
-**When to Use:**
-- Rendering > 100 table rows
-- Processing > 500 data points for charts
-- Any operation taking > 50ms
-
-**Impact:**
-- 60-80% reduction in Total Blocking Time (TBT)
-- INP < 200ms (Google "Good" threshold)
-- Page remains responsive during heavy operations
-- +10-20 Lighthouse Performance score
-
-**Effort:** 2-3 hours (refactor 5-6 long-running functions)
-
----
-
-## Core Web Vitals Monitoring (Real User Data)
-
-### Why Lighthouse Scores ≠ Real User Experience
-
-**Lighthouse** = Lab data (simulated 4G, throttled CPU, perfect network)  
-**Real users** = Slow WiFi, old phones, multi-tasking, ad blockers
-
-**You need BOTH:**
-1. **Lighthouse CI** (automated, catches regressions in dev)
-2. **Real User Monitoring (RUM)** (actual user experience in production)
-
-### Implementation: web-vitals Library
-
-**Install:**
-```bash
-npm install web-vitals --save
-```
-
-**Track Core Web Vitals:**
-```javascript
-// app/assets/js/performance-monitoring.js
-import {onLCP, onFID, onCLS} from 'web-vitals';
-
-function sendToGoogleAnalytics({name, delta, id}) {
-  // Send to Google Analytics 4
-  gtag('event', name, {
-    event_category: 'Web Vitals',
-    value: Math.round(name === 'CLS' ? delta * 1000 : delta),
-    event_label: id,
-    non_interaction: true
-  });
-}
-
-// Track all Core Web Vitals
-onLCP(sendToGoogleAnalytics);
-onFID(sendToGoogleAnalytics);
-onCLS(sendToGoogleAnalytics);
-```
-
-**Google Analytics 4 Dashboard:**
-- LCP: 75th percentile < 2.5s
-- FID/INP: 75th percentile < 100ms / 200ms
-- CLS: 75th percentile < 0.1
-
-**Impact:**
-- Continuous monitoring of real user performance
-- Catch regressions before users complain
-- Data-driven optimization decisions
-
-**Effort:** 1-2 hours (setup + GA4 custom events)
-
----
-
-### Lighthouse CI (Automated Performance Testing)
-
-**Install:**
-```bash
-npm install @lhci/cli --save-dev
-```
-
-**Configuration:**
-```json
-// lighthouserc.json
-{
-  "ci": {
-    "collect": {
-      "url": [
-        "http://localhost:8080/",
-        "http://localhost:8080/assets.html",
-        "http://localhost:8080/bills.html"
-      ],
-      "numberOfRuns": 3
-    },
-    "assert": {
-      "assertions": {
-        "categories:performance": ["error", {"minScore": 0.9}],
-        "categories:accessibility": ["error", {"minScore": 0.95}],
-        "first-contentful-paint": ["error", {"maxNumericValue": 2000}],
-        "largest-contentful-paint": ["error", {"maxNumericValue": 2500}],
-        "cumulative-layout-shift": ["error", {"maxNumericValue": 0.1}]
-      }
-    },
-    "upload": {
-      "target": "temporary-public-storage"
+    for (let i = startIndex; i < endIndex && i < items.length; i++) {
+      const row = document.createElement('div');
+      row.style.position = 'absolute';
+      row.style.top = `${i * itemHeight}px`;
+      row.style.height = `${itemHeight}px`;
+      row.innerHTML = renderRow(items[i]);
+      viewport.appendChild(row);
     }
   }
+
+  container.addEventListener('scroll', () => {
+    scrollTop = container.scrollTop;
+    render();
+  });
+
+  render();
+}
+
+// Usage
+const container = document.getElementById('transaction-list');
+createVirtualList(container, transactions, 60);
+```
+
+**Expected Improvement**: Handles **10,000+ items** without lag
+
+---
+
+## Strategy 9: Web Workers for Heavy Calculations
+
+### Problem
+Complex calculations (budget projections, debt payoff schedules) block UI thread.
+
+### Solution
+Offload calculations to Web Workers (background threads).
+
+### Implementation
+
+**Create Worker** (`assets/js/workers/budget-calculator.worker.js`):
+```javascript
+/**
+ * Web Worker — Budget Projections
+ */
+self.addEventListener('message', (e) => {
+  const { type, data } = e.data;
+
+  if (type === 'calculate-projection') {
+    const projection = calculateBudgetProjection(data);
+    self.postMessage({ type: 'projection-result', projection });
+  }
+});
+
+function calculateBudgetProjection({ income, expenses, savings, months }) {
+  const projection = [];
+  let balance = 0;
+
+  for (let i = 0; i < months; i++) {
+    balance += income - expenses - savings;
+    projection.push({
+      month: i + 1,
+      balance,
+      savings: savings * (i + 1)
+    });
+  }
+
+  return projection;
 }
 ```
 
-**GitHub Actions Integration:**
-```yaml
-# .github/workflows/lighthouse-ci.yml
-name: Lighthouse CI
-on: [push, pull_request]
+**Use Worker** (`app.js`):
+```javascript
+const budgetWorker = new Worker('assets/js/workers/budget-calculator.worker.js');
 
-jobs:
-  lighthouse:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm ci
-      - run: npm run build
-      - run: npm install -g @lhci/cli
-      - run: lhci autorun
+budgetWorker.addEventListener('message', (e) => {
+  if (e.data.type === 'projection-result') {
+    console.log('[Worker] Projection:', e.data.projection);
+    renderProjectionChart(e.data.projection);
+  }
+});
+
+// Trigger calculation
+budgetWorker.postMessage({
+  type: 'calculate-projection',
+  data: { income: 8000, expenses: 5000, savings: 1000, months: 12 }
+});
 ```
 
-**Impact:**
-- Block PRs that degrade performance
-- Automated regression testing
-- Historical performance trends
+**Expected Improvement**: UI remains responsive during heavy calculations
 
-**Effort:** 2-3 hours (setup + GitHub Actions)
+---
+
+## Strategy 10: Service Worker Caching (PWA)
+
+### Problem
+Every page load requires network requests, slow on poor connections.
+
+### Solution
+Cache app shell (HTML, CSS, JS) and API responses using Service Worker (covered in PWA research).
+
+**See**: `reports/pwa-research.md` — Service Worker implementation
+
+**Expected Improvement**: Repeat visits load in **<500ms** (from cache)
+
+---
+
+## Performance Testing Checklist
+
+### Lighthouse Audit
+```powershell
+# Run Lighthouse via CLI
+npm install -g lighthouse
+
+lighthouse https://nice-cliff-05b13880f.2.azurestaticapps.net `
+  --output html `
+  --output-path ./reports/lighthouse-report.html `
+  --chrome-flags="--headless"
+```
+
+**Target Scores**:
+- Performance: **90+**
+- Accessibility: **100**
+- Best Practices: **100**
+- SEO: **100**
+- PWA: **100** (after PWA implementation)
+
+### WebPageTest
+Test on real devices/connections:
+- https://www.webpagetest.org
+- Location: Los Angeles (West Coast USA)
+- Connection: 3G, 4G, Cable
+- Target: **Speed Index < 3.0s**
+
+### Chrome DevTools Performance Tab
+1. Open DevTools → Performance
+2. Click Record
+3. Load Dashboard page
+4. Stop recording
+5. Analyze:
+   - **FCP** (blue line): < 1.5s
+   - **LCP** (green line): < 2.5s
+   - **Long Tasks** (red bars): Minimize
 
 ---
 
 ## Performance Budget
 
-**Set measurable goals and enforce them in CI/CD.**
+Set hard limits to prevent regressions:
 
-| Metric | Target | Current (Estimate) | Gap |
-|--------|--------|-------------------|-----|
-| **Lighthouse Performance** | 90+ | Unknown | TBD |
-| **First Contentful Paint (FCP)** | < 1.5s | ~2-3s (estimate) | -0.5-1.5s |
-| **Largest Contentful Paint (LCP)** | < 2.5s | ~3-4s (estimate) | -0.5-1.5s |
-| **Total Blocking Time (TBT)** | < 200ms | ~500-800ms (estimate) | -300-600ms |
-| **Cumulative Layout Shift (CLS)** | < 0.1 | Unknown | TBD |
-| **JavaScript Bundle Size** | < 200KB | ~350KB (20 files) | -150KB |
-| **CSS Size** | < 100KB | 229KB (12 files) | -129KB |
-| **Images** | WebP/AVIF | PNG/JPEG | Convert all |
+| Resource Type | Max Size | Current | Target |
+|---------------|----------|---------|--------|
+| **Total Page** | 2.5 MB | ? | < 1 MB |
+| **JavaScript** | 500 KB | ? | < 300 KB |
+| **CSS** | 150 KB | ? | < 50 KB |
+| **Images** | 500 KB | ? | < 200 KB |
+| **Fonts** | 100 KB | ? | < 80 KB |
 
-**Enforcement:**
-```javascript
-// webpack.config.js
-module.exports = {
-  performance: {
-    maxAssetSize: 200000,  // 200KB
-    maxEntrypointSize: 300000,  // 300KB
-    hints: 'error'  // Fail build if exceeded
-  }
-};
-```
-
----
-
-## Additional Optimizations
-
-### Preconnect to External Origins
-
-**Problem:** DNS lookup + TLS handshake delays for Supabase API.
-
-**Solution:**
-```html
-<head>
-  <!-- Resolve DNS + establish connection early -->
-  <link rel="preconnect" href="https://qqtiofdqplwycnwplmen.supabase.co">
-  <link rel="dns-prefetch" href="https://qqtiofdqplwycnwplmen.supabase.co">
-</head>
-```
-
-**Impact:** 100-300ms faster API requests (avoids DNS/TLS latency)
-
----
-
-### Font Loading Strategy
-
-**Problem:** FOUT (Flash of Unstyled Text) or FOIT (Flash of Invisible Text).
-
-**Solution:**
-```css
-/* Preload critical fonts */
-<link rel="preload" href="/assets/fonts/SourceSerif4-Regular.woff2" as="font" type="font/woff2" crossorigin>
-
-/* Use font-display: swap */
-@font-face {
-  font-family: 'Source Serif 4';
-  src: url('/assets/fonts/SourceSerif4-Regular.woff2') format('woff2');
-  font-display: swap;  /* Show fallback font immediately, swap when loaded */
-}
-```
-
-**Impact:** Faster FCP (text visible immediately with fallback font)
-
----
-
-### Event Listener Delegation
-
-**Problem:** 500 table rows = 500 delete button event listeners = memory bloat.
-
-**Solution:**
-```javascript
-// BEFORE: Individual listeners
-rows.forEach(row => {
-  row.querySelector('.delete-btn').addEventListener('click', handleDelete);
-});
-
-// AFTER: Single delegated listener
-table.addEventListener('click', (e) => {
-  if (e.target.classList.contains('delete-btn')) {
-    handleDelete(e);
-  }
-});
-```
-
-**Impact:** 90% reduction in event listeners, faster memory usage
-
----
-
-### Azure CDN (Optional, Advanced)
-
-**Problem:** Slow page loads for users far from Azure region.
-
-**Solution:** Enable Azure CDN for global distribution.
-
+**Enforcement**:
 ```json
-// staticwebapp.config.json
 {
-  "globalHeaders": {
-    "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "DENY"
-  },
-  "platform": {
-    "apiRuntime": "node:18"
-  }
+  "budgets": [
+    {
+      "resourceSizes": [
+        { "resourceType": "script", "budget": 300 },
+        { "resourceType": "stylesheet", "budget": 50 },
+        { "resourceType": "image", "budget": 200 }
+      ]
+    }
+  ]
 }
 ```
 
-**Setup in Azure Portal:**
-1. Navigate to Static Web App → CDN
-2. Enable Azure CDN (Standard Microsoft)
-3. Configure caching rules (same as Cache-Control headers)
+---
 
-**Impact:**
-- 40-60% faster page loads for international users
-- Lower latency via edge caching
+## Quick Wins (Implement First)
 
-**Effort:** 2 hours (Azure setup + DNS config)
+1. ✅ **Defer Non-Critical CSS** (30 min) → FCP -40%
+2. ✅ **Lazy-Load Charts** (1 hour) → TTI -30%
+3. ✅ **Debounce Search Input** (15 min) → UX improvement
+4. ✅ **Add `defer` to Scripts** (10 min) → TBT -20%
+5. ✅ **Preconnect to CDNs** (5 min) → TTFB -100ms
+
+**Total Time**: 2 hours  
+**Total Impact**: **~50% faster load time**
 
 ---
 
-## 3-Phase Implementation Roadmap
+## Implementation Roadmap
 
-### Phase 1: Quick Wins (6-8 hours, ~30-40 point Lighthouse gain)
+### Week 1: Foundation
+- [ ] Extract critical CSS (inline in `<head>`)
+- [ ] Defer non-critical CSS/JS
+- [ ] Add preconnect/dns-prefetch hints
+- [ ] Run baseline Lighthouse audit
 
-**Priority 1 (Core Delivery):**
-1. ✅ **Async/defer scripts** (1-2h) — Update all 11 HTML files
-2. ✅ **Cache-Control headers** (1h) — Create `staticwebapp.config.json`
-3. ✅ **Preconnect to Supabase** (30 min) — Add to all HTML `<head>`
-4. ✅ **Font preloading** (30 min) — Preload Source Serif 4 + Inter
+### Week 2: Lazy Loading
+- [ ] Implement lazy chart loading (Intersection Observer)
+- [ ] Lazy-load images (`loading="lazy"`)
+- [ ] Code split JS (dynamic imports)
+- [ ] Debounce search/filter operations
 
-**Priority 2 (Monitoring):**
-5. ✅ **Core Web Vitals tracking** (1-2h) — Install web-vitals + GA4 events
-6. ✅ **Baseline Lighthouse audit** (30 min) — Run and document current scores
+### Week 3: Optimization
+- [ ] Run PurgeCSS on Bootstrap
+- [ ] Convert images to WebP
+- [ ] Implement virtual scrolling for transaction list
+- [ ] Create Web Worker for budget calculations
 
-**Expected Result:**
-- Lighthouse Performance: Unknown → 60-70
-- FCP: ~2-3s → ~1.5-2s
-- LCP: ~3-4s → ~2.5-3s
-
----
-
-### Phase 2: Modern Build System (8-12 hours, ~20-30 point Lighthouse gain)
-
-**Priority 1 (Build Pipeline):**
-7. ✅ **Webpack setup** (4-5h) — Code splitting, bundling, minification
-8. ✅ **Critical CSS extraction** (2-3h) — Inline critical, async non-critical
-9. ✅ **Task yielding refactor** (2-3h) — Refactor 5-6 long-running functions
-10. ✅ **Lighthouse CI** (2-3h) — GitHub Actions + performance budgets
-
-**Expected Result:**
-- Lighthouse Performance: 60-70 → 85-90
-- FCP: ~1.5-2s → ~0.8-1.2s
-- LCP: ~2.5-3s → ~1.5-2s
-- TBT: ~500-800ms → ~100-200ms
+### Week 4: Testing
+- [ ] Run Lighthouse audits (target: 90+ performance)
+- [ ] WebPageTest on 3G connection
+- [ ] Real device testing (iOS Safari, Android Chrome)
+- [ ] Set performance budget (fail CI if exceeded)
 
 ---
 
-### Phase 3: Advanced Optimizations (4-6 hours, ~5-10 point Lighthouse gain)
+## Next Steps
 
-**Priority 1 (Asset Optimization):**
-11. ✅ **Image conversion** (2-3h) — Batch convert to WebP/AVIF + lazy loading
-12. ✅ **Event listener delegation** (1-2h) — Refactor table event handlers
-13. ✅ **Azure CDN setup** (2h) — Optional, for global distribution
-
-**Expected Result:**
-- Lighthouse Performance: 85-90 → 90-95
-- LCP: ~1.5-2s → ~1-1.5s (WebP images)
-- All Core Web Vitals: "Good" (green)
+1. **Create Task Work Items** for each optimization strategy
+2. **Baseline Performance Audit** — Lighthouse + WebPageTest (before optimization)
+3. **Implement Quick Wins** — 2 hours for 50% improvement
+4. **Track Metrics** — Dashboard showing FCP, LCP, TTI over time
 
 ---
 
-## Success Metrics
-
-### Lighthouse Scores (Target: 90+)
-
-| Category | Current (Est) | Phase 1 | Phase 2 | Phase 3 | Target |
-|----------|--------------|---------|---------|---------|--------|
-| Performance | Unknown | 60-70 | 85-90 | 90-95 | 90+ |
-| Accessibility | 95+ | 95+ | 95+ | 95+ | 95+ |
-| Best Practices | Unknown | 80+ | 90+ | 95+ | 90+ |
-| SEO | Unknown | 90+ | 95+ | 100 | 95+ |
-
-### Core Web Vitals (Target: All Green)
-
-| Metric | Current (Est) | Phase 1 | Phase 2 | Phase 3 | Target |
-|--------|--------------|---------|---------|---------|--------|
-| LCP | ~3-4s | ~2.5-3s | ~1.5-2s | ~1-1.5s | < 2.5s |
-| FID/INP | Unknown | ~100-200ms | ~50-100ms | ~30-50ms | < 100ms |
-| CLS | Unknown | ~0.1-0.15 | ~0.05-0.1 | < 0.05 | < 0.1 |
-
-### Business Impact
-
-- **Conversion rate:** +10-20% (faster pages = more signups)
-- **Bounce rate:** -15-25% (users don't abandon slow pages)
-- **SEO ranking:** +10-30% (Google prioritizes fast sites)
-- **User satisfaction:** +20-40% (perceived performance = quality)
-
----
-
-## Backlog Items Created
-
-**Phase 1: Quick Wins (6-8 hours total)**
-- **FC-118** (P1, 4-5h) — Webpack build system (code splitting, minification, console removal)
-- **FC-119** (P1, 1-2h) — Async/defer script loading (all 11 HTML files)
-- **FC-120** (P1, 2-3h) — Critical CSS extraction + async non-critical
-- **FC-121** (P1, 1h) — Cache-Control headers (staticwebapp.config.json)
-- **FC-122** (P1, 1-2h) — Lazy loading (images + charts)
-- **FC-123** (P1, 2-3h) — Core Web Vitals monitoring (web-vitals + GA4 + Lighthouse CI)
-
-**Phase 2: Asset Optimization (4-5 hours total)**
-- **FC-124** (P2, 2-3h) — Image conversion (WebP/AVIF + picture elements)
-- **FC-125** (P2, 2-3h) — Task yielding (refactor long-running functions)
-- **FC-126** (P2, 1-2h) — Event listener delegation (tables)
-
-**Phase 3: Advanced (2 hours total)**
-- **FC-127** (P2, 2h) — Azure CDN setup (optional, global distribution)
-
-**Total Estimated Effort:** 18-24 hours (spread across 2-3 sprints)
-
-**Expected Lighthouse Gain:** +30-50 points (Unknown → 90+)
-
----
-
-## References
-
-**Official Documentation:**
-- [Google Core Web Vitals](https://web.dev/vitals/) (2024)
-- [Lighthouse Performance Scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring/) (2024)
-- [web-vitals Library](https://github.com/GoogleChrome/web-vitals) (Google, 2024)
-- [Webpack Documentation](https://webpack.js.org/guides/) (2024)
-- [Critical CSS Tool](https://github.com/addyosmani/critical) (Addy Osmani, 2024)
-
-**Best Practices:**
-- [Web.dev Performance Guide](https://web.dev/fast/) (Google, 2024)
-- [MDN Performance](https://developer.mozilla.org/en-US/docs/Web/Performance) (Mozilla, 2024)
-- [Azure Static Web Apps Performance](https://learn.microsoft.com/en-us/azure/static-web-apps/configuration) (Microsoft, 2024)
-
-**Research Papers:**
-- "The Impact of Page Load Time on User Behavior" (Google Research, 2023)
-- "Core Web Vitals and SEO Ranking Factors" (Search Engine Journal, 2024)
-- "Real User Monitoring Best Practices" (Calibre App, 2024)
-
----
-
-## Conclusion
-
-✅ **RESEARCH COMPLETE** — Comprehensive performance optimization strategy documented with 3-phase implementation roadmap (18-24 hours total effort).
-
-**Key Takeaways:**
-1. **Modern build tooling is essential** — Webpack code splitting + critical CSS = 40-60% faster FCP
-2. **Measurement drives optimization** — Can't improve what you don't measure (Core Web Vitals + Lighthouse CI)
-3. **Quick wins exist** — Async scripts + caching + preconnect = 6-8 hours for 30-40 point gain
-4. **Performance = business value** — 10-20% conversion rate increase from faster pages
-
-**Next Steps:**
-1. Spawn Builder for FC-118 (Webpack setup, highest impact, 4-5h)
-2. Run baseline Lighthouse audit (document current scores)
-3. Implement Phase 1 quick wins (6-8h total)
-4. Monitor Core Web Vitals in production (web-vitals + GA4)
-
-**Awaiting:** Founder approval OR auto-proceed with Phase 1 (Quick Wins).
-
----
-
-**Research Complete:** 2026-02-16 07:15 EST  
-**Total Research Time:** ~20 minutes  
-**Implementation Backlog Created:** 10 tasks, 18-24 hours  
-**Expected Lighthouse Gain:** +30-50 points
+**Researcher**: Capital (Orchestrator)  
+**Status**: Complete ✅  
+**Ready for Implementation**: Yes ✅
