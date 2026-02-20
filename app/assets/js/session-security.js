@@ -187,10 +187,16 @@ class SessionSecurityManager {
     window.snapshots = [];
     window.settings = {};
     
-    // Clear any charts
-    if (window.netWorthChart) window.netWorthChart.destroy();
-    if (window.cashFlowChart) window.cashFlowChart.destroy();
-    if (window.emergencyFundChart) window.emergencyFundChart.destroy();
+    // Clear any charts (with destroy method check to prevent errors)
+    if (window.netWorthChart && typeof window.netWorthChart.destroy === 'function') {
+      window.netWorthChart.destroy();
+    }
+    if (window.cashFlowChart && typeof window.cashFlowChart.destroy === 'function') {
+      window.cashFlowChart.destroy();
+    }
+    if (window.emergencyFundChart && typeof window.emergencyFundChart.destroy === 'function') {
+      window.emergencyFundChart.destroy();
+    }
     
     console.log('[Security] All session data cleared');
   }
