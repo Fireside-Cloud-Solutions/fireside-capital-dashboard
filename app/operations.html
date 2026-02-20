@@ -129,14 +129,14 @@
 
       <div id="dataContainer" class="data-hidden">
 
-        <!-- -- Ops toolbar: cash flow toggle + realtime badge (BUG-UIUX-OPS-MOBILE-HEADER-001) -- -->
-        <div class="ops-toolbar d-flex align-items-center gap-2 mb-3">
+        <!-- -- Ops toolbar: cash flow toggle + realtime badge (GitHub Issue #9 - ARIA structure) -- -->
+        <div class="ops-toolbar d-flex align-items-center gap-2 mb-3" role="toolbar" aria-label="Operations dashboard controls">
           <div class="btn-group" id="cashFlowToggle" role="group" aria-label="Cash flow time range">
             <button type="button" class="btn btn-outline-secondary btn-sm active" data-days="30">30d</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-days="60">60d</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-days="90">90d</button>
           </div>
-          <span id="realtimeStatus" class="badge bg-secondary">
+          <span id="realtimeStatus" class="badge bg-secondary" role="status" aria-live="polite">
             <i class="bi bi-circle-fill me-1 realtime-dot"></i> Connecting...
           </span>
         </div>
