@@ -232,15 +232,7 @@ function removeTourElements() {
   if (spotlight) spotlight.remove();
 }
 
-// Helper function for escaping HTML (fallback if not defined globally)
-if (typeof escapeHtml === 'undefined') {
-  function escapeHtml(str) {
-    if (str == null) return '';
-    const div = document.createElement('div');
-    div.textContent = String(str);
-    return div.innerHTML;
-  }
-}
+// escapeHtml() is provided globally by security-utils.js (always loaded first)
 
 // ===== EVENT DELEGATION FOR TOUR BUTTONS (BUG-TOUR-INLINE-001) =====
 // Replaces inline onclick handlers with delegated listeners — CSP compliant

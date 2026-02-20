@@ -361,11 +361,7 @@
   }
 
   // ===== HELPER: HTML ESCAPE =====
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
+  // Removed duplicate - using global escapeHtml() from security-utils.js
 
   // Start initialization
   init();

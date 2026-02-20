@@ -88,18 +88,10 @@ function clearCache() {
 }
 
 // ===== XSS PROTECTION =====
-function escapeHtml(str) {
-    if (str == null) return '';
-    const div = document.createElement('div');
-    div.textContent = String(str);
-    return div.innerHTML;
-}
-
+// escapeHtml() and sanitizeUserHTML() are now provided by security-utils.js (loaded globally)
+// Keeping sanitizeHTML as an alias for backward compatibility
 function sanitizeHTML(str) {
-    if (str == null) return '';
-    const div = document.createElement('div');
-    div.textContent = String(str);
-    return div.innerHTML;
+    return escapeHtml(str); // Delegate to canonical implementation
 }
 
 function escapeAttribute(str) {

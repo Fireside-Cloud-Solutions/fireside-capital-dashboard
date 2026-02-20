@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital → Fireside Personal Assistant
 **Owner:** Matt Hubacher
-**Last Updated:** 2026-02-17 07:20 EST (Sprint QA 0720: 4 bugs fixed, 1 P1 blocker needs manual Supabase migration)
+**Last Updated:** 2026-02-20 05:50 EST (Sprint QA 0548: Code verification complete, BUG-JS-DUPLICATE-ESCAPEHTML-001 upgraded P2→P1)
 
 ---
 
@@ -190,11 +190,11 @@ These will be tracked in a separate backlog when Fireside Assistant development 
 | BUG-CSS-001 | Bug | P3 | L | Ready | **!important abuse** - 307 !important instances causing specificity battles. Large refactoring effort (8-12h) - Updated count 2026-02-20, see reports/qa-code-review-audit-0420.md |
 | BUG-PERF-003 | Bug | P3 | S | Ready | **Excessive script tags** - 15-20 individual script tags slow page load. Bundle with Webpack (45 min) - see reports/SPRINT-QA-AUDIT-COMPLETE-2026-02-15.md |
 | BUG-CODE-INNERHTML-0220-003 | Bug | P2 | M | Ready | **innerHTML XSS risk** - 117 instances of innerHTML= across 10+ files (app.js: 55, operations.js: 12). Potential XSS if any content from user/external sources. Audit all uses, replace with textContent or createElement() (4-6h) - see reports/qa-code-review-audit-0420.md |
-| BUG-JS-DUPLICATE-FORMATCURRENCY-001 | Bug | P2 | S | Ready | **formatCurrency() defined 3 times** - Duplicate function definitions in app.js, operations.js (as opsFormatCurrency), and likely charts.js. Maintenance burden + inconsistent formatting behavior (2-3h) - see reports/sprint-uiux-js-audit-0536.md |
-| BUG-JS-DUPLICATE-ESCAPEHTML-001 | Bug | P2 | XS | Ready | **escapeHtml() defined 3 times** - security-utils.js (canonical), app.js, operations.js (as opsEscape). XSS protection inconsistency + code duplication (1-2h) - see reports/sprint-uiux-js-audit-0536.md |
-| BUG-JS-CHART-DEFAULTS-DUPLICATE-001 | Bug | P3 | XS | Ready | **Chart.js defaults set in 2 files** - chart-theme.js AND charts.js both set Chart.defaults (52 total usages). Load order dependency + redundant config (1h) - see reports/sprint-uiux-js-audit-0536.md |
+| BUG-JS-DUPLICATE-FORMATCURRENCY-001 | Bug | P2 | S | Ready | **formatCurrency() defined 2 times** - VERIFIED Sprint QA 0548: app.js line 121 + transactions.js line 262. Maintenance burden + inconsistent formatting behavior (2-3h) - see reports/sprint-qa-code-verification-0548.md |
+| BUG-JS-DUPLICATE-ESCAPEHTML-001 | Bug | P1 | S | Ready | **escapeHtml() defined 7 times — SECURITY ISSUE** - VERIFIED Sprint QA 0548, UPGRADED P2→P1: security-utils.js (canonical) + 6 DUPLICATES (app.js, loading-states.js, notification-enhancements.js, toast-notifications.js, tour.js, transactions.js). XSS protection inconsistency unacceptable (3-4h) - see reports/sprint-qa-code-verification-0548.md |
+| BUG-JS-CHART-DEFAULTS-DUPLICATE-001 | Bug | P3 | XS | Ready | **Chart.js defaults set in 2 files** - VERIFIED Sprint QA 0548: chart-theme.js (canonical) + charts.js lines 59-65 (duplicate). Load order dependency + redundant config. Remove from charts.js (1h) - see reports/sprint-qa-code-verification-0548.md |
 | BUG-JS-TECHNICAL-DEBT-001 | Bug | P3 | M | Ready | **93 TODO/FIXME/HACK/BUG comments** - Technical debt scattered across JS files. Need triage + BACKLOG conversion (4-5h) - see reports/sprint-uiux-js-audit-0536.md |
-| BUG-CSS-THEME-MIGRATION-INCOMPLETE-001 | Bug | P2 | M | Ready | **136 old theme selectors won't work with Bootstrap 5.3** - FC-102 migrated to data-bs-theme but left body[data-theme='light'] selectors in main.css (99), components.css (31), accessibility.css (6). Light mode toggle BROKEN (2-3h) - see reports/sprint-qa-css-audit-0527.md |
+| BUG-CSS-THEME-MIGRATION-INCOMPLETE-001 | Bug | P2 | M | Done | **88 old theme selectors replaced with Bootstrap 5.3** - FIXED commit bd7b24c (2026-02-20). Replaced body[data-theme='light'] with [data-bs-theme="light"] in main.css (59), components.css (23), accessibility.css (6). Light mode toggle now works correctly - see reports/sprint-qa-css-audit-0527.md |
 | FINDING-JS-ARIA-COVERAGE-001 | Feature | P2 | M | Ready | **Missing ARIA attributes on dynamic components** - 12 modals missing aria-labelledby, loading states missing aria-busy, 9 charts missing role='img', tables missing aria-sort, collapsibles missing aria-expanded (3-4h) - see reports/sprint-uiux-js-audit-0536.md |
 | FC-142 | Chore | P1 | M | Ready | **Split main.css into ITCSS layers** - Break down 92KB main.css into layered architecture (1-settings, 3-generic, 4-elements, 5-objects, 6-components, 7-utilities) with import orchestrator for better maintainability (6-8h) - Sprint Research Task |
 | FC-143 | Chore | P1 | S | Ready | **Create critical CSS bundle for faster FCP** - Extract critical path CSS (design tokens + auth state + typography) into <14KB bundle, update all 11 HTML files to inline critical and defer non-critical (3-4h) - Sprint Research Task |

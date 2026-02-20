@@ -308,13 +308,9 @@ const LoadingStates = (function() {
    * Escape HTML to prevent XSS
    * @param {string} str - String to escape
    * @returns {string} - Escaped string
+   * NOTE: Using global escapeHtml() from security-utils.js
    */
-  function escapeHtml(str) {
-    if (str === null || str === undefined) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  // Removed duplicate - using global escapeHtml() from security-utils.js
 
   // ===== PUBLIC API =====
   return {

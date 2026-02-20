@@ -251,12 +251,7 @@ async function updateTransactionCategory(transactionId, newCategory) {
   }
 }
 
-// Helper function to escape HTML (prevent XSS)
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+// escapeHtml() is provided globally by security-utils.js (loaded in HTML)
 
 // Helper function to format currency
 function formatCurrency(amount) {
