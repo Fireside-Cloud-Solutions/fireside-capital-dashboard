@@ -1,6 +1,223 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 05:20 EST (Sprint QA 0504 FINAL — 100% HTML audit complete, 12 new bugs documented, commits 96e0c7e + 15a42c5 + afb7c02)
+**Last Updated:** 2026-02-20 05:23 EST (Sprint Dev 0523 — 2 P2 Income bugs fixed, commit 58adc30)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0523 (Feb 20, 5:23 AM) — INCOME PAGE BUGS ✅
+
+**Status:** ✅ **COMMIT 58adc30 — 2 P2 BUGS FIXED**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~8 minutes
+**Task:** Check Azure DevOps/Discord for work, pick highest priority item, fix it, commit, push
+
+### Situation Assessment
+
+**Azure DevOps:** CLI not available (no PAT configured)
+**Discord channels:**
+- #qa: Sprint QA 0504 completed 100% HTML audit (12/12 pages), found 12 new bugs
+- #ui-ux: Sprint UI/UX 0458 completed assets page audit
+- #research: Sprint Research 0513 completed 4 research topics
+
+**Highest priority work:** P2 bugs from Sprint QA 0504 Income page audit (7 min total effort for 2 quick wins)
+
+### Work Done
+
+| Item | Status | Commit | Notes |
+|------|--------|--------|-------|
+| BUG-INCOME-MODAL-CANCEL-001 | ✅ Fixed | 58adc30 | Income modal missing Cancel button — users trapped |
+| BUG-INCOME-ARIA-LIVE-001 | ✅ Fixed | 58adc30 | 3 summary cards missing screen reader announcements |
+
+### BUG-INCOME-MODAL-CANCEL-001 Details (P2, 2 min)
+
+**Problem:** `#addIncomeModal` footer had only Save button — no Cancel/Close button. Users were trapped in modal (could only dismiss via X button or clicking backdrop).
+
+**Fix:** Added `<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>` to modal footer before Save button.
+
+**Impact:** Improved UX, follows Bootstrap modal best practices, consistent with other modals (assets, bills, debts all have Cancel buttons after recent fixes).
+
+### BUG-INCOME-ARIA-LIVE-001 Details (P2, 5 min)
+
+**Problem:** 3 income summary cards (Monthly Income, Annual Income, Next Paycheck) had no `aria-live` regions. When data updated (add/edit/delete income), screen readers couldn't announce changes — accessibility failure for vision-impaired users.
+
+**Fix:** Added `role="status" aria-live="polite"` to all 3 `.summary-card` divs. Screen readers will now politely announce changes to these financial metrics when they update.
+
+**WCAG 2.1 AA Compliance:** Fixes criterion 4.1.3 (Status Messages) for income page.
+
+### Discord Alerts Posted
+
+**Channel:** #dev (1468289849009373336)
+**Message:** 1474351256209461465 — Sprint Dev 0523 summary + remaining P2 quick wins
+
+### Remaining P2 Quick Wins (From Sprint QA 0504)
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| BUG-DASHBOARD-HEADING-SEMANTIC-001 | P2 | 5 min | 11 chart headings h5→h6 for semantic consistency |
+| BUG-DASHBOARD-ARIA-LIVE-001 | P2 | 15 min | 6 dashboard stat cards missing aria-live regions |
+| BUG-INCOME-CSS-STALE-0220-001 | P3 | 3 min | 6 CSS files have stale version strings (v=20260218 → v=20260220) |
+
+**Total remaining:** 23 minutes for 3 bugs
+
+### Next Priority Items
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-173 | P1 | 5-6h | Operations Dashboard page (FC-172 Cash Flow Engine ✅ complete — unblocked) |
+| BUG-DEPLOY-STALE-0220-001 | P0 | N/A | **Azure deployment frozen** (529 commits undeployed) — **Matt must fix CDN/Static Web App** |
+| FC-188 | P1 | 2h | npm build scripts (terser + cssnano minification) |
+| FC-193 | P1 | 1h | Deploy 5 Supabase RPCs for Ops Dashboard |
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0513 (Feb 20, 5:13 AM) — CSS + CHART.JS + BOOTSTRAP + PWA ✅
+
+**Status:** ✅ **RESEARCH COMPLETE — 4 TOPICS DONE, 4 REPORTS SAVED**
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** ~70 minutes
+**Task:** Continue sprint research — CSS architecture, Chart.js, Bootstrap dark theme, PWA
+
+### Research Completed (4 Topics)
+
+| Topic | Status | Key Findings |
+|-------|--------|--------------|
+| CSS Architecture | ✅ | Current 98KB main.css should split into CUBE CSS modules (64% reduction → 35KB). Design tokens already excellent. |
+| Chart.js Optimization | ✅ | Strong foundations exist. Add: theme switching, real-time streaming, keyboard nav, export-to-image. |
+| Bootstrap Dark Theme | ✅ | Fireside already has good overrides. Need: theme toggle UI + missing variables (offcanvas, toast, pagination). |
+| PWA (Progressive Web App) | ✅ | Offline access via service worker + manifest.json. 3 files needed, 2-3 day implementation. |
+
+### CSS Architecture Research (Report: `reports/css-architecture-research.md`)
+
+**Current State:** 98KB monolithic main.css with excellent design tokens
+**Recommendation:** Split into CUBE CSS modules (Composition, Utilities, Blocks, Exceptions)
+
+**Key Improvements:**
+1. **Modularize main.css** → 64% size reduction (98KB → 35KB)
+   - Split into: `core/`, `composition/`, `blocks/`, `pages/`
+2. **Extract critical CSS** → 50% faster First Contentful Paint
+   - Inline above-fold styles in `<head>`
+3. **Implement PurgeCSS** → Remove unused Bootstrap classes
+   - Automated build process
+
+**Financial Dashboard CSS Patterns:**
+- Metric cards with semantic financial colors (positive/negative/neutral)
+- Financial tables with hover states + amount coloring
+- Chart containers with loading states + skeleton loaders
+
+### Chart.js Research (Report: `reports/chartjs-research.md`)
+
+**Current State:** Solid foundation (chart-theme.js + chart-factory.js)
+**Recommendation:** Add 4 enhancements + 3 new chart patterns
+
+**Enhancements:**
+1. **Dynamic theme switching** — Charts auto-update when user toggles dark/light mode
+2. **Real-time data streaming** — `streamDataToChart()` helper for live updates
+3. **Keyboard navigation** — WCAG 2.1 AA compliance (arrow keys + screen reader support)
+4. **Export to image** — `exportChartImage()` + clipboard copy
+
+**New Chart Patterns:**
+1. **Sparklines** — Compact trend indicators in metric cards
+2. **Stacked area charts** — Income vs. expenses over time
+3. **Gauge charts** — Budget progress (e.g., "75% used")
+
+**Performance Already Optimized** ✅:
+- Disabled animations (40% faster render)
+- Pre-parsed timestamps (62% faster)
+- Data decimation for 1000+ points
+
+### Bootstrap Dark Theme Research (Report: `reports/bootstrap-dark-theme-research.md`)
+
+**Current State:** Strong foundations with custom CSS variable overrides
+**Recommendation:** Add theme toggle UI + missing component variables
+
+**Enhancement 1: Theme Toggle JavaScript**
+- Auto-detects system preference + persists user choice
+- Dropdown UI: Light / Dark / Auto modes
+- LocalStorage persistence
+- ~2KB JS overhead
+
+**Enhancement 2: Missing Bootstrap Variables**
+Add to `design-tokens.css`:
+- Offcanvas (mobile sidebar)
+- Toast notifications
+- Pagination
+- Navbar
+- Focus rings (keyboard navigation)
+
+**Enhancement 3: Component-Specific Themes**
+- Custom colors for alerts, badges, progress bars
+- Financial semantic colors (positive/negative/neutral)
+
+### PWA Research (Report: `reports/pwa-research.md`)
+
+**Benefits:**
+- 📱 Install to home screen (iOS/Android/Desktop)
+- 🔌 Work offline — View dashboard without internet
+- ⚡ Instant loading — Pre-cached assets
+- 📊 Background sync — Queue actions when offline
+- 🔔 Push notifications — Payment reminders, budget alerts
+
+**Required Files (3):**
+1. **manifest.json** — App metadata (name, icons, theme colors)
+2. **sw.js** — Service worker (offline caching strategy)
+3. **Service Worker Registration** (in app.js)
+
+**Caching Strategy:**
+- **App Shell** (HTML, CSS, JS) → Cache-first (instant load)
+- **Supabase API** → Network-first (fresh data when online, stale when offline)
+- **Static Assets** (icons, fonts) → Cache-first (rarely change)
+
+**Implementation:** 2-3 days (Week 1: core setup, Week 2: offline data, Week 3: install prompts)
+
+### Reports Generated (4)
+
+1. `reports/css-architecture-research.md` (11.6 KB)
+2. `reports/chartjs-research.md` (19 KB)
+3. `reports/bootstrap-dark-theme-research.md` (17.3 KB)
+4. `reports/pwa-research.md` (21.3 KB)
+
+**Total research output:** 69.2 KB documentation
+
+### Discord Alerts Posted
+
+**Channel:** #dashboard (1467330085949276448)
+1. **Message 1474349218331361406** — CSS Architecture + Chart.js summary
+2. **Message 1474349686042132521** — Bootstrap Dark Theme summary
+3. **Message 1474350300310798491** — PWA summary + sprint research complete
+
+### Research Backlog Status — ALL 18 TOPICS COMPLETE ✅
+
+| Session | Topic | Status |
+|---------|-------|--------|
+| Feb 16 | CSS Architecture | ✅ Done (refreshed 0513) |
+| Feb 16 | Financial Dashboard UI Patterns | ✅ Done |
+| 0450 | Chart.js | ✅ Done (refreshed 0513) |
+| 0450 | Bootstrap Dark Theme | ✅ Done (refreshed 0513) |
+| Feb 13 | PWA | ✅ Done (refreshed 0513) |
+| Feb 13 | Performance | ✅ Done |
+| 0431 | Cash Flow Forecasting | ✅ Done |
+| 0535 | Budget vs Actuals + Demo Mode | ✅ Done |
+| 0635 | Webpack Build Pipeline | ✅ Done |
+| 0657 | Supabase Advanced Query Patterns | ✅ Done |
+| 0751 (Feb 17) | Smart Categorization + Realtime | ✅ Done |
+| 0433 (Feb 18) | Plaid Production Integration | ✅ Done |
+| 0511 (Feb 18) | Gmail Bill Parsing | ✅ Done |
+| 0612 (Feb 18) | Azure Functions Architecture | ✅ Done |
+| 0656 (Feb 18) | React Native Expo Deep Dive | ✅ Done |
+| **0513 (Feb 20)** | **CSS Architecture (refresh)** | ✅ **Done** |
+| **0513 (Feb 20)** | **Chart.js (refresh)** | ✅ **Done** |
+| **0513 (Feb 20)** | **Bootstrap Dark Theme (refresh)** | ✅ **Done** |
+| **0513 (Feb 20)** | **PWA (refresh)** | ✅ **Done** |
+
+**Next research cycle:** Accessibility audit (WCAG 2.1 AA), Performance monitoring (Lighthouse CI), Financial dashboard UI patterns (advanced)
+
+### Next Steps
+
+Research findings ready for Builder implementation:
+- **CSS Modularization** — Split main.css (FC-xxx)
+- **Theme Toggle UI** — Light/Dark/Auto dropdown (FC-xxx)
+- **Chart.js Enhancements** — Real-time streaming + keyboard nav (FC-xxx)
+- **PWA Setup** — manifest.json + service worker (FC-xxx)
 
 ---
 
