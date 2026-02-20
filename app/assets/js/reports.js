@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initReportsPage();
     
     // Add export button handler
-    const exportBtn = document.querySelector('.page-header-actions button');
+    const exportBtn = document.getElementById('exportReportBtn');
     if (exportBtn) {
       console.log('[Reports] Export button found, attaching click handler...');
       exportBtn.addEventListener('click', exportReportsData);
