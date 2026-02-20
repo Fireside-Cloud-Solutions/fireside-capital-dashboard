@@ -401,6 +401,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
       
+      // Date range presets (GitHub Issue #5)
+      // Quick-select buttons for common date ranges
+      document.querySelectorAll('[data-preset]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const preset = e.target.dataset.preset;
+          const today = new Date();
+          let startDate, endDate;
+          
+          switch(preset) {
+            case 'last7':
+              startDate = new Date(today);
+              startDate.setDate(today.getDate() - 7);
+              endDate = today;
+              break;
+            case 'last30':
+              startDate = new Date(today);
+              startDate.setDate(today.getDate() - 30);
+              endDate = today;
+              break;
+            case 'last90':
+              startDate = new Date(today);
+              startDate.setDate(today.getDate() - 90);
+              endDate = today;
+              break;
+            case 'thisMonth':
+              startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+              endDate = today;
+              break;
+            case 'thisYear':
+              startDate = new Date(today.getFullYear(), 0, 1);
+              endDate = today;
+              break;
+          }
+          
+          // Format dates as YYYY-MM-DD for date inputs
+          const formatDate = (d) => d.toISOString().split('T')[0];
+          const startInput = document.getElementById('startDate');
+          const endInput = document.getElementById('endDate');
+          
+          if (startInput) startInput.value = formatDate(startDate);
+          if (endInput) endInput.value = formatDate(endDate);
+          
+          // Auto-apply filters after preset selection
+          const applyBtn = document.getElementById('applyFiltersBtn');
+          if (applyBtn) applyBtn.click();
+        });
+      });
+      
     } catch (error) {
       console.error('[Transactions] Initialization failed:', error);
     }

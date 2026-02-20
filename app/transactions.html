@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <!-- FC-104: FOUC prevention ï¿½ set theme before CSS renders -->
   <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Transactions</title>
   <meta name="description" content="View and categorize your bank transactions automatically imported via Plaid integration. Track spending patterns and manage your cash flow.">
@@ -174,6 +174,17 @@
               <div class="col-6 col-md-4">
                 <label for="endDate" class="form-label">To</label>
                 <input type="date" id="endDate" class="form-control">
+              </div>
+            </div>
+            <!-- Date Range Presets (GitHub Issue #5) -->
+            <div class="mt-3">
+              <label class="form-label text-muted small">Quick Ranges:</label>
+              <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="last7">Last 7 days</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="last30">Last 30 days</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="last90">Last 90 days</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="thisMonth">This Month</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="thisYear">This Year</button>
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-3">

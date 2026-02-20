@@ -1,6 +1,6 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 06:00 EST (Sprint Dev 0600 — 2 P1 SECURITY & ACCESSIBILITY FIXES ✅)
+**Last Updated:** 2026-02-20 06:00 EST (Sprint Dev 0600 — 3 P1 BUGS FIXED ✅ Security, Accessibility, UI/UX)
 
 ---
 
@@ -24,6 +24,7 @@
 |------|--------|--------|-------|
 | BUG-JS-DUPLICATE-ESCAPEHTML-001 | ✅ Done | e10d90b | Removed 6 duplicate escapeHtml() functions, consolidated to security-utils.js |
 | GitHub Issue #11 | ✅ Done | 4f6a2a7 | Operations bills aging keyboard accessibility (WCAG 2.1 AA) |
+| GitHub Issues #4 + #12 | ✅ Done | 9d95b3b | Removed 208 hardcoded skeleton loader widths across 8 pages |
 
 ### Bug Details
 
