@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- FC-104: FOUC prevention — set theme before CSS renders -->
   <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
-  <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Assets</title>
   <meta name="description" content="Track your real estate, vehicles, and other assets. Monitor property values, loans, and equity to understand your total net worth.">
   
@@ -28,13 +26,13 @@
   <link rel="stylesheet" href="assets/css/design-tokens.css?v=20260219" />
   <link rel="stylesheet" href="assets/css/main.css?v=20260219" />
   
-  <link rel="stylesheet" href="assets/css/components.css?v=20260218" />
-  <link rel="stylesheet" href="assets/css/responsive.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/utilities.css?v=20260218" />
+  <link rel="stylesheet" href="assets/css/components.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/responsive.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/utilities.css?v=20260220" />
   
-  <link rel="stylesheet" href="assets/css/accessibility.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/logged-out-cta.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/critical.css?v=20260217" />
+  <link rel="stylesheet" href="assets/css/accessibility.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/logged-out-cta.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/critical.css?v=20260220" />
 </head>
 <body data-theme="dark">
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -137,6 +135,16 @@
       </div>
 
       <div id="dataContainer" class="data-hidden">
+        <!-- Empty State -->
+        <div id="assetEmptyState" class="empty-state" style="display:none">
+          <i class="bi bi-house-door empty-state-icon"></i>
+          <h5 class="mb-2">No Assets Yet</h5>
+          <p class="text-muted mb-3">Start tracking your real estate, vehicles, and other assets to monitor your net worth.</p>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+            <i class="bi bi-plus-circle"></i> Add Your First Asset
+          </button>
+        </div>
+
         <div class="table-card">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
@@ -179,6 +187,24 @@
                   <td><div class="skeleton-loader skeleton-line" style="width: 105px;"></div></td>
                   <td><div class="skeleton-loader skeleton-line" style="width: 105px;"></div></td>
                   <td><div class="skeleton-loader skeleton-line" style="width: 100px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                </tr>
+                <tr class="skeleton-row">
+                  <td><div class="skeleton-loader skeleton-line" style="width: 145px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 95px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 118px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 108px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 102px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 95px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
+                </tr>
+                <tr class="skeleton-row">
+                  <td><div class="skeleton-loader skeleton-line" style="width: 155px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 105px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 112px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 110px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 108px;"></div></td>
+                  <td><div class="skeleton-loader skeleton-line" style="width: 98px;"></div></td>
                   <td><div class="skeleton-loader skeleton-line" style="width: 80px;"></div></td>
                 </tr>
               </tbody>
@@ -248,6 +274,7 @@
             </div>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" id="saveAssetBtn" class="btn btn-primary">Save Asset</button>
           </div>
         </form>
