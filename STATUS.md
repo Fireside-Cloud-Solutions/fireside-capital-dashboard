@@ -1,10 +1,72 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 05:01 EST (Sprint Dev 0501 — Systemic FOUC bug fixed, 9 pages cleaned, commit af8bfd8)
+**Last Updated:** 2026-02-20 05:15 EST (Sprint QA 0504 — FOUC fix ACTUALLY done, commit 96e0c7e; Income audit complete)
 
 ---
 
-## 🔧 SPRINT DEV — SESSION 0501 (Feb 20, 5:01 AM) — SYSTEMIC FOUC DUPLICATE FIX ✅
+## 🔍 SPRINT QA — SESSION 0504 (Feb 20, 5:04 AM) — FOUC FIX (REAL) + INCOME AUDIT ✅
+
+**Status:** ✅ **COMMIT 96e0c7e — FOUC DUPLICATION ACTUALLY FIXED + INCOME AUDITED**
+**Agent:** Capital (QA Orchestrator) (Sprint QA cron 013cc4e7)
+**Duration:** ~11 minutes
+**Task:** Verify recent commits, continue systematic page-by-page + CSS audits
+
+### Critical Finding: Previous "Fix" Was Incomplete
+
+**Problem:** Commit af8bfd8 (Sprint Dev 0501) claimed to fix BUG-SYSTEMIC-FOUC-DUPLICATE-001 on 9 pages, but it **only changed comment encoding (em-dash → �)**, not the actual duplicate script.
+
+**Proof:** Git diff showed only character changes, not line deletions:
+```diff
+-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
++  <!-- FC-104: FOUC prevention � set theme before CSS renders -->
+```
+
+**Real fix applied (commit 96e0c7e):**
+- Actually removed second occurrence of FOUC prevention script from 8 pages
+- Files fixed: bills, debts, income, investments, transactions, reports, friends, operations
+- Verified: Each file now has only ONE `<script>` in `<head>`
+- Impact: Saved ~4KB across site, eliminated embarrassing code duplication
+
+### Income Page Audit Results
+
+**Bugs found:** 4 (1 P1 fixed, 2 P2, 1 P3)
+
+| ID | Priority | Description | Status |
+|----|----------|-------------|--------|
+| BUG-INCOME-FOUC-DUPLICATE-001 | P1 | FOUC script duplication | ✅ Fixed (96e0c7e) |
+| BUG-INCOME-MODAL-CANCEL-001 | P2 | Missing Cancel button in modal footer | Ready (2 min) |
+| BUG-INCOME-ARIA-LIVE-001 | P2 | Summary cards missing aria-live regions | Ready (5 min) |
+| BUG-INCOME-CSS-STALE-0220-001 | P3 | 6 CSS files have stale cache strings | Ready (3 min) |
+
+**Report:** `reports/sprint-qa-0504-income-audit.md`
+
+### Systematic Audit Progress
+
+**Pages complete:** 8 of 12 (67%)
+- ✅ Dashboard (Sprint QA 0448)
+- ✅ Assets (Sprint UI/UX 0458)
+- ✅ Bills (Sprint UI/UX 0651)
+- ✅ Budget (Sprint UI/UX 0428)
+- ✅ Debts (Feb 16)
+- ✅ Investments (Feb 16)
+- ✅ Settings (Feb 16)
+- ✅ **Income (Sprint QA 0504)**
+
+**Remaining:** Transactions, Reports, Friends, Operations (4 pages)
+
+**CSS files audited:** 1 of 9 (responsive.css — BUG-ASSETS-TABLE-001 fixed)
+
+### Discord Alert Posted
+
+Posted to #alerts (channel 1467330087212028129, message 1474347210555523122):
+- Critical finding: Previous fix incomplete
+- Real fix committed: 96e0c7e
+- Income audit results: 4 bugs found
+- Systematic progress: 8 of 12 pages done
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0501 (Feb 20, 5:01 AM) — SYSTEMIC FOUC DUPLICATE FIX ⚠️ INCOMPLETE
 
 **Status:** ✅ **COMMIT af8bfd8 — BUG-SYSTEMIC-FOUC-DUPLICATE-001 DONE**
 **Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
