@@ -1,6 +1,6 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 06:00 EST (Sprint Dev 0600 — BUG-JS-DUPLICATE-ESCAPEHTML-001 FIXED ✅)
+**Last Updated:** 2026-02-20 06:00 EST (Sprint Dev 0600 — 2 P1 SECURITY & ACCESSIBILITY FIXES ✅)
 
 ---
 
@@ -23,6 +23,7 @@
 | Item | Status | Commit | Notes |
 |------|--------|--------|-------|
 | BUG-JS-DUPLICATE-ESCAPEHTML-001 | ✅ Done | e10d90b | Removed 6 duplicate escapeHtml() functions, consolidated to security-utils.js |
+| GitHub Issue #11 | ✅ Done | 4f6a2a7 | Operations bills aging keyboard accessibility (WCAG 2.1 AA) |
 
 ### Bug Details
 
