@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <!-- FC-104: FOUC prevention ï¿½ set theme before CSS renders -->
   <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Reports</title>
   <meta name="description" content="Generate financial reports, export data to CSV or PDF, and analyze your finances with comprehensive charts and summaries.">
@@ -170,7 +170,7 @@
             <div class="chart-skeleton chart-skeleton--line" id="netWorthSkeleton">
               <div class="skeleton-loader skeleton-chart-lg"></div>
             </div>
-            <canvas id="netWorthTimelineChart"></canvas>
+            <canvas id="netWorthTimelineChart" aria-label="Chart showing net worth over time as a line graph"></canvas>
           </div>
         </div>
 
@@ -184,7 +184,7 @@
                 <div class="chart-skeleton chart-skeleton--bar" id="monthlyCashFlowSkeleton">
                   <div class="skeleton-loader skeleton-chart-lg"></div>
                 </div>
-                <canvas id="monthlyCashFlowChart"></canvas>
+                <canvas id="monthlyCashFlowChart" aria-label="Chart showing monthly cash flow as a bar graph"></canvas>
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@
                 <div class="chart-skeleton chart-skeleton--doughnut" id="spendingCategoriesSkeleton">
                   <div class="skeleton-loader skeleton-chart-lg"></div>
                 </div>
-                <canvas id="spendingCategoriesChart"></canvas>
+                <canvas id="spendingCategoriesChart" aria-label="Chart showing top spending categories as a doughnut chart"></canvas>
               </div>
             </div>
           </div>
@@ -212,7 +212,7 @@
                 <div class="chart-skeleton chart-skeleton--line" id="savingsRateSkeleton">
                   <div class="skeleton-loader skeleton-chart-lg"></div>
                 </div>
-                <canvas id="savingsRateChart"></canvas>
+                <canvas id="savingsRateChart" aria-label="Chart showing savings rate over time as a line graph"></canvas>
               </div>
             </div>
           </div>
@@ -225,7 +225,7 @@
                 <div class="chart-skeleton chart-skeleton--line" id="investmentGrowthSkeleton">
                   <div class="skeleton-loader skeleton-chart-lg"></div>
                 </div>
-                <canvas id="investmentGrowthChart"></canvas>
+                <canvas id="investmentGrowthChart" aria-label="Chart showing investment growth over time as a line graph"></canvas>
               </div>
             </div>
           </div>
