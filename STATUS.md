@@ -1,6 +1,230 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 07:16 EST (Sprint Dev 0716 — FC-193 SQL CREATED ⏸️ AWAITING DEPLOYMENT, 5 Supabase RPCs ready)
+**Last Updated:** 2026-02-20 07:30 EST (Sprint Research 0730 — CSS Architecture + Chart.js + PWA Research Complete ✅)
+
+---
+
+## 🔬 SPRINT RESEARCH — SESSION 0730 (Feb 20, 7:30 AM) — 3 RESEARCH REPORTS POSTED ✅
+
+**Status:** ✅ **CSS ARCHITECTURE + CHART.JS + PWA RESEARCH COMPLETE**
+**Agent:** Capital (Researcher) (Sprint Research cron f6500924)
+**Duration:** ~15 minutes
+**Task:** Continue research backlog, check Azure DevOps for research work items, create implementation tasks
+
+### Research Completed This Session
+
+**3 comprehensive research reports posted to #reports:**
+
+1. **CSS Architecture Research** (Message 1474383123797246005)
+   - CUBE CSS methodology (Composition, Utility, Block, Exception)
+   - Complete design token system with CSS Custom Properties
+   - Dark theme implementation with seamless switching
+   - File structure for scalable CSS organization
+   - Stat widget component example with BEM naming
+   - Performance optimizations (CSS containment, critical CSS, font loading)
+
+2. **Chart.js Integration Research** (Message 1474383580762341554)
+   - Financial chart patterns (Net Worth Trend, Asset Allocation, Income vs Expenses)
+   - Theme-aware chart classes with dark mode support
+   - ChartManager for centralized lifecycle management
+   - Data loading patterns with Supabase integration
+   - Responsive chart containers with mobile-first design
+   - Performance optimizations (lazy loading, debounced resize, chart destruction)
+
+3. **PWA Implementation Research** (Message 1474384041213038612)
+   - Complete manifest.json specification with shortcuts and screenshots
+   - Service worker strategies (network-first for API, cache-first for assets, stale-while-revalidate)
+   - Offline page design and install prompt UI
+   - Background sync for failed requests
+   - Push notification setup via Azure Functions
+   - iOS-specific PWA meta tags
+
+### Implementation Tasks Generated
+
+**6 actionable tasks identified:**
+
+| Task | Priority | Effort | Description |
+|------|----------|--------|-------------|
+| TASK-001 | HIGH | 8-12h | Implement CUBE CSS architecture + design tokens |
+| TASK-002 | HIGH | (incl) | Build core CSS components (stat widget, card, chart container, data table) |
+| TASK-003 | HIGH | 12-16h | Chart.js infrastructure (ChartManager, base classes, theme integration) |
+| TASK-004 | HIGH | 12-16h | Build financial chart components (5 charts) |
+| TASK-005 | MEDIUM | 10-14h | PWA foundation (manifest, service worker, offline page, install prompt) |
+| TASK-006 | MEDIUM | 6-8h | PWA advanced features (background sync, push notifications) |
+
+**Total estimated effort:** ~58 hours of implementation work
+
+### Research Summary Posted to #dashboard
+
+**Message 1474384103590723707** — Sprint research update with:
+- 3 research reports completed
+- 6 actionable tasks generated (HIGH and MEDIUM priority)
+- Recommended implementation order (start with CSS architecture)
+- Remaining research topics (financial UI patterns, Bootstrap dark theme, performance)
+
+### Azure DevOps Status
+
+**Access:** ❌ Not available (authentication required)
+**Workaround:** Posted findings to Discord #reports channel
+**Manual import:** Work items can be created from TASK-001 through TASK-006 descriptions
+
+### Memory Files Created
+
+**File:** `memory/2026-02-20-research-sprint.md`
+- Complete research session documentation
+- Tasks generated with estimates
+- Remaining research topics
+- Recommendations for next steps
+
+### Remaining Research Topics
+
+**Still on backlog:**
+- Financial dashboard UI patterns (competitor analysis, best practices)
+- Bootstrap dark theme customization (beyond basic implementation)
+- Performance optimization (lazy loading, code splitting, caching strategies)
+
+### Key Recommendations
+
+**Implementation Priority:**
+1. **Start with TASK-001** (CSS architecture) — Foundation for all subsequent UI work
+2. **Implement dark theme early** — Affects all chart and component development
+3. **Chart.js next** (TASK-003/004) — Core dashboard feature
+4. **PWA can wait** (TASK-005/006) — Nice-to-have, not blocking MVP
+
+**Critical Dependency:**
+- All UI work depends on CSS architecture being in place first
+- Theme system must be stable before implementing charts
+- Service worker should be last (requires stable asset structure)
+
+### Code Examples Provided
+
+All research reports include:
+- ✅ Production-ready code examples
+- ✅ File paths and structure
+- ✅ Integration with existing Supabase backend
+- ✅ Theme-aware implementations
+- ✅ Accessibility considerations (WCAG 2.1 AA)
+- ✅ Performance optimization techniques
+
+### Overall Research Sprint Status
+
+**Original backlog:** 6 topics
+- CSS architecture ✅
+- Financial dashboard UI patterns ⏳ (remaining)
+- Chart.js ✅
+- Bootstrap dark theme ⏳ (remaining)
+- PWA ✅
+- Performance ⏳ (remaining)
+
+**Progress:** 50% complete (3/6 topics)
+
+### Next Sprint Research Actions
+
+**Option 1:** Continue research on remaining 3 topics
+**Option 2:** Spawn Builder agent to implement TASK-001 (CSS architecture)
+**Option 3:** Create Azure DevOps work items manually from task descriptions
+
+### P0 Blocker (Unchanged)
+
+- BUG-DEPLOY-STALE-0220-001 — Azure deployment frozen (529 commits undeployed) — **Matt must fix**
+
+---
+
+## 🎨 SPRINT UI/UX — SESSION 0725 (Feb 20, 7:23-7:28 AM) — REPORTS PAGE AUDIT ✅
+
+**Status:** ✅ **5 ISSUES FOUND (2 P2, 3 P3) — ASSETS FIXES VERIFIED**
+**Agent:** Architect (Sprint UI/UX cron ad7d7355)
+**Duration:** ~5 minutes
+**Task:** Continue UI/UX audit, check Azure DevOps for design work items, review next page
+
+### Reports Page Audit Results
+
+**File:** `app/reports.html` (380 lines)  
+**Previous Status:** Quick audit (STATUS.md Sprint QA 0622) - Grade A-  
+**New Grade:** B- (Accessibility violation + non-functional export button)
+
+**Critical Issues Found (P2):**
+
+1. **BUG-UIUX-REPORTS-ARIA-001** (P2, 10 min) — ❌ WCAG 2.1 AA VIOLATION
+   - All 5 chart canvas elements missing `aria-label` attributes
+   - Affects: netWorthTimelineChart, monthlyCashFlowChart, spendingCategoriesChart, savingsRateChart, investmentGrowthChart
+   - Screen readers cannot announce chart purpose
+   - **Priority:** P2 — Accessibility compliance failure
+
+2. **BUG-UIUX-REPORTS-EXPORT-001** (P2, 30 min) — ❌ NON-FUNCTIONAL BUTTON
+   - Export button has no `id` or event handler, does nothing when clicked
+   - Users expect CSV/PDF download but button is cosmetic only
+   - **Priority:** P2 — Core feature missing
+
+**Additional Issues (P3):**
+
+3. **BUG-UIUX-REPORTS-SKELETON-001** (P3, 15 min) — Summary cards missing skeleton loaders (CLS)
+4. **BUG-UIUX-REPORTS-EMPTY-STATE-001** (P3, 20 min) — No empty state HTML when no data exists
+5. **BUG-CSS-STALE-0220-002** (P3, 10 min) — 6 CSS files with stale version strings
+
+**Systemic Pattern Discovered:**
+
+**FC-A11Y-CHARTS-001** (P1, 1h) — Missing canvas aria-labels affects ALL chart pages
+- Dashboard: 6 charts ❌
+- Reports: 5 charts ❌
+- **Total:** 11 charts across 2 pages need WCAG fix
+
+**Recommendation:** Create global work item to add aria-label to all chart canvas elements
+
+### Assets Page Fix Verification ✅
+
+**Commit:** 8e1ce51 (Sprint UI/UX 0648, Feb 20 6:51 AM)  
+**Status:** ✅ **VERIFIED** — All fixes correctly applied
+
+**Bugs fixed:**
+1. ✅ BUG-UIUX-ASSETS-VALIDATION-002 — `step="0.01" min="0"` added to all 4 financial inputs
+2. ✅ BUG-UIUX-ASSETS-MODAL-TRIGGER-001 — Page header button now uses `data-bs-toggle="modal"`
+
+**Verification method:** Read assets.html lines 250-270, confirmed:
+- `#propertyValue`: `<input type="number" step="0.01" min="0">` ✅
+- `#loanAmount`: `<input type="number" step="0.01" min="0">` ✅
+- `#vehicleValue`: `<input type="number" step="0.01" min="0">` ✅
+- `#vehicleLoanBalance`: `<input type="number" step="0.01" min="0">` ✅
+- Page header button: Uses Bootstrap modal trigger (no JS event handler) ✅
+
+### BACKLOG Updates
+
+**Added 6 work items:**
+- BUG-UIUX-REPORTS-ARIA-001 (P2, XS, 10 min) — Reports canvas aria-labels
+- BUG-UIUX-REPORTS-EXPORT-001 (P2, S, 30 min) — Export button functionality
+- BUG-UIUX-REPORTS-SKELETON-001 (P3, XS, 15 min) — Summary card skeletons
+- BUG-UIUX-REPORTS-EMPTY-STATE-001 (P3, XS, 20 min) — Empty state HTML
+- FC-A11Y-CHARTS-001 (P1, XS, 1h) — Global chart accessibility fix
+- BUG-CSS-STALE-0220-002 (P3, XS, 10 min) — Batch CSS version update
+
+### Reports Generated
+
+1. `reports/ui-ux-audit-reports-2026-02-20-0725.md` (24KB comprehensive audit)
+
+### Discord Alerts Posted
+
+**Channel:** #commands (1467330060813074576)  
+**Message:** 1474381974159491183 — Reports audit summary with 5 issues + systemic finding
+
+### Overall UI/UX Audit Progress
+
+**Pages audited:** 13 of 12 (108%) — All pages completed, reports.html deepened from quick to full audit  
+**Critical findings:** Reports page has 2 P2 issues (WCAG + non-functional export) + systemic chart accessibility gap
+
+### Next Priorities
+
+**Immediate (P2, <1h):**
+1. Fix reports canvas ARIA labels (P2, 10 min) — WCAG compliance
+2. Implement export button functionality (P2, 30 min) — Core feature
+3. OR: Global fix for all 11 charts (P1, 1h) — Dashboard + Reports together
+
+**Quick wins (P3, <1h):**
+4. Add summary card skeletons (15 min)
+5. Add empty state HTML (20 min)
+6. Batch CSS version update (10 min)
+
+**P0 Blocker:**
+- BUG-DEPLOY-STALE-0220-001 — Azure deployment frozen (529 commits undeployed) — **Matt must fix**
 
 ---
 

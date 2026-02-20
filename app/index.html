@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <!-- Build: 2026-02-01-17:00 - FINAL FIX -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <!-- FC-104: FOUC prevention � set theme before CSS renders -->
   <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Dashboard</title>
-  <meta name="description" content="Track your net worth, bills, investments, debts, and budget with Fireside Capital � your personal finance dashboard. Monitor your financial health in one place.">
+  <meta name="description" content="Track your net worth, bills, investments, debts, and budget with Fireside Capital ? your personal finance dashboard. Monitor your financial health in one place.">
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -31,17 +31,17 @@
   <!-- Critical CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/design-tokens.css?v=20260219" />
-  <link rel="stylesheet" href="assets/css/main.css?v=20260219" />
+  <link rel="stylesheet" href="assets/css/design-tokens.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/main.css?v=20260220" />
   
-  <link rel="stylesheet" href="assets/css/components.css?v=20260219" />
-  <link rel="stylesheet" href="assets/css/responsive.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/utilities.css?v=20260218" />
+  <link rel="stylesheet" href="assets/css/components.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/responsive.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/utilities.css?v=20260220" />
   
-  <link rel="stylesheet" href="assets/css/accessibility.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/logged-out-cta.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/onboarding.css?v=20260217" />
-  <link rel="stylesheet" href="assets/css/critical.css?v=20260217" />
+  <link rel="stylesheet" href="assets/css/accessibility.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/logged-out-cta.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/onboarding.css?v=20260220" />
+  <link rel="stylesheet" href="assets/css/critical.css?v=20260220" />
   
   <!-- Performance: Chart.js lazy-loaded on dashboard only (saves 270 KB on other pages) -->
   <!-- See assets/js/lazy-loader.js -->
@@ -165,7 +165,7 @@
                 </div>
                 <div class="stat-value d-none" id="netWorthValue">$0.00</div>
                 <div class="stat-trend d-none" id="netWorthTrend">
-                  <span class="trend-indicator">�</span>
+                  <span class="trend-indicator">?</span>
                 </div>
               </div>
             </div>
@@ -188,7 +188,7 @@
                 </div>
                 <div class="stat-value d-none" id="totalAssetsValue">$0.00</div>
                 <div class="stat-trend d-none" id="assetsTrend">
-                  <span class="trend-indicator">�</span>
+                  <span class="trend-indicator">?</span>
                 </div>
                 <div class="stat-meta d-none" id="assetCount">0 assets</div>
               </div>
@@ -232,7 +232,7 @@
                 </div>
                 <div class="stat-value d-none" id="totalDebtsValue">$0.00</div>
                 <div class="stat-trend d-none" id="debtsTrend">
-                  <span class="trend-indicator">�</span>
+                  <span class="trend-indicator">?</span>
                 </div>
                 <div class="stat-meta d-none" id="debtCount">0 debts</div>
               </div>
@@ -256,7 +256,7 @@
                 </div>
                 <div class="stat-value d-none" id="totalInvestmentsValue">$0.00</div>
                 <div class="stat-trend d-none" id="investmentsTrend">
-                  <span class="trend-indicator">�</span>
+                  <span class="trend-indicator">?</span>
                 </div>
                 <div class="stat-meta d-none" id="investmentCount">0 investments</div>
               </div>
@@ -418,10 +418,10 @@
   <!-- Performance optimization: Lazy loader utility (2 KB, load immediately) -->
   <script src="assets/js/lazy-loader.js"></script>
   
-  <!-- CRITICAL: Supabase � Required for data fetching (synchronous for early execution) -->
+  <!-- CRITICAL: Supabase ? Required for data fetching (synchronous for early execution) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- CRITICAL: Bootstrap JS � Required for UI components (synchronous for early execution) -->
+  <!-- CRITICAL: Bootstrap JS ? Required for UI components (synchronous for early execution) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- Plaid: Lazy-loaded when user clicks "Connect Bank" (saves 95 KB) -->
@@ -430,24 +430,24 @@
   <!-- CRITICAL SCRIPTS: Execute early to render content (synchronous) -->
   <script src="assets/js/csrf.js"></script>
   <script src="assets/js/security-utils.js"></script>
-  <script src="assets/js/session-security.js?v=20260218"></script>
+  <script src="assets/js/session-security.js?v=20260220"></script>
   <script src="assets/js/toast-notifications.js"></script>
   <script src="assets/js/demo-data.js"></script>
-  <script src="assets/js/realtime.js?v=20260218"></script>
-  <script src="assets/js/data-layer.js?v=20260218"></script>
-  <script src="assets/js/app.js?v=20260219b"></script>
+  <script src="assets/js/realtime.js?v=20260220"></script>
+  <script src="assets/js/data-layer.js?v=20260220"></script>
+  <script src="assets/js/app.js?v=20260220b"></script>
   <script src="assets/js/event-handlers.js"></script>
-  <script src="assets/js/chart-factory.js?v=20260219"></script>
-  <script src="assets/js/charts.js?v=20260219"></script>
-  <script src="assets/js/budget-actuals.js?v=20260218" defer></script>
+  <script src="assets/js/chart-factory.js?v=20260220"></script>
+  <script src="assets/js/charts.js?v=20260220"></script>
+  <script src="assets/js/budget-actuals.js?v=20260220" defer></script>
   
   <!-- NON-CRITICAL SCRIPTS: Progressive enhancement (defer for performance) -->
   <script src="assets/js/rate-limiter.js" defer></script>
-  <script src="assets/js/rate-limit-db.js?v=20260218" defer></script>
+  <script src="assets/js/rate-limit-db.js?v=20260220" defer></script>
   <script src="assets/js/polish-utilities.js" defer></script>
   <script src="assets/js/notification-enhancements.js" defer></script>
   <script src="assets/js/security-patch.js" defer></script>
-  <script src="assets/js/app-polish-enhancements.js?v=20260218" defer></script>
+  <script src="assets/js/app-polish-enhancements.js?v=20260220" defer></script>
   <script src="assets/js/plaid.js" defer></script>
   <script src="assets/js/subscriptions.js" defer></script>
 
@@ -647,7 +647,7 @@
             </div>
             <h2 class="onboarding-welcome-title">Welcome to Fireside Capital!</h2>
             <p class="onboarding-welcome-description">
-              Let's get your finances organized. Track your assets, manage bills, monitor investments, and achieve your financial goals�all in one place.
+              Let's get your finances organized. Track your assets, manage bills, monitor investments, and achieve your financial goals?all in one place.
             </p>
             <div class="onboarding-welcome-actions">
               <button type="button" class="btn btn-lg btn-primary" id="onboardingGetStartedBtn">Get Started</button>
@@ -751,8 +751,8 @@
   </div>
 
   <!-- Onboarding Scripts (defer for performance) -->
-  <script src="assets/js/onboarding.js?v=20260218" defer></script>
-  <script src="assets/js/tour.js?v=20260219" defer></script>
+  <script src="assets/js/onboarding.js?v=20260220" defer></script>
+  <script src="assets/js/tour.js?v=20260220" defer></script>
 </body>
 
 </html>
