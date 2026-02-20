@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <!-- FC-104: FOUC prevention ï¿½ set theme before CSS renders -->
   <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Operations Dashboard</title>
   <meta name="description" content="Real-time operational dashboard: safe-to-spend, cash flow forecast, bills aging, and budget vs actuals.">
@@ -148,9 +148,11 @@
           <div class="col-12 col-md-4 col-xl-3">
             <div id="safeToSpend" class="h-100">
               <div class="card h-100">
-                <div class="card-body d-flex align-items-center justify-content-center">
-                  <div class="spinner-border spinner-border-sm text-primary" role="status">
-                    <span class="visually-hidden">Loading…</span>
+                <div class="card-body loading">
+                  <div class="stat-card-skeleton">
+                    <div class="skeleton-loader skeleton-label"></div>
+                    <div class="skeleton-loader skeleton-value"></div>
+                    <div class="skeleton-loader skeleton-meta"></div>
                   </div>
                 </div>
               </div>
@@ -184,7 +186,7 @@
                 <div id="billsAging">
                   <div class="text-center py-3">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                      <span class="visually-hidden">Loading…</span>
+                      <span class="visually-hidden">Loadingï¿½</span>
                     </div>
                   </div>
                 </div>
@@ -205,7 +207,7 @@
                 <div id="bvaHorizontal">
                   <div class="text-center py-3">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                      <span class="visually-hidden">Loading…</span>
+                      <span class="visually-hidden">Loadingï¿½</span>
                     </div>
                   </div>
                 </div>
@@ -219,11 +221,11 @@
           <div class="col-12">
             <div class="card">
               <div class="card-body">
-                <h6 class="ops-card-title"><i class="bi bi-calendar2-week me-1"></i> Upcoming — Next 14 Days</h6>
+                <h6 class="ops-card-title"><i class="bi bi-calendar2-week me-1"></i> Upcoming ï¿½ Next 14 Days</h6>
                 <div id="upcomingTx">
                   <div class="text-center py-3">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                      <span class="visually-hidden">Loading…</span>
+                      <span class="visually-hidden">Loadingï¿½</span>
                     </div>
                   </div>
                 </div>
