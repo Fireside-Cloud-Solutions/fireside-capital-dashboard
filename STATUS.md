@@ -1,6 +1,54 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-19 07:55 EST (Sprint Dev 0755 — FC-102 DONE, commit 1fd857c)
+**Last Updated:** 2026-02-20 04:15 EST (Sprint Dev 0415 — FC-172 DONE, commit efd7f6b)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0415 (Feb 20, 4:15 AM) — FC-172 CASH FLOW ENGINE ✅
+
+**Status:** ✅ **COMMIT efd7f6b — FC-172 DONE**
+**Agent:** Capital (Lead Dev) (Sprint Dev cron a54d89bf)
+**Duration:** ~15 minutes
+
+### Work Done
+
+| Item | Status | Commit | Notes |
+|------|--------|--------|-------|
+| FC-172 | ✅ Done | efd7f6b | Cash Flow Projection Engine — 361 lines, production-ready |
+
+### FC-172 Details
+
+**New file:** `app/assets/js/cash-flow.js` (295 lines + 66 JSDoc)
+
+Core functions implemented:
+- `generateCashFlowProjection({ startBalance, incomes, bills, debts, days })` — day-by-day ledger with running balance
+- `getOccurrences(startDate, frequency, days)` — handles all 8 frequency types (daily → annual)
+- `advanceByFrequency(date, frequency)` — month-end edge case handling (Feb 28 → Mar 31 uses `setMonth()`, not day arithmetic)
+- `calculateSafeToSpend(projection, safetyBuffer)` — lowest projected balance in 14 days minus $500 buffer
+- `getBillsAging(projection)` — 3-bucket AP view (≤7d red, 8-30d yellow, 31-60d green)
+- `getUpcomingTransactions(projection)` — next 14 days with running balance, inflows before outflows
+
+**Edge cases handled:**
+- Supports both snake_case (`next_payment_date`) and camelCase (`nextPaymentDate`) field names
+- Handles inactive items (`is_active === false`)
+- Safety valve on `getOccurrences()` prevents infinite loops (max 500 occurrences)
+- Frequency fallback to 'monthly' if unknown type
+
+**Zero dependencies** — pure vanilla JS, no Chart.js or external libs required  
+**Exposed via:** `window.CashFlow.*` for use by operations.js (FC-173)
+
+### Channels Status
+- #qa: No new bugs since Feb 18
+- #ui-ux: No new bugs since Feb 18
+- #research: All 15 research topics complete
+
+### Next P1 Ready Items
+
+| ID | Priority | Est | Description |
+|----|----------|-----|-------------|
+| FC-173 | P1 | 5-6h | Operations Dashboard page (depends on FC-172 ✅ — now unblocked) |
+| FC-188 | P1 | 2h | npm build scripts (terser + cssnano) |
+| FC-193 | P1 | 1h | Deploy 5 Supabase RPCs for Ops Dashboard |
 
 ---
 
