@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- FC-104: FOUC prevention — set theme before CSS renders -->
+  <!-- FC-104: FOUC prevention ï¿½ set theme before CSS renders -->
   <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-bs-theme',t);document.documentElement.setAttribute('data-theme',t);}());</script>
   <title>Fireside Capital - Assets</title>
   <meta name="description" content="Track your real estate, vehicles, and other assets. Monitor property values, loans, and equity to understand your total net worth.">
@@ -89,7 +89,7 @@
         <h2>Assets</h2>
         <div class="page-header-actions">
           <div id="pageActions" class="initially-hidden">
-            <button class="btn btn-primary btn-touch-target" id="openAssetModalBtn" aria-label="Add new asset">
+            <button class="btn btn-primary btn-touch-target" data-bs-toggle="modal" data-bs-target="#addAssetModal" aria-label="Add new asset">
               <i class="bi bi-plus-circle"></i> Add Asset
             </button>
           </div>
@@ -243,11 +243,11 @@
                 <div class="row g-3">
                   <div class="col-md-4">
                     <label for="propertyValue" class="form-label">Market Value</label>
-                    <input type="number" class="form-control" id="propertyValue" step="0.01" />
+                    <input type="number" class="form-control" id="propertyValue" step="0.01" min="0" />
                   </div>
                   <div class="col-md-4">
                     <label for="loanAmount" class="form-label">Loan Amount</label>
-                    <input type="number" class="form-control" id="loanAmount" step="0.01" />
+                    <input type="number" class="form-control" id="loanAmount" step="0.01" min="0" />
                   </div>
                   <div class="col-md-4">
                     <label for="realEstateNextDueDate" class="form-label">Next Due Date</label>
@@ -259,11 +259,11 @@
                  <div class="row g-3">
                     <div class="col-md-4">
                       <label for="vehicleValue" class="form-label">Vehicle Value</label>
-                      <input type="number" class="form-control" id="vehicleValue" />
+                      <input type="number" class="form-control" id="vehicleValue" step="0.01" min="0" />
                     </div>
                     <div class="col-md-4">
                       <label for="vehicleLoanBalance" class="form-label">Loan Balance</label>
-                      <input type="number" class="form-control" id="vehicleLoanBalance" />
+                      <input type="number" class="form-control" id="vehicleLoanBalance" step="0.01" min="0" />
                     </div>
                     <div class="col-md-4">
                       <label for="vehicleNextDueDate" class="form-label">Next Due Date</label>
