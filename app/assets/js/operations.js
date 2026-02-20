@@ -581,7 +581,9 @@ function renderBillsAging() {
     return `
       <div class="bills-bucket card border mb-2 border-${variant} border-opacity-25"
            role="button"
+           tabindex="0"
            aria-expanded="false"
+           aria-controls="${bucketId}"
            data-action="toggle-bucket"
            aria-label="${label} — ${bucketBills.length} bills totalling ${opsFormatCurrency(total)}">
         <div class="card-body py-2 px-3">
@@ -595,7 +597,7 @@ function renderBillsAging() {
               <i class="bi bi-chevron-down text-muted small"></i>
             </div>
           </div>
-          <div class="bills-bucket-list">
+          <div class="bills-bucket-list" id="${bucketId}">
             ${rows}
           </div>
         </div>
@@ -614,9 +616,24 @@ function renderBillsAging() {
   // each call stacks another listener; N clicks per user click breaks toggle open/close.
   if (!el.dataset.bucketListenerAttached) {
     el.dataset.bucketListenerAttached = 'true';
+    
+    // Click handler
     el.addEventListener('click', (e) => {
       const bucket = e.target.closest('[data-action="toggle-bucket"]');
       if (!bucket) return;
+      const list = bucket.querySelector('.bills-bucket-list');
+      if (!list) return;
+      const expanded = list.classList.toggle('expanded');
+      bucket.setAttribute('aria-expanded', expanded);
+    });
+    
+    // Keyboard handler (Enter/Space) — Fix for GitHub Issue #11 (WCAG 2.1.1 + 4.1.2)
+    // Makes bills aging buckets keyboard accessible for non-mouse users
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const bucket = e.target.closest('[data-action="toggle-bucket"]');
+      if (!bucket) return;
+      e.preventDefault(); // Prevent space from scrolling page
       const list = bucket.querySelector('.bills-bucket-list');
       if (!list) return;
       const expanded = list.classList.toggle('expanded');
