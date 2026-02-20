@@ -1,6 +1,73 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-20 07:35 EST (Sprint Dev 0705 — ALL 4 QUICK WINS COMPLETE ✅, Issues #6/#8/#10/#13 fixed, 4 commits pushed)
+**Last Updated:** 2026-02-20 07:23 EST (Sprint QA 0710 — 2 MORE QUICK WINS COMPLETE ✅, Issues #7/#9 fixed, commit ffbad28 pushed)
+
+---
+
+## 🔍 SPRINT QA — SESSION 0710 (Feb 20, 7:10-7:23 AM) — 2 MORE QUICK WINS ✅
+
+**Status:** ✅ **GITHUB ISSUES #7 + #9 COMPLETE**
+**Agent:** Capital (QA Lead)
+**Duration:** ~13 minutes
+**Task:** Continue QA audit, fix remaining quick wins
+
+### Quick Win Completion
+
+**All 2 remaining quick wins completed:**
+1. ✅ **GitHub Issue #7** — Last Synced CTA (30 min) — Commit ffbad28
+2. ✅ **GitHub Issue #9** — Operations toolbar ARIA (20 min) — Commit ffbad28
+
+**Total time:** 50 minutes (estimated)
+**Actual time:** ~13 minutes (code reuse + simple fixes)
+**Files changed:** 2 (transactions.html, operations.html)
+
+### GitHub Issue #7: Last Synced CTA
+
+**Problem:** "Last synced: Never" was static text, no prompt to sync
+**Fix:** Made "Never" clickable button that triggers sync
+**Changes:**
+- Changed #lastSyncTime from `<span>` to `<button class="btn btn-link">`
+- Refactored sync logic into `performSync()` function (DRY)
+- Added event listener to trigger sync on click
+- Better onboarding UX — users can click "Never" instead of finding Sync button
+
+**Impact:** Reduces onboarding friction, clearer call-to-action
+
+### GitHub Issue #9: Operations Toolbar ARIA
+
+**Problem:** Toolbar had no semantic structure for screen readers
+**Fix:** Added ARIA roles and labels
+**Changes:**
+- Added `role="toolbar"` + `aria-label="Operations dashboard controls"` to `.ops-toolbar`
+- Added `role="status"` + `aria-live="polite"` to realtime status badge
+- WCAG 1.3.1 + 4.1.3 compliance
+
+**Impact:** Screen readers now understand toolbar purpose and announce status changes
+
+### BACKLOG Updates
+
+**Updated 2 items:**
+- BUG-UIUX-TRANS-007: Ready → Done (commit ffbad28)
+- BUG-A11Y-OPS-009: Ready → Done (commit ffbad28)
+
+### GitHub Issues Summary
+
+**Closed Today (6 total):**
+- Sprint Dev 0705: Issues #6, #8, #10, #13 (4 quick wins)
+- Sprint QA 0710: Issues #7, #9 (2 quick wins)
+
+**Remaining Open:** 1 issue
+- Issue #2: Hardcoded colors refactor (P2, 4-6h) — Backlog
+
+**Overall Progress:** 10 of 11 GitHub issues closed (91%) ✅
+
+### Next Priorities
+
+**Only 1 GitHub issue remains:**
+1. **Issue #2** — Hardcoded colors (P2, 4-6h) — Theme consistency refactor
+
+**P0 Blocker:**
+- BUG-DEPLOY-STALE-0220-001 — Azure deployment frozen (20+ days) — **Matt must fix**
 
 ---
 
