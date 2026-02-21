@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital ? Fireside Personal Assistant
 **Owner:** Matt Hubacher
-**Last Updated:** 2026-02-21 04:32 EST (Sprint UI/UX 0432: Settings page audit complete � 7 issues found, 2 P1, 3 P2, 2 P3)
+**Last Updated:** 2026-02-21 04:46 EST (Sprint QA 0446: Systematic audit complete — 1 critical systemic bug found)
 
 ---
 
@@ -37,6 +37,7 @@
 | BUG-UI-FORM-SETTINGS-005 | Bug | P2 | S | Ready | **Settings page: No live validation on emergency fund goal** - Emergency fund goal input (#emergencyFundGoal) has min/max validation attributes BUT no live feedback during typing. Users must submit form to see errors. Location: settings.html line 143. Fix: Add JS to validate on blur/input events, toggle .is-invalid class with descriptive error messages. (30 min) - Sprint UI/UX 0432, 2026-02-21 - see reports/ui-ux-audit-settings-2026-02-21-0432.md |
 | BUG-UI-STATUS-SETTINGS-006 | Bug | P3 | XS | Ready | **Settings page: Inconsistent success feedback** - Two empty status spans (#settingsStatus, #budgetSettingsStatus) with no clear feedback UX. Users don't know if save succeeded. Location: settings.html lines 148, 299. Fix: Use toast notifications (toast-notifications.js) for success/error feedback to match other pages. (10 min) - Sprint UI/UX 0432, 2026-02-21 - see reports/ui-ux-audit-settings-2026-02-21-0432.md |
 | BUG-UI-LAYOUT-SETTINGS-007 | Bug | P3 | XS | Ready | **Settings page: Budget total preview needs better visual hierarchy** - Budget total preview uses gray muted text for amount, hard to scan. Location: settings.html lines 287-292. Fix: Make total amount bold and larger when populated (fw-bold class), keep muted "Nothing budgeted yet" placeholder. Add JS to format as currency when total > $0. (5 min) - Sprint UI/UX 0432, 2026-02-21 - see reports/ui-ux-audit-settings-2026-02-21-0432.md |
+| BUG-UI-TYPE-SYSTEMIC-H1-001 | Bug | P1 | S | Ready | **SYSTEMIC: 11 pages use h2 instead of h1 for page title** - WCAG 2.4.6 violation. Screen readers expect exactly ONE h1 per page to identify main content. Affected: Assets, Bills, Budget, Dashboard, Debts, Friends, Income, Investments, Operations, Reports, Transactions (Settings FIXED commit ac37738). Fix: Batch find/replace `<h2>PageTitle</h2>` → `<h1>PageTitle</h1>` across 11 files. PowerShell script available. (15-20 min) - Sprint QA 0446, 2026-02-21 - see reports/bug-ui-type-systemic-h1-tags.md + reports/sprint-qa-0446-systematic-audit.md |
 ### EPIC-003: Email Bill Parsing (Fireside Capital feature)
 **Status:** Backlog
 **Description:** Parse bills from Gmail/Outlook and auto-import into Fireside Capital. This is a FINANCE feature - it feeds data into the personal finance app. Not full email management.

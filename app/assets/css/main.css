@@ -201,6 +201,7 @@ strong {
   overflow: visible;
 }
 
+.page-header h1,
 .page-header h2 {
   margin: 0;
   font-family: var(--font-heading);
@@ -248,6 +249,7 @@ strong {
     gap: var(--space-4);
   }
 
+  .page-header h1,
   .page-header h2 {
     font-size: 1.75rem;
   }
