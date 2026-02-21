@@ -252,14 +252,7 @@ async function updateTransactionCategory(transactionId, newCategory) {
 }
 
 // escapeHtml() is provided globally by security-utils.js (loaded in HTML)
-
-// Helper function to format currency
-function formatCurrency(amount) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(amount);
-}
+// formatCurrency() is provided globally by app.js (loaded in HTML)
 
 // Add manual transaction
 async function addManualTransaction() {
