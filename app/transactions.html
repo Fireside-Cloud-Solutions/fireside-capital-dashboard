@@ -156,7 +156,7 @@
           <div class="card-body">
             <div class="row g-2">
               <div class="col-12 col-md-4">
-                <label for="categoryFilter" class="form-label">Category</label>
+                <label for="categoryFilter" class="form-label mb-1">Category</label>
                 <select id="categoryFilter" class="form-select">
                   <option value="">All Categories</option>
                   <option value="Bills & Utilities">Bills & Utilities</option>
@@ -172,11 +172,11 @@
                 </select>
               </div>
               <div class="col-6 col-md-4">
-                <label for="startDate" class="form-label">From</label>
+                <label for="startDate" class="form-label mb-1">From</label>
                 <input type="date" id="startDate" class="form-control">
               </div>
               <div class="col-6 col-md-4">
-                <label for="endDate" class="form-label">To</label>
+                <label for="endDate" class="form-label mb-1">To</label>
                 <input type="date" id="endDate" class="form-control">
               </div>
             </div>
@@ -315,11 +315,11 @@
           <form id="loginForm">
             <div id="loginAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email address</label>
+              <label for="loginEmail" class="form-label mb-1">Email address</label>
               <input type="email" class="form-control" name="loginEmail" id="loginEmail" required autocomplete="username">
             </div>
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
+              <label for="loginPassword" class="form-label mb-1">Password</label>
               <input type="password" class="form-control" name="loginPassword" id="loginPassword" required autocomplete="current-password">
             </div>
             <div class="d-flex justify-content-between align-items-center">
@@ -332,7 +332,7 @@
             <p class="fw-semibold mb-2">Reset Password</p>
             <div id="forgotAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="forgotEmail" class="form-label">Enter your email address</label>
+              <label for="forgotEmail" class="form-label mb-1">Enter your email address</label>
               <input type="email" class="form-control" id="forgotEmail">
             </div>
             <button type="button" id="forgotPasswordBtn" class="btn btn-outline-secondary btn-sm">Send Reset Link</button>
@@ -355,19 +355,19 @@
           <form id="signupForm">
             <div id="signupAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="signupFirstName" class="form-label">First Name</label>
+              <label for="signupFirstName" class="form-label mb-1">First Name</label>
               <input type="text" class="form-control" name="signupFirstName" id="signupFirstName" required>
             </div>
             <div class="mb-3">
-              <label for="signupLastName" class="form-label">Last Name</label>
+              <label for="signupLastName" class="form-label mb-1">Last Name</label>
               <input type="text" class="form-control" name="signupLastName" id="signupLastName" required>
             </div>
             <div class="mb-3">
-              <label for="signupEmail" class="form-label">Email address</label>
+              <label for="signupEmail" class="form-label mb-1">Email address</label>
               <input type="email" class="form-control" name="signupEmail" id="signupEmail" required autocomplete="email">
             </div>
             <div class="mb-3">
-              <label for="signupPassword" class="form-label">Password (min 6 characters)</label>
+              <label for="signupPassword" class="form-label mb-1">Password (min 6 characters)</label>
               <input type="password" class="form-control" name="signupPassword" id="signupPassword" minlength="6" required autocomplete="new-password">
             </div>
             <button type="submit" class="btn btn-primary" id="signupSubmitBtn">Sign Up</button>
@@ -388,11 +388,11 @@
           <form id="resetPasswordForm">
             <div id="resetPasswordAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
+              <label for="newPassword" class="form-label mb-1">New Password (min 6 characters)</label>
               <input type="password" class="form-control" id="newPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="mb-3">
-              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <label for="confirmNewPassword" class="form-label mb-1">Confirm New Password</label>
               <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="d-flex gap-2">
@@ -418,22 +418,22 @@
             <div id="addTransactionAlert" class="alert d-none" role="alert"></div>
             
             <div class="mb-3">
-              <label for="transactionDate" class="form-label">Date</label>
+              <label for="transactionDate" class="form-label mb-1">Date</label>
               <input type="date" class="form-control" id="transactionDate" required>
             </div>
             
             <div class="mb-3">
-              <label for="transactionDescription" class="form-label">Description/Merchant</label>
+              <label for="transactionDescription" class="form-label mb-1">Description/Merchant</label>
               <input type="text" class="form-control" id="transactionDescription" placeholder="e.g., Coffee shop, Gas station" required>
             </div>
             
             <div class="mb-3">
-              <label for="transactionAmount" class="form-label">Amount</label>
+              <label for="transactionAmount" class="form-label mb-1">Amount</label>
               <input type="number" class="form-control" id="transactionAmount" step="0.01" min="0.01" placeholder="0.00" required>
             </div>
             
             <div class="mb-3">
-              <label for="transactionType" class="form-label">Type</label>
+              <label for="transactionType" class="form-label mb-1">Type</label>
               <select class="form-select" id="transactionType" required>
                 <option value="">Select type...</option>
                 <option value="expense">Expense</option>
@@ -442,7 +442,7 @@
             </div>
             
             <div class="mb-3">
-              <label for="transactionCategory" class="form-label">Category</label>
+              <label for="transactionCategory" class="form-label mb-1">Category</label>
               <select class="form-select" id="transactionCategory" required>
                 <option value="">Select category...</option>
                 <option value="dining">Dining</option>
@@ -460,7 +460,7 @@
             </div>
             
             <div class="mb-3">
-              <label for="transactionAccount" class="form-label">Account (Optional)</label>
+              <label for="transactionAccount" class="form-label mb-1">Account (Optional)</label>
               <input type="text" class="form-control" id="transactionAccount" placeholder="e.g., Cash, Venmo, PayPal">
             </div>
             

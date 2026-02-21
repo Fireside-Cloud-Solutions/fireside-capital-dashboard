@@ -282,11 +282,11 @@
               </div>
               <div class="modal-body">
                 <div class="mb-3">
-                  <label for="budgetItemName" class="form-label">Item Name (e.g., Groceries)</label>
+                  <label for="budgetItemName" class="form-label mb-1">Item Name (e.g., Groceries)</label>
                   <input type="text" class="form-control" id="budgetItemName" required>
                 </div>
                 <div class="mb-3">
-                  <label for="budgetItemCategory" class="form-label">Category</label>
+                  <label for="budgetItemCategory" class="form-label mb-1">Category</label>
                   <select class="form-select" id="budgetItemCategory" required>
                     <option value="" disabled selected>Select a category...</option>
                     <option value="dining">Dining</option>
@@ -301,7 +301,7 @@
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="budgetItemNeeded" class="form-label">Amount Needed ($)</label>
+                  <label for="budgetItemNeeded" class="form-label mb-1">Amount Needed ($)</label>
                   <input type="number" class="form-control" id="budgetItemNeeded" required min="0" step="0.01">
                 </div>
               </div>
@@ -326,11 +326,11 @@
             <form id="loginForm">
               <div id="loginAlert" class="alert d-none" role="alert"></div>
               <div class="mb-3">
-                <label for="loginEmail" class="form-label">Email address</label>
+                <label for="loginEmail" class="form-label mb-1">Email address</label>
                 <input type="email" class="form-control" name="loginEmail" id="loginEmail" required autocomplete="username">
               </div>
               <div class="mb-3">
-                <label for="loginPassword" class="form-label">Password</label>
+                <label for="loginPassword" class="form-label mb-1">Password</label>
                 <input type="password" class="form-control" name="loginPassword" id="loginPassword" required autocomplete="current-password">
               </div>
               <div class="d-flex justify-content-between align-items-center">
@@ -343,7 +343,7 @@
               <p class="fw-semibold mb-2">Reset Password</p>
               <div id="forgotAlert" class="alert d-none" role="alert"></div>
               <div class="mb-3">
-                <label for="forgotEmail" class="form-label">Enter your email address</label>
+                <label for="forgotEmail" class="form-label mb-1">Enter your email address</label>
                 <input type="email" class="form-control" id="forgotEmail">
               </div>
               <button type="button" id="forgotPasswordBtn" class="btn btn-outline-secondary btn-sm">Send Reset Link</button>
@@ -366,19 +366,19 @@
             <form id="signupForm">
               <div id="signupAlert" class="alert d-none" role="alert"></div>
               <div class="mb-3">
-                <label for="signupFirstName" class="form-label">First Name</label>
+                <label for="signupFirstName" class="form-label mb-1">First Name</label>
                 <input type="text" class="form-control" name="signupFirstName" id="signupFirstName" required>
               </div>
               <div class="mb-3">
-                <label for="signupLastName" class="form-label">Last Name</label>
+                <label for="signupLastName" class="form-label mb-1">Last Name</label>
                 <input type="text" class="form-control" name="signupLastName" id="signupLastName" required>
               </div>
               <div class="mb-3">
-                <label for="signupEmail" class="form-label">Email address</label>
+                <label for="signupEmail" class="form-label mb-1">Email address</label>
                 <input type="email" class="form-control" name="signupEmail" id="signupEmail" required autocomplete="email">
               </div>
               <div class="mb-3">
-                <label for="signupPassword" class="form-label">Password (min 6 characters)</label>
+                <label for="signupPassword" class="form-label mb-1">Password (min 6 characters)</label>
                 <input type="password" class="form-control" name="signupPassword" id="signupPassword" minlength="6" required autocomplete="new-password">
               </div>
               <button type="submit" class="btn btn-primary" id="signupSubmitBtn">Sign Up</button>
@@ -424,11 +424,11 @@
           <form id="resetPasswordForm">
             <div id="resetPasswordAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
+              <label for="newPassword" class="form-label mb-1">New Password (min 6 characters)</label>
               <input type="password" class="form-control" id="newPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="mb-3">
-              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <label for="confirmNewPassword" class="form-label mb-1">Confirm New Password</label>
               <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="d-flex gap-2">

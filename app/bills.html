@@ -338,11 +338,11 @@
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="billName" class="form-label">Bill Name <span class="text-danger">*</span></label>
+              <label for="billName" class="form-label mb-1">Bill Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="billName" required placeholder="e.g., Electric Bill, Netflix">
             </div>
             <div class="mb-3">
-              <label for="billType" class="form-label">Type</label>
+              <label for="billType" class="form-label mb-1">Type</label>
               <select class="form-select" id="billType" required>
                 <option value="">Choose...</option>
                 <option value="housing">Housing</option>
@@ -355,16 +355,16 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="billAmount" class="form-label">Amount ($) <span class="text-danger">*</span></label>
+              <label for="billAmount" class="form-label mb-1">Amount ($) <span class="text-danger">*</span></label>
               <input type="number" class="form-control" id="billAmount" required min="0" step="0.01" placeholder="e.g., 125.50">
               <small class="form-text text-muted">Enter the typical monthly amount</small>
             </div>
             <div class="mb-3">
-              <label for="billNextDueDate" class="form-label">Next Payment Date</label>
+              <label for="billNextDueDate" class="form-label mb-1">Next Payment Date</label>
               <input type="date" class="form-control" id="billNextDueDate">
             </div>
             <div class="mb-3">
-              <label for="billFrequency" class="form-label">Frequency</label>
+              <label for="billFrequency" class="form-label mb-1">Frequency</label>
               <select class="form-select" id="billFrequency" required>
                 <option value="">Choose...</option>
                 <option value="weekly">Weekly</option>
@@ -383,17 +383,17 @@
               <h6 class="mb-3 icon-primary"><i class="bi bi-bank me-1"></i> Loan Details</h6>
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label for="billInterestRate" class="form-label">Interest Rate (APR %)</label>
+                  <label for="billInterestRate" class="form-label mb-1">Interest Rate (APR %)</label>
                   <input type="number" class="form-control" id="billInterestRate" min="0" max="100" step="0.01" placeholder="e.g. 5.99">
                 </div>
                 <div class="col-md-6">
-                  <label for="billOriginalPrincipal" class="form-label">Original Loan Amount ($)</label>
+                  <label for="billOriginalPrincipal" class="form-label mb-1">Original Loan Amount ($)</label>
                   <input type="number" class="form-control" id="billOriginalPrincipal" min="0" step="0.01" placeholder="e.g. 25000">
                 </div>
               </div>
               <div class="row g-3 mt-1">
                 <div class="col-md-6">
-                  <label class="form-label">Loan Term</label>
+                  <label class="form-label mb-1">Loan Term</label>
                   <div class="input-group">
                     <input type="number" class="form-control" id="billLoanTermValue" min="1" step="1" placeholder="e.g. 5">
                     <select class="form-select form-select-compact" id="billLoanTermUnit">
@@ -403,23 +403,23 @@
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <label for="billStartDate" class="form-label">Start Date</label>
+                  <label for="billStartDate" class="form-label mb-1">Start Date</label>
                   <input type="date" class="form-control" id="billStartDate">
                 </div>
               </div>
               <div class="row g-3 mt-1">
                 <div class="col-md-6">
-                  <label for="billPaymentsMade" class="form-label">Payments Made</label>
+                  <label for="billPaymentsMade" class="form-label mb-1">Payments Made</label>
                   <input type="number" class="form-control" id="billPaymentsMade" min="0" step="1" placeholder="e.g. 12">
                 </div>
                 <div class="col-md-6">
-                  <label for="billTotalFinanced" class="form-label">Total Cost (incl. interest) ($)</label>
+                  <label for="billTotalFinanced" class="form-label mb-1">Total Cost (incl. interest) ($)</label>
                   <input type="number" class="form-control" id="billTotalFinanced" min="0" step="0.01" placeholder="Auto-calculated if blank">
                 </div>
               </div>
               <div class="row g-3 mt-2">
                 <div class="col-12">
-                  <label class="form-label">Remaining Balance</label>
+                  <label class="form-label mb-1">Remaining Balance</label>
                   <div id="remainingBalanceDisplay" class="form-control-plaintext fw-semibold icon-primary" style="font-size: 1.1rem;">?</div>
                 </div>
               </div>
@@ -456,11 +456,11 @@
           <form id="loginForm">
             <div id="loginAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email address</label>
+              <label for="loginEmail" class="form-label mb-1">Email address</label>
               <input type="email" class="form-control" name="loginEmail" id="loginEmail" required autocomplete="username">
             </div>
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
+              <label for="loginPassword" class="form-label mb-1">Password</label>
               <input type="password" class="form-control" name="loginPassword" id="loginPassword" required autocomplete="current-password">
             </div>
             <div class="d-flex justify-content-between align-items-center">
@@ -473,7 +473,7 @@
             <p class="fw-semibold mb-2">Reset Password</p>
             <div id="forgotAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="forgotEmail" class="form-label">Enter your email address</label>
+              <label for="forgotEmail" class="form-label mb-1">Enter your email address</label>
               <input type="email" class="form-control" id="forgotEmail">
             </div>
             <button type="button" id="forgotPasswordBtn" class="btn btn-outline-secondary btn-sm">Send Reset Link</button>
@@ -496,19 +496,19 @@
           <form id="signupForm">
             <div id="signupAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="signupFirstName" class="form-label">First Name</label>
+              <label for="signupFirstName" class="form-label mb-1">First Name</label>
               <input type="text" class="form-control" name="signupFirstName" id="signupFirstName" required>
             </div>
             <div class="mb-3">
-              <label for="signupLastName" class="form-label">Last Name</label>
+              <label for="signupLastName" class="form-label mb-1">Last Name</label>
               <input type="text" class="form-control" name="signupLastName" id="signupLastName" required>
             </div>
             <div class="mb-3">
-              <label for="signupEmail" class="form-label">Email address</label>
+              <label for="signupEmail" class="form-label mb-1">Email address</label>
               <input type="email" class="form-control" name="signupEmail" id="signupEmail" required autocomplete="email">
             </div>
             <div class="mb-3">
-              <label for="signupPassword" class="form-label">Password (min 6 characters)</label>
+              <label for="signupPassword" class="form-label mb-1">Password (min 6 characters)</label>
               <input type="password" class="form-control" name="signupPassword" id="signupPassword" minlength="6" required autocomplete="new-password">
             </div>
             <button type="submit" class="btn btn-primary" id="signupSubmitBtn">Sign Up</button>
@@ -637,16 +637,16 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Bill</label>
+            <label class="form-label mb-1">Bill</label>
             <input type="text" class="form-control" id="shareBillName" disabled>
             <input type="hidden" id="shareBillId">
           </div>
           <div class="mb-3">
-            <label class="form-label">Bill Amount</label>
+            <label class="form-label mb-1">Bill Amount</label>
             <input type="text" class="form-control" id="shareBillAmount" disabled>
           </div>
           <div class="mb-3">
-            <label class="form-label">Share With</label>
+            <label class="form-label mb-1">Share With</label>
             <select class="form-select" id="shareFriendSelect">
               <option value="">Select a friend...</option>
             </select>
@@ -655,7 +655,7 @@
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Split Type</label>
+            <label class="form-label mb-1">Split Type</label>
             <select class="form-select" id="shareSplitType">
               <option value="equal">Equal (50/50)</option>
               <option value="percentage">Percentage</option>
@@ -665,14 +665,14 @@
           <div id="percentageSplitFields" class="d-none">
             <div class="row g-3 mb-3">
               <div class="col-6">
-                <label class="form-label">Your Percentage</label>
+                <label class="form-label mb-1">Your Percentage</label>
                 <div class="input-group">
                   <input type="number" class="form-control" id="shareOwnerPercent" value="50" min="0" max="100" step="1">
                   <span class="input-group-text">%</span>
                 </div>
               </div>
               <div class="col-6">
-                <label class="form-label">Their Percentage</label>
+                <label class="form-label mb-1">Their Percentage</label>
                 <div class="input-group">
                   <input type="number" class="form-control" id="shareSharedPercent" value="50" min="0" max="100" step="1">
                   <span class="input-group-text">%</span>
@@ -684,14 +684,14 @@
           <div id="fixedSplitFields" class="d-none">
             <div class="row g-3 mb-3">
               <div class="col-6">
-                <label class="form-label">Your Amount</label>
+                <label class="form-label mb-1">Your Amount</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
                   <input type="number" class="form-control" id="shareOwnerFixed" min="0" step="0.01">
                 </div>
               </div>
               <div class="col-6">
-                <label class="form-label">Their Amount</label>
+                <label class="form-label mb-1">Their Amount</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
                   <input type="number" class="form-control" id="shareSharedFixed" min="0" step="0.01">
@@ -729,11 +729,11 @@
           <form id="resetPasswordForm">
             <div id="resetPasswordAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
+              <label for="newPassword" class="form-label mb-1">New Password (min 6 characters)</label>
               <input type="password" class="form-control" id="newPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="mb-3">
-              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <label for="confirmNewPassword" class="form-label mb-1">Confirm New Password</label>
               <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="d-flex gap-2">

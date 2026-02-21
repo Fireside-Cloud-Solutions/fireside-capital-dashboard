@@ -227,11 +227,11 @@
           <div class="modal-body">
             <div class="row g-3">
               <div class="col-md-6">
-                <label for="assetName" class="form-label">Asset Name <span class="text-danger">*</span></label>
+                <label for="assetName" class="form-label mb-1">Asset Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="assetName" required />
               </div>
               <div class="col-md-6">
-                <label for="assetType" class="form-label">Asset Type <span class="text-danger">*</span></label>
+                <label for="assetType" class="form-label mb-1">Asset Type <span class="text-danger">*</span></label>
                 <select class="form-select" id="assetType" required>
                   <option value="">Choose...</option>
                   <option value="real-estate">Real Estate</option>
@@ -242,15 +242,15 @@
               <div class="col-12 asset-fields real-estate-fields d-none">
                 <div class="row g-3">
                   <div class="col-md-4">
-                    <label for="propertyValue" class="form-label">Market Value</label>
+                    <label for="propertyValue" class="form-label mb-1">Market Value</label>
                     <input type="number" class="form-control" id="propertyValue" step="0.01" min="0" />
                   </div>
                   <div class="col-md-4">
-                    <label for="loanAmount" class="form-label">Loan Amount</label>
+                    <label for="loanAmount" class="form-label mb-1">Loan Amount</label>
                     <input type="number" class="form-control" id="loanAmount" step="0.01" min="0" />
                   </div>
                   <div class="col-md-4">
-                    <label for="realEstateNextDueDate" class="form-label">Next Due Date</label>
+                    <label for="realEstateNextDueDate" class="form-label mb-1">Next Due Date</label>
                     <input type="date" class="form-control" id="realEstateNextDueDate" />
                   </div>
                 </div>
@@ -258,15 +258,15 @@
               <div class="col-12 asset-fields vehicle-fields d-none">
                  <div class="row g-3">
                     <div class="col-md-4">
-                      <label for="vehicleValue" class="form-label">Vehicle Value</label>
+                      <label for="vehicleValue" class="form-label mb-1">Vehicle Value</label>
                       <input type="number" class="form-control" id="vehicleValue" step="0.01" min="0" />
                     </div>
                     <div class="col-md-4">
-                      <label for="vehicleLoanBalance" class="form-label">Loan Balance</label>
+                      <label for="vehicleLoanBalance" class="form-label mb-1">Loan Balance</label>
                       <input type="number" class="form-control" id="vehicleLoanBalance" step="0.01" min="0" />
                     </div>
                     <div class="col-md-4">
-                      <label for="vehicleNextDueDate" class="form-label">Next Due Date</label>
+                      <label for="vehicleNextDueDate" class="form-label mb-1">Next Due Date</label>
                       <input type="date" class="form-control" id="vehicleNextDueDate" />
                     </div>
                 </div>
@@ -294,11 +294,11 @@
           <form id="loginForm">
             <div id="loginAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email address</label>
+              <label for="loginEmail" class="form-label mb-1">Email address</label>
               <input type="email" class="form-control" name="loginEmail" id="loginEmail" required autocomplete="username">
             </div>
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
+              <label for="loginPassword" class="form-label mb-1">Password</label>
               <input type="password" class="form-control" name="loginPassword" id="loginPassword" required autocomplete="current-password">
             </div>
             <div class="d-flex justify-content-between align-items-center">
@@ -311,7 +311,7 @@
             <p class="fw-semibold mb-2">Reset Password</p>
             <div id="forgotAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="forgotEmail" class="form-label">Enter your email address</label>
+              <label for="forgotEmail" class="form-label mb-1">Enter your email address</label>
               <input type="email" class="form-control" id="forgotEmail">
             </div>
             <button type="button" id="forgotPasswordBtn" class="btn btn-outline-secondary btn-sm">Send Reset Link</button>
@@ -334,19 +334,19 @@
           <form id="signupForm">
             <div id="signupAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="signupFirstName" class="form-label">First Name</label>
+              <label for="signupFirstName" class="form-label mb-1">First Name</label>
               <input type="text" class="form-control" name="signupFirstName" id="signupFirstName" required>
             </div>
             <div class="mb-3">
-              <label for="signupLastName" class="form-label">Last Name</label>
+              <label for="signupLastName" class="form-label mb-1">Last Name</label>
               <input type="text" class="form-control" name="signupLastName" id="signupLastName" required>
             </div>
             <div class="mb-3">
-              <label for="signupEmail" class="form-label">Email address</label>
+              <label for="signupEmail" class="form-label mb-1">Email address</label>
               <input type="email" class="form-control" name="signupEmail" id="signupEmail" required autocomplete="email">
             </div>
             <div class="mb-3">
-              <label for="signupPassword" class="form-label">Password (min 6 characters)</label>
+              <label for="signupPassword" class="form-label mb-1">Password (min 6 characters)</label>
               <input type="password" class="form-control" name="signupPassword" id="signupPassword" minlength="6" required autocomplete="new-password">
             </div>
             <button type="submit" class="btn btn-primary" id="signupSubmitBtn">Sign Up</button>
@@ -411,11 +411,11 @@
           <form id="resetPasswordForm">
             <div id="resetPasswordAlert" class="alert d-none" role="alert"></div>
             <div class="mb-3">
-              <label for="newPassword" class="form-label">New Password (min 6 characters)</label>
+              <label for="newPassword" class="form-label mb-1">New Password (min 6 characters)</label>
               <input type="password" class="form-control" id="newPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="mb-3">
-              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <label for="confirmNewPassword" class="form-label mb-1">Confirm New Password</label>
               <input type="password" class="form-control" id="confirmNewPassword" minlength="6" required autocomplete="new-password">
             </div>
             <div class="d-flex gap-2">
