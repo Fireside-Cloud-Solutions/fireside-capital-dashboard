@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital ? Fireside Personal Assistant
 **Owner:** Matt Hubacher
-**Last Updated:** 2026-02-21 04:46 EST (Sprint QA 0446: Systematic audit complete — 1 critical systemic bug found)
+**Last Updated:** 2026-02-21 06:42 EST (Sprint Dev 0642: 2 P2 empty state bugs fixed)
 
 ---
 
@@ -45,6 +45,8 @@
 | BUG-UIUX-MODAL-FORM-SPACING-001 | Bug | P2 | S | Ready | **All modal forms use mb-3 for label-to-input (should be mb-1 for better grouping)** - Modal form fields use Bootstrap default mb-3 (16px) for all spacing. Labels-to-inputs should be tighter (4px) for better visual grouping (Gestalt proximity principle). Affects 10+ pages (all modals). Global find/replace label form-label → label form-label mb-1. (2h) - Sprint QA 0513, 2026-02-21 - see reports/sprint-qa-0513-audit-report.md |
 | BUG-UIUX-OPS-TOGGLE-CONTRAST-001 | Bug | P3 | XS | Ready | **Operations cash flow toggle active state lacks contrast in dark mode** - Active state for cash flow toggle buttons (operations.html line ~113) uses Bootstrap default .active class, lacks sufficient contrast in dark mode. Users may not see which time range is selected (30d/60d/90d). Add custom .ops-toolbar .btn.active CSS with --color-secondary background, bold font, box-shadow. (20 min) - Sprint QA 0513, 2026-02-21 - see reports/sprint-qa-0513-audit-report.md |
 | BUG-UIUX-TRANS-PAGINATION-DOCS-001 | Bug | P3 | XS | Ready | **Pagination controls use d-none with no explanation** - Pagination controls (transactions.html line ~245) use d-none by default (correct — hidden until transactions load), but logic isn't documented. Add HTML comment + data-state attribute. (10 min) - Sprint QA 0513, 2026-02-21 - see reports/sprint-qa-0513-audit-report.md |
+| BUG-UIUX-BUDGET-EMPTY-STATE-001 | Bug | P2 | XS | Done | **Budget table has no empty state** - When no budget items exist, table shows only headers (poor UX). ✅ FIXED commit 0b9a114 (2026-02-21 Sprint Dev 0642). Added static empty state div with calculator icon, title, description, and "Add Your First Budget Item" CTA button. JavaScript toggleEmptyState() already implemented (app.js line 2917). Empty state auto-shows when no budget items exist. (20 min) - Sprint QA 0620, 2026-02-21 - see reports/sprint-qa-0620-budget-audit.md + reports/sprint-qa-0620-final-report.md |
+| BUG-UIUX-INVESTMENTS-EMPTY-STATE-001 | Bug | P2 | XS | Done | **Investments table has no empty state** - When no investments exist, table shows only headers (poor UX). ✅ FIXED commit 0b9a114 (2026-02-21 Sprint Dev 0642). Added static empty state div with piggy-bank icon, title, description, and "Add Your First Investment" CTA button. JavaScript toggleEmptyState() already implemented (app.js line 1112). Empty state auto-shows when no investments exist. (20 min) - Sprint QA 0620, 2026-02-21 - see reports/sprint-qa-0620-final-report.md |
 ### EPIC-003: Email Bill Parsing (Fireside Capital feature)
 **Status:** Backlog
 **Description:** Parse bills from Gmail/Outlook and auto-import into Fireside Capital. This is a FINANCE feature - it feeds data into the personal finance app. Not full email management.
