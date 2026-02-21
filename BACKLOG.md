@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital ? Fireside Personal Assistant
 **Owner:** Matt Hubacher
-**Last Updated:** 2026-02-21 06:42 EST (Sprint Dev 0642: 2 P2 empty state bugs fixed)
+**Last Updated:** 2026-02-21 07:35 EST (Sprint QA 0720: 6 recent fixes verified, 1 CRITICAL database bug found)
 
 ---
 
@@ -24,6 +24,7 @@
 **Status:** Planning
 **Description:** React Native + Expo mobile app for Fireside Capital. Same features as web, native feel.
 
+| BUG-DB-SCHEMA-SNAPSHOTS-001 | Bug | P0 | XS | Ready | **🚨 CRITICAL: Snapshots table missing monthlyBills column** - Supabase `snapshots` table missing `monthlyBills` column. Causing 400 errors on every page load. Daily net worth snapshots NOT being saved. Dashboard charts may have stale data. Error: "Could not find the 'monthlyBills' column of 'snapshots' in the schema cache" (PGRST204). Fix: Run migration `ALTER TABLE snapshots ADD COLUMN "monthlyBills" NUMERIC;`. Blocking core feature. (30 min) - Sprint QA 0720, 2026-02-21 - see reports/sprint-qa-0720-recent-fixes-verification.md |
 | BUG-UIUX-REPORTS-ARIA-001 | Bug | P2 | XS | Done | **Reports page: All 5 chart canvas elements missing aria-label** - WCAG 2.1 AA violation (Success Criteria 1.1.1, 4.1.2). Screen readers cannot announce chart purpose. Affects: #netWorthTimelineChart, #monthlyCashFlowChart, #spendingCategoriesChart, #savingsRateChart, #investmentGrowthChart. Fix: Add aria-label to each canvas with descriptive text. (10 min) - FIXED commit f3a101f (2026-02-20 Sprint Dev 0737) - Sprint UI/UX 0725, 2026-02-20 - see reports/ui-ux-audit-reports-2026-02-20-0725.md |
 | BUG-UIUX-REPORTS-EXPORT-001 | Bug | P2 | S | Done | **Reports page: Export button non-functional** - FIXED commit 01f6467 (2026-02-20 Sprint QA 0741). Added id="exportReportBtn" and updated event listener to connect to existing exportReportsData() function. CSV export now functional. (30 min) - Sprint UI/UX 0725, 2026-02-20 |
 | BUG-UIUX-REPORTS-SKELETON-001 | Bug | P3 | XS | Done | **Reports page: Summary cards missing skeleton loaders** - FIXED commit 5274e31 (2026-02-20 Sprint QA 0741). Added .loading class + skeleton-loader divs to 3 summary cards with JS to remove after data loads. (15 min) - Sprint UI/UX 0725, 2026-02-20 |

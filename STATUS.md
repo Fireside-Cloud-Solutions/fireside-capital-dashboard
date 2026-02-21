@@ -1,6 +1,98 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-21 07:15 EST (Sprint Dev 0715 — 2 P3 UX Polish Bugs Fixed ✅)
+**Last Updated:** 2026-02-21 07:35 EST (Sprint QA 0720 — 6 Recent Fixes Verified ✅, 🚨 1 CRITICAL Database Bug Found)
+
+---
+
+## 🔍 SPRINT QA — SESSION 0720 (Feb 21, 7:35 AM) — 6 RECENT FIXES VERIFIED ✅, 🚨 CRITICAL BUG FOUND
+
+**Status:** ✅ **TESTING COMPLETE — ALL 6 FIXES VERIFIED, 1 P0 DATABASE BUG FOUND**
+**Agent:** Capital (QA Lead) (cron 013cc4e7 sprint-qa)
+**Duration:** ~20 minutes
+**Task:** Verify recent fixes on live site, continue systematic QA audit
+
+### Fixes Verified (All ✅ PASS)
+
+1. ✅ **BUG-UIUX-OPS-TOGGLE-CONTRAST-001** (P3, commit ef3c22f) — Operations toggle dark mode contrast
+   - Active button now has blue background, white text, font-weight 600, box-shadow
+   - Tested 30d/60d/90d toggles on live site
+   - Dark mode contrast is excellent
+
+2. ✅ **BUG-UIUX-TRANS-PAGINATION-DOCS-001** (P3, commit ef3c22f) — Pagination documentation
+   - HTML comment added explaining pagination logic
+   - Data-state attribute added for tracking (hidden → visible)
+   - Source code verified at transactions.html lines 263-264
+
+3. ✅ **BUG-UI-STATUS-SETTINGS-006** (P3, commit f84ba65) — Settings toast notifications
+   - Replaced inline status spans with Toast.success/error/warning calls
+   - Button shows loading state (disabled + spinner) during save
+   - 100% toast consistency across all 12 pages achieved 🎉
+   - Source code verified: app.js lines 2465-2532
+
+4. ✅ **BUG-UIUX-BUDGET-EMPTY-STATE-001** (P2, commit 0b9a114) — Budget empty state
+   - Static empty state HTML added with calculator icon + CTA
+   - Source code verified: budget.html lines 152-157
+   - Empty state coverage now 11/11 pages (100%)
+
+5. ✅ **BUG-UIUX-INVESTMENTS-EMPTY-STATE-001** (P2, commit 0b9a114) — Investments empty state
+   - Static empty state HTML added with piggy-bank icon + CTA
+   - Source code verified: investments.html lines 139-145
+   - Empty state coverage now 11/11 pages (100%)
+
+6. ✅ **Onboarding Modal Keyboard Trap** (P2 WCAG, commit c37d6a4) — Accessibility fix
+   - Removed data-bs-keyboard="false" from onboarding modal
+   - Users can now dismiss with ESC key
+   - WCAG 2.1 AA Success Criterion 2.1.2 compliance restored
+
+### 🚨 CRITICAL BUG FOUND — BUG-DB-SCHEMA-SNAPSHOTS-001 (P0)
+
+**Severity:** P0 (Critical) — Blocking daily snapshot saves  
+**Issue:** Supabase `snapshots` table missing `monthlyBills` column
+
+**Impact:**
+- ❌ Daily net worth snapshots NOT being saved
+- ❌ Dashboard charts may have stale data
+- ❌ 400 errors on EVERY page load (all 12 pages)
+- ❌ User losing historical financial tracking data
+
+**Console Error (repeated on every page):**
+```
+Error saving snapshot: {
+  code: PGRST204,
+  message: "Could not find the 'monthlyBills' column of 'snapshots' in the schema cache"
+}
+```
+
+**Fix Required:**
+```sql
+ALTER TABLE snapshots ADD COLUMN "monthlyBills" NUMERIC;
+```
+
+**Priority:** FIX TODAY (blocking core feature)  
+**Status:** Added to BACKLOG.md, posted to #alerts channel  
+**Next Action:** Spawning Architect sub-agent to fix database schema
+
+### Production Readiness Update
+
+**Before:** 100% WCAG 2.1 AA compliant, all 6 recent fixes deployed  
+**After:** ⚠️ **BLOCKED BY CRITICAL DATABASE BUG** — Must fix schema before production
+
+**Overall Grade:** A- (would be A+ without database schema bug)
+
+### Reports Generated
+
+1. `reports/sprint-qa-0720-recent-fixes-verification.md` (9.4 KB) — Comprehensive verification report with screenshots
+
+### Next Actions
+
+**IMMEDIATE (TODAY):**
+1. 🚨 Spawn Architect to fix BUG-DB-SCHEMA-SNAPSHOTS-001 (30 min database migration)
+2. Verify snapshot saves work after schema fix
+3. Test on live site
+
+**SHORT-TERM (NEXT BUILDER SESSION):**
+1. Continue Sprint Dev work (next P2/P3 bug from BACKLOG.md)
+2. BUG-UIUX-MODAL-FORM-SPACING-001 (P2, 2h) — Global modal label spacing
 
 ---
 
