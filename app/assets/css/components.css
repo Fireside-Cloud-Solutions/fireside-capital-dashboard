@@ -1686,6 +1686,16 @@ tbody.loading {
   margin-bottom: 0 !important;
 }
 
+/* Active state for cash flow toggle buttons (BUG-UIUX-OPS-TOGGLE-CONTRAST-001) */
+/* Bootstrap default .active class lacks sufficient contrast in dark mode */
+.ops-toolbar .btn.active {
+  background-color: var(--color-secondary) !important;
+  border-color: var(--color-secondary) !important;
+  color: white !important;
+  font-weight: 600;
+  box-shadow: 0 0 0 3px rgba(1, 164, 239, 0.2);
+}
+
 /* Safe to Spend KPI: responsive amount sizing (BUG-UIUX-OPS-KPI-WRAP-001) */
 /* display-6 (2.5rem) wraps/overflows on col-md-4 narrow cards (~240px).    */
 /* Cap at 1.9rem so $16,232.83 stays on one line at all desktop breakpoints. */
