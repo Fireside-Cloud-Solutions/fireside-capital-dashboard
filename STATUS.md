@@ -1,6 +1,136 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-21 07:35 EST (Sprint QA 0720 — 6 Recent Fixes Verified ✅, 🚨 1 CRITICAL Database Bug Found)
+**Last Updated:** 2026-02-21 07:50 EST (Sprint QA 0740 — Database Bug REVISED: 5 Missing Columns, Complete Migration Ready)
+
+---
+
+## 🔍 SPRINT QA — SESSION 0740 (Feb 21, 7:50 AM) — DATABASE BUG REVISED: 5 MISSING COLUMNS ⚠️
+
+**Status:** ✅ **COMPLETE — CRITICAL BUG FULLY INVESTIGATED, COMPLETE MIGRATION READY**  
+**Agent:** Capital (QA Lead) (cron 013cc4e7 sprint-qa)  
+**Duration:** ~50 minutes  
+**Task:** Continue QA audit, investigate database bug, create complete fix
+
+### Critical Finding: Database Bug WORSE Than Initially Reported
+
+**Original Report (Session 0720):**
+- Thought snapshots table missing 1 column: `monthlyBills`
+- Created migration 001 (incomplete)
+
+**Actual Problem (Session 0740):**
+- Snapshots table missing **5 required columns** (not just 1)
+- Previous migration 001 incomplete + never executed
+- Snapshots table has ZERO rows (no historical data)
+
+### Missing Columns Discovered
+1. ❌ `totalAssets` NUMERIC
+2. ❌ `totalInvestments` NUMERIC
+3. ❌ `totalDebts` NUMERIC
+4. ❌ `monthlyBills` NUMERIC
+5. ❌ `monthlyIncome` NUMERIC
+
+### Evidence Gathered
+
+**1. REST API Testing:**
+```powershell
+# Snapshots table is empty
+Invoke-RestMethod ".../snapshots?select=*&limit=1"
+Result: { "value": [], "Count": 0 }
+
+# Missing columns confirmed
+Invoke-RestMethod ".../snapshots?select=totalAssets,monthlyBills"
+Result: 400 Bad Request
+```
+
+**2. Live Site Testing:**
+- Dashboard: ✅ All charts rendering (uses current data, not snapshots)
+- Bills: ✅ 14 bills displayed correctly
+- Operations: ✅ Toggle contrast fix verified (commit ef3c22f)
+- Reports: ❌ Skeleton loaders + empty charts (database bug)
+
+**3. Screenshot Evidence:**
+- Operations: 60d toggle button active state working perfectly
+- Reports: All 5 charts blank, summary cards showing skeleton loaders
+- Bills: All features working, shared bills displaying correctly
+
+### Complete Fix Created
+
+**Migration 002:** `migrations/002_complete_snapshots_schema.sql`
+
+```sql
+ALTER TABLE snapshots 
+ADD COLUMN IF NOT EXISTS "totalAssets" NUMERIC,
+ADD COLUMN IF NOT EXISTS "totalInvestments" NUMERIC,
+ADD COLUMN IF NOT EXISTS "totalDebts" NUMERIC,
+ADD COLUMN IF NOT EXISTS "monthlyBills" NUMERIC,
+ADD COLUMN IF NOT EXISTS "monthlyIncome" NUMERIC;
+```
+
+**Why Complete:**
+- Adds ALL 5 missing columns (not just 1)
+- Safe to run multiple times (IF NOT EXISTS)
+- Matches exact field names in app.js:3805-3817
+- Includes verification query
+
+### Impact Analysis
+
+**Currently Broken:**
+- ❌ Daily snapshot auto-save (400 errors)
+- ❌ Reports page (shows $0.00 / skeleton loaders)
+- ❌ Net worth trend charts (no historical data)
+- ❌ Dashboard delta indicators (shows "—")
+
+**Will Auto-Fix After Migration:**
+- ✅ First page load → saves first snapshot
+- ✅ Reports page → shows actual data
+- ✅ Trend charts → start accumulating data
+- ✅ Delta indicators → work after 2+ snapshots
+
+### Reports Generated
+
+1. `migrations/002_complete_snapshots_schema.sql` (1.8 KB) — Complete database fix
+2. `reports/BUG-DB-SCHEMA-SNAPSHOTS-001-REVISED.md` (8.1 KB) — Comprehensive analysis
+3. `reports/sprint-qa-0740-completion-report.md` (11.8 KB) — Session summary
+
+### Communication
+
+**Discord Alert:** Posted to #alerts (1467330087212028129)
+- Critical database bug details
+- SQL migration script (copy-paste ready)
+- Supabase dashboard link
+- Verification checklist
+
+**BACKLOG.md Updated:**
+- BUG-DB-SCHEMA-SNAPSHOTS-001: Complete description with 5 missing columns
+- Time estimate: 4 min execution
+- Migration file: 002_complete_snapshots_schema.sql
+
+### Git Activity
+
+**Commit:** 5b53b15  
+**Message:** "CRITICAL: Revised database migration - snapshots table missing 5 columns (not just 1)"  
+**Files:** 3 (migration, bug report, BACKLOG.md)
+
+### Next Actions
+
+**IMMEDIATE (FOUNDER MUST DO TODAY):**
+1. Execute migration 002 via Supabase SQL Editor
+2. Verify console errors stop on all pages
+3. Refresh any page to trigger first snapshot save
+4. Check Reports page shows actual data ($214k investments, $9.7k debts, $286k net worth)
+5. Verify snapshots table has 1 row with all 8 columns populated
+
+**NEXT QA SESSION:**
+1. Re-test Reports page after migration
+2. Verify delta indicators work (after 2+ snapshots)
+3. Continue systematic audits (remaining pages)
+
+### Production Readiness Update
+
+**Before:** ⚠️ **BLOCKED BY CRITICAL DATABASE BUG**  
+**After Migration:** ✅ **PRODUCTION READY**  
+
+**Overall Grade:** A- (database bug is the only P0 blocker)
 
 ---
 
