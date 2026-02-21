@@ -8,26 +8,26 @@ window.debugBillsCalculation = function() {
   console.log('=== BILLS CALCULATION DEBUG ===');
   const allBills = window.bills || [];
   console.log(`Total bills in database: ${allBills.length}`);
-  
+
   const activeBills = allBills.filter(b => {
     const info = getBillFinancingInfo(b);
     return !(info.isFinancing && info.status === 'paid_off');
   });
   console.log(`Active bills (excluding paid-off financing): ${activeBills.length}`);
-  
+
   let totalMonthly = 0;
   const billDetails = [];
-  
+
   activeBills.forEach((b, index) => {
     if (!b.amount || b.amount === 0 || !b.frequency) {
       console.warn(`Skipping bill #${index + 1}: "${b.name}" - invalid amount or frequency`);
       return;
     }
-    
+
     const shareInfo = getShareInfoForBill(b.id);
     const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
     const monthlyAmount = normalizeToMonthly(userAmount, b.frequency);
-    
+
     billDetails.push({
       name: b.name,
       type: b.type,
@@ -38,14 +38,14 @@ window.debugBillsCalculation = function() {
       isShared: !!shareInfo,
       shareStatus: shareInfo?.status || 'N/A'
     });
-    
+
     totalMonthly += monthlyAmount;
   });
-  
+
   console.table(billDetails);
   console.log(`TOTAL MONTHLY: ${formatCurrency(totalMonthly)}`);
   console.log('=== END DEBUG ===');
-  
+
   return { billDetails, totalMonthly };
 };
 
@@ -66,13 +66,13 @@ const dataCache = {};
 function getCachedData(key) {
   const cached = dataCache[key];
   if (!cached) return null;
-  
+
   const now = Date.now();
   if (now - cached.timestamp > CACHE_DURATION) {
     delete dataCache[key];
     return null;
   }
-  
+
   return cached.data;
 }
 
@@ -140,7 +140,7 @@ function getNextDate(currentDate, frequency) {
 }
 function getThemeColors() {
   const currentTheme = document.documentElement.getAttribute('data-bs-theme') || document.body.getAttribute('data-theme') || 'dark';
-  
+
   if (currentTheme === 'light') {
     return {
       fill: 'rgba(244, 78, 36, 0.15)',
@@ -191,10 +191,10 @@ async function safeCreateChart(ctx, config, chartName) {
       console.warn(`Chart canvas not found for: ${chartName || 'unknown chart'}`);
       return null;
     }
-    
+
     // Lazy load Chart.js if not already loaded
     await loadChartJs();
-    
+
     // Mobile-specific chart initialization
     if (window.innerWidth < 768) {
       // Apply mobile-friendly defaults
@@ -202,18 +202,18 @@ async function safeCreateChart(ctx, config, chartName) {
       Chart.defaults.responsive = true;
       Chart.defaults.maintainAspectRatio = false;
     }
-    
+
     // Ensure canvas background is visible (not black)
     const canvas = (typeof ctx === 'string') ? document.getElementById(ctx) : ctx;
     if (canvas) {
       canvas.style.backgroundColor = 'transparent';
-      
+
       // Force canvas redraw to fix black box issue
       const context = canvas.getContext('2d');
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
-      
+
       // FC-077 Fix: Destroy existing chart instance before creating new one
       const canvasId = canvas.id;
       if (canvasId && window.chartInstances[canvasId]) {
@@ -222,14 +222,14 @@ async function safeCreateChart(ctx, config, chartName) {
         delete window.chartInstances[canvasId];
       }
     }
-    
+
     const chart = new Chart(ctx, config);
-    
+
     // Store chart instance for cleanup on next render
     if (canvas && canvas.id) {
       window.chartInstances[canvas.id] = chart;
     }
-    
+
     // Remove loading state from parent chart-card once chart is rendered
     if (canvas) {
       const chartCard = canvas.closest('.chart-card');
@@ -240,7 +240,7 @@ async function safeCreateChart(ctx, config, chartName) {
         }, 100);
       }
     }
-    
+
     return chart;
   } catch (err) {
     console.error(`Failed to render ${chartName || 'chart'}:`, err);
@@ -333,11 +333,11 @@ const sb = window.sb = window.supabase.createClient(supabaseUrl, supabaseKey, {
     autoRefreshToken: true, // Automatically refresh tokens before expiry
     persistSession: true, // Persist session across browser restarts
     detectSessionInUrl: true, // Support password reset and magic links
-    
+
     // Flow type configuration
     flowType: 'pkce' // Use PKCE flow for enhanced security (prevents token interception)
   },
-  
+
   // Global settings
   global: {
     headers: {
@@ -413,16 +413,16 @@ function getPageName() {
 function toggleLoggedOutCTA(show) {
   const container = document.getElementById('dataContainer');
   if (!container) return;
-  
+
   let ctaEl = container.querySelector('.logged-out-cta');
-  
+
   if (show) {
     // Show CTA
     if (!ctaEl) {
       // Create CTA if it doesn't exist
       const pageName = getPageName();
       const config = LOGGED_OUT_CTA_CONFIG[pageName] || LOGGED_OUT_CTA_CONFIG.dashboard;
-      
+
       ctaEl = document.createElement('div');
       ctaEl.className = 'logged-out-cta show';
       ctaEl.setAttribute('data-page', pageName);
@@ -577,12 +577,12 @@ async function login(email, password) {
       return;
     }
 
-    // Record successful login — onLogin() is NOT called here to avoid double-firing.
+    // Record successful login - onLogin() is NOT called here to avoid double-firing.
     // onAuthStateChange(SIGNED_IN) in init() already calls sessionSecurity.onLogin().
     // BUG-SESSION-DOUBLE-FIRE-001 fix: single source of truth for session start.
     if (sessionSecurity) {
       sessionSecurity.recordLoginAttempt(true, email);
-      // DO NOT call sessionSecurity.onLogin() here — onAuthStateChange(SIGNED_IN) handles it
+      // DO NOT call sessionSecurity.onLogin() here - onAuthStateChange(SIGNED_IN) handles it
     }
 
     showAuthAlert('loginAlert', '✅ Login successful!', 'success');
@@ -657,14 +657,14 @@ async function logout() {
   } catch (e) {
     console.warn('[Logout] sessionSecurity.onLogout failed:', e);
   }
-  
+
   try {
     // Clear all session data
     clearCache();
   } catch (e) {
     console.warn('[Logout] clearCache failed:', e);
   }
-  
+
   // Clear CSRF token on logout
   try {
     if (typeof CSRF !== 'undefined') {
@@ -673,14 +673,14 @@ async function logout() {
   } catch (e) {
     console.warn('[Logout] CSRF.clearToken failed:', e);
   }
-  
+
   try {
     // Sign out from Supabase (revokes tokens server-side)
     await sb.auth.signOut();
   } catch (e) {
     console.error('[Logout] sb.auth.signOut failed:', e);
   }
-  
+
   // Always force UI update even if signOut had issues
   currentUser = null;
   document.getElementById('loggedInState')?.classList.add('d-none');
@@ -695,7 +695,7 @@ async function logout() {
   document.querySelectorAll('.auth-required').forEach(el => {
     el.style.display = 'none';
   });
-  
+
   // Redirect to home page if not already there
   if (window.location.pathname !== '/index.html' && window.location.pathname !== '/') {
     window.location.href = 'index.html';
@@ -705,24 +705,24 @@ async function logout() {
 // ===== ONBOARDING CHECK =====
 async function checkOnboardingStatus() {
   if (!currentUser) return;
-  
+
   // Only check onboarding on the dashboard (index.html)
   const currentPage = window.location.pathname.split('/').pop();
   if (currentPage !== 'index.html' && currentPage !== '') return;
-  
+
   // Check if user has any data
   const hasAssets = (window.assets || []).length > 0;
   const hasBills = (window.bills || []).length > 0;
   const hasIncome = (window.income || []).length > 0;
   const hasInvestments = (window.investments || []).length > 0;
   const hasDebts = (window.debts || []).length > 0;
-  
+
   const hasData = hasAssets || hasBills || hasIncome || hasInvestments || hasDebts;
-  
+
   // Check onboarding flag in settings
   const settings = window.settings || {};
   const onboardingDone = settings.onboarding_completed || false;
-  
+
   // Show onboarding if user has no data and hasn't completed onboarding
   if (!hasData && !onboardingDone) {
     debugLog("ONBOARDING: Showing wizard for new user");
@@ -743,7 +743,7 @@ async function fetchAllDataFromSupabase(forceRefresh = false) {
   if (!currentUser) return; // Exit if no user is logged in
 
   const cacheKey = `data_${currentUser.id}`;
-  
+
   // Performance: Check cache first (unless force refresh)
   if (!forceRefresh) {
     const cached = getCachedData(cacheKey);
@@ -827,19 +827,19 @@ async function renderAll() {
   renderIncome();
 
   // If we are on the dashboard, render the dashboard components
-  // Use 'netWorthValue' as the check — it only exists on the dashboard, not reports.html
+  // Use 'netWorthValue' as the check - it only exists on the dashboard, not reports.html
   if (document.getElementById('netWorthValue')) {
       updateDashboardCards();
       renderUpcomingPayments();
-      
+
       // Load subscription widget
       if (typeof loadSubscriptionWidget === 'function') {
         loadSubscriptionWidget();
       }
-      
+
       // Performance: Load critical chart first (Net Worth is most important)
       await renderNetWorthChart();
-      
+
       // Defer non-critical charts using requestIdleCallback for better perceived performance
       if (window.requestIdleCallback) {
         requestIdleCallback(() => {
@@ -858,7 +858,7 @@ async function renderAll() {
   // If we are on the reports page, render all charts
   if (document.getElementById('reportNetWorth') && document.getElementById('netWorthTimelineChart')) {
       await renderNetWorthChart();
-      
+
       // Render additional charts moved from dashboard
       if (typeof generateMonthlyCashFlowChart === 'function') {
         generateMonthlyCashFlowChart();
@@ -878,7 +878,7 @@ async function renderAll() {
   const goalInput = document.getElementById('emergencyFundGoal');
   const emptyState = document.getElementById('settingsEmptyState');
   const settingsCard = document.getElementById('settingsCard');
-  
+
   if (goalInput && emptyState && settingsCard) {
     if (window.settings?.emergency_fund_goal) {
       // User has a goal set - show form, hide empty state
@@ -918,11 +918,11 @@ function renderReportsSummary() {
                         (window.debts && window.debts.length > 0) ||
                         (window.bills && window.bills.length > 0) ||
                         (window.income && window.income.length > 0);
-    
+
     if (typeof toggleEmptyState === 'function') {
       toggleEmptyState('dataContainer', 'reports', hasAnyData);
     }
-    
+
     const totalInv = (window.investments || []).reduce((s, i) => s + getRaw(i.value), 0);
     const totalDebt = (window.debts || []).reduce((s, d) => s + getRaw(d.amount), 0);
     const totalAssetEquity = (window.assets || []).reduce((s, a) => s + Math.max(0, getRaw(a.value) - getRaw(a.loan)), 0);
@@ -948,14 +948,14 @@ function getAssetTypeDisplayName(type) {
 function renderAssets() {
   const tbody = document.getElementById('assetTableBody');
   if (!tbody) return;
-  
+
   const assets = window.assets || [];
-  
+
   // Toggle empty state
   if (typeof toggleEmptyState === 'function') {
     toggleEmptyState('dataContainer', 'assets', assets);
   }
-  
+
   tbody.innerHTML = assets.map(a => `
       <tr>
           <td>${escapeHtml(a.name)}</td><td>${escapeHtml(getAssetTypeDisplayName(a.type))}</td><td>${formatCurrency(a.value)}</td>
@@ -1031,12 +1031,12 @@ async function saveAsset() {
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
-  
+
   // Reset loading state
   if (typeof setButtonLoading === 'function') {
     setButtonLoading('saveAssetBtn', false);
   }
-  
+
   if (allowed === null) return; // Rate limited
 }
 function confirmDeleteAsset(id, name) {
@@ -1091,14 +1091,14 @@ function getInvestmentTypeDisplayName(type) {
 function renderInvestments() {
   const tbody = document.getElementById('investmentTableBody');
   if (!tbody) return;
-  
+
   const investments = window.investments || [];
-  
+
   // Toggle empty state
   if (typeof toggleEmptyState === 'function') {
     toggleEmptyState('dataContainer', 'investments', investments);
   }
-  
+
   tbody.innerHTML = investments.map(inv => `
       <tr>
           <td>${escapeHtml(inv.name)}</td><td>${escapeHtml(getInvestmentTypeDisplayName(inv.type))}</td><td>${formatCurrency(inv.startingBalance)}</td>
@@ -1117,11 +1117,11 @@ function openInvestmentModal(id = null) {
   if (id) {
       const inv = window.investments.find(i => i.id == id); // FIX: Changed === to ==
       if(inv) {
-          f.investmentName.value = escapeHtml(inv.name || ''); 
+          f.investmentName.value = escapeHtml(inv.name || '');
           f.investmentType.value = inv.type || ''; // Don't escape enum values
           f.investmentValue.value = inv.value;
           f.startingBalance.value = inv.startingBalance || '';
-          f.monthlyContribution.value = inv.monthlyContribution; 
+          f.monthlyContribution.value = inv.monthlyContribution;
           f.annualReturn.value = inv.annualReturn;
           f.nextContributionDate.value = inv.nextContributionDate;
       }
@@ -1172,12 +1172,12 @@ async function saveInvestment() {
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
-  
+
   // Reset loading state
   if (typeof setButtonLoading === 'function') {
     setButtonLoading('saveInvestmentBtn', false);
   }
-  
+
   if (allowed === null) return; // Rate limited
 }
 function confirmDeleteInvestment(id, name) {
@@ -1232,14 +1232,14 @@ function getDebtTypeDisplayName(type) {
 function renderDebts() {
   const tbody = document.getElementById('debtTableBody');
   if (!tbody) return;
-  
+
   const debts = window.debts || [];
-  
+
   // Toggle empty state
   if (typeof toggleEmptyState === 'function') {
     toggleEmptyState('dataContainer', 'debts', debts);
   }
-  
+
   tbody.innerHTML = debts.map(d => `
       <tr>
           <td>${escapeHtml(d.name)}</td><td>${escapeHtml(getDebtTypeDisplayName(d.type))}</td><td>${formatCurrency(d.amount)}</td><td>${escapeHtml(d.interestRate)}%</td>
@@ -1293,7 +1293,7 @@ async function saveDebt() {
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
-  
+
   if (allowed === null) return; // Rate limited
 }
 function confirmDeleteDebt(id) {
@@ -1501,7 +1501,7 @@ function renderBills() {
   const ownedBills = window.bills || [];
   const sharedBills = window.sharedBillsForDisplay || [];
   const allBills = [...ownedBills, ...sharedBills];
-  
+
   // Toggle empty state for bills page
   if (typeof toggleEmptyState === 'function') {
     toggleEmptyState('dataContainer', 'bills', allBills);
@@ -1522,26 +1522,26 @@ function renderBills() {
     const info = getBillFinancingInfo(b);
     return !(info.isFinancing && info.status === 'paid_off');
   });
-  
+
   // Clear skeleton rows and let toggleEmptyState handle showing the static empty state div
   if (activeBills.length === 0) {
     // Remove skeleton rows
     const skeletonRows = tbody.querySelectorAll('.skeleton-row');
     skeletonRows.forEach(row => row.remove());
-    
+
     // Update summary cards to show $0.00
     const totalBillsEl = document.getElementById('totalBills');
     const subscriptionsCountEl = document.getElementById('subscriptionsCount');
     if (totalBillsEl) totalBillsEl.textContent = '$0.00';
     if (subscriptionsCountEl) subscriptionsCountEl.textContent = '0';
-    
+
     return; // Exit early, toggleEmptyState already called above will show static empty state div
   }
-  
+
   // Remove skeleton rows when we have data
   const skeletonRows = tbody.querySelectorAll('.skeleton-row');
   skeletonRows.forEach(row => row.remove());
-  
+
   tbody.innerHTML = activeBills.map(b => {
       // Shared-with-me bills: show "Shared by X" badge, read-only actions
       if (b.isSharedWithMe) {
@@ -1588,7 +1588,7 @@ function renderBills() {
       if (DEBUG) console.warn(`Skipping bill "${b.name}": amount=${b.amount}, frequency=${b.frequency}`);
       return sum;
     }
-    
+
     // For shared-with-me bills, amount is already the user's portion
     if (b.isSharedWithMe) {
       const monthlyAmount = normalizeToMonthly(b.amount, b.frequency);
@@ -1597,30 +1597,30 @@ function renderBills() {
     const shareInfo = getShareInfoForBill(b.id);
     // If bill is shared (and accepted), use owner_amount; otherwise use full amount
     const userAmount = (shareInfo && shareInfo.status === 'accepted') ? shareInfo.owner_amount : b.amount;
-    
+
     // Skip if user amount is invalid
     if (!userAmount || userAmount === 0) {
       if (DEBUG) console.warn(`Skipping bill "${b.name}": userAmount=${userAmount}`);
       return sum;
     }
-    
+
     // Normalize to monthly amount based on frequency
     const monthlyAmount = normalizeToMonthly(userAmount, b.frequency);
-    
+
     // Debug logging to help identify calculation issues
     if (DEBUG) {
       console.log(`Bill: ${b.name} | Frequency: ${b.frequency} | Amount: ${formatCurrency(b.amount)} | ` +
         `User Amount: ${formatCurrency(userAmount)} | Monthly: ${formatCurrency(monthlyAmount)} | ` +
         `Shared: ${shareInfo ? 'Yes' : 'No'}`);
     }
-    
+
     return sum + monthlyAmount;
   }, 0);
-  
+
   if (DEBUG) {
     console.log(`Total Monthly Bills: ${formatCurrency(totalBills)} (from ${activeBills.length} active bills)`);
   }
-  
+
   if (document.getElementById('billsTotal')) {
     const el = document.getElementById('billsTotal');
     el.textContent = formatCurrency(totalBills);
@@ -1644,7 +1644,7 @@ function renderBills() {
     if (card) card.classList.remove('loading');
   }
 
-  // FC-UIUX-051: Next Due card — soonest upcoming bill by nextDueDate
+  // FC-UIUX-051: Next Due card - soonest upcoming bill by nextDueDate
   const nextDueAmountEl = document.getElementById('billsNextDueAmount');
   const nextDueNameEl = document.getElementById('billsNextDueName');
   if (nextDueAmountEl && nextDueNameEl) {
@@ -1663,7 +1663,7 @@ function renderBills() {
       nextDueAmountEl.style.color = daysUntil <= 3 ? 'var(--color-danger)' : daysUntil <= 7 ? 'var(--color-warning)' : '';
       nextDueNameEl.textContent = `${next.name} · ${dueTxt}`;
     } else {
-      nextDueAmountEl.textContent = '—';
+      nextDueAmountEl.textContent = '-';
       nextDueNameEl.textContent = 'No upcoming bills';
     }
     nextDueAmountEl.classList.remove('d-none');
@@ -2024,7 +2024,7 @@ async function saveBill() {
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
-  
+
   if (allowed === null) return; // Rate limited
 }
 function showAmortizationSchedule(billId) {
@@ -2109,11 +2109,11 @@ function showAmortizationSchedule(billId) {
 
 async function confirmDeleteBill(id, name) {
   deleteBillId = id;
-  
+
   // Check if bill is shared with other users (any accepted shares)
   const acceptedShares = billSharesCache.filter(s => s.bill_id === id && s.status === 'accepted');
   const isShared = acceptedShares.length > 0;
-  
+
   if (isShared) {
     // Show warning modal for shared bills
     showSharedBillDeleteWarning(id, name);
@@ -2128,11 +2128,11 @@ function showSharedBillDeleteWarning(id, name) {
   // Get all shares for this bill (count users it's shared with)
   const shares = billSharesCache.filter(s => s.bill_id === id && s.status === 'accepted');
   const sharedUserCount = shares.length;
-  
+
   // Populate modal content
   document.getElementById('sharedBillName').textContent = `"${name}"`;
   document.getElementById('sharedUserCount').textContent = sharedUserCount;
-  
+
   // Set up confirmation handler
   const confirmBtn = document.getElementById('confirmSharedBillDelete');
   confirmBtn.onclick = async () => {
@@ -2140,8 +2140,8 @@ function showSharedBillDeleteWarning(id, name) {
     if (modal) modal.hide();
     await deleteBillConfirmed();
   };
-  
-  // Show the warning modal — getOrCreateInstance prevents duplicate Modal instances on repeat calls
+
+  // Show the warning modal - getOrCreateInstance prevents duplicate Modal instances on repeat calls
   const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sharedBillDeleteWarningModal'));
   modal.show();
 }
@@ -2206,14 +2206,14 @@ function getIncomeFrequencyDisplayName(freq) {
 function renderIncome() {
   const tbody = document.getElementById('incomeTableBody');
   if (!tbody) return;
-  
+
   const income = window.income || [];
-  
+
   // Toggle empty state
   if (typeof toggleEmptyState === 'function') {
     toggleEmptyState('dataContainer', 'income', income);
   }
-  
+
   tbody.innerHTML = income.map(i => `
       <tr>
           <td>${escapeHtml(i.name)}</td>
@@ -2244,7 +2244,7 @@ function renderIncome() {
   });
   const totalAnnual = totalMonthly * 12;
 
-  // Next Paycheck — soonest future nextDueDate
+  // Next Paycheck - soonest future nextDueDate
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   let nextPayIncome = null;
@@ -2281,7 +2281,7 @@ function renderIncome() {
         dateEl.classList.remove('d-none');
       }
     } else {
-      el.textContent = '—';
+      el.textContent = '-';
     }
     el.classList.remove('d-none');
     const card = el.closest('.summary-card');
@@ -2331,7 +2331,7 @@ async function saveIncome() {
     await fetchAllDataFromSupabase(true);
     renderAll();
   });
-  
+
   if (allowed === null) return; // Rate limited
 }
 function confirmDeleteIncome(id, name) {
@@ -2443,7 +2443,7 @@ async function saveSettings() {
   }
 
   if (!currentUser) return;
-  
+
   const goalInput = document.getElementById('emergencyFundGoal');
   const goal = getRaw(goalInput.value);
 
@@ -2517,7 +2517,7 @@ async function saveCategoryBudgets() {
   setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
 }
 
-// FC-180: Live total preview — sum all category budget inputs
+// FC-180: Live total preview - sum all category budget inputs
 function updateCategoryBudgetTotal() {
   const totalEl = document.getElementById('categoryBudgetTotal');
   if (!totalEl) return;
@@ -2526,7 +2526,7 @@ function updateCategoryBudgetTotal() {
     total += parseFloat(input.value) || 0;
   });
   if (total === 0) {
-    totalEl.textContent = 'Nothing budgeted yet — fill in your limits above';
+    totalEl.textContent = 'Nothing budgeted yet - fill in your limits above';
     totalEl.className = 'text-muted small fst-italic';
   } else {
     totalEl.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' / mo';
@@ -2796,7 +2796,7 @@ async function loadAndRenderBudget() {
     allBudgetRecords.filter(a => a.suppressed).map(a => a.item_id)
   );
 
-  // BUG-BUDGET-INCOME-NORMALIZE-001: Normalize to monthly — raw amount is wrong for
+  // BUG-BUDGET-INCOME-NORMALIZE-001: Normalize to monthly - raw amount is wrong for
   // bi-weekly/weekly/annual income (e.g. bi-weekly $3,569 → $7,733/mo, not $3,569/mo).
   const totalIncome = (window.income || []).reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
   const totalAssigned = Object.values(budgetAssignments).reduce((sum, amount) => sum + getRaw(amount), 0);
@@ -2823,7 +2823,7 @@ async function loadAndRenderBudget() {
     const card = el.closest('.summary-card');
     if (card) card.classList.remove('loading');
   }
-  
+
   // Initialize activityAmount (Spent) card - placeholder for transaction integration
   if(document.getElementById('activityAmount')) {
     const el = document.getElementById('activityAmount');
@@ -2877,7 +2877,7 @@ async function loadAndRenderBudget() {
       `)
       .eq('shared_with_id', currentUser.id)
       .eq('status', 'accepted');
-    
+
     if (!sharesError && sharedBills) {
       sharedBillsForDisplay = sharedBills.map(share => ({
         ...share.bill,
@@ -3051,7 +3051,7 @@ async function loadAndRenderBudget() {
 
       await saveBudgetAssignment(itemId, assignedAmount, itemType);
 
-      // BUG-BUDGET-INCOME-NORMALIZE-001: Normalize to monthly — matches budget header calculation
+      // BUG-BUDGET-INCOME-NORMALIZE-001: Normalize to monthly - matches budget header calculation
       const totalIncome = (window.income || []).reduce((sum, i) => sum + normalizeToMonthly(i.amount, i.frequency), 0);
       const allAssignedInputs = Array.from(document.querySelectorAll('.assigned-input'));
       const newTotalAssigned = allAssignedInputs.reduce((sum, currentInput) => sum + getRaw(currentInput.value), 0);
@@ -3141,7 +3141,7 @@ async function saveBudgetItem() {
 
   if (!currentUser) return;
   const monthString = `${currentBudgetMonth.getFullYear()}-${(currentBudgetMonth.getMonth() + 1).toString().padStart(2, '0')}`;
-  
+
   // Generate a unique item_id for standalone/custom budget items
   const customItemId = crypto.randomUUID ? crypto.randomUUID() : 'custom-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
   const neededAmount = getRaw(document.getElementById('budgetItemNeeded').value);
@@ -3508,48 +3508,48 @@ function initializeBudgetPage() {
 // Calculate and display month-over-month trends
 async function calculateAndDisplayTrends(currentValues) {
   const snapshots = window.snapshots || [];
-  
+
   // Get snapshots from the last 60 days
   const now = new Date();
   const thirtyDaysAgo = new Date(now);
   thirtyDaysAgo.setDate(now.getDate() - 30);
   const sixtyDaysAgo = new Date(now);
   sixtyDaysAgo.setDate(now.getDate() - 60);
-  
+
   // Find snapshots from last month (30-60 days ago)
   const lastMonthSnapshots = snapshots.filter(s => {
     const snapDate = new Date(s.date + 'T00:00:00');
     return snapDate >= sixtyDaysAgo && snapDate < thirtyDaysAgo;
   });
-  
+
   // Get the most recent snapshot from last month
-  const lastMonthSnapshot = lastMonthSnapshots.length > 0 
+  const lastMonthSnapshot = lastMonthSnapshots.length > 0
     ? lastMonthSnapshots.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     : null;
-  
+
   // Helper function to create trend HTML
   function getTrendHTML(currentValue, lastMonthValue, isInverse = false) {
     // CRITICAL FIX: Ensure we handle all falsy values (undefined, null, 0, NaN)
     // Never show "No data yet" text - always show either a trend or a dash
     if (lastMonthValue === undefined || lastMonthValue === null || lastMonthValue === 0 || isNaN(lastMonthValue)) {
-      return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+      return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">-</span>';
     }
-    
+
     const change = currentValue - lastMonthValue;
     const percentChange = (change / lastMonthValue) * 100;
-    
+
     // Handle edge case where percentChange is NaN or Infinity
     if (!isFinite(percentChange)) {
-      return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+      return '<span class="trend-indicator" style="color: var(--color-text-tertiary);">-</span>';
     }
-    
+
     // Determine if this is good or bad
     // isInverse = true means decrease is good (e.g., for debts)
     const isGood = isInverse ? change < 0 : change > 0;
     const color = isGood ? 'var(--color-success)' : '#dc2626';
     const arrow = change > 0 ? '↑' : '↓';
     const sign = change > 0 ? '+' : '';
-    
+
     return `
       <span class="trend-indicator" style="color: ${color};">
         <span style="font-size: 1.2em;">${arrow}</span>
@@ -3560,12 +3560,12 @@ async function calculateAndDisplayTrends(currentValues) {
       </div>
     `;
   }
-  
+
   // Update each stat card with trend
   const el = (id) => document.getElementById(id);
-  
+
   if (lastMonthSnapshot) {
-    // Net Worth trend — column is camelCase 'netWorth' (matches snapshots table schema)
+    // Net Worth trend - column is camelCase 'netWorth' (matches snapshots table schema)
     if (el('netWorthTrend')) {
       el('netWorthTrend').innerHTML = getTrendHTML(
         currentValues.netWorth,
@@ -3574,7 +3574,7 @@ async function calculateAndDisplayTrends(currentValues) {
       );
       el('netWorthTrend').classList.remove('d-none');
     }
-    
+
     // Assets trend (if exists)
     const assetsTrendEl = el('assetsTrend');
     if (assetsTrendEl) {
@@ -3585,7 +3585,7 @@ async function calculateAndDisplayTrends(currentValues) {
       );
       assetsTrendEl.classList.remove('d-none');
     }
-    
+
     // Investments trend (if exists)
     const investmentsTrendEl = el('investmentsTrend');
     if (investmentsTrendEl) {
@@ -3596,7 +3596,7 @@ async function calculateAndDisplayTrends(currentValues) {
       );
       investmentsTrendEl.classList.remove('d-none');
     }
-    
+
     // Debts trend (decrease is good)
     const debtsTrendEl = el('debtsTrend');
     if (debtsTrendEl) {
@@ -3608,13 +3608,13 @@ async function calculateAndDisplayTrends(currentValues) {
       debtsTrendEl.classList.remove('d-none');
     }
   } else {
-    // No historical trend data — show a dash for all trend elements
+    // No historical trend data - show a dash for all trend elements
     // CRITICAL FIX: Ensure ALL trend elements show dash, never "No data yet" text
     const trendElements = ['netWorthTrend', 'assetsTrend', 'investmentsTrend', 'debtsTrend', 'billsTrend', 'incomeTrend'];
     trendElements.forEach(elementId => {
       const element = el(elementId);
       if (element) {
-        element.innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">—</span>';
+        element.innerHTML = '<span class="trend-indicator" style="color: var(--color-text-tertiary);">-</span>';
         element.classList.remove('d-none');
       }
     });
@@ -3623,7 +3623,7 @@ async function calculateAndDisplayTrends(currentValues) {
 
 async function updateDashboardCards() {
   if (!currentUser) return;
-  
+
   // Check if user has any data at all
   const hasAnyData = (window.assets && window.assets.length > 0) ||
                       (window.investments && window.investments.length > 0) ||
@@ -3631,11 +3631,11 @@ async function updateDashboardCards() {
                       (window.bills && window.bills.length > 0) ||
                       (window.sharedBillsForDisplay && window.sharedBillsForDisplay.length > 0) ||
                       (window.income && window.income.length > 0);
-  
+
   if (typeof toggleEmptyState === 'function') {
     toggleEmptyState('dataContainer', 'dashboard', hasAnyData);
   }
-  
+
   try {
     // Calculate totals
     const assets = window.assets || [];
@@ -3643,7 +3643,7 @@ async function updateDashboardCards() {
     const debts = window.debts || [];
     const bills = [...(window.bills || []), ...(window.sharedBillsForDisplay || [])];
     const income = window.income || [];
-    
+
     const totalAssets = assets.reduce((sum, a) => sum + (getRaw(a.value) || 0), 0);
     // BUG-DASHBOARD-NETWORTH-OVERSTATEMENT-001: Asset loans (mortgage, car loans) are stored
     // in assets.loan and must be subtracted from net worth. Previously only debts table was
@@ -3660,22 +3660,22 @@ async function updateDashboardCards() {
       if (info.isFinancing && info.status === 'paid_off') {
         return sum;
       }
-      
+
       // Shared-with-me bills: amount is already the user's portion
       if (bill.isSharedWithMe) {
         const amount = getRaw(bill.amount) || 0;
         return sum + normalizeToMonthly(amount, bill.frequency);
       }
-      
+
       // Use owner's share if bill is shared
       const shareInfo = getShareInfoForBill(bill.id);
-      const userAmount = (shareInfo && shareInfo.status === 'accepted') 
-        ? shareInfo.owner_amount 
+      const userAmount = (shareInfo && shareInfo.status === 'accepted')
+        ? shareInfo.owner_amount
         : bill.amount;
-      
+
       const amount = getRaw(userAmount) || 0;
       let monthlyAmount = amount;
-      
+
       switch((bill.frequency || '').toLowerCase()) {
         case 'daily': monthlyAmount = amount * 30; break;
         case 'weekly': monthlyAmount = amount * 52 / 12; break;
@@ -3690,7 +3690,7 @@ async function updateDashboardCards() {
         case 'annual': monthlyAmount = amount / 12; break;
         default: monthlyAmount = amount; break;
       }
-      
+
       return sum + monthlyAmount;
     }, 0);
 
@@ -3703,7 +3703,7 @@ async function updateDashboardCards() {
 
     // Update stat card values
     const el = (id) => document.getElementById(id);
-    
+
     if (el('netWorthValue')) {
       el('netWorthValue').textContent = formatCurrency(netWorth);
       el('netWorthValue').classList.remove('d-none');
@@ -3777,19 +3777,19 @@ async function updateDashboardCards() {
       monthlyIncome
     });
 
-    // Save snapshot — includes all financial totals for MoM trend calculations (FC-086)
+    // Save snapshot - includes all financial totals for MoM trend calculations (FC-086)
     const today = new Date().toISOString().split('T')[0];
     const { error } = await sb.from('snapshots').upsert(
-      { 
-        date: today, 
-        netWorth, 
-        totalAssets, 
-        totalInvestments, 
-        totalDebts, 
-        monthlyBills, 
+      {
+        date: today,
+        netWorth,
+        totalAssets,
+        totalInvestments,
+        totalDebts,
+        monthlyBills,
         monthlyIncome,
-        user_id: currentUser.id 
-      }, 
+        user_id: currentUser.id
+      },
       { onConflict: 'date,user_id' }
     );
     if (error) console.error("Error saving snapshot:", error);
@@ -3819,7 +3819,7 @@ function renderUpcomingPayments() {
     }
     return;
   }
-  
+
   // Render upcoming payments list
   c.innerHTML = upcoming.map(item => {
     // BUG FIX: Use owner_amount for shared bills in upcoming payments
@@ -3979,7 +3979,7 @@ function init() {
       if (event === 'SIGNED_OUT' && sessionSecurity) {
         sessionSecurity.onLogout();
       }
-      
+
       // Clean up realtime subscriptions
       if (notificationChannel) {
         sb.removeChannel(notificationChannel);
@@ -4071,13 +4071,26 @@ function init() {
   document.getElementById('saveBillBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBill(); });
   document.getElementById('saveIncomeBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveIncome(); });
   document.getElementById('saveBudgetItemBtn')?.addEventListener('click', (e) => { e.preventDefault(); saveBudgetItem(); });
-  // saveSettingsBtn removed — consolidated into saveBudgetsBtn ("Save All Settings")
+  // saveSettingsBtn removed - consolidated into saveBudgetsBtn ("Save All Settings")
 
-  // FC-180 + BUG-UIUX-FC180-DUAL-SAVE-001: Unified save — one button saves emergency fund goal + category budgets
+  // FC-180 + BUG-UIUX-FC180-DUAL-SAVE-001: Unified save - one button saves emergency fund goal + category budgets
   document.getElementById('saveBudgetsBtn')?.addEventListener('click', async (e) => {
     e.preventDefault();
-    await saveSettings();
-    await saveCategoryBudgets();
+    const btn = e.currentTarget;
+    const originalHTML = btn.innerHTML;
+    
+    // Disable button and show loading state
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
+    
+    try {
+      await saveSettings();
+      await saveCategoryBudgets();
+    } finally {
+      // Re-enable button and restore original text
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
   });
 
   // FC-180: Live total preview on any budget input change
@@ -4088,7 +4101,7 @@ function init() {
     const emptyState = document.getElementById('settingsEmptyState');
     const settingsCard = document.getElementById('settingsCard');
     const goalInput = document.getElementById('emergencyFundGoal');
-    
+
     if (emptyState && settingsCard && goalInput) {
       emptyState.classList.add('d-none');
       settingsCard.classList.remove('d-none');
@@ -4097,13 +4110,13 @@ function init() {
       goalInput.focus();
     }
   });
-  
+
   // Real-time validation for Emergency Fund Goal input
   document.getElementById('emergencyFundGoal')?.addEventListener('input', (e) => {
     const input = e.target;
     const value = parseFloat(input.value);
     const feedback = document.getElementById('emergencyGoalFeedback');
-    
+
     if (!input.value) {
       // Empty is valid (optional field)
       input.classList.remove('is-invalid', 'is-valid');
@@ -4126,7 +4139,7 @@ function init() {
       feedback.textContent = '';
     }
   });
-  
+
   // Real-time validation for Category Budget inputs (BUG-UI-FORM-SETTINGS-002)
   document.querySelectorAll('.category-budget-input').forEach(input => {
     input.addEventListener('input', (e) => {
@@ -4135,7 +4148,7 @@ function init() {
       const category = target.dataset.category;
       const feedbackId = `${category}Feedback`;
       const feedback = document.getElementById(feedbackId);
-      
+
       if (!target.value) {
         // Empty is valid (optional field)
         target.classList.remove('is-invalid', 'is-valid');
@@ -4276,7 +4289,7 @@ function setupSidebarToggle() {
     sidebar.classList.add('show');
     if (overlay) overlay.classList.add('show');
     toggle.innerHTML = '<i class="bi bi-x-lg"></i>';
-    
+
     // ISSUE 3 FIX: Use CSS class approach for reliable scroll lock
     const scrollY = window.scrollY;
     document.body.dataset.scrollY = scrollY;
@@ -4288,13 +4301,13 @@ function setupSidebarToggle() {
     sidebar.classList.remove('show');
     if (overlay) overlay.classList.remove('show');
     toggle.innerHTML = '<i class="bi bi-list"></i>';
-    
+
     // ISSUE 3 FIX: Save scroll position BEFORE clearing styles, restore after
     const scrollY = parseInt(document.body.dataset.scrollY || '0');
     document.body.classList.remove('sidebar-open');
     document.body.style.removeProperty('--scroll-lock-offset');
     document.body.removeAttribute('data-scroll-y');
-    
+
     // Restore scroll position (no delay needed with CSS class approach)
     window.scrollTo(0, scrollY);
   };
@@ -4352,14 +4365,14 @@ async function ensureUserProfile() {
     .select('id')
     .eq('id', currentUser.id)
     .single();
-  
+
   if (!profile) {
     const email = currentUser.email || '';
     const firstName = currentUser.user_metadata?.first_name || '';
     const lastName = currentUser.user_metadata?.last_name || '';
     const displayName = firstName ? `${firstName} ${lastName}`.trim() : email.split('@')[0];
     const username = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 30);
-    
+
     await sb.from('user_profiles').upsert({
       id: currentUser.id,
       display_name: displayName,
@@ -4373,18 +4386,18 @@ let notificationChannel = null;
 
 async function initNotifications() {
   if (!currentUser) return;
-  
+
   // Fetch unread count
   await updateNotificationBadge();
-  
+
   // Load recent notifications
   await loadNotifications();
-  
+
   // Subscribe to realtime notifications
   if (notificationChannel) {
     sb.removeChannel(notificationChannel);
   }
-  
+
   notificationChannel = sb
     .channel('user-notifications')
     .on(
@@ -4416,13 +4429,13 @@ async function updateNotificationBadge() {
   if (!currentUser) return;
   const badge = document.getElementById('notificationBadge');
   if (!badge) return;
-  
+
   const { count } = await sb
     .from('notifications')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', currentUser.id)
     .eq('is_read', false);
-  
+
   const unread = count || 0;
   if (unread > 0) {
     badge.textContent = unread > 99 ? '99+' : unread;
@@ -4437,25 +4450,25 @@ async function loadNotifications() {
   const listEl = document.getElementById('notificationList');
   const noNotifEl = document.getElementById('noNotifications');
   if (!listEl) return;
-  
+
   const { data: notifications } = await sb
     .from('notifications')
     .select('*')
     .eq('user_id', currentUser.id)
     .order('created_at', { ascending: false })
     .limit(20);
-  
+
   // Remove old notification items (keep header and divider)
   const existingItems = listEl.querySelectorAll('.notification-item');
   existingItems.forEach(el => el.remove());
-  
+
   if (!notifications || notifications.length === 0) {
     if (noNotifEl) noNotifEl.classList.remove('d-none');
     return;
   }
-  
+
   if (noNotifEl) noNotifEl.classList.add('d-none');
-  
+
   const iconMap = {
     'friend_request': 'bi-person-plus text-primary',
     'friend_accepted': 'bi-person-check text-success',
@@ -4467,18 +4480,18 @@ async function loadNotifications() {
     'payment_reminder': 'bi-bell text-warning',
     'connection_removed': 'bi-person-dash text-danger'
   };
-  
+
   notifications.forEach(notif => {
     const li = document.createElement('li');
     li.className = 'notification-item';
     const iconClass = iconMap[notif.type] || 'bi-bell text-muted';
     const isUnread = !notif.is_read;
     const timeAgo = getTimeAgo(notif.created_at);
-    
+
     li.innerHTML = `
-      <a class="dropdown-item py-2 px-3 ${isUnread ? '' : 'opacity-75'}" href="#" 
-         data-notif-id="${escapeAttribute(notif.id)}" 
-         data-notif-type="${escapeAttribute(notif.type)}" 
+      <a class="dropdown-item py-2 px-3 ${isUnread ? '' : 'opacity-75'}" href="#"
+         data-notif-id="${escapeAttribute(notif.id)}"
+         data-notif-type="${escapeAttribute(notif.type)}"
          data-notif-data="${escapeAttribute(JSON.stringify(notif.data || {}))}">
         <div class="d-flex align-items-start gap-2">
           <i class="bi ${iconClass} mt-1" style="font-size: 1.1rem;"></i>
@@ -4520,7 +4533,7 @@ async function handleNotificationClick(notifId, type, data) {
   // Mark as read
   await sb.from('notifications').update({ is_read: true }).eq('id', notifId);
   await updateNotificationBadge();
-  
+
   // Navigate based on type
   if (type === 'friend_request' || type === 'friend_accepted' || type === 'connection_removed') {
     window.location.href = 'friends.html';
@@ -4568,7 +4581,7 @@ async function searchFriends(query) {
     if (container) container.textContent = '';
     return;
   }
-  
+
   // Search user_profiles by username or display_name
   const { data: profiles } = await sb
     .from('user_profiles')
@@ -4576,14 +4589,14 @@ async function searchFriends(query) {
     .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
     .neq('id', currentUser.id)
     .limit(20);
-  
+
   // Also try email search via RPC
   let emailResults = [];
   if (query.includes('@')) {
     const { data } = await sb.rpc('search_users_by_email', { search_email: query });
     emailResults = data || [];
   }
-  
+
   // Merge and deduplicate
   const allResults = [...(profiles || [])];
   emailResults.forEach(er => {
@@ -4591,26 +4604,26 @@ async function searchFriends(query) {
       allResults.push(er);
     }
   });
-  
+
   // Get existing connections to filter
   const { data: connections } = await sb
     .from('connections')
     .select('requester_id, addressee_id, status')
     .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
-  
+
   const connectedIds = new Set();
   (connections || []).forEach(c => {
     if (c.status !== 'declined') {
       connectedIds.add(c.requester_id === currentUser.id ? c.addressee_id : c.requester_id);
     }
   });
-  
+
   // Filter out already connected users
   const filtered = allResults.filter(p => !connectedIds.has(p.id));
-  
+
   const container = document.getElementById('searchResults');
   if (!container) return;
-  
+
   if (filtered.length === 0) {
     const message = document.createElement('p');
     message.className = 'text-muted mt-2';
@@ -4618,7 +4631,7 @@ async function searchFriends(query) {
     container.replaceChildren(message);
     return;
   }
-  
+
   container.innerHTML = filtered.map(p => `
     <div class="card mb-2">
       <div class="card-body p-3 d-flex justify-content-between align-items-center">
@@ -4641,13 +4654,13 @@ async function searchFriends(query) {
 
 async function sendFriendRequest(addresseeId) {
   if (!currentUser) return;
-  
+
   const { error } = await sb.from('connections').insert({
     requester_id: currentUser.id,
     addressee_id: addresseeId,
     status: 'pending'
   });
-  
+
   if (error) {
     if (error.message.includes('duplicate') || error.message.includes('unique')) {
       alert('You already have a pending connection with this user.');
@@ -4656,7 +4669,7 @@ async function sendFriendRequest(addresseeId) {
     }
     return;
   }
-  
+
   // Refresh search results and outgoing
   const searchInput = document.getElementById('friendSearchInput');
   if (searchInput && searchInput.value) {
@@ -4713,14 +4726,14 @@ async function removeFriend(connectionId, friendName) {
 
 async function loadFriendsPage() {
   if (!currentUser || !document.getElementById('friendSearchInput')) return;
-  
+
   // Show skeleton loaders while data is loading
   const pendingContainer = document.getElementById('pendingRequestsContainer');
   const pendingSection = document.getElementById('pendingRequestsSection');
   const friendsContainer = document.getElementById('myFriendsContainer');
   const outgoingContainer = document.getElementById('outgoingRequestsContainer');
   const outgoingSection = document.getElementById('outgoingRequestsSection');
-  
+
   const skeletonHTML = `
     <div class="col-xl-4 col-md-6 col-12">
       <div class="card">
@@ -4737,18 +4750,18 @@ async function loadFriendsPage() {
       </div>
     </div>
   `.repeat(3);
-  
+
   if (pendingContainer) pendingContainer.innerHTML = skeletonHTML;
   if (friendsContainer) friendsContainer.innerHTML = skeletonHTML;
   if (outgoingContainer) outgoingContainer.innerHTML = skeletonHTML;
-  
+
   // Load pending requests (incoming)
   const { data: pendingIncoming } = await sb
     .from('connections')
     .select('id, created_at, requester_id, requester:user_profiles!connections_requester_id_user_profiles_fkey(id, username, display_name, avatar_url)')
     .eq('addressee_id', currentUser.id)
     .eq('status', 'pending');
-  
+
   if (pendingContainer) {
     if (pendingIncoming && pendingIncoming.length > 0) {
       pendingSection.classList.remove('d-none');
@@ -4777,21 +4790,21 @@ async function loadFriendsPage() {
       pendingSection.classList.add('d-none');
     }
   }
-  
+
   // Load my friends (accepted)
   const { data: myConnections } = await sb
     .from('connections')
     .select('id, status, created_at, requester_id, addressee_id, requester:user_profiles!connections_requester_id_user_profiles_fkey(id, username, display_name, avatar_url), addressee:user_profiles!connections_addressee_id_user_profiles_fkey(id, username, display_name, avatar_url)')
     .eq('status', 'accepted')
     .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
-  
+
   if (friendsContainer) {
     const friends = (myConnections || []).map(conn => ({
       connectionId: conn.id,
       friend: conn.requester?.id === currentUser.id ? conn.addressee : conn.requester,
       since: conn.created_at
     }));
-    
+
     if (friends.length > 0) {
       if (typeof hideEmptyState === 'function') {
         hideEmptyState('myFriendsContainer');
@@ -4832,14 +4845,14 @@ async function loadFriendsPage() {
       }
     }
   }
-  
+
   // Load outgoing requests
   const { data: outgoing } = await sb
     .from('connections')
     .select('id, created_at, addressee:user_profiles!connections_addressee_id_user_profiles_fkey(id, username, display_name, avatar_url)')
     .eq('requester_id', currentUser.id)
     .eq('status', 'pending');
-  
+
   if (outgoingContainer) {
     if (outgoing && outgoing.length > 0) {
       outgoingSection.classList.remove('d-none');
@@ -4876,14 +4889,14 @@ let sharedWithMeCache = [];
 
 async function loadSharedBillsData() {
   if (!currentUser) return;
-  
+
   // Load shares I own (to show indicators)
   const { data: myShares } = await sb
     .from('bill_shares')
     .select('*, shared_user:user_profiles!bill_shares_shared_with_id_user_profiles_fkey(id, username, display_name)')
     .eq('owner_id', currentUser.id);
   billSharesCache = myShares || [];
-  
+
   // Load shares shared with me (accepted)
   const { data: sharedWithMe } = await sb
     .from('bill_shares')
@@ -4891,14 +4904,14 @@ async function loadSharedBillsData() {
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'accepted');
   sharedWithMeCache = sharedWithMe || [];
-  
+
   // Load pending shares (awaiting my acceptance)
   const { data: pendingShares } = await sb
     .from('bill_shares')
     .select('*, bill:bills!bill_shares_bill_id_fkey(*), owner:user_profiles!bill_shares_owner_id_user_profiles_fkey(id, username, display_name)')
     .eq('shared_with_id', currentUser.id)
     .eq('status', 'pending');
-  
+
   // Load outgoing shares (bills I'm sharing with others) � with bill + friend details
   const { data: myOutgoingShares } = await sb
     .from('bill_shares')
@@ -4947,12 +4960,12 @@ function renderSharedWithMe(shares) {
   const section = document.getElementById('sharedWithMeSection');
   const tbody = document.getElementById('sharedWithMeTableBody');
   if (!section || !tbody) return;
-  
+
   if (shares.length === 0) {
     section.classList.add('d-none');
     return;
   }
-  
+
   section.classList.remove('d-none');
   tbody.innerHTML = shares.map(share => {
     const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${escapeHtml(share.shared_percent)}%` : formatCurrency(share.shared_fixed);
@@ -4979,12 +4992,12 @@ function renderPendingShares(shares) {
   const section = document.getElementById('pendingSharesSection');
   const container = document.getElementById('pendingSharesContainer');
   if (!section || !container) return;
-  
+
   if (shares.length === 0) {
     section.classList.add('d-none');
     return;
   }
-  
+
   section.classList.remove('d-none');
   container.innerHTML = shares.map(share => {
     const splitLabel = share.split_type === 'equal' ? '50/50' : share.split_type === 'percentage' ? `${escapeHtml(share.owner_percent)}/${escapeHtml(share.shared_percent)}` : 'Fixed';
@@ -5082,18 +5095,18 @@ async function revokeShareBill(shareId) {
 async function openShareBillModal(billId) {
   const bill = (window.bills || []).find(b => b.id == billId);
   if (!bill) return;
-  
+
   document.getElementById('shareBillId').value = bill.id;
   document.getElementById('shareBillName').value = escapeHtml(bill.name || '');
   document.getElementById('shareBillAmount').value = formatCurrency(bill.amount);
-  
+
   // Reset fields
   document.getElementById('shareSplitType').value = 'equal';
   document.getElementById('percentageSplitFields').classList.add('d-none');
   document.getElementById('fixedSplitFields').classList.add('d-none');
   document.getElementById('shareOwnerPercent').value = 50;
   document.getElementById('shareSharedPercent').value = 50;
-  
+
   // Load friends into dropdown
   const friendSelect = document.getElementById('shareFriendSelect');
   const noFriendsMsg = document.getElementById('noFriendsMsg');
@@ -5101,15 +5114,15 @@ async function openShareBillModal(billId) {
   defaultOption.value = '';
   defaultOption.textContent = 'Select a friend...';
   friendSelect.replaceChildren(defaultOption);
-  
+
   const { data: connections } = await sb
     .from('connections')
     .select('id, requester_id, addressee_id, requester:user_profiles!connections_requester_id_user_profiles_fkey(id, username, display_name), addressee:user_profiles!connections_addressee_id_user_profiles_fkey(id, username, display_name)')
     .eq('status', 'accepted')
     .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
-  
+
   const friends = (connections || []).map(conn => conn.requester?.id === currentUser.id ? conn.addressee : conn.requester).filter(Boolean);
-  
+
   if (friends.length === 0) {
     noFriendsMsg.classList.remove('d-none');
   } else {
@@ -5121,7 +5134,7 @@ async function openShareBillModal(billId) {
       friendSelect.appendChild(opt);
     });
   }
-  
+
   updateSharePreview();
   bootstrap.Modal.getOrCreateInstance(document.getElementById('shareBillModal')).show();
 }
@@ -5130,7 +5143,7 @@ function updateSharePreview() {
   const billAmount = getRaw(document.getElementById('shareBillAmount').value);
   const splitType = document.getElementById('shareSplitType').value;
   let ownerAmount = 0, sharedAmount = 0;
-  
+
   switch (splitType) {
     case 'equal':
       ownerAmount = billAmount / 2;
@@ -5147,7 +5160,7 @@ function updateSharePreview() {
       sharedAmount = parseFloat(document.getElementById('shareSharedFixed').value) || 0;
       break;
   }
-  
+
   document.getElementById('sharePreviewOwner').textContent = formatCurrency(ownerAmount);
   document.getElementById('sharePreviewShared').textContent = formatCurrency(sharedAmount);
 }
@@ -5166,17 +5179,17 @@ async function confirmShareBill() {
   const billId = document.getElementById('shareBillId').value;
   const friendId = document.getElementById('shareFriendSelect').value;
   const splitType = document.getElementById('shareSplitType').value;
-  
+
   if (!friendId) {
     alert('Please select a friend to share with.');
     return;
   }
-  
+
   const bill = (window.bills || []).find(b => b.id == billId);
   if (!bill) return;
-  
+
   let owner_percent, shared_percent, owner_fixed, shared_fixed, owner_amount, shared_amount;
-  
+
   switch (splitType) {
     case 'equal':
       owner_percent = 50;
@@ -5211,7 +5224,7 @@ async function confirmShareBill() {
       shared_amount = shared_fixed;
       break;
   }
-  
+
   const { error } = await sb.from('bill_shares').insert({
     bill_id: billId,
     owner_id: currentUser.id,
@@ -5225,7 +5238,7 @@ async function confirmShareBill() {
     owner_amount: Math.round(owner_amount * 100) / 100,
     shared_amount: Math.round(shared_amount * 100) / 100
   });
-  
+
   if (error) {
     if (error.message.includes('unique') || error.message.includes('duplicate')) {
       alert('This bill is already shared with that user.');
@@ -5234,7 +5247,7 @@ async function confirmShareBill() {
     }
     return;
   }
-  
+
   bootstrap.Modal.getInstance(document.getElementById('shareBillModal')).hide();
   await loadSharedBillsData();
   renderBills(); // Re-render to show share indicators
@@ -5292,7 +5305,7 @@ function initializeTooltips() {
 // Initialize share-related UI on bills page
 function initShareBillUI() {
   if (!document.getElementById('shareBillModal')) return;
-  
+
   // Split type toggle
   document.getElementById('shareSplitType')?.addEventListener('change', (e) => {
     document.getElementById('percentageSplitFields').classList.toggle('d-none', e.target.value !== 'percentage');
@@ -5301,12 +5314,12 @@ function initShareBillUI() {
     document.getElementById('fixedAmountError')?.classList.add('d-none');
     updateSharePreview();
   });
-  
+
   // Live preview updates for percentage fields
   ['shareOwnerPercent', 'shareSharedPercent'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', updateSharePreview);
   });
-  
+
   // Fixed amount auto-fill: editing one field calculates the other as remainder
   document.getElementById('shareOwnerFixed')?.addEventListener('input', (e) => {
     const billAmount = getRaw(document.getElementById('shareBillAmount').value);
@@ -5330,7 +5343,7 @@ function initShareBillUI() {
     if (warn) warn.classList.toggle('d-none', sharedVal <= billAmount);
     updateSharePreview();
   });
-  
+
   // Percentage sync
   document.getElementById('shareOwnerPercent')?.addEventListener('input', (e) => {
     document.getElementById('shareSharedPercent').value = 100 - (parseFloat(e.target.value) || 0);
@@ -5340,7 +5353,7 @@ function initShareBillUI() {
     document.getElementById('shareOwnerPercent').value = 100 - (parseFloat(e.target.value) || 0);
     updateSharePreview();
   });
-  
+
   // Confirm share
   document.getElementById('confirmShareBillBtn')?.addEventListener('click', confirmShareBill);
 }
@@ -5357,7 +5370,7 @@ window.addEventListener('resize', function() {
       Chart.defaults.font.size = 11;
       Chart.defaults.responsive = true;
       Chart.defaults.maintainAspectRatio = false;
-      
+
       // Ensure all canvases have transparent background
       const canvases = document.querySelectorAll('.chart-wrapper canvas');
       canvases.forEach(canvas => {
