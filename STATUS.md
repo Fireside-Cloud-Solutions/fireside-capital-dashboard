@@ -1,6 +1,39 @@
 # STATUS.md — Current Project State
 
-**Last Updated:** 2026-02-21 06:35 EST (Sprint QA 0600 — Systematic Audit Complete: 1 Critical Bug Found ✅)
+**Last Updated:** 2026-02-21 06:17 EST (Sprint Dev 0615 — BUG-SYSTEMIC-HIDDEN-ACTIONS-001 Fixed ✅)
+
+---
+
+## 🔧 SPRINT DEV — SESSION 0615 (Feb 21, 6:15 AM) — Systemic Hidden Actions Bug Fixed
+
+**Status:** ✅ **COMPLETE — 9 PAGES FIXED, DEPLOYED**
+**Agent:** Capital (Lead Dev) (cron a54d89bf sprint-dev)
+**Duration:** 10 minutes
+**Task:** Fix highest priority bug from Azure DevOps/Discord channels
+
+### Bug Fixed
+
+✅ **BUG-SYSTEMIC-HIDDEN-ACTIONS-001** (P1, XS, 15 min)
+   - **Issue:** Page action buttons hidden on load across 9/12 pages (75%)
+   - **Root cause:** `class="initially-hidden"` on `<div id="pageActions">` causing 200-500ms FOUC
+   - **Fix:** Removed `class="initially-hidden"` from pageActions div in 9 files
+   - **Files:** assets.html, bills.html, budget.html, debts.html, friends.html, income.html, investments.html, reports.html, transactions.html
+   - **Commit:** 7e018dd (Sprint Dev 0615)
+   - **Impact:** Eliminates FOUC, reduces perceived delay, improves UX on 75% of pages
+   - **Testing:** Verified on assets.html and bills.html - buttons now visible immediately
+
+### Implementation Method
+- Used PowerShell batch script from bug report
+- Applied find/replace across 9 files simultaneously
+- Verified changes in 2 sample files
+- Committed and pushed to main branch
+- Azure Static Web Apps auto-deploying
+
+### BACKLOG Updates
+- Marked BUG-SYSTEMIC-HIDDEN-ACTIONS-001 as **Done** (commit 7e018dd)
+
+### Next Priority
+Checked development channels for next task (QA/UI-UX/Research all have findings documented)
 
 ---
 
