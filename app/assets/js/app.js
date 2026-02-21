@@ -1523,38 +1523,24 @@ function renderBills() {
     return !(info.isFinancing && info.status === 'paid_off');
   });
   
-  // Show empty state in table if no bills exist
+  // Clear skeleton rows and let toggleEmptyState handle showing the static empty state div
   if (activeBills.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center py-5">
-          <div class="empty-state-inline">
-            <svg xmlns="http://www.w3.org/2000/svg" class="empty-state-icon-inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="64" height="64">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <h3 class="mt-3" style="color: var(--color-text-primary);">No Bills Yet</h3>
-            <p class="text-muted">Track your recurring expenses like rent, utilities, and subscriptions</p>
-            <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
-              <button class="btn btn-primary" onclick="typeof openBillModal === 'function' && openBillModal()" aria-label="Add your first bill">
-                <i class="bi bi-plus-circle"></i> Add Your First Bill
-              </button>
-              <button class="btn btn-outline-secondary" id="scanEmailFromEmpty" onclick="document.getElementById('scanEmailBillsBtn')?.click()" aria-label="Scan email for bills">
-                <i class="bi bi-envelope-check"></i> Scan Email
-              </button>
-            </div>
-          </div>
-        </td>
-      </tr>
-    `;
+    // Remove skeleton rows
+    const skeletonRows = tbody.querySelectorAll('.skeleton-row');
+    skeletonRows.forEach(row => row.remove());
     
-    // Also update summary cards to show $0.00
+    // Update summary cards to show $0.00
     const totalBillsEl = document.getElementById('totalBills');
     const subscriptionsCountEl = document.getElementById('subscriptionsCount');
     if (totalBillsEl) totalBillsEl.textContent = '$0.00';
     if (subscriptionsCountEl) subscriptionsCountEl.textContent = '0';
     
-    return; // Exit early, no bills to render
+    return; // Exit early, toggleEmptyState already called above will show static empty state div
   }
+  
+  // Remove skeleton rows when we have data
+  const skeletonRows = tbody.querySelectorAll('.skeleton-row');
+  skeletonRows.forEach(row => row.remove());
   
   tbody.innerHTML = activeBills.map(b => {
       // Shared-with-me bills: show "Shared by X" badge, read-only actions

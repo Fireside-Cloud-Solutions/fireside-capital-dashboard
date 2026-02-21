@@ -207,6 +207,17 @@
             </button>
           </div>
         </div>
+
+        <!-- Static empty state (shown by JS when no bills exist) -->
+        <div id="billEmptyState" class="empty-state" style="display:none">
+          <i class="bi bi-receipt empty-state-icon"></i>
+          <h3>No Bills Tracked</h3>
+          <p>Add your recurring bills and subscriptions to track payments and stay on top of your finances.</p>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBillModal" aria-label="Add your first bill">
+            <i class="bi bi-plus-circle me-2"></i> Add Your First Bill
+          </button>
+        </div>
+
         <div class="table-card mb-4">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
