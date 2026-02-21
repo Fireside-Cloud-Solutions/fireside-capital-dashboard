@@ -140,7 +140,7 @@
                     </button>
                 </div>
                 
-                <div class="card card-max-width-md d-none" id="settingsCard">
+                <div class="card card-max-width-md d-none loading" id="settingsCard">
                     <div class="card-body-padded">
                         <h5 class="mb-4 card-section-heading">
                           <i class="bi bi-bullseye me-2 icon-primary"></i>Financial Goals
@@ -148,7 +148,8 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <label for="emergencyFundGoal" class="form-label">Emergency Fund Goal</label>
-                                <div class="input-group has-validation">
+                                <div class="skeleton-loader skeleton-input mb-2"></div>
+                                <div class="input-group has-validation d-none">
                                     <span class="input-group-text">$</span>
                                     <input type="number" class="form-control" id="emergencyFundGoal" placeholder="e.g., 15000" min="100" max="1000000" step="100" aria-describedby="emergencyGoalHelp emergencyGoalFeedback">
                                     <div id="emergencyGoalFeedback" class="invalid-feedback"></div>
@@ -161,14 +162,26 @@
                 </div>
 
                 <!-- FC-180: Category Budget Settings -->
-                <div class="card card-max-width-md d-none mt-4" id="categoryBudgetsCard">
+                <div class="card card-max-width-md d-none loading mt-4" id="categoryBudgetsCard">
                     <div class="card-body-padded">
                         <h5 class="mb-1 card-section-heading">
                           <i class="bi bi-calculator me-2 icon-primary"></i>Monthly Category Budgets
                         </h5>
                         <p class="text-muted small mb-4">Set a monthly spending limit per category. Leave any at $0 to skip tracking that category. These power the Budget vs Actuals tracker on the Budget page.</p>
+                        <!-- Skeleton loaders for 9 category inputs -->
+                        <div class="row g-3" id="categoryBudgetsGridSkeleton">
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                          <div class="col-md-6 col-lg-4"><div class="skeleton-loader skeleton-input"></div></div>
+                        </div>
 
-                        <div class="row g-3" id="categoryBudgetsGrid">
+                        <div class="row g-3 d-none" id="categoryBudgetsGrid">
                           <!-- dining -->
                           <div class="col-md-6 col-lg-4">
                             <label for="budget_dining" class="form-label d-flex align-items-center gap-2">

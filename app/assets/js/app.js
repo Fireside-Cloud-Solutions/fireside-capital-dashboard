@@ -880,6 +880,12 @@ async function renderAll() {
   const settingsCard = document.getElementById('settingsCard');
 
   if (goalInput && emptyState && settingsCard) {
+    // Remove skeleton loaders
+    settingsCard.classList.remove('loading');
+    const skeletonInput = settingsCard.querySelector('.skeleton-loader');
+    if (skeletonInput) skeletonInput.remove();
+    goalInput.parentElement.classList.remove('d-none');
+    
     if (window.settings?.emergency_fund_goal) {
       // User has a goal set - show form, hide empty state
       goalInput.value = window.settings.emergency_fund_goal;
@@ -895,6 +901,13 @@ async function renderAll() {
   // FC-180: Pre-populate category budget inputs and show the budgets card
   const categoryBudgetsCard = document.getElementById('categoryBudgetsCard');
   if (categoryBudgetsCard) {
+    // Remove skeleton loaders
+    categoryBudgetsCard.classList.remove('loading');
+    const skeletonGrid = document.getElementById('categoryBudgetsGridSkeleton');
+    if (skeletonGrid) skeletonGrid.remove();
+    const realGrid = document.getElementById('categoryBudgetsGrid');
+    if (realGrid) realGrid.classList.remove('d-none');
+    
     const savedBudgets = window.settings?.category_budgets || {};
     document.querySelectorAll('.category-budget-input').forEach(input => {
       const cat = input.dataset.category;
