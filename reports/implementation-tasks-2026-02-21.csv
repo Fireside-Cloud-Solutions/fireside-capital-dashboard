@@ -1,0 +1,21 @@
+ID,Title,Type,Priority,Effort (hours),Impact,Status,Research Source,Sprint,Code Example Location
+FC-CSS-001,Refactor to three-layer token system,Task,High,4,High - Future-proof theming,Ready,css-architecture-research-2026-02-21.md,Sprint 2,Section 1: Three-Layer Token Architecture
+FC-CSS-002,Add @property declarations for animated tokens,Task,Medium,2,Medium - Smooth animations,Ready,css-architecture-research-2026-02-21.md,Sprint 3,Section 2: Type-Safe Custom Properties
+FC-CSS-003,Extract chart tokens to dedicated file,Task,Medium,1,Medium - Centralized theming,Ready,css-architecture-research-2026-02-21.md,Sprint 2,Section 5: Extract Chart Tokens
+FC-CSS-004,Remove duplicate token definitions,Task,Low,0.5,Low - Code quality,Ready,css-architecture-research-2026-02-21.md,Sprint 1,Section: Opportunities for Improvement
+FC-CHART-001,Create chart theme system (chart-theme.js),Task,High,2,High - Consistent theming,Ready,chartjs-best-practices-2026-02-21.md,Sprint 1,Priority 1: Create Chart Theme System
+FC-CHART-002,Fix chart container structure (responsive),Task,High,1,High - Proper responsiveness,Ready,chartjs-best-practices-2026-02-21.md,Sprint 1,Priority 2: Fix Chart Container Structure
+FC-CHART-003,Implement decimation for large datasets,Task,Medium,1.5,Medium - 50-60% faster render,Ready,chartjs-best-practices-2026-02-21.md,Sprint 3,Priority 3: Optimize Large Charts
+FC-CHART-004,Mobile-specific chart optimizations,Task,Medium,1,Medium - Better mobile UX,Ready,chartjs-best-practices-2026-02-21.md,Sprint 3,Priority 4: Implement Mobile Optimizations
+FC-CHART-005,Add click-to-drill-down interactions,Task,Low,2,Low - Nice-to-have UX,Ready,chartjs-best-practices-2026-02-21.md,Sprint 4,Priority 5: Add Click-to-Drill-Down
+FC-UI-001,Implement F-pattern layout on main dashboard,Task,High,3,High - Better visual hierarchy,Ready,financial-dashboard-ui-patterns-2026-02-21.md,Sprint 1,Priority 1: F-Pattern Layout
+FC-UI-002,Create modern KPI card component,Task,High,2,High - Professional look,Ready,financial-dashboard-ui-patterns-2026-02-21.md,Sprint 1,Priority 2: Modern KPI Card Component
+FC-UI-003,Enhance financial tables with semantic styling,Task,Medium,2.5,Medium - Better scannability,Ready,financial-dashboard-ui-patterns-2026-02-21.md,Sprint 2,Priority 3: Financial Tables Enhancement
+FC-UI-004,Standardize Chart.js theming,Task,Medium,2,Medium - Consistency,Ready,financial-dashboard-ui-patterns-2026-02-21.md,Sprint 2,Priority 4: Standardize Chart.js Theming
+FC-UI-005,Design empty states for all pages,Task,Medium,1.5,Medium - Better first-run UX,Ready,financial-dashboard-ui-patterns-2026-02-21.md,Sprint 3,Priority 5: Design Empty States
+FC-BUILD-001,Implement Webpack build pipeline,Task,Critical,10,Critical - 67% smaller JS payload,Ready,sprint-research-0550-implementation-tasks-2026-02-21.md,Sprint 1,Task: Implement Webpack Build Pipeline
+FC-BUILD-002,Extract and inline critical CSS,Task,High,4,High - 57% faster FCP,Ready,sprint-research-0550-implementation-tasks-2026-02-21.md,Sprint 2,Task: Extract and Inline Critical CSS
+FC-BUILD-003,Add Supabase resource hints,Task,High,0.5,High - 56% faster API calls,Ready,sprint-research-0550-implementation-tasks-2026-02-21.md,Sprint 1,Task: Add Resource Hints for Supabase
+FC-PWA-001,Implement service worker with hybrid caching,Task,High,4,High - Offline support,Ready,sprint-research-0550-implementation-tasks-2026-02-21.md,Sprint 4,Task: Implement Service Worker
+FC-PWA-002,Enhanced PWA manifest with shortcuts,Task,Medium,1,Medium - Better install UX,Ready,sprint-research-0550-implementation-tasks-2026-02-21.md,Sprint 4,Task: Enhanced PWA Manifest
+FC-PERF-001,Set up Core Web Vitals monitoring,Task,High,3,High - Performance tracking,Ready,sprint-research-0550-implementation-tasks-2026-02-21.md,Sprint 5,Task: Set Up Core Web Vitals Monitoring

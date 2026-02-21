@@ -1,519 +1,489 @@
 # CSS Architecture Research — Fireside Capital Dashboard
+
 **Research Date:** February 21, 2026  
-**Researcher:** Capital (Sprint Research Agent)  
-**Topic:** CSS Architecture Best Practices & Recommendations
+**Status:** Completed  
+**Priority:** Medium (P2)  
+**Scope:** CSS organization, naming conventions, scalability
 
 ---
 
 ## Executive Summary
 
-The Fireside Capital dashboard already has a **solid foundation** with modular CSS files, design tokens, and component separation. However, adopting a formal CSS methodology (ITCSS + BEM naming) would improve scalability, reduce specificity conflicts, and make the codebase easier for new developers to navigate.
+The Fireside Capital dashboard currently has **no consistent CSS architecture methodology**, leading to:
+- **98KB main.css** (difficult to maintain)
+- **Mixed naming conventions** (utilities, semantic classes, IDs)
+- **No clear component boundaries**
+- **Risk of specificity conflicts** as the app scales
 
-**Current State:** ✅ Good foundation  
-**Recommended Next Step:** Formalize architecture with ITCSS layers + BEM naming convention
-
----
-
-## Current CSS Architecture Analysis
-
-### ✅ What's Working Well
-
-1. **Modular File Structure**
-   - `design-tokens.css` — CSS custom properties (colors, spacing, typography)
-   - `components.css` — Component-specific styles
-   - `utilities.css` — Utility classes
-   - `responsive.css` — Media queries
-   - `critical.css` — Above-the-fold styles
-   - `accessibility.css` — A11y enhancements
-
-2. **Design System Foundation**
-   - Comprehensive design tokens (color palette, typography scale, spacing grid)
-   - 8px spacing system
-   - Clear brand hierarchy (Flame Orange, Sky Blue, Lime Green)
-   - Consistent border-radius, shadow, and transition tokens
-
-3. **Documentation**
-   - Inline comments explaining design decisions
-   - Version tracking in CSS files
-   - UX polish notes
-
-### ⚠️ Areas for Improvement
-
-1. **No Formal Naming Convention**
-   - Class names are descriptive but inconsistent (`notification-item`, `#notificationBadge`, `.dropdown-header`)
-   - No namespacing to distinguish components from utilities
-   - Risk of naming collisions as the app grows
-
-2. **Specificity Management**
-   - Some use of ID selectors (`#notificationBell`, `#notificationList`)
-   - Deep descendant selectors in places (`.notification-item:hover`)
-   - No clear specificity hierarchy
-
-3. **File Organization**
-   - Components mixed in single file (40KB `components.css`)
-   - No clear layer separation (settings → tools → generic → elements → objects → components → utilities)
+**Recommendation:** Implement **ITCSS + BEM** hybrid architecture:
+- **ITCSS** for file organization (settings → tools → generic → elements → components → utilities)
+- **BEM** for component naming (.card, .card__title, .card--featured)
+- Keep existing design tokens (already excellent)
 
 ---
 
-## Recommended CSS Methodology: **ITCSS + BEM**
+## Current State Analysis
 
-### Why ITCSS (Inverted Triangle CSS)?
-
-**ITCSS** organizes CSS by **specificity** — from generic to specific, low to high:
-
+### File Structure (10 CSS files, 225KB total)
 ```
-Settings    →  CSS custom properties, variables
-Tools       →  Mixins, functions (if using preprocessor)
-Generic     →  Resets, normalize
-Elements    →  Base HTML element styling (h1, p, button)
-Objects     →  Layout patterns (.o-container, .o-grid)
-Components  →  UI components (.c-card, .c-notification)
-Utilities   →  Single-purpose classes (.u-mb-16, .u-text-center)
+assets/css/
+├── design-tokens.css     (22KB)  ✅ Good — CSS custom properties
+├── main.css              (98KB)  ⚠️  Too large — needs splitting
+├── components.css        (40KB)  ⚠️  No clear component boundaries
+├── responsive.css        (30KB)  ✅ Good — separate media queries
+├── accessibility.css     (12KB)  ✅ Good — a11y focused
+├── utilities.css         (9KB)   ✅ Good — utility classes
+├── onboarding.css        (8KB)   ⚠️  Page-specific (should be modular)
+├── logged-out-cta.css    (5KB)   ⚠️  Page-specific
+├── critical.css          (2KB)   ✅ Good — above-the-fold styles
+└── main.css.orig         (184KB) ⚠️  Legacy file — DELETE
 ```
 
-**Benefits:**
-- ✅ Prevents specificity wars
-- ✅ Clear import order
-- ✅ Scales to enterprise-level projects
-- ✅ Works perfectly with design tokens (Settings layer)
+### Naming Convention Issues
 
-### Why BEM (Block Element Modifier)?
-
-**BEM** provides a naming convention that makes component boundaries crystal clear:
-
+**Current approach:** Inconsistent mix
 ```css
-/* Block */
-.c-notification { }
+/* ID selectors (too specific) */
+#notificationBell { }
+#notificationList { }
 
-/* Element (child of block) */
-.c-notification__item { }
-.c-notification__badge { }
+/* Generic class names (collision risk) */
+.dropdown-header { }
+.page-header { }
 
-/* Modifier (variation) */
-.c-notification--unread { }
-.c-notification__badge--danger { }
+/* Utility classes (good) */
+.mb-8 { margin-bottom: 8px; }
+.p-16 { padding: 16px; }
+
+/* No component structure */
+/* Should be: .notification-bell, .notification-bell__badge, etc. */
 ```
-
-**Benefits:**
-- ✅ Self-documenting (you know what `.c-notification__badge--danger` does)
-- ✅ No specificity surprises
-- ✅ Easy to search codebase
-- ✅ Namespace prefixes prevent collisions
 
 ---
 
-## Recommended File Structure (ITCSS Layers)
+## Recommended Architecture: ITCSS + BEM
+
+### Why ITCSS?
+- **Manages specificity naturally** (least to most specific)
+- **Prevents conflicts** with clear layering
+- **Works with existing design tokens**
+
+### Why BEM?
+- **Clear component boundaries** (.card, .card__title, .card--featured)
+- **Self-documenting** (you know what classes do)
+- **Scales to large teams** without conflicts
+
+### Hybrid Structure
 
 ```
 assets/css/
 ├── 1-settings/
-│   └── tokens.css          (current design-tokens.css)
+│   └── design-tokens.css        (already exists ✅)
 ├── 2-tools/
-│   └── mixins.css          (future: if adopting PostCSS/SCSS)
+│   ├── mixins.css               (future: Sass/PostCSS mixins)
+│   └── functions.css
 ├── 3-generic/
-│   └── reset.css           (normalize/reset)
+│   ├── reset.css                (CSS reset/normalize)
+│   └── box-sizing.css
 ├── 4-elements/
-│   └── base.css            (body, h1-h6, a, button defaults)
+│   ├── typography.css           (h1-h6, p, base styles)
+│   ├── forms.css                (base input/button styles)
+│   └── tables.css
 ├── 5-objects/
-│   ├── layout.css          (.o-container, .o-grid, .o-section)
-│   └── media.css           (.o-media — image + content pattern)
+│   ├── layout.css               (grid, containers)
+│   └── media.css                (responsive objects)
 ├── 6-components/
-│   ├── card.css            (.c-card)
-│   ├── notification.css    (.c-notification)
-│   ├── button.css          (.c-btn)
-│   ├── form.css            (.c-form)
-│   ├── chart.css           (.c-chart)
-│   └── ...                 (one file per component)
+│   ├── notification-bell.css    (BEM: .notification-bell)
+│   ├── card.css                 (BEM: .card, .card__header)
+│   ├── nav.css                  (BEM: .nav, .nav__item)
+│   ├── dashboard.css            (BEM: .dashboard, .dashboard__widget)
+│   ├── chart.css                (BEM: .chart, .chart__legend)
+│   └── ...
 ├── 7-utilities/
-│   ├── spacing.css         (.u-mb-16, .u-p-24)
-│   ├── text.css            (.u-text-center, .u-text-primary)
-│   └── visibility.css      (.u-hidden, .u-sr-only)
-├── shame.css               (quick fixes/hacks — to be refactored)
-└── main.css                (imports all layers in order)
-```
-
-**Import order in `main.css`:**
-```css
-/* 1. Settings */
-@import '1-settings/tokens.css';
-
-/* 2. Tools (skip if not using preprocessor) */
-
-/* 3. Generic */
-@import '3-generic/reset.css';
-
-/* 4. Elements */
-@import '4-elements/base.css';
-
-/* 5. Objects */
-@import '5-objects/layout.css';
-@import '5-objects/media.css';
-
-/* 6. Components */
-@import '6-components/button.css';
-@import '6-components/card.css';
-@import '6-components/notification.css';
-/* ... */
-
-/* 7. Utilities */
-@import '7-utilities/spacing.css';
-@import '7-utilities/text.css';
-
-/* Shame */
-@import 'shame.css';
+│   ├── spacing.css              (already exists ✅)
+│   ├── display.css
+│   └── accessibility.css        (already exists ✅)
+└── main.css                     (imports all layers in order)
 ```
 
 ---
 
-## BEM Naming Convention Guide
+## Implementation Plan
 
-### Component Namespace Prefixes
+### Phase 1: File Reorganization (1 day)
+1. Create ITCSS folder structure
+2. Split `main.css` into component files
+3. Update `main.css` to import files in ITCSS order
+4. Test that nothing breaks
 
+**Example main.css (new):**
 ```css
-.c-   Component      (.c-card, .c-btn, .c-notification)
-.o-   Object/Layout  (.o-container, .o-grid, .o-media)
-.u-   Utility        (.u-mb-16, .u-text-center, .u-hidden)
-.is-  State          (.is-active, .is-loading, .is-error)
-.has- State          (.has-dropdown, .has-icon)
+/* Fireside Capital — Main Stylesheet (ITCSS Architecture) */
+
+/* 1. Settings — Variables, design tokens */
+@import '1-settings/design-tokens.css';
+
+/* 2. Tools — Mixins, functions (future) */
+/* @import '2-tools/mixins.css'; */
+
+/* 3. Generic — Resets, box-sizing */
+@import '3-generic/reset.css';
+
+/* 4. Elements — Base element styles */
+@import '4-elements/typography.css';
+@import '4-elements/forms.css';
+
+/* 5. Objects — Layout primitives */
+@import '5-objects/layout.css';
+
+/* 6. Components — UI components (BEM naming) */
+@import '6-components/notification-bell.css';
+@import '6-components/card.css';
+@import '6-components/nav.css';
+@import '6-components/dashboard.css';
+@import '6-components/chart.css';
+
+/* 7. Utilities — Utility classes (highest specificity) */
+@import '7-utilities/spacing.css';
+@import '7-utilities/display.css';
+@import '7-utilities/accessibility.css';
+
+/* Responsive — Media queries */
+@import 'responsive.css';
 ```
 
-### Example: Refactoring Notification Component
+### Phase 2: BEM Conversion (2-3 days)
+Convert existing components to BEM naming.
+
+**Example: Notification Bell**
 
 **Before (current):**
 ```css
 #notificationBell { }
 #notificationBadge { }
-.notification-item { }
-.notification-item.unread { }
 .dropdown-header { }
+.notification-item { }
 ```
 
-**After (BEM + namespace):**
+**After (BEM):**
 ```css
-.c-notification { }
-.c-notification__bell { }
-.c-notification__badge { }
-.c-notification__badge--danger { }
-.c-notification__menu { }
-.c-notification__item { }
-.c-notification__item--unread { }
-.c-notification__header { }
+.notification-bell { }
+.notification-bell__badge { }
+.notification-bell__dropdown { }
+.notification-bell__dropdown-header { }
+.notification-bell__item { }
+.notification-bell__item--unread { }
 ```
 
 **HTML:**
 ```html
-<div class="c-notification">
-  <button class="c-notification__bell" aria-label="Notifications">
-    <i class="bi bi-bell"></i>
-    <span class="c-notification__badge c-notification__badge--danger">3</span>
-  </button>
-  
-  <div class="c-notification__menu">
-    <div class="c-notification__header">
-      <strong>Notifications</strong>
-      <button class="c-btn c-btn--text">Mark all read</button>
-    </div>
-    
-    <div class="c-notification__item c-notification__item--unread">
-      <i class="bi bi-exclamation-circle"></i>
-      <div class="c-notification__content">
-        <strong>Bill Due Soon</strong>
-        <p>Electric bill due in 3 days ($125.50)</p>
-      </div>
+<button class="notification-bell" id="notificationBell">
+  <i class="bi bi-bell"></i>
+  <span class="notification-bell__badge">3</span>
+</button>
+
+<div class="notification-bell__dropdown">
+  <div class="notification-bell__dropdown-header">
+    <h6>Notifications</h6>
+  </div>
+  <div class="notification-bell__item notification-bell__item--unread">
+    <div class="notification-bell__item-icon">💰</div>
+    <div class="notification-bell__item-content">
+      <p>New transaction detected</p>
+      <span class="notification-bell__item-time">2m ago</span>
     </div>
   </div>
 </div>
 ```
 
----
+### Phase 3: Component Extraction (3-5 days)
+Extract reusable components from `main.css`:
 
-## Migration Strategy (Incremental)
-
-**Option A: Big Bang Refactor (NOT RECOMMENDED)**
-- Rewrite all CSS at once
-- High risk, breaks existing pages
-
-**Option B: Gradual Migration (RECOMMENDED)**
-1. ✅ Create new ITCSS folder structure
-2. ✅ Move `design-tokens.css` → `1-settings/tokens.css`
-3. ✅ Create `main.css` with new import order
-4. ✅ Refactor ONE component at a time (start with smallest)
-5. ✅ Update HTML to use BEM classes
-6. ✅ Remove old CSS once all references updated
-7. ✅ Repeat for next component
-
-**Start with:** Notification component (already isolated in `components.css`)
+**Priority components:**
+1. **Dashboard widgets** (.dashboard-widget, .dashboard-widget__header)
+2. **Charts** (.chart, .chart__legend, .chart__tooltip)
+3. **Cards** (.card, .card__header, .card__body, .card__footer)
+4. **Forms** (.form-field, .form-field__label, .form-field__input)
+5. **Navigation** (.nav, .nav__item, .nav__item--active)
+6. **Tables** (.data-table, .data-table__row, .data-table__cell)
 
 ---
 
-## Code Example: Button Component
+## Code Examples
 
-**File: `6-components/button.css`**
+### Dashboard Widget Component
+
+**File:** `6-components/dashboard-widget.css`
+
 ```css
-/* ==========================================
-   Button Component
-   Namespace: .c-btn
-   
-   Variants:
-   - Primary (Flame Orange)
-   - Secondary (Sky Blue)
-   - Tertiary (Neutral Gray)
-   - Success (Lime Green)
-   - Danger (Red outline)
-   
-   Sizes: default, small, large
-   States: disabled, loading
-   ========================================== */
+/* ========================================
+   Dashboard Widget — BEM Component
+   ======================================== */
 
-/* Block */
-.c-btn {
-  display: inline-flex;
+.dashboard-widget {
+  background-color: var(--color-bg-2);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  border: 1px solid var(--color-border-subtle);
+  transition: border-color 0.2s ease;
+}
+
+.dashboard-widget:hover {
+  border-color: var(--color-border-default);
+}
+
+/* Header */
+.dashboard-widget__header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-2); /* 8px */
-  padding: var(--space-3) var(--space-4); /* 12px 16px */
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  font-weight: var(--weight-semibold);
-  line-height: 1.5;
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-  border: 2px solid transparent;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 150ms ease;
-  min-height: 44px; /* WCAG touch target */
-  
-  /* Default: Tertiary (neutral gray) */
-  background-color: var(--color-tertiary);
-  color: var(--color-button-text);
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
-.c-btn:hover:not(:disabled) {
-  background-color: var(--color-tertiary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.c-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
-}
-
-.c-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Modifier: Primary (Flame Orange) */
-.c-btn--primary {
-  background-color: var(--color-primary);
-  color: var(--color-button-text);
-}
-
-.c-btn--primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-}
-
-/* Modifier: Secondary (Sky Blue) */
-.c-btn--secondary {
-  background-color: var(--color-secondary);
-  color: var(--color-button-text);
-}
-
-.c-btn--secondary:hover:not(:disabled) {
-  background-color: var(--color-secondary-hover);
-}
-
-/* Modifier: Success (Lime Green) */
-.c-btn--success {
-  background-color: var(--color-accent);
-  color: var(--color-button-text);
-}
-
-.c-btn--success:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
-}
-
-/* Modifier: Danger (Red outline) */
-.c-btn--danger {
-  background-color: transparent;
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-}
-
-.c-btn--danger:hover:not(:disabled) {
-  background-color: var(--color-danger);
+.dashboard-widget__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  margin: 0;
 }
 
-/* Modifier: Small */
-.c-btn--sm {
-  padding: var(--space-2) var(--space-3); /* 8px 12px */
-  font-size: var(--text-sm);
-  min-height: 36px;
+.dashboard-widget__actions {
+  display: flex;
+  gap: var(--spacing-2);
 }
 
-/* Modifier: Large */
-.c-btn--lg {
-  padding: var(--space-4) var(--space-6); /* 16px 24px */
-  font-size: var(--text-lg);
-  min-height: 52px;
+/* Body */
+.dashboard-widget__body {
+  margin-bottom: var(--spacing-4);
 }
 
-/* Modifier: Full width */
-.c-btn--block {
-  width: 100%;
+/* Footer (optional) */
+.dashboard-widget__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
-/* Modifier: Icon-only */
-.c-btn--icon {
-  padding: var(--space-3);
-  min-width: 44px;
+/* Modifiers */
+.dashboard-widget--highlight {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary-light);
 }
 
-/* State: Loading */
-.c-btn.is-loading {
-  position: relative;
-  color: transparent;
+.dashboard-widget--loading {
+  opacity: 0.6;
   pointer-events: none;
 }
 
-.c-btn.is-loading::after {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.dashboard-widget--error {
+  border-color: var(--color-error);
+  background-color: var(--color-error-bg);
 }
 ```
 
-**Usage in HTML:**
+**HTML Usage:**
 ```html
-<!-- Primary action -->
-<button class="c-btn c-btn--primary">Connect Bank Account</button>
-
-<!-- Secondary action -->
-<button class="c-btn c-btn--secondary">View Details</button>
-
-<!-- Danger action -->
-<button class="c-btn c-btn--danger">Delete Account</button>
-
-<!-- Small button -->
-<button class="c-btn c-btn--secondary c-btn--sm">Edit</button>
-
-<!-- Loading state -->
-<button class="c-btn c-btn--primary is-loading">Saving...</button>
-
-<!-- Icon button -->
-<button class="c-btn c-btn--icon" aria-label="Settings">
-  <i class="bi bi-gear"></i>
-</button>
+<div class="dashboard-widget">
+  <div class="dashboard-widget__header">
+    <h3 class="dashboard-widget__title">Net Worth</h3>
+    <div class="dashboard-widget__actions">
+      <button class="btn btn-sm btn-tertiary">
+        <i class="bi bi-gear"></i>
+      </button>
+    </div>
+  </div>
+  <div class="dashboard-widget__body">
+    <canvas id="netWorthChart"></canvas>
+  </div>
+  <div class="dashboard-widget__footer">
+    <span>Last updated: 2m ago</span>
+    <a href="/reports" class="link">View details →</a>
+  </div>
+</div>
 ```
 
----
+### Chart Component
 
-## Utility Classes (7-utilities/)
+**File:** `6-components/chart.css`
 
-**File: `7-utilities/spacing.css`**
 ```css
-/* ==========================================
-   Spacing Utilities
-   Namespace: .u-
-   Grid: 8px base
-   ========================================== */
+/* ========================================
+   Chart Component — BEM
+   ======================================== */
 
-/* Margin bottom */
-.u-mb-0  { margin-bottom: 0 !important; }
-.u-mb-8  { margin-bottom: 8px !important; }
-.u-mb-16 { margin-bottom: 16px !important; }
-.u-mb-24 { margin-bottom: 24px !important; }
-.u-mb-32 { margin-bottom: 32px !important; }
-.u-mb-48 { margin-bottom: 48px !important; }
+.chart {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Default height */
+}
 
-/* Margin top */
-.u-mt-0  { margin-top: 0 !important; }
-.u-mt-8  { margin-top: 8px !important; }
-.u-mt-16 { margin-top: 16px !important; }
-.u-mt-24 { margin-top: 24px !important; }
-.u-mt-32 { margin-top: 32px !important; }
+.chart__canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
 
-/* Padding */
-.u-p-8  { padding: 8px !important; }
-.u-p-16 { padding: 16px !important; }
-.u-p-24 { padding: 24px !important; }
-.u-p-32 { padding: 32px !important; }
+.chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
 
-/* Padding horizontal/vertical */
-.u-px-16 { padding-left: 16px !important; padding-right: 16px !important; }
-.u-px-24 { padding-left: 24px !important; padding-right: 24px !important; }
-.u-py-16 { padding-top: 16px !important; padding-bottom: 16px !important; }
-.u-py-24 { padding-top: 24px !important; padding-bottom: 24px !important; }
+.chart__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
 
-/* Gap (for flexbox/grid) */
-.u-gap-8  { gap: 8px !important; }
-.u-gap-12 { gap: 12px !important; }
-.u-gap-16 { gap: 16px !important; }
-.u-gap-24 { gap: 24px !important; }
+.chart__legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.chart__legend-label {
+  white-space: nowrap;
+}
+
+/* Modifiers */
+.chart--small {
+  height: 200px;
+}
+
+.chart--large {
+  height: 400px;
+}
+
+.chart--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart--loading::before {
+  content: "Loading chart...";
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
 ```
 
 ---
 
-## Key Takeaways
+## Migration Strategy
 
-### ✅ Keep Doing
-- Design tokens in CSS custom properties
-- 8px spacing grid
-- Modular file separation
-- Inline documentation
+### Option A: Big Bang (Not Recommended)
+- Convert everything at once
+- ❌ High risk of breaking changes
+- ❌ Difficult to test thoroughly
 
-### 🔄 Improve
-- Adopt ITCSS folder structure (7 layers)
-- Implement BEM naming with namespace prefixes
-- Break apart large `components.css` into individual component files
-- Eliminate ID selectors in CSS
-- Create `shame.css` for quick fixes that need refactoring
+### Option B: Gradual Migration (Recommended)
+1. **Week 1:** Set up ITCSS folder structure, move design tokens
+2. **Week 2:** Convert 2-3 high-priority components to BEM
+3. **Week 3:** Extract remaining components
+4. **Week 4:** Refactor utilities, remove duplicates
+5. **Week 5:** Final cleanup, delete legacy files
 
-### 🚀 Benefits
-- **Scalability:** Easier to add new components without naming conflicts
-- **Maintainability:** New developers can navigate codebase faster
-- **Consistency:** BEM enforces uniform naming patterns
-- **Specificity Control:** ITCSS prevents specificity wars
-- **Performance:** Easier to identify unused CSS for removal
+**Backward Compatibility:**
+- Keep old class names as aliases during migration
+- Use both old and new classes in HTML temporarily
+- Deprecate old classes after 2 weeks
+
+**Example:**
+```css
+/* Temporary alias during migration */
+#notificationBell,
+.notification-bell {
+  /* shared styles */
+}
+
+/* Remove #notificationBell after 2 weeks */
+```
 
 ---
 
-## Next Steps (Implementation Backlog)
+## Benefits of This Approach
 
-1. ✅ **Research Complete** — Create Azure DevOps tasks
-2. 🔨 **Create ITCSS folder structure** in `assets/css/`
-3. 🔨 **Migrate design-tokens.css** → `1-settings/tokens.css`
-4. 🔨 **Refactor notification component** (first BEM migration)
-5. 🔨 **Refactor button component** (use example code above)
-6. 🔨 **Create utilities** with `.u-` namespace
-7. 🔨 **Document migration in CONTRIBUTING.md**
-8. 🔨 **Update build process** if needed (CSS imports)
+### Developer Experience
+- **Predictable naming** — know exactly what classes do
+- **No more specificity wars** — ITCSS manages it automatically
+- **Easier onboarding** — new devs understand structure quickly
+- **Better IDE autocomplete** — BEM names are self-documenting
+
+### Performance
+- **Smaller file sizes** — remove duplicates, better compression
+- **Faster rendering** — fewer selector collisions
+- **Better caching** — component CSS can be cached independently
+
+### Maintainability
+- **Isolated changes** — edit one component file at a time
+- **Easier debugging** — know which file to look in
+- **Safer refactoring** — clear component boundaries
+- **Less technical debt** — prevent future spaghetti code
+
+---
+
+## Next Steps — Create Implementation Tasks
+
+### Task 1: Set Up ITCSS Folder Structure
+**Effort:** 2 hours  
+**Files:** Create 7 folders, move existing files
+
+### Task 2: Convert Notification Component to BEM
+**Effort:** 4 hours  
+**Files:** `6-components/notification-bell.css`, update HTML
+
+### Task 3: Extract Dashboard Widget Component
+**Effort:** 6 hours  
+**Files:** `6-components/dashboard-widget.css`, refactor pages
+
+### Task 4: Extract Chart Component
+**Effort:** 4 hours  
+**Files:** `6-components/chart.css`, standardize Chart.js integration
+
+### Task 5: Document CSS Architecture
+**Effort:** 3 hours  
+**Files:** Create `docs/css-architecture.md` with component library
 
 ---
 
 ## References
 
-- [ITCSS: Scalable and Maintainable CSS Architecture](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture)
-- [5 Methodologies for Architecting CSS](https://www.valoremreply.com/resources/insights/blog/2020/november/5-methodologies-for-architecting-css/)
+### Articles
 - [Efficient CSS Architectures: BEM, SMACSS, and ITCSS](https://codedamn.com/news/css/efficient-css-architectures-bem-smacss-itcss)
-- [BEM Methodology Documentation](http://getbem.com/)
-- [CSS Architecture for Design Systems](https://bradfrost.com/blog/post/css-architecture-for-design-systems/)
+- [CSS Architecture and Organization: BEM, OOCSS, and SMACSS](https://dev.to/sharique_siddiqui_8242dad/css-architecture-and-organization-bem-oocss-and-smacss-1i4e)
+
+### Methodologies
+- **BEM:** http://getbem.com/
+- **ITCSS:** https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/
+- **SMACSS:** http://smacss.com/
+
+### Tools
+- **PostCSS** (for future CSS processing)
+- **Stylelint** (enforce BEM naming)
+- **PurgeCSS** (remove unused CSS)
 
 ---
 
-**Research Status:** ✅ Complete  
-**Implementation Status:** 🔨 Ready for tasking  
-**Estimated Effort:** 2-3 sprints (gradual migration)
+## Questions for Product Owner
+
+1. **Timeline:** Can we allocate 2-3 weeks for gradual migration?
+2. **Breaking changes:** OK to temporarily have duplicate class names?
+3. **Sass/PostCSS:** Should we introduce a CSS preprocessor for better DX?
+4. **Component library:** Want a Storybook-style component showcase?
+
+---
+
+**Research Completed:** February 21, 2026  
+**Next Action:** Review recommendations, create implementation tasks  
+**Estimated Implementation:** 2-3 weeks (gradual migration)

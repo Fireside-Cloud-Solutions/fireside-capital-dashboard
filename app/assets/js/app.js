@@ -2462,48 +2462,48 @@ async function saveSettings() {
 
   // Check if input has validation errors
   if (goalInput.classList.contains('is-invalid')) {
-    const statusEl = document.getElementById('settingsStatus');
-    statusEl.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Please fix validation errors before saving.</span>';
-    setTimeout(() => { statusEl.innerHTML = ''; }, 5000);
+    Toast.warning('Please fix validation errors before saving.');
     return;
   }
 
   // Validate goal value (fallback if real-time validation didn't trigger)
   if (goal && (goal < 100 || goal > 1000000)) {
-    const statusEl = document.getElementById('settingsStatus');
-    statusEl.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Please enter a value between $100 and $1,000,000.</span>';
-    setTimeout(() => { statusEl.innerHTML = ''; }, 5000);
+    Toast.warning('Please enter a value between $100 and $1,000,000.');
     return;
   }
 
-  // Show loading state
-  const statusEl = document.getElementById('settingsStatus');
-  statusEl.innerHTML = '<span class="text-muted"><i class="spinner-border spinner-border-sm me-1"></i>Saving...</span>';
-  statusEl.className = "ms-3";
+  // Disable button during save
+  const saveBtn = document.getElementById('saveBudgetsBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Saving...';
+  }
 
   const { error } = await sb
       .from('settings')
       .upsert({ user_id: currentUser.id, emergency_fund_goal: goal });
 
   if (error) {
-      statusEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Save failed. Try again.</span>';
+      Toast.error('Save failed. Please try again.');
       console.error(error);
   } else {
-      statusEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Saved successfully!</span>';
+      Toast.success('Emergency fund goal saved successfully!');
       // Re-fetch settings data to update the app state
       clearCache(); // Performance: Clear cache on data mutation
 
       await fetchAllDataFromSupabase(true);
   }
-  setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
+
+  // Re-enable button
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '<i class="bi bi-check-lg"></i> Save All Settings';
+  }
 }
 
 // FC-180: Save category budgets to Supabase settings.category_budgets (JSON)
 async function saveCategoryBudgets() {
   if (!currentUser) return;
-
-  const statusEl = document.getElementById('budgetSettingsStatus');
-  if (!statusEl) return;
 
   // Collect values from all category inputs
   const budgets = {};
@@ -2513,21 +2513,31 @@ async function saveCategoryBudgets() {
     if (cat && val > 0) budgets[cat] = val;
   });
 
-  statusEl.innerHTML = '<span class="text-muted"><i class="spinner-border spinner-border-sm me-1"></i>Saving...</span>';
+  // Disable button during save
+  const saveBtn = document.getElementById('saveBudgetsBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Saving...';
+  }
 
   const { error } = await sb
     .from('settings')
     .upsert({ user_id: currentUser.id, category_budgets: budgets });
 
   if (error) {
-    statusEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Save failed. Try again.</span>';
+    Toast.error('Failed to save category budgets. Please try again.');
   } else {
     // Update in-memory settings so BvA reads it immediately
     if (window.settings) window.settings.category_budgets = budgets;
-    statusEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Budgets saved!</span>';
+    Toast.success('Category budgets saved successfully!');
     clearCache();
   }
-  setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
+
+  // Re-enable button
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '<i class="bi bi-check-lg"></i> Save All Settings';
+  }
 }
 
 // FC-180: Live total preview - sum all category budget inputs
