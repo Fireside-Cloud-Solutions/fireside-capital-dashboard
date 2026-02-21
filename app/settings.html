@@ -174,9 +174,10 @@
                             <label for="budget_dining" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-cup-hot text-muted"></i> Dining
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_dining" data-category="dining" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_dining" data-category="dining" placeholder="0" min="0" max="99999" step="10" aria-describedby="diningFeedback">
+                              <div id="diningFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- groceries -->
@@ -184,9 +185,10 @@
                             <label for="budget_groceries" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-cart3 text-muted"></i> Groceries
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_groceries" data-category="groceries" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_groceries" data-category="groceries" placeholder="0" min="0" max="99999" step="10" aria-describedby="groceriesFeedback">
+                              <div id="groceriesFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- transportation -->
@@ -194,9 +196,10 @@
                             <label for="budget_transportation" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-car-front text-muted"></i> Transportation
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_transportation" data-category="transportation" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_transportation" data-category="transportation" placeholder="0" min="0" max="99999" step="10" aria-describedby="transportationFeedback">
+                              <div id="transportationFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- utilities -->
@@ -204,9 +207,10 @@
                             <label for="budget_utilities" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-lightning-charge text-muted"></i> Utilities
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_utilities" data-category="utilities" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_utilities" data-category="utilities" placeholder="0" min="0" max="99999" step="10" aria-describedby="utilitiesFeedback">
+                              <div id="utilitiesFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- entertainment -->
@@ -214,9 +218,10 @@
                             <label for="budget_entertainment" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-controller text-muted"></i> Entertainment
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_entertainment" data-category="entertainment" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_entertainment" data-category="entertainment" placeholder="0" min="0" max="99999" step="10" aria-describedby="entertainmentFeedback">
+                              <div id="entertainmentFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- shopping -->
@@ -224,9 +229,10 @@
                             <label for="budget_shopping" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-bag text-muted"></i> Shopping
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_shopping" data-category="shopping" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_shopping" data-category="shopping" placeholder="0" min="0" max="99999" step="10" aria-describedby="shoppingFeedback">
+                              <div id="shoppingFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- healthcare -->
@@ -234,9 +240,10 @@
                             <label for="budget_healthcare" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-heart-pulse text-muted"></i> Healthcare
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_healthcare" data-category="healthcare" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_healthcare" data-category="healthcare" placeholder="0" min="0" max="99999" step="10" aria-describedby="healthcareFeedback">
+                              <div id="healthcareFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- travel -->
@@ -244,9 +251,10 @@
                             <label for="budget_travel" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-airplane text-muted"></i> Travel
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_travel" data-category="travel" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_travel" data-category="travel" placeholder="0" min="0" max="99999" step="10" aria-describedby="travelFeedback">
+                              <div id="travelFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                           <!-- other -->
@@ -254,9 +262,10 @@
                             <label for="budget_other" class="form-label d-flex align-items-center gap-2">
                               <i class="bi bi-three-dots text-muted"></i> Other
                             </label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                               <span class="input-group-text">$</span>
-                              <input type="number" class="form-control category-budget-input" id="budget_other" data-category="other" placeholder="0" min="0" max="99999" step="10">
+                              <input type="number" class="form-control category-budget-input" id="budget_other" data-category="other" placeholder="0" min="0" max="99999" step="10" aria-describedby="otherFeedback">
+                              <div id="otherFeedback" class="invalid-feedback"></div>
                             </div>
                           </div>
                         </div>

@@ -4126,6 +4126,39 @@ function init() {
       feedback.textContent = '';
     }
   });
+  
+  // Real-time validation for Category Budget inputs (BUG-UI-FORM-SETTINGS-002)
+  document.querySelectorAll('.category-budget-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const target = e.target;
+      const value = parseFloat(target.value);
+      const category = target.dataset.category;
+      const feedbackId = `${category}Feedback`;
+      const feedback = document.getElementById(feedbackId);
+      
+      if (!target.value) {
+        // Empty is valid (optional field)
+        target.classList.remove('is-invalid', 'is-valid');
+        if (feedback) feedback.textContent = '';
+      } else if (isNaN(value)) {
+        target.classList.add('is-invalid');
+        target.classList.remove('is-valid');
+        if (feedback) feedback.textContent = 'Please enter a valid number';
+      } else if (value < 0) {
+        target.classList.add('is-invalid');
+        target.classList.remove('is-valid');
+        if (feedback) feedback.textContent = 'Amount cannot be negative';
+      } else if (value > 99999) {
+        target.classList.add('is-invalid');
+        target.classList.remove('is-valid');
+        if (feedback) feedback.textContent = 'Maximum budget is $99,999';
+      } else {
+        target.classList.remove('is-invalid');
+        target.classList.add('is-valid');
+        if (feedback) feedback.textContent = '';
+      }
+    });
+  });
 
   // SUG-02: Wire up Export button on Reports page
   const exportBtn = document.querySelector('button .bi-download')?.closest('button');
