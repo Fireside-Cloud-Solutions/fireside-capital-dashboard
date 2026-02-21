@@ -124,8 +124,8 @@ h3 {
 }
 
 h4 {
-  font-size: 20px;
-  margin-bottom: 12px;
+  font-size: 1.25rem; /* 20px */
+  margin-bottom: 0.75rem; /* 12px */
 }
 
 h5, h6 {
@@ -135,27 +135,27 @@ h5, h6 {
 }
 
 h5 {
-  font-size: 18px;
-  margin-bottom: 8px;
+  font-size: 1.125rem; /* 18px */
+  margin-bottom: 0.5rem; /* 8px */
 }
 
 h6 {
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   letter-spacing: var(--tracking-wide);
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem; /* 8px */
 }
 
 /* Body text readable (16px) */
 p, li, td, span {
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.6;
-  margin-bottom: 16px;
+  margin-bottom: 1rem; /* 16px */
 }
 
 /* Muted text for secondary info (14px, reduced opacity) */
 .text-muted,
 small {
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px */
   opacity: 0.7;
   line-height: 1.5;
 }
