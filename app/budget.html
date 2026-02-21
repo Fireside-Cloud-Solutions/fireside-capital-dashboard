@@ -147,6 +147,17 @@
             </div>
 
             <div id="dataContainer" class="data-hidden">
+            
+            <!-- Empty State -->
+            <div id="budgetEmptyState" class="empty-state" style="display:none">
+              <i class="bi bi-calculator empty-state-icon"></i>
+              <h3>No Budget Items Yet</h3>
+              <p>Create your monthly budget to plan spending, track expenses, and reach your financial goals.</p>
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBudgetItemModal" aria-label="Add your first budget item">
+                <i class="bi bi-plus-circle me-2"></i> Add Your First Budget Item
+              </button>
+            </div>
+            
             <!-- Summary Cards -->
             <div class="row g-3 g-xl-4 mb-4">
                 <div class="col-xl-3 col-md-6 col-12">

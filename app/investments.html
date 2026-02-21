@@ -134,6 +134,17 @@
       </div>
 
       <div id="dataContainer" class="data-hidden">
+        
+        <!-- Empty State -->
+        <div id="investmentEmptyState" class="empty-state" style="display:none">
+          <i class="bi bi-piggy-bank empty-state-icon"></i>
+          <h3>No Investments Tracked</h3>
+          <p>Start tracking your investment accounts, retirement savings, and portfolio growth to monitor your path to financial independence.</p>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInvestmentModal" aria-label="Add your first investment">
+            <i class="bi bi-plus-circle me-2"></i> Add Your First Investment
+          </button>
+        </div>
+        
         <div class="table-card">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
