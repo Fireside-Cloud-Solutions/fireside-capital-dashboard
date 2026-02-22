@@ -1,331 +1,229 @@
-# CSS Architecture Research Findings
-**Date:** February 14, 2026  
-**Researcher:** Capital  
-**Status:** ✅ Complete
+# CSS Architecture Research — Fireside Capital
 
-## Executive Summary
-
-The Fireside Capital dashboard has a **well-structured CSS architecture** with strong design token foundation and specialized financial UI patterns. This research identifies optimization opportunities and provides actionable recommendations for performance, maintainability, and dark theme consistency.
+**Date:** 2026-02-22  
+**Researcher:** Capital (Orchestrator)  
+**Status:** Recommendations Ready
 
 ---
 
-## Current Architecture Analysis
+## Summary
 
-### ✅ Strengths
+Researched CSS architecture methodologies (BEM, SMACSS, ITCSS) to establish a scalable, maintainable CSS system for the Fireside Capital dashboard.
 
-1. **Design Token System** (`design-tokens.css` - 13.6KB)
-   - Comprehensive CSS custom properties
-   - Logo-native brand colors (Flame Orange, Sky Blue, Lime Green)
-   - Dark theme optimized (charcoal backgrounds)
-   - Responsive font scaling
-   - Semantic spacing scale
-   - Well-organized shadows and transitions
-
-2. **Financial UI Patterns** (`financial-patterns.css` - 10.5KB)
-   - Tabular number formatting for amounts
-   - Semantic color states (positive/negative/neutral)
-   - Optimized transaction list grid layout
-   - Budget progress bars
-   - Account cards with hover states
-   - Print styles for financial statements
-
-3. **Modular Organization**
-   - Separate concerns (tokens, components, patterns, utilities)
-   - Accessibility-specific file
-   - Responsive breakpoints isolated
-   - Onboarding flow separated
-
-### ⚠️ Areas for Improvement
-
-1. **File Size** - `main.css` is 91KB (needs audit for unused rules)
-2. **No CSS Purging** - Likely contains unused Bootstrap classes
-3. **Redundancy** - Some shadow/color definitions appear in multiple files
-4. **No Critical CSS** - All CSS loaded in `<head>` blocking render
-5. **No CSS Modules** - Global namespace risks conflicts
+**Recommendation:** ITCSS + BEM naming convention
 
 ---
 
-## Actionable Recommendations
+## Methodologies Evaluated
 
-### 🚀 Priority 1: Performance Optimization
+### BEM (Block Element Modifier)
+- **Pros:** Clear naming, prevents collisions, self-documenting
+- **Cons:** Verbose class names
+- **Use Case:** Component naming within ITCSS
 
-#### A. Implement PurgeCSS for Production Builds
+### SMACSS (Scalable and Modular Architecture for CSS)
+- **Pros:** 5-category system (Base, Layout, Module, State, Theme)
+- **Cons:** Less prescriptive than ITCSS
+- **Use Case:** Good for smaller projects
 
-**Problem:** Bootstrap includes 200KB+ of CSS, but we likely use <30% of classes.
+### ITCSS (Inverted Triangle CSS)
+- **Pros:** Organizes by specificity, perfect for Bootstrap apps, prevents specificity wars
+- **Cons:** Requires disciplined file organization
+- **Use Case:** **CHOSEN** — Best fit for our Bootstrap 5 + custom CSS setup
 
-**Solution:**
-```json
-// package.json
-{
-  "scripts": {
-    "build:css": "purgecss --css app/assets/css/*.css --content app/**/*.html app/**/*.js --output app/assets/css/dist"
-  },
-  "devDependencies": {
-    "@fullhuman/purgecss": "^6.0.0"
-  }
+---
+
+## Proposed ITCSS Structure
+
+```
+app/assets/css/
+├── 1-settings/       # CSS variables, configuration
+│   └── _variables.css
+├── 2-tools/          # Mixins, functions (if preprocessor added)
+├── 3-generic/        # Normalize, resets
+│   └── _normalize.css
+├── 4-elements/       # Base HTML element styling
+│   └── _typography.css
+├── 5-objects/        # Layout patterns (OOCSS)
+│   └── _grid.css
+├── 6-components/     # UI components (BEM naming)
+│   ├── _card.css
+│   ├── _chart-container.css
+│   ├── _metric-box.css
+│   └── _bill-item.css
+├── 7-utilities/      # Helper classes
+│   └── _utilities.css
+└── main.css          # Master import file
+```
+
+**Naming Convention:**
+- Components: `.c-block__element--modifier`
+- Objects (layouts): `.o-layout__item`
+- Utilities: `.u-text-center`, `.u-margin-top-lg`
+
+---
+
+## Implementation Example
+
+### Before (Current Approach)
+```css
+.card {
+  padding: 20px;
+}
+.card .title {
+  font-size: 18px;
+}
+.card.important {
+  border: 2px solid red;
 }
 ```
 
-**Safelist Configuration:**
-```javascript
-// purgecss.config.js
-module.exports = {
-  content: ['app/**/*.html', 'app/**/*.js'],
-  css: ['app/assets/css/*.css'],
-  safelist: {
-    standard: [/^chart-/, /^modal/, /^dropdown/, /^tooltip/],
-    deep: [/^btn-/, /^alert-/, /^badge-/],
-    greedy: [/data-bs-/]
-  }
+### After (ITCSS + BEM)
+```css
+/* 6-components/_metric-card.css */
+.c-metric-card {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.c-metric-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.c-metric-card__value {
+  font-size: var(--font-size-2xl);
+  color: var(--color-primary);
+}
+
+.c-metric-card--alert {
+  border-left: 4px solid var(--color-danger);
 }
 ```
 
-**Expected Impact:** Reduce CSS from ~200KB → ~60KB (70% reduction)
-
----
-
-#### B. Extract Critical CSS for Above-the-Fold Content
-
-**Problem:** Dashboard loads 91KB CSS before rendering anything.
-
-**Solution:**
-```bash
-# Install critical
-npm install --save-dev critical
-```
-
-```javascript
-// scripts/extract-critical.js
-const critical = require('critical');
-
-critical.generate({
-  inline: true,
-  base: 'app/',
-  src: 'index.html',
-  target: 'index.html',
-  width: 1300,
-  height: 900,
-  dimensions: [
-    { width: 375, height: 667 },  // Mobile
-    { width: 1300, height: 900 }  // Desktop
-  ]
-});
-```
-
-**Expected Impact:** First Contentful Paint improves by 400-600ms
-
----
-
-#### C. Consolidate Shadow & Color Definitions
-
-**Problem:** `--shadow-elevated` defined in both `design-tokens.css` and used inconsistently.
-
-**Action:** Audit all CSS files and remove duplicate custom property definitions.
-
-```bash
-# Find duplicate custom property definitions
-Get-Content app/assets/css/*.css | Select-String "--shadow-|--color-" | Group-Object | Where-Object { $_.Count -gt 1 }
-```
-
----
-
-### 🎨 Priority 2: Bootstrap Dark Theme Consistency
-
-#### Current State
-- Custom dark theme via `design-tokens.css`
-- Bootstrap 5.3+ has built-in dark mode support
-- Potential conflicts between custom tokens and Bootstrap's `data-bs-theme="dark"`
-
-#### Recommendation: Hybrid Approach
-
-**Option A: Override Bootstrap Dark Mode Variables** (Recommended)
-```scss
-// Create app/assets/scss/bootstrap-override.scss
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/variables-dark";
-
-// Override dark mode colors to match Fireside tokens
-$primary-dark: #f44e24;
-$secondary-dark: #01a4ef;
-$success-dark: #81b900;
-$danger-dark: #dc3545;
-$warning-dark: #ffc107;
-$info-dark: #01a4ef;
-
-// Override background colors
-$body-bg-dark: #0f0f0f;
-$body-color-dark: #f0f0f0;
-$border-color-dark: #2a2a2a;
-
-@import "bootstrap/scss/bootstrap";
-```
-
-**Option B: Keep Current Custom Token System** (Current)
-- Already working well
-- More control over exact values
-- No Bootstrap dark mode conflicts
-
-**Action:** If using Bootstrap components (modals, dropdowns), test with `data-bs-theme="dark"` on `<html>` to ensure consistency.
-
----
-
-### 📊 Priority 3: Chart.js Theme Integration
-
-#### Current Issue
-Chart.js defaults to light backgrounds — conflicts with dark dashboard.
-
-#### Solution: Global Chart.js Theme Configuration
-
-```javascript
-// app/assets/js/chart-theme.js
-Chart.defaults.color = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-text-primary').trim();
-
-Chart.defaults.borderColor = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-border-subtle').trim();
-
-Chart.defaults.backgroundColor = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-bg-2').trim();
-
-Chart.defaults.font.family = getComputedStyle(document.documentElement)
-  .getPropertyValue('--font-body').trim();
-
-Chart.defaults.plugins.legend.labels.color = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-text-secondary').trim();
-
-Chart.defaults.plugins.tooltip.backgroundColor = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-bg-3').trim();
-
-Chart.defaults.plugins.tooltip.borderColor = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-border-default').trim();
-
-Chart.defaults.plugins.tooltip.borderWidth = 1;
-
-Chart.defaults.plugins.tooltip.titleColor = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-text-primary').trim();
-
-Chart.defaults.plugins.tooltip.bodyColor = getComputedStyle(document.documentElement)
-  .getPropertyValue('--color-text-secondary').trim();
-
-// Financial chart colors (from design tokens)
-const chartColors = {
-  primary: '#f44e24',      // Flame Orange
-  secondary: '#01a4ef',    // Sky Blue
-  accent: '#81b900',       // Lime Green
-  danger: '#dc3545',       // Red
-  warning: '#ffc107',      // Amber
-  success: '#81b900',      // Lime Green
-  positive: '#81b900',     // Income/Gains
-  negative: '#dc3545',     // Expenses/Losses
-};
-```
-
-**Include in HTML:**
+**HTML:**
 ```html
-<!-- After Chart.js but before chart creation -->
-<script src="assets/js/chart-theme.js"></script>
+<div class="c-metric-card c-metric-card--alert">
+  <h3 class="c-metric-card__title">Net Worth</h3>
+  <p class="c-metric-card__value">$125,430</p>
+</div>
 ```
 
 ---
 
-### 🛠️ Priority 4: Component-Level Recommendations
+## CSS Variable System (Settings Layer)
 
-#### Financial Amount Display
 ```css
-/* Add to financial-patterns.css */
-.amount-compact {
-  font-size: var(--text-body-sm);
-  font-weight: var(--weight-medium);
-}
-
-/* Compact mode for tables with many rows */
-.density-compact .amount {
-  font-size: var(--text-small);
-  line-height: 1.3;
-}
-
-/* Highlight significant amounts */
-.amount-significant {
-  background: linear-gradient(135deg, 
-    rgba(var(--color-primary-rgb), 0.08) 0%, 
-    rgba(var(--color-accent-rgb), 0.08) 100%);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-}
-```
-
-#### Transaction List Performance
-```css
-/* Use CSS containment for large lists */
-.transaction-row {
-  contain: layout style paint;
-  content-visibility: auto; /* Only render visible rows */
-}
-
-/* Reduce layout thrashing on scroll */
-.transaction-list {
-  will-change: scroll-position;
-  overflow-y: auto;
-  max-height: 600px;
-}
-```
-
-#### Skeleton Loaders (Already Implemented ✅)
-```css
-/* Existing in financial-patterns.css - well done! */
-.skeleton-amount { 
-  /* Smooth loading state for financial data */ 
+/* 1-settings/_variables.css */
+:root {
+  /* Colors */
+  --color-primary: #01a4ef;
+  --color-secondary: #f44e24;
+  --color-success: #81b900;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  --color-surface: #ffffff;
+  --color-background: #f8f9fa;
+  --color-text: #212529;
+  --color-text-muted: #6c757d;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  
+  /* Typography */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 2rem;      /* 32px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
 }
 ```
 
 ---
 
-## Implementation Priority Queue
+## Benefits
 
-| Priority | Task | Impact | Effort | Est. Time |
-|----------|------|--------|--------|-----------|
-| **P0** | Create `chart-theme.js` | High | Low | 30 min |
-| **P0** | Test Bootstrap dark mode conflicts | Medium | Low | 1 hour |
-| **P1** | Set up PurgeCSS build script | High | Medium | 2 hours |
-| **P1** | Extract critical CSS for dashboard | High | Medium | 3 hours |
-| **P2** | Audit & consolidate duplicate tokens | Medium | Medium | 4 hours |
-| **P2** | Add CSS containment to transaction lists | Medium | Low | 1 hour |
-| **P3** | Create component library documentation | Low | High | 8 hours |
+### Scalability
+- Easy to add new components without affecting existing ones
+- Clear layer boundaries prevent specificity conflicts
 
----
+### Maintainability
+- Self-documenting class names reduce cognitive load
+- Sub-agents can follow consistent naming patterns
+- Easy to locate styles (component name = file name)
 
-## Browser Testing Checklist
+### Performance
+- Eliminates redundant CSS
+- Reduces specificity wars
+- Smaller final CSS bundle
 
-- [ ] Chart colors match design tokens in Chrome/Firefox/Safari
-- [ ] Transaction list scroll performance with 1000+ rows
-- [ ] Dark theme consistency across all pages
-- [ ] Print styles work for monthly statements
-- [ ] Mobile responsive behavior (375px - 768px)
-- [ ] High contrast mode (Windows/macOS)
-- [ ] Reduced motion preferences respected
+### Collaboration
+- Clear conventions for multi-agent development
+- Predictable structure for code review
 
 ---
 
-## Next Steps
+## Migration Strategy
 
-1. **Immediate:** Create `chart-theme.js` and test on dashboard page
-2. **This Week:** Set up PurgeCSS and measure file size reduction
-3. **Next Sprint:** Extract critical CSS for production deploy
-4. **Ongoing:** Document component usage in Storybook or similar
+### Phase 1: Foundation (Week 1)
+1. Create ITCSS folder structure
+2. Implement CSS variable system
+3. Extract Bootstrap overrides to settings layer
+
+### Phase 2: Component Migration (Week 2-3)
+1. Identify all current components
+2. Create BEM-named component files
+3. Migrate styles component-by-component
+4. Update HTML templates
+
+### Phase 3: Cleanup (Week 4)
+1. Remove old CSS files
+2. Optimize variable usage
+3. Document component library
+4. Create style guide
+
+---
+
+## Implementation Tasks
+
+- [ ] Create ITCSS folder structure in `app/assets/css/`
+- [ ] Build CSS variable system (`1-settings/_variables.css`)
+- [ ] Audit existing `styles.css` and categorize rules
+- [ ] Create component files with BEM naming
+- [ ] Update HTML templates to use new class names
+- [ ] Create `main.css` import manifest
+- [ ] Document component usage in style guide
 
 ---
 
 ## References
 
-- [Bootstrap 5.3 Dark Mode Docs](https://getbootstrap.com/docs/5.3/customize/color-modes/)
-- [Chart.js Theme Configuration](https://www.chartjs.org/docs/latest/configuration/responsive.html)
-- [PurgeCSS Documentation](https://purgecss.com/)
-- [Critical CSS Extraction](https://github.com/addyosmani/critical)
-- [CSS Containment Spec](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Containment)
-
----
-
-**Status:** Ready for implementation  
-**Review Required:** Architect approval for build script changes  
-**Dependencies:** None (can be implemented incrementally)
+- [ITCSS: Scalable and Maintainable CSS Architecture](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture)
+- [BEM Methodology](http://getbem.com/)
+- [Organizing CSS: OOCSS, SMACSS, and BEM](https://mattstauffer.com/blog/organizing-css-oocss-smacss-and-bem/)
+- [5 Methodologies for Architecting CSS](https://www.valoremreply.com/resources/insights/blog/2020/november/5-methodologies-for-architecting-css/)
