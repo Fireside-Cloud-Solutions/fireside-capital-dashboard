@@ -86,7 +86,7 @@ const CSRF = (function() {
   function addTokenToForm(formId) {
     const form = document.getElementById(formId);
     if (!form) {
-      console.warn(`CSRF: Form with ID "${formId}" not found`);
+      // Silently skip forms that don't exist on this page
       return;
     }
 
