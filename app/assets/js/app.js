@@ -3,6 +3,28 @@
 const DEBUG = false;
 function debugLog(...args) { if (DEBUG) console.log(...args); }
 
+// ===== SKELETON FADE UTILITY (TASK #2 Part 2) =====
+// Smoothly fade out skeleton loaders before removing them from the DOM
+function fadeOutAndRemove(elements, callback) {
+  if (!elements) return Promise.resolve();
+  
+  // Handle single element or NodeList/Array
+  const elementsArray = elements.length !== undefined ? Array.from(elements) : [elements];
+  if (elementsArray.length === 0) return Promise.resolve();
+  
+  // Add fade-out class to all elements
+  elementsArray.forEach(el => el.classList.add('fade-out'));
+  
+  // Wait for transition (150ms), then remove elements and call callback
+  return new Promise(resolve => {
+    setTimeout(() => {
+      elementsArray.forEach(el => el.remove());
+      if (callback) callback();
+      resolve();
+    }, 150); // Match CSS transition duration in components.css
+  });
+}
+
 // BUG-002 DEBUG: Manual bill calculation checker (call from console: window.debugBillsCalculation())
 window.debugBillsCalculation = function() {
   console.log('=== BILLS CALCULATION DEBUG ===');
@@ -880,42 +902,44 @@ async function renderAll() {
   const settingsCard = document.getElementById('settingsCard');
 
   if (goalInput && emptyState && settingsCard) {
-    // Remove skeleton loaders
-    settingsCard.classList.remove('loading');
+    // Remove skeleton loaders with fade transition
     const skeletonInput = settingsCard.querySelector('.skeleton-loader');
-    if (skeletonInput) skeletonInput.remove();
-    goalInput.parentElement.classList.remove('d-none');
-    
-    if (window.settings?.emergency_fund_goal) {
-      // User has a goal set - show form, hide empty state
-      goalInput.value = window.settings.emergency_fund_goal;
-      emptyState.classList.add('d-none');
-      settingsCard.classList.remove('d-none');
-    } else {
-      // New user with no goal - show empty state, hide form
-      emptyState.classList.remove('d-none');
-      settingsCard.classList.add('d-none');
-    }
+    fadeOutAndRemove(skeletonInput, () => {
+      settingsCard.classList.remove('loading');
+      goalInput.parentElement.classList.remove('d-none');
+      
+      if (window.settings?.emergency_fund_goal) {
+        // User has a goal set - show form, hide empty state
+        goalInput.value = window.settings.emergency_fund_goal;
+        emptyState.classList.add('d-none');
+        settingsCard.classList.remove('d-none');
+      } else {
+        // New user with no goal - show empty state, hide form
+        emptyState.classList.remove('d-none');
+        settingsCard.classList.add('d-none');
+      }
+    });
   }
 
   // FC-180: Pre-populate category budget inputs and show the budgets card
   const categoryBudgetsCard = document.getElementById('categoryBudgetsCard');
   if (categoryBudgetsCard) {
-    // Remove skeleton loaders
-    categoryBudgetsCard.classList.remove('loading');
+    // Remove skeleton loaders with fade transition
     const skeletonGrid = document.getElementById('categoryBudgetsGridSkeleton');
-    if (skeletonGrid) skeletonGrid.remove();
-    const realGrid = document.getElementById('categoryBudgetsGrid');
-    if (realGrid) realGrid.classList.remove('d-none');
-    
-    const savedBudgets = window.settings?.category_budgets || {};
-    document.querySelectorAll('.category-budget-input').forEach(input => {
-      const cat = input.dataset.category;
-      if (cat && savedBudgets[cat]) input.value = savedBudgets[cat];
+    fadeOutAndRemove(skeletonGrid, () => {
+      categoryBudgetsCard.classList.remove('loading');
+      const realGrid = document.getElementById('categoryBudgetsGrid');
+      if (realGrid) realGrid.classList.remove('d-none');
+      
+      const savedBudgets = window.settings?.category_budgets || {};
+      document.querySelectorAll('.category-budget-input').forEach(input => {
+        const cat = input.dataset.category;
+        if (cat && savedBudgets[cat]) input.value = savedBudgets[cat];
+      });
+      updateCategoryBudgetTotal();
+      // Show card whenever settings are visible (logged in)
+      if (currentUser) categoryBudgetsCard.classList.remove('d-none');
     });
-    updateCategoryBudgetTotal();
-    // Show card whenever settings are visible (logged in)
-    if (currentUser) categoryBudgetsCard.classList.remove('d-none');
   }
 
   // Populate reports summary cards
@@ -1585,22 +1609,22 @@ function renderBills() {
 
   // Clear skeleton rows and let toggleEmptyState handle showing the static empty state div
   if (activeBills.length === 0) {
-    // Remove skeleton rows
+    // Remove skeleton rows with fade transition
     const skeletonRows = tbody.querySelectorAll('.skeleton-row');
-    skeletonRows.forEach(row => row.remove());
-
-    // Update summary cards to show $0.00
-    const totalBillsEl = document.getElementById('totalBills');
-    const subscriptionsCountEl = document.getElementById('subscriptionsCount');
-    if (totalBillsEl) totalBillsEl.textContent = '$0.00';
-    if (subscriptionsCountEl) subscriptionsCountEl.textContent = '0';
+    fadeOutAndRemove(skeletonRows, () => {
+      // Update summary cards to show $0.00
+      const totalBillsEl = document.getElementById('totalBills');
+      const subscriptionsCountEl = document.getElementById('subscriptionsCount');
+      if (totalBillsEl) totalBillsEl.textContent = '$0.00';
+      if (subscriptionsCountEl) subscriptionsCountEl.textContent = '0';
+    });
 
     return; // Exit early, toggleEmptyState already called above will show static empty state div
   }
 
-  // Remove skeleton rows when we have data
+  // Remove skeleton rows when we have data (with fade transition)
   const skeletonRows = tbody.querySelectorAll('.skeleton-row');
-  skeletonRows.forEach(row => row.remove());
+  fadeOutAndRemove(skeletonRows);
 
   tbody.innerHTML = activeBills.map(b => {
       // Shared-with-me bills: show "Shared by X" badge, read-only actions
