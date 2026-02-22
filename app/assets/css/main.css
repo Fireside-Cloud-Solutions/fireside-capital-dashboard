@@ -667,6 +667,12 @@ strong {
   min-height: 40px;
 }
 
+/* Optimize spacing when no trend data exists */
+.stat-trend:empty {
+  min-height: 0;
+  margin-top: 0;
+}
+
 .trend-indicator {
   display: inline-flex;
   align-items: center;
