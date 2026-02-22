@@ -2,7 +2,7 @@
 
 **Product:** Fireside Capital ? Fireside Personal Assistant
 **Owner:** Matt Hubacher
-**Last Updated:** 2026-02-21 07:57 EST (Sprint Dev 0757: Global modal form spacing fixed - 186 labels updated)
+**Last Updated:** 2026-02-22 04:00 EST (Sprint QA 0400: Database bug verified fixed, 1 new P3 bug found - CSRF console pollution)
 
 ---
 
@@ -24,7 +24,8 @@
 **Status:** Planning
 **Description:** React Native + Expo mobile app for Fireside Capital. Same features as web, native feel.
 
-| BUG-DB-SCHEMA-SNAPSHOTS-001 | Bug | P0 | XS | Ready | **🚨 CRITICAL: Snapshots table missing 5 required columns** - Supabase `snapshots` table missing FIVE columns: totalAssets, totalInvestments, totalDebts, monthlyBills, monthlyIncome. Causing 400 errors on every page load. Daily snapshots NOT being saved (data loss). Reports page shows $0.00 for everything. Snapshots table has ZERO rows. ✅ MIGRATION READY: `migrations/002_complete_snapshots_schema.sql` (Migration 001 was incomplete + never executed). Execute via Supabase SQL Editor. (4 min execution) - Sprint QA 0740, 2026-02-21 - see reports/BUG-DB-SCHEMA-SNAPSHOTS-001-REVISED.md |
+| BUG-DB-SCHEMA-SNAPSHOTS-001 | Bug | P0 | XS | Done | **✅ FIXED: Snapshots table missing 5 required columns** - Supabase `snapshots` table was missing FIVE columns: totalAssets, totalInvestments, totalDebts, monthlyBills, monthlyIncome. Migration 002 executed successfully - snapshots now saving properly, Reports page charts working. Verified Sprint QA 0400 (2026-02-22) - see reports/sprint-qa-0400-session-report.md |
+| BUG-JS-CSRF-CONSOLE-POLLUTION-001 | Bug | P3 | XS | Ready | **CSRF script logs 7-8 warnings on every page** - csrf.js lines 119-133 have hardcoded list of ALL form IDs and tries to attach tokens to all of them on every page. When form doesn't exist (e.g. billForm on assets.html), line 88 logs console.warn. Causes console pollution (7-8 warnings per page). CSRF protection still works correctly. Quick fix: Change line 88 from console.warn to silent return (2 min). Better fix: Refactor to DOM scan with data-csrf-protect attribute (15 min). No functional impact, P3 cosmetic. (2 min quick fix) - Sprint QA 0400, 2026-02-22 - see reports/BUG-JS-CSRF-CONSOLE-POLLUTION-001.md |
 | BUG-UIUX-REPORTS-ARIA-001 | Bug | P2 | XS | Done | **Reports page: All 5 chart canvas elements missing aria-label** - WCAG 2.1 AA violation (Success Criteria 1.1.1, 4.1.2). Screen readers cannot announce chart purpose. Affects: #netWorthTimelineChart, #monthlyCashFlowChart, #spendingCategoriesChart, #savingsRateChart, #investmentGrowthChart. Fix: Add aria-label to each canvas with descriptive text. (10 min) - FIXED commit f3a101f (2026-02-20 Sprint Dev 0737) - Sprint UI/UX 0725, 2026-02-20 - see reports/ui-ux-audit-reports-2026-02-20-0725.md |
 | BUG-UIUX-REPORTS-EXPORT-001 | Bug | P2 | S | Done | **Reports page: Export button non-functional** - FIXED commit 01f6467 (2026-02-20 Sprint QA 0741). Added id="exportReportBtn" and updated event listener to connect to existing exportReportsData() function. CSV export now functional. (30 min) - Sprint UI/UX 0725, 2026-02-20 |
 | BUG-UIUX-REPORTS-SKELETON-001 | Bug | P3 | XS | Done | **Reports page: Summary cards missing skeleton loaders** - FIXED commit 5274e31 (2026-02-20 Sprint QA 0741). Added .loading class + skeleton-loader divs to 3 summary cards with JS to remove after data loads. (15 min) - Sprint UI/UX 0725, 2026-02-20 |
