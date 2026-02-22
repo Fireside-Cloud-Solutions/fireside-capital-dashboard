@@ -1479,6 +1479,23 @@ strong {
 }
 
 /* =================================================================
+   OPERATIONS TOOLBAR - Visual grouping for dashboard controls
+   ================================================================= */
+
+.ops-toolbar {
+  background-color: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  transition: all 150ms ease-in-out;
+}
+
+.ops-toolbar:hover {
+  background-color: var(--color-bg-3);
+  border-color: var(--color-border-default);
+}
+
+/* =================================================================
    BOOTSTRAP VARIABLE OVERRIDES
    ================================================================= */
 
