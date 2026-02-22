@@ -135,6 +135,31 @@
 
       <div id="dataContainer" class="data-hidden">
         
+        <!-- Investment KPI Summary Cards (FC-UIUX-030) -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="summary-card loading" role="status" aria-live="polite">
+              <h6>Total Portfolio Value</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 140px; height: 32px;"></div>
+              <h4 id="investmentTotalValue" class="d-none">$0.00</h4>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="summary-card loading" role="status" aria-live="polite">
+              <h6>Monthly Contributions</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 120px; height: 32px;"></div>
+              <h4 id="investmentMonthlyContribution" class="d-none">$0.00</h4>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-12 col-12">
+            <div class="summary-card loading" role="status" aria-live="polite">
+              <h6>Average Annual Return</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 80px; height: 32px;"></div>
+              <h4 id="investmentAvgReturn" class="d-none">-</h4>
+            </div>
+          </div>
+        </div>
+
         <!-- Empty State -->
         <div id="investmentEmptyState" class="empty-state" style="display:none">
           <i class="bi bi-piggy-bank empty-state-icon"></i>

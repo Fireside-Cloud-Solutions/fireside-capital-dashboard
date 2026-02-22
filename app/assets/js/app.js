@@ -1122,6 +1122,53 @@ function renderInvestments() {
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteInvestment('${escapeAttribute(inv.id)}', '${escapeAttribute(inv.name)}')" aria-label="Delete ${escapeAttribute(inv.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
+
+  // FC-UIUX-030: Investment KPI Summary Cards
+  let totalValue = 0;
+  let totalMonthlyContribution = 0;
+  let weightedReturn = 0;
+  
+  investments.forEach(inv => {
+    const value = parseFloat(inv.value) || 0;
+    const contribution = parseFloat(inv.monthlyContribution) || 0;
+    const returnRate = parseFloat(inv.annualReturn) || 0;
+    
+    totalValue += value;
+    totalMonthlyContribution += contribution;
+    
+    // Weight return by portfolio value
+    if (value > 0 && returnRate > 0) {
+      weightedReturn += returnRate * value;
+    }
+  });
+  
+  // Calculate weighted average return
+  const avgReturn = totalValue > 0 ? (weightedReturn / totalValue) : 0;
+  
+  // Update KPI cards
+  if (document.getElementById('investmentTotalValue')) {
+    const el = document.getElementById('investmentTotalValue');
+    el.textContent = formatCurrency(totalValue);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  
+  if (document.getElementById('investmentMonthlyContribution')) {
+    const el = document.getElementById('investmentMonthlyContribution');
+    el.textContent = formatCurrency(totalMonthlyContribution);
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
+  
+  if (document.getElementById('investmentAvgReturn')) {
+    const el = document.getElementById('investmentAvgReturn');
+    el.textContent = avgReturn > 0 ? avgReturn.toFixed(2) + '%' : '-';
+    el.classList.remove('d-none');
+    const card = el.closest('.summary-card');
+    if (card) card.classList.remove('loading');
+  }
 }
 function openInvestmentModal(id = null) {
   editInvestmentId = id;
