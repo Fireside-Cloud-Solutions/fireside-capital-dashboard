@@ -1,395 +1,581 @@
-# CSS Architecture Research — Fireside Capital Dashboard
-**Date:** February 23, 2026  
-**Researcher:** Capital  
+# CSS Architecture Research — Fireside Capital
+**Research Date:** February 23, 2026  
 **Status:** Complete  
+**Priority:** Medium  
+**Estimated Implementation:** 8-12 hours
+
+---
 
 ## Executive Summary
-Modern CSS architecture has evolved toward a hybrid approach combining **CSS Globals + BEM + Utility Classes**. The CUBE CSS methodology (Composition, Utility, Block, Exception) provides a pragmatic framework for scalable financial dashboards.
 
-## Key Findings
+The Fireside Capital dashboard has a **strong CSS foundation** with design tokens and modular files, but lacks a formal architecture pattern. This research evaluates the current state and recommends adopting **CUBE CSS** (Composition, Utility, Block, Exception) — a modern, maintainable approach ideal for financial dashboards.
 
-### 1. Recommended Architecture: Hybrid BEM + Utilities
+**Current State:**
+- ✅ Design token system (`design-tokens.css`) — excellent
+- ✅ Logical file separation (main.css, components.css, utilities.css)
+- ✅ Bootstrap 5 integration with dark mode
+- ⚠️ 100KB+ `main.css` file — needs splitting
+- ⚠️ No clear naming convention (BEM, CUBE, etc.)
+- ⚠️ Component styles scattered across files
 
-#### Why This Approach?
-- **BEM alone** → Too many class names, bloated CSS for minor variations
-- **Utilities alone** → Unreadable HTML, poor for complex animations
-- **Hybrid** → Best of both: DRY code, fast customization, maintainable
+**Recommended Action:** Refactor to CUBE CSS with isolated component modules.
 
-#### Layer Structure
+---
+
+## Current Architecture Analysis
+
+### File Structure (Current)
 ```
-Global Styles (CSS Custom Properties)
-    ↓
-Composition (Layout Skeletons)
-    ↓
-Utilities (Single-purpose classes)
-    ↓
-Blocks (Component-specific BEM)
-    ↓
-Exceptions (Data attribute variants)
+assets/css/
+├── design-tokens.css      (21KB) — ✅ Excellent design token system
+├── main.css               (100KB) — ⚠️ TOO LARGE, needs splitting
+├── components.css         (41KB) — ⚠️ Should be multiple files
+├── utilities.css          (9KB) — ✅ Good
+├── responsive.css         (30KB) — ✅ Good separation
+├── accessibility.css      (11KB) — ✅ Good separation
+├── onboarding.css         (8KB) — ✅ Page-specific
+├── logged-out-cta.css     (4KB) — ✅ Component-specific
+└── critical.css           (1.6KB) — ✅ Performance optimization
 ```
 
-### 2. CSS Globals — Foundation Layer
+### Strengths
+1. **Design Tokens** — Comprehensive CSS variables for colors, spacing, typography
+2. **Dark Mode** — Proper light/dark theme switching via `data-bs-theme`
+3. **Financial Semantic Colors** — Dedicated tokens for positive/negative/neutral values
+4. **Spacing Grid** — Consistent 8px grid system
+5. **Accessibility** — Separate file for a11y overrides
 
-#### What Goes in Globals
-- **Design tokens:** spacing, typography, colors, shadows
-- **Responsive rules:** cascade through custom properties
-- **Behavioral components:** `.text-component`, `.card-base`
+### Weaknesses
+1. **Monolithic Files** — `main.css` (100KB) and `components.css` (41KB) are too large
+2. **No Component Isolation** — Card styles, button overrides, chart styles all mixed
+3. **Missing Naming Convention** — No BEM, SMACSS, or CUBE structure
+4. **Specificity Issues** — Global selectors mixed with component styles
+5. **Hard to Find Components** — Developer must search across multiple files
 
-#### Implementation for Fireside Capital
+---
+
+## Recommended Architecture: CUBE CSS
+
+### What is CUBE CSS?
+
+CUBE stands for **Composition | Utility | Block | Exception**:
+- **Composition** — Layout primitives (stack, cluster, grid, etc.)
+- **Utility** — Single-purpose classes (`.text-center`, `.mt-4`)
+- **Block** — Reusable components (cards, buttons, charts)
+- **Exception** — Context-specific overrides (`.card[data-variant="highlight"]`)
+
+**Why CUBE for Financial Dashboards?**
+- **Component-based:** Perfect for card-heavy financial UI
+- **Utility-first friendly:** Works with Bootstrap utilities
+- **Maintainable:** Clear separation between layout, styling, and exceptions
+- **Scalable:** Easy to add new financial widgets without breaking existing ones
+
+### Proposed File Structure
+
+```
+assets/css/
+├── 0-tokens/
+│   └── design-tokens.css           (21KB) — No changes needed
+├── 1-global/
+│   ├── reset.css                   (New: ~2KB)
+│   ├── typography.css              (New: ~8KB)
+│   └── accessibility.css           (11KB) — Move here
+├── 2-composition/
+│   ├── layouts.css                 (New: stack, cluster, sidebar patterns)
+│   ├── grid.css                    (New: financial dashboard grid system)
+│   └── spacing.css                 (New: extracted from main.css)
+├── 3-utilities/
+│   ├── utilities.css               (9KB) — Keep as-is
+│   └── responsive.css              (30KB) — Keep as-is
+├── 4-blocks/
+│   ├── buttons.css                 (New: ~6KB)
+│   ├── cards.css                   (New: ~12KB)
+│   ├── charts.css                  (New: ~8KB)
+│   ├── financial-display.css       (New: positive/negative value styles)
+│   ├── forms.css                   (New: ~10KB)
+│   ├── modals.css                  (New: ~4KB)
+│   ├── navigation.css              (New: ~8KB)
+│   └── tables.css                  (New: ~6KB)
+├── 5-exceptions/
+│   ├── onboarding.css              (8KB) — Keep as-is
+│   └── logged-out-cta.css          (4KB) — Keep as-is
+└── critical.css                    (1.6KB) — Keep as-is
+```
+
+**Load Order (in HTML):**
+```html
+<link rel="stylesheet" href="assets/css/0-tokens/design-tokens.css" />
+<link rel="stylesheet" href="assets/css/1-global/reset.css" />
+<link rel="stylesheet" href="assets/css/1-global/typography.css" />
+<link rel="stylesheet" href="assets/css/2-composition/layouts.css" />
+<link rel="stylesheet" href="assets/css/3-utilities/utilities.css" />
+<link rel="stylesheet" href="assets/css/4-blocks/cards.css" />
+<link rel="stylesheet" href="assets/css/4-blocks/buttons.css" />
+<!-- Load other blocks as needed -->
+```
+
+---
+
+## Implementation Plan
+
+### Phase 1: Extract Blocks (4-6 hours)
+Split `main.css` and `components.css` into discrete component files:
+
+**Priority Components to Extract:**
+1. **Cards** (`cards.css`) — Most common UI element
+2. **Buttons** (`buttons.css`) — High-impact, frequently styled
+3. **Charts** (`charts.css`) — Chart.js wrapper styles
+4. **Forms** (`forms.css`) — Input fields, validation states
+5. **Financial Display** (`financial-display.css`) — Positive/negative value styles
+
+**Code Example: `cards.css`**
 ```css
-/* app/assets/css/globals/_tokens.css */
-:root {
-  /* Spacing Scale */
-  --space-unit: 1em;
-  --space-xs: calc(0.5 * var(--space-unit));
-  --space-sm: calc(0.75 * var(--space-unit));
-  --space-md: calc(1.25 * var(--space-unit));
-  --space-lg: calc(2 * var(--space-unit));
-  --space-xl: calc(3.25 * var(--space-unit));
+/* =================================================================
+   BLOCK: Cards
+   Financial dashboard card component with variants
+   ================================================================= */
 
-  /* Typography Scale */
-  --text-base-size: 1em;
-  --text-scale-ratio: 1.2;
-  --text-xs: calc(var(--text-base-size) / var(--text-scale-ratio) / var(--text-scale-ratio));
-  --text-sm: calc(var(--text-xs) * var(--text-scale-ratio));
-  --text-md: calc(var(--text-sm) * var(--text-scale-ratio) * var(--text-scale-ratio));
-  --text-lg: calc(var(--text-md) * var(--text-scale-ratio));
-  --text-xl: calc(var(--text-lg) * var(--text-scale-ratio));
-  --text-xxl: calc(var(--text-xl) * var(--text-scale-ratio));
-
-  /* Financial Dashboard Colors */
-  --color-primary: #01a4ef;
-  --color-secondary: #f44e24;
-  --color-success: #81b900;
-  --color-danger: #dc3545;
-  --color-warning: #ffc107;
-  
-  /* Contrast levels for text hierarchy */
-  --color-contrast-higher: #1a1a1a;
-  --color-contrast-high: #333;
-  --color-contrast-medium: #666;
-  --color-contrast-low: #999;
-  
-  /* Surface colors */
-  --color-bg: #ffffff;
-  --color-bg-light: #f8f9fa;
-  --color-bg-dark: #2c3e50;
+.card {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-shadow);
 }
 
-/* Responsive scaling at 64rem (1024px) */
-@media (min-width: 64rem) {
-  :root {
-    --space-unit: 1.25em;
-    --text-base-size: 1.125em;
-    --text-scale-ratio: 1.25;
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Exception: Highlight card (e.g., Net Worth summary) */
+.card[data-variant="highlight"] {
+  background: linear-gradient(135deg, var(--color-bg-2) 0%, var(--color-bg-3) 100%);
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Exception: Warning card (e.g., bill overdue) */
+.card[data-variant="warning"] {
+  border-left: 4px solid var(--color-warning);
+}
+
+/* Exception: Empty state card */
+.card[data-state="empty"] {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--color-text-tertiary);
+}
+
+.card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.card__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-h4);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.card__body {
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.card__footer {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-subtle);
+}
+```
+
+### Phase 2: Create Composition Patterns (2-3 hours)
+
+**Code Example: `layouts.css`**
+```css
+/* =================================================================
+   COMPOSITION: Layout Primitives
+   Based on Every Layout patterns — https://every-layout.dev
+   ================================================================= */
+
+/* Stack: Vertical spacing between children */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.stack--sm { gap: var(--space-sm); }
+.stack--lg { gap: var(--space-lg); }
+.stack--xl { gap: var(--space-xl); }
+
+/* Cluster: Horizontal grouping with wrapping */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.cluster--space-between {
+  justify-content: space-between;
+}
+
+/* Sidebar: Asymmetric two-column layout */
+.sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.sidebar > :first-child {
+  flex-basis: 20rem; /* Sidebar width */
+  flex-grow: 1;
+}
+
+.sidebar > :last-child {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: 50%; /* Content takes priority */
+}
+
+/* Grid: Responsive auto-fit grid */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: var(--space-lg);
+}
+
+/* Financial Dashboard Grid: 3-column for KPIs */
+.financial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .financial-grid {
+    grid-template-columns: 1fr;
   }
 }
-
-/* Dark theme tokens */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #1a1a1a;
-    --color-bg-light: #2c2c2c;
-    --color-contrast-higher: #f8f9fa;
-    --color-contrast-high: #e0e0e0;
-    --color-contrast-medium: #b3b3b3;
-  }
-}
 ```
 
-### 3. Utility Classes — Speed Layer
+### Phase 3: Create Financial Display Utilities (1-2 hours)
 
-#### Core Utilities Needed
+**Code Example: `financial-display.css`**
 ```css
-/* app/assets/css/globals/_utilities.css */
+/* =================================================================
+   BLOCK: Financial Value Display
+   Semantic styling for positive/negative/neutral financial values
+   ================================================================= */
 
-/* Spacing */
-.padding-xs { padding: var(--space-xs); }
-.padding-sm { padding: var(--space-sm); }
-.padding-md { padding: var(--space-md); }
-.padding-lg { padding: var(--space-lg); }
-.padding-xl { padding: var(--space-xl); }
-
-.margin-top-md { margin-top: var(--space-md); }
-.margin-bottom-lg { margin-bottom: var(--space-lg); }
-
-/* Typography */
-.text-xs { font-size: var(--text-xs); }
-.text-sm { font-size: var(--text-sm); }
-.text-md { font-size: var(--text-md); }
-.text-lg { font-size: var(--text-lg); }
-.text-xl { font-size: var(--text-xl); }
-.text-xxl { font-size: var(--text-xxl); }
-
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.font-bold { font-weight: 700; }
-.font-normal { font-weight: 400; }
-
-/* Colors */
-.color-primary { color: var(--color-primary); }
-.color-success { color: var(--color-success); }
-.color-danger { color: var(--color-danger); }
-.color-contrast-medium { color: var(--color-contrast-medium); }
-
-.bg-primary { background-color: var(--color-primary); }
-.bg-light { background-color: var(--color-bg-light); }
-
-/* Layout */
-.flex { display: flex; }
-.flex-column { flex-direction: column; }
-.justify-between { justify-content: space-between; }
-.align-center { align-items: center; }
-.gap-sm { gap: var(--space-sm); }
-.gap-md { gap: var(--space-md); }
-
-/* Display */
-.block { display: block; }
-.hidden { display: none; }
-.width-100 { width: 100%; }
-
-/* Financial-specific */
-.currency {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
+.financial-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-body-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-snug);
 }
 
-.amount-positive { color: var(--color-success); }
-.amount-negative { color: var(--color-danger); }
+/* Positive: Gains, income, equity increases */
+.financial-value--positive {
+  color: var(--color-financial-positive-text);
+}
+
+.financial-value--positive::before {
+  content: '+';
+  opacity: 0.7;
+}
+
+/* Negative: Losses, expenses, debt increases */
+.financial-value--negative {
+  color: var(--color-financial-negative-text);
+}
+
+.financial-value--negative::before {
+  content: '−'; /* Proper minus sign, not hyphen */
+}
+
+/* Neutral: Static values, balances */
+.financial-value--neutral {
+  color: var(--color-text-primary);
+}
+
+/* Large display (e.g., Net Worth) */
+.financial-value--display {
+  font-size: var(--text-display);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+/* Delta indicator (e.g., "+$1,234 this month") */
+.financial-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-small);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-weight: var(--weight-medium);
+}
+
+.financial-delta--positive {
+  background: var(--color-financial-positive-bg);
+  color: var(--color-financial-positive-text);
+}
+
+.financial-delta--negative {
+  background: var(--color-financial-negative-bg);
+  color: var(--color-financial-negative-text);
+}
+
+.financial-delta__icon {
+  width: 12px;
+  height: 12px;
+}
 ```
 
-### 4. BEM Components — Behavior Layer
+### Phase 4: Documentation & Style Guide (1 hour)
 
-#### When to Use BEM
-- Complex hover/focus effects
-- Animations and transitions
-- Positioning relationships between elements
-- Component-specific behavioral CSS
+Create `docs/css-style-guide.md` with:
+- Component naming conventions
+- When to use composition vs. utilities
+- How to create new blocks
+- Exception pattern guidelines
 
-#### Example: Debt Card Component
-```html
-<!-- app/debts.html -->
-<article class="debt-card radius-md padding-md bg-light">
-  <div class="debt-card__header flex justify-between align-center margin-bottom-sm">
-    <h3 class="debt-card__title text-lg font-bold">Student Loan</h3>
-    <span class="debt-card__badge" data-variant="active">Active</span>
-  </div>
-  
-  <div class="debt-card__metrics">
-    <div class="metric">
-      <span class="metric__label text-sm color-contrast-medium">Balance</span>
-      <span class="metric__value text-xl currency amount-negative">$24,350.00</span>
-    </div>
-    <div class="metric">
-      <span class="metric__label text-sm color-contrast-medium">Rate</span>
-      <span class="metric__value text-lg">5.25%</span>
-    </div>
-  </div>
-  
-  <div class="debt-card__progress-wrapper margin-top-md">
-    <div class="debt-card__progress" data-progress="35"></div>
-  </div>
-</article>
+---
+
+## Performance Impact
+
+### Before Refactor
+```
+main.css:         100KB
+components.css:    41KB
+utilities.css:      9KB
+responsive.css:    30KB
+Total CSS:        180KB (uncompressed)
 ```
 
+### After Refactor (With Code Splitting)
+```
+Critical path (dashboard):
+- design-tokens.css:  21KB
+- reset.css:           2KB
+- layouts.css:         4KB
+- utilities.css:       9KB
+- cards.css:          12KB
+- buttons.css:         6KB
+- charts.css:          8KB
+Total critical:       62KB (65% reduction)
+
+Lazy-loaded (per-page):
+- onboarding.css: 8KB (only on first visit)
+- forms.css: 10KB (only on settings/add pages)
+```
+
+**Performance Wins:**
+- ✅ 65% reduction in critical CSS
+- ✅ Faster first contentful paint
+- ✅ Better browser caching (components change less than page styles)
+- ✅ Easier to tree-shake unused CSS with PurgeCSS later
+
+---
+
+## Migration Strategy
+
+### Option A: Big Bang (1-2 days, high risk)
+Refactor all CSS at once. **NOT RECOMMENDED** for production site.
+
+### Option B: Incremental (Recommended)
+1. **Week 1:** Extract `cards.css` and `buttons.css` → Test on dashboard
+2. **Week 2:** Extract `charts.css` and `forms.css` → Test on all pages
+3. **Week 3:** Create composition patterns → Refactor dashboard layout
+4. **Week 4:** Extract remaining components → Deprecate old files
+
+**Testing Protocol:**
+- Visual regression testing with Percy or BackstopJS
+- Manual QA on all 8 pages (dashboard, assets, bills, budget, debts, income, investments, settings)
+- Dark mode + light mode verification
+- Mobile + desktop responsive checks
+
+---
+
+## Implementation Tasks (Ready for Azure DevOps)
+
+### Task 1: Extract Card Component (2 hours)
+**Description:** Create `assets/css/4-blocks/cards.css` and extract all card styles from `main.css` and `components.css`.
+
+**Acceptance Criteria:**
+- [ ] All `.card` styles moved to `cards.css`
+- [ ] Card variants documented (highlight, warning, empty)
+- [ ] No visual regressions on dashboard
+- [ ] File size of `main.css` reduced by ~12KB
+
+**Code to implement:** (See Phase 1 example above)
+
+---
+
+### Task 2: Extract Button Component (1.5 hours)
+**Description:** Create `assets/css/4-blocks/buttons.css` and extract all button styles.
+
+**Acceptance Criteria:**
+- [ ] All `.btn` overrides moved to `buttons.css`
+- [ ] Tri-color hierarchy maintained (orange primary, blue secondary, gray tertiary)
+- [ ] Hover states and transitions preserved
+- [ ] File size of `main.css` reduced by ~6KB
+
+**Code Example:**
 ```css
-/* app/assets/css/components/_debt-card.css */
-.debt-card {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
+/* =================================================================
+   BLOCK: Buttons
+   Tri-color button hierarchy: Orange > Blue > Gray
+   ================================================================= */
 
-.debt-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.debt-card__badge {
-  padding: 0.25em 0.75em;
-  border-radius: 999px;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  background-color: var(--color-contrast-low);
-  color: white;
-}
-
-.debt-card__badge[data-variant="active"] {
-  background-color: var(--color-success);
-}
-
-.debt-card__badge[data-variant="paid"] {
-  background-color: var(--color-primary);
-}
-
-.debt-card__progress-wrapper {
-  height: 8px;
-  background-color: var(--color-bg-light);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.debt-card__progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-success) 0%, var(--color-primary) 100%);
-  border-radius: 999px;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 0%;
-}
-
-.debt-card__progress[data-progress="35"] {
-  width: 35%;
-}
-```
-
-### 5. Exception Pattern — Data Attributes Over Modifiers
-
-#### Why Data Attributes?
-- **Easier JS integration:** `element.dataset.variant = 'active'`
-- **Accessible:** Don't interfere with ARIA attributes
-- **Cleaner HTML:** `data-variant="ghost"` vs `button--ghost button--large button--disabled`
-
-#### Example: Button Variants
-```html
-<button class="btn" data-variant="solid">Pay Now</button>
-<button class="btn" data-variant="ghost">Details</button>
-<button class="btn" data-variant="disabled">Paid</button>
-```
-
-```css
 .btn {
-  padding: var(--space-sm) var(--space-md);
-  border: 2px solid transparent;
-  border-radius: 4px;
-  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-body);
+  border: none;
   cursor: pointer;
-  transition: all 0.2s;
-  background-color: var(--color-primary);
-  color: white;
+  transition: all var(--duration-normal) var(--ease-default);
+  min-height: 44px; /* WCAG touch target */
 }
 
-.btn[data-variant="ghost"] {
-  background-color: transparent;
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-button-text);
 }
 
-.btn[data-variant="disabled"] {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-glow-orange);
 }
-```
 
-## Recommendations for Fireside Capital
+.btn-secondary {
+  background: var(--color-secondary);
+  color: var(--color-button-text);
+}
 
-### Phase 1: Establish Globals (Week 1)
-**Priority:** HIGH  
-**Effort:** 4 hours  
+.btn-secondary:hover {
+  background: var(--color-secondary-hover);
+  box-shadow: var(--shadow-glow-blue);
+}
 
-1. Create `app/assets/css/globals/` directory
-2. Build design token files:
-   - `_tokens.css` → spacing, typography, colors
-   - `_utilities.css` → utility classes
-   - `_reset.css` → CSS reset
-   - `_text-component.css` → text wrapper behavioral class
-3. Import globals in `style.css`
+.btn-outline-danger {
+  background: transparent;
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
+}
 
-### Phase 2: Refactor Existing Components (Week 1-2)
-**Priority:** MEDIUM  
-**Effort:** 8 hours  
-
-Refactor these pages using hybrid approach:
-- ✅ **dashboard.html** → Cards showing account summaries
-- ✅ **debts.html** → Debt cards with progress bars
-- ✅ **bills.html** → Bill cards with due date badges
-- ✅ **investments.html** → Portfolio cards with charts
-
-### Phase 3: Component Library (Week 2)
-**Priority:** MEDIUM  
-**Effort:** 6 hours  
-
-Document reusable patterns:
-- Card variants (metric-card, account-card, bill-card)
-- Button variants (solid, ghost, danger, success)
-- Badge variants (status, priority, category)
-- Form components (input, select, checkbox with utility classes)
-
-### Phase 4: Dark Mode (Week 3)
-**Priority:** LOW  
-**Effort:** 3 hours  
-
-Leverage CSS custom properties for automatic dark mode:
-```css
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #1a1a1a;
-    --color-bg-light: #2c2c2c;
-    /* ... other dark tokens */
-  }
+.btn-outline-danger:hover {
+  background: var(--color-danger);
+  color: var(--color-text-on-brand);
 }
 ```
 
-## File Structure Recommendation
-```
-app/assets/css/
-├── globals/
-│   ├── _tokens.css          # Design tokens
-│   ├── _reset.css           # CSS reset
-│   ├── _utilities.css       # Utility classes
-│   ├── _text-component.css  # Text wrapper
-│   └── _grid.css            # Grid layout utilities
-├── components/
-│   ├── _debt-card.css
-│   ├── _bill-card.css
-│   ├── _account-card.css
-│   ├── _metric-card.css
-│   ├── _btn.css
-│   └── _badge.css
-├── pages/
-│   ├── _dashboard.css       # Page-specific styles
-│   ├── _debts.css
-│   └── _bills.css
-└── style.css                # Main import file
-```
+---
 
-## Anti-Patterns to Avoid
+### Task 3: Create Financial Display Component (1.5 hours)
+**Description:** Create `assets/css/4-blocks/financial-display.css` for positive/negative/neutral value styling.
 
-### ❌ DON'T: Create BEM classes for everything
-```html
-<!-- Too many meaningless names -->
-<div class="card__content-wrapper">
-  <p class="card__text card__text--small card__text--secondary"></p>
-</div>
-```
+**Acceptance Criteria:**
+- [ ] Replace inline `style="color: green"` with `.financial-value--positive`
+- [ ] All financial values use semantic classes
+- [ ] Delta indicators styled consistently
+- [ ] Works in both dark and light mode
 
-### ✅ DO: Use utilities for simple properties
-```html
-<!-- Clear, self-documenting -->
-<div class="padding-md">
-  <p class="text-sm color-contrast-medium"></p>
-</div>
-```
+**Code to implement:** (See Phase 3 example above)
 
-### ❌ DON'T: Use utilities for complex effects
-```html
-<!-- Unreadable utility soup -->
-<div class="position-relative overflow-hidden transition-all duration-300 hover:translate-y-2 hover:shadow-lg"></div>
-```
+---
 
-### ✅ DO: Use BEM for behavioral CSS
-```html
-<div class="debt-card"></div> <!-- .debt-card handles hover/transitions in CSS -->
+### Task 4: Create Composition Layouts (2 hours)
+**Description:** Create `assets/css/2-composition/layouts.css` with layout primitives.
+
+**Acceptance Criteria:**
+- [ ] `.stack`, `.cluster`, `.sidebar`, `.auto-grid` patterns implemented
+- [ ] Dashboard refactored to use composition classes
+- [ ] Responsive breakpoints tested
+- [ ] Documentation added to style guide
+
+**Code to implement:** (See Phase 2 example above)
+
+---
+
+### Task 5: Create CSS Style Guide (1 hour)
+**Description:** Document the CUBE CSS architecture in `docs/css-style-guide.md`.
+
+**Contents:**
+- CUBE CSS principles
+- File organization rules
+- Naming conventions
+- When to create new blocks vs. exceptions
+- Code examples for each layer
+
+---
+
+## Future Enhancements
+
+### Critical CSS Extraction (Future)
+Use `critical` npm package to inline above-the-fold CSS:
+```bash
+npm install critical --save-dev
 ```
 
-## Next Steps
-1. **Task:** Create globals directory structure
-2. **Task:** Build design token CSS file with Fireside brand colors
-3. **Task:** Create utility classes file
-4. **Task:** Refactor debt-card component as proof of concept
-5. **Task:** Document component patterns in Storybook or style guide
+```javascript
+// build-critical.js
+const critical = require('critical');
+
+critical.generate({
+  inline: true,
+  base: 'app/',
+  src: 'index.html',
+  target: 'index.html',
+  width: 1300,
+  height: 900
+});
+```
+
+### CSS Minification & Purging (Future)
+```bash
+npm install purgecss cssnano --save-dev
+```
+
+`postcss.config.js`:
+```javascript
+module.exports = {
+  plugins: [
+    require('@fullhuman/postcss-purgecss')({
+      content: ['./app/**/*.html', './app/**/*.js'],
+      safelist: ['data-bs-theme', 'data-variant']
+    }),
+    require('cssnano')({ preset: 'default' })
+  ]
+};
+```
+
+---
 
 ## References
-- [CUBE CSS Methodology](https://cube.fyi/)
-- [BEM + Utilities (CSS-Tricks)](https://css-tricks.com/building-a-scalable-css-architecture-with-bem-and-utility-classes/)
-- [CodyFrame Architecture](https://codyhouse.co/ds/docs/framework)
+
+- **CUBE CSS Methodology:** https://cube.fyi
+- **Every Layout (Composition Patterns):** https://every-layout.dev
+- **Bootstrap 5 Dark Mode:** https://getbootstrap.com/docs/5.3/customize/color-modes/
+- **CSS Custom Properties Best Practices:** https://web.dev/css-custom-properties/
+
+---
+
+## Recommendation
+
+**Adopt CUBE CSS incrementally over 4 weeks.** Start with extracting `cards.css` and `buttons.css` this sprint. The modular architecture will:
+1. Improve developer velocity (easier to find and edit components)
+2. Reduce CSS bundle size by 65%
+3. Enable better code reuse across pages
+4. Simplify future UI additions
+
+**Estimated ROI:** 8 hours upfront investment → 2-3 hours saved per future feature.
+
+**Status:** Ready for backlog — recommend Medium priority after live site bug fixes.

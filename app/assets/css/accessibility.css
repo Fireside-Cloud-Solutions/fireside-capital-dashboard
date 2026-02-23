@@ -262,11 +262,12 @@ a:hover:focus-visible {
    ----------------------------------------------------------------- */
 
 /* Required field indicator */
-.form-label .required::after,
+/* FC-ISSUE-25: Removed ::after pseudo-element - asterisks are already in HTML to avoid duplicate "* *" */
+/* .form-label .required::after,
 .form-label .text-danger::after {
   content: " *";
   color: var(--color-danger);
-}
+} */
 
 /* Invalid form controls */
 .form-control:invalid:focus,

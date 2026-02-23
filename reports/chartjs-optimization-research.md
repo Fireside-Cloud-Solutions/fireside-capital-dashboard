@@ -1,860 +1,613 @@
-# Chart.js Integration & Optimization Research
-**Research Date:** February 15, 2026  
+# Chart.js Optimization Research — Fireside Capital
+**Research Date:** February 23, 2026  
 **Status:** Complete  
-**Priority:** Medium  
+**Priority:** Low (Current implementation is solid)  
+**Estimated Additional Optimization:** 2-4 hours
 
 ---
 
 ## Executive Summary
 
-Fireside Capital has a **mature Chart.js implementation** with performance optimizations, dark theme integration, and financial formatting. This research identifies **advanced optimization techniques** and **best practices** from industry-leading dashboards to push performance from "good" to "exceptional."
+The Fireside Capital dashboard has **strong Chart.js implementation** with performance optimizations already in place. This research identifies additional optimization opportunities and best practices for financial data visualization.
 
-### Current State Assessment ✅
-- **8 chart types** implemented (net worth timeline, cash flow, spending categories, etc.)
-- **Performance optimizations** applied (animations disabled, Path2D caching, decimation for 100+ points)
-- **Time range filtering** (1M, 3M, 6M, 1Y, All) with localStorage persistence
-- **Dark theme integration** via `chart-theme.js` with CSS custom properties
-- **Financial formatting** (currency tooltips, Y-axis labels)
-- **Projection lines** for net worth forecasting
-- **Responsive design** with legend position based on viewport
+**Current State:**
+- ✅ Global performance defaults (animations disabled, Path2D caching)
+- ✅ Theme synchronization with CSS design tokens
+- ✅ Responsive legend positioning
+- ✅ Time range filtering with localStorage persistence
+- ✅ Data decimation for 100+ data points
+- ⚠️ Missing: Web Worker offloading for large datasets
+- ⚠️ Missing: Chart lazy loading (loads on all pages)
+- ⚠️ Missing: Advanced caching strategies
 
-### Gaps Identified
-1. **No lazy loading** — Chart.js (270KB) loads on every page
-2. **No incremental data updates** — Full chart re-render on data change
-3. **Limited chart types** — Missing waterfall, gauge, sankey diagrams
-4. **No export functionality** — Can't save charts as PNG/PDF
-5. **No real-time updates** — Supabase Realtime not integrated
-6. **Limited accessibility** — Missing ARIA labels, keyboard navigation
-7. **No worker offloading** — Data processing blocks main thread
+**Recommendation:** Implement lazy loading and Web Worker offloading for projection calculations.
 
 ---
 
-## 1. Performance Benchmark Analysis
+## Current Implementation Analysis
 
-### Current Performance (Based on Code Review)
-
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| Initial Load Time (Chart.js) | ~270KB (~80KB gzipped) | < 50KB (lazy load) | ❌ Needs optimization |
-| Chart Render Time (< 100 points) | ~50-100ms | < 50ms | ✅ Good |
-| Chart Render Time (100+ points) | ~200-300ms (decimation on) | < 100ms | ⚠️ Can improve |
-| Time Range Switch | ~100ms (animation off) | < 50ms | ✅ Good |
-| Memory Usage (8 charts) | ~15-20MB | < 10MB | ⚠️ Can improve |
-
-### Industry Benchmarks (Mint, Personal Capital, YNAB)
-
-| Platform | Chart Library | Load Strategy | Render Time | Notes |
-|----------|---------------|---------------|-------------|-------|
-| **Mint** | D3.js | Lazy-loaded | ~30-50ms | Custom build, only needed modules |
-| **Personal Capital** | Highcharts | Bundled with async chunks | ~40-60ms | Code-split by route |
-| **YNAB** | React + D3 | Component-level lazy | ~20-40ms | Virtualized scrolling for data |
-| **Plaid** | Chart.js | CDN + defer | ~60-80ms | Similar to Fireside Capital |
-
-**Key Takeaway:** Fireside Capital's performance is **competitive** but can improve with lazy loading and incremental updates.
-
----
-
-## 2. Advanced Optimization Techniques
-
-### 2.1 Lazy Loading Strategy (Save 270KB on Non-Dashboard Pages)
-
-**Current Problem:**  
-`index.html` loads Chart.js on every page, even if no charts exist (bills, income, debts pages).
-
-**Solution: Route-Based Lazy Loading**
-
-```javascript
-// assets/js/lazy-loader.js (NEW)
-
-const CHART_PAGES = ['index.html', 'investments.html', 'reports.html'];
-
-function needsCharts() {
-  const currentPage = window.location.pathname.split('/').pop();
-  return CHART_PAGES.includes(currentPage);
-}
-
-async function loadChartJS() {
-  if (window.Chart) return; // Already loaded
-  
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      console.log('✅ Chart.js lazy-loaded');
-      // Load theme after Chart.js
-      const themeScript = document.createElement('script');
-      themeScript.src = 'assets/js/chart-theme.js';
-      themeScript.onload = resolve;
-      themeScript.onerror = reject;
-      document.head.appendChild(themeScript);
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-// Auto-load if needed
-if (needsCharts()) {
-  loadChartJS().then(() => {
-    // Chart.js ready, initialize charts
-    const event = new CustomEvent('chartjs:ready');
-    window.dispatchEvent(event);
-  });
-}
-
-// Export for manual loading
-window.loadChartJS = loadChartJS;
+### File Structure
+```
+assets/js/
+├── chart-theme.js       (6.6KB)  — Theme config, global defaults
+├── chart-factory.js     (18.7KB) — Chart creation utilities
+├── charts.js            (34KB)   — Dashboard chart implementations
 ```
 
-**Update HTML:**
-```html
-<!-- Remove from <head>: -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+### Strengths
 
-<!-- Add to <body> end: -->
-<script src="assets/js/lazy-loader.js"></script>
-<script>
-  // charts.js now waits for Chart.js to load
-  window.addEventListener('chartjs:ready', () => {
-    renderNetWorthChart();
-    renderCashFlowChart();
-    // ...
-  });
-</script>
+#### 1. Performance Defaults ✅
+```javascript
+// From charts.js:151-154
+Chart.defaults.animation = false;       // Enables Path2D caching
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.datasets.line.tension = 0; // Straight lines (faster)
 ```
 
-**Expected Improvement:**
-- **Bills page:** 270KB → 0KB (100% reduction)
-- **Debts page:** 270KB → 0KB (100% reduction)
-- **Income page:** 270KB → 0KB (100% reduction)
-- **Dashboard:** 270KB (no change, but async loaded)
+**Impact:** ~67% faster rendering (confirmed by FC-093 comments)
 
----
-
-### 2.2 Incremental Data Updates (Avoid Full Re-Render)
-
-**Current Problem:**  
-`updateChartData()` replaces entire dataset → full re-layout.
-
-**Solution: Append New Data Points**
-
+#### 2. Theme Synchronization ✅
 ```javascript
-// charts.js - Incremental update helper
-
-function appendDataPoint(chart, newLabel, newValue) {
-  if (!chart) return;
-  
-  const maxPoints = 100; // Keep last 100 points
-  
-  // Add new data
-  chart.data.labels.push(newLabel);
-  chart.data.datasets[0].data.push(newValue);
-  
-  // Remove old data if exceeds maxPoints
-  if (chart.data.labels.length > maxPoints) {
-    chart.data.labels.shift();
-    chart.data.datasets[0].data.shift();
-  }
-  
-  // Update with minimal animation
-  chart.update('none');
+// From chart-theme.js:24-28
+function getToken(property) {
+  return rootStyles.getPropertyValue(property).trim();
 }
 
-// Usage: Real-time Supabase updates
-supabaseClient
-  .channel('snapshots')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'snapshots'
-  }, (payload) => {
-    const newSnapshot = payload.new;
-    appendDataPoint(
-      chartInstances.netWorth,
-      newSnapshot.date,
-      newSnapshot.net_worth
-    );
-  })
-  .subscribe();
+Chart.defaults.color = getToken('--color-text-secondary');
 ```
 
-**Expected Improvement:**
-- **Update time:** 100ms → 10ms (90% faster)
-- **No layout thrashing** (only adds 1 point, doesn't re-layout entire chart)
+**Impact:** Charts automatically adapt to dark/light mode without manual reconfiguration.
 
----
-
-### 2.3 Web Worker Data Processing
-
-**Current Problem:**  
-Large datasets (365+ days) block main thread during processing.
-
-**Solution: Offload to Web Worker**
-
+#### 3. Data Decimation ✅
 ```javascript
-// assets/js/workers/chart-data-worker.js (NEW)
+// From charts.js:159-161
+function shouldEnableDecimation(dataLength) {
+  return dataLength > 100;
+}
+```
 
-self.addEventListener('message', (e) => {
-  const { action, data } = e.data;
-  
-  switch (action) {
-    case 'processSnapshots':
-      const processed = processSnapshots(data.snapshots, data.range);
-      self.postMessage({ action: 'processSnapshots', result: processed });
-      break;
-      
-    case 'calculateProjection':
-      const projection = calculateProjection(data.values, data.months);
-      self.postMessage({ action: 'calculateProjection', result: projection });
-      break;
-      
-    case 'aggregateCategories':
-      const aggregated = aggregateCategories(data.transactions);
-      self.postMessage({ action: 'aggregateCategories', result: aggregated });
-      break;
-  }
-});
+**Impact:** Reduces rendering load for historical data (1+ year of daily snapshots).
 
-function processSnapshots(snapshots, range) {
-  // Heavy data processing here (doesn't block UI)
-  const filtered = snapshots.filter(/* ... */);
-  const deduplicated = dedupeSnapshotsByDate(filtered);
+#### 4. Time Range Filtering ✅
+```javascript
+// From charts.js:37-47
+function filterDataByTimeRange(data, labels, range) {
+  const months = TIME_RANGES[range].months;
+  const cutoffIndex = Math.max(0, data.length - months);
   return {
-    labels: deduplicated.map(s => s.date),
-    data: deduplicated.map(s => s.net_worth)
+    data: data.slice(cutoffIndex),
+    labels: labels.slice(cutoffIndex)
   };
 }
+```
 
-function calculateProjection(values, months) {
-  // Linear regression for projection
-  const avgGrowth = (values[values.length - 1] - values[0]) / values.length;
-  const lastValue = values[values.length - 1];
+**Impact:** Instant time range changes with `update('none')` mode.
+
+### Weaknesses
+
+#### 1. Missing Lazy Loading ⚠️
+**Problem:** Chart.js (270KB) loads on ALL pages, even settings/assets pages with no charts.
+
+**Solution:** Implement dynamic import:
+```javascript
+// In lazy-loader.js
+async function loadChartsIfNeeded() {
+  const chartElements = document.querySelectorAll('canvas[id*="chart"]');
+  if (chartElements.length === 0) return;
   
-  const projection = [];
-  for (let i = 1; i <= months; i++) {
-    projection.push(lastValue + (avgGrowth * i));
+  if (!window.Chart) {
+    await import('https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js');
+    await import('./chart-theme.js');
   }
-  return projection;
+  
+  // Then initialize charts
+  await import('./charts.js');
 }
 
-function aggregateCategories(transactions) {
-  const categories = {};
-  transactions.forEach(tx => {
-    if (!categories[tx.category]) {
-      categories[tx.category] = 0;
-    }
-    categories[tx.category] += Math.abs(tx.amount);
-  });
-  return Object.entries(categories)
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value);
+// Call on dashboard page only
+if (window.location.pathname.includes('index.html') || 
+    window.location.pathname === '/') {
+  loadChartsIfNeeded();
 }
 ```
 
-**Main Thread Usage:**
+**Impact:** ~270KB saved on 5 out of 8 pages (assets, bills, budget, debts, income).
 
+#### 2. Missing Web Worker Offloading ⚠️
+**Problem:** Projection calculations run on main thread (blocks UI during calculation).
+
+**Solution:** Offload heavy calculations to Web Worker:
 ```javascript
-// charts.js - Use worker for heavy processing
-
-const chartWorker = new Worker('assets/js/workers/chart-data-worker.js');
-
-chartWorker.addEventListener('message', (e) => {
-  const { action, result } = e.data;
+// workers/chart-projections.worker.js
+self.addEventListener('message', function(e) {
+  const { type, data } = e.data;
   
-  if (action === 'processSnapshots') {
-    // Worker finished processing, render chart
-    renderNetWorthChart(result.labels, result.data);
+  if (type === 'calculateProjection') {
+    const { values, months } = data;
+    
+    // Calculate linear regression
+    const xMean = values.reduce((sum, v, i) => sum + i, 0) / values.length;
+    const yMean = values.reduce((sum, v) => sum + v, 0) / values.length;
+    
+    let numerator = 0;
+    let denominator = 0;
+    
+    for (let i = 0; i < values.length; i++) {
+      numerator += (i - xMean) * (values[i] - yMean);
+      denominator += Math.pow(i - xMean, 2);
+    }
+    
+    const slope = numerator / denominator;
+    const intercept = yMean - slope * xMean;
+    
+    // Generate projection data
+    const projectionData = [];
+    const startIndex = values.length;
+    
+    for (let i = 0; i < months; i++) {
+      projectionData.push({
+        x: startIndex + i,
+        y: slope * (startIndex + i) + intercept
+      });
+    }
+    
+    self.postMessage({ type: 'projectionComplete', data: projectionData });
   }
 });
-
-// Trigger worker processing
-chartWorker.postMessage({
-  action: 'processSnapshots',
-  data: { snapshots: window.snapshots, range: '1Y' }
-});
-```
-
-**Expected Improvement:**
-- **Main thread blocked:** 200ms → 5ms (95% reduction)
-- **Scrolling/interactions:** No jank during chart updates
-
----
-
-### 2.4 Chart.js Tree Shaking (Custom Build)
-
-**Current Problem:**  
-Loading full Chart.js bundle (~270KB) but only using Line, Bar, Doughnut charts.
-
-**Solution: Custom Build with Only Needed Components**
-
-```javascript
-// assets/js/chart.custom.js (NEW - custom build)
-
-import {
-  Chart,
-  LineController,
-  BarController,
-  DoughnutController,
-  CategoryScale,
-  LinearScale,
-  TimeScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
-
-Chart.register(
-  LineController,
-  BarController,
-  DoughnutController,
-  CategoryScale,
-  LinearScale,
-  TimeScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-export default Chart;
-```
-
-**Build with Webpack/Rollup:**
-
-```javascript
-// webpack.config.js
-module.exports = {
-  entry: './assets/js/chart.custom.js',
-  output: {
-    filename: 'chart.bundle.min.js',
-    path: path.resolve(__dirname, 'assets/js/dist'),
-    library: 'Chart',
-    libraryTarget: 'umd'
-  },
-  mode: 'production'
-};
-```
-
-**Expected Improvement:**
-- **Bundle size:** 270KB → ~120KB (56% reduction)
-- **Load time:** 80ms → 35ms (56% faster)
-
----
-
-### 2.5 Canvas Render Optimizations
-
-**Current Config Check:**
-
-```javascript
-// charts.js - Ensure these are set
-
-Chart.defaults.animation = false; // ✅ Already done
-Chart.defaults.parsing = false;   // ✅ Already done
-Chart.defaults.normalized = true; // ✅ Already done
-```
-
-**Additional Optimizations:**
-
-```javascript
-// Add to chart-theme.js
-
-// Enable hardware acceleration
-Chart.defaults.devicePixelRatio = window.devicePixelRatio || 1;
-
-// Optimize point rendering (reduce draw calls)
-Chart.defaults.datasets.line.pointRadius = 0;              // Hide points by default
-Chart.defaults.datasets.line.pointHoverRadius = 4;         // Show on hover
-Chart.defaults.datasets.line.pointHitRadius = 10;          // Larger hover target
-
-// Reduce memory usage
-Chart.defaults.datasets.line.clip = 10; // Clip rendering outside chart area
-
-// Optimize bar charts
-Chart.defaults.datasets.bar.borderWidth = 0;               // Remove borders (faster)
-Chart.defaults.datasets.bar.borderRadius = 4;              // Rounded corners
-
-// Optimize doughnut charts
-Chart.defaults.datasets.doughnut.borderWidth = 0;
-Chart.defaults.datasets.doughnut.spacing = 2;              // Gap between segments
-```
-
----
-
-## 3. Additional Chart Types for Financial Dashboards
-
-### 3.1 Waterfall Chart (Income vs Expenses)
-
-Shows cumulative effect of sequential values (income - expenses = net).
-
-```javascript
-// charts.js - Waterfall chart renderer
-
-function renderWaterfallChart() {
-  const ctx = document.getElementById('waterfallChart');
-  if (!ctx) return;
-  
-  // Sample data: Income sources (positive) + Expense categories (negative)
-  const data = {
-    labels: ['Starting Balance', 'Salary', 'Freelance', 'Rent', 'Food', 'Transport', 'Ending Balance'],
-    values: [5000, 4000, 1500, -1200, -800, -300, 8200]
-  };
-  
-  // Calculate cumulative values for positioning
-  const cumulative = [];
-  let running = 0;
-  data.values.forEach((value, index) => {
-    cumulative.push(running);
-    running += value;
-  });
-  
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: 'Increase',
-          data: data.values.map((v, i) => v > 0 ? v : null),
-          backgroundColor: window.firesideChartColors.positive,
-          base: cumulative
-        },
-        {
-          label: 'Decrease',
-          data: data.values.map((v, i) => v < 0 ? Math.abs(v) : null),
-          backgroundColor: window.firesideChartColors.negative,
-          base: cumulative
-        }
-      ]
-    },
-    options: {
-      plugins: {
-        legend: { display: true },
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              const value = data.values[context.dataIndex];
-              return `${context.dataset.label}: ${formatCurrency(Math.abs(value))}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { stacked: true },
-        y: {
-          stacked: true,
-          ticks: {
-            callback: (value) => formatCurrency(value)
-          }
-        }
-      }
-    }
-  });
-}
-```
-
-**Use Case:** Monthly cash flow breakdown (income - expenses categories = net change)
-
----
-
-### 3.2 Gauge Chart (Debt-to-Income Ratio)
-
-Half-circle gauge showing DTI percentage.
-
-```javascript
-// charts.js - Gauge chart (using Doughnut with rotation)
-
-function renderDTIGaugeChart(dtiPercentage) {
-  const ctx = document.getElementById('dtiGaugeChart');
-  if (!ctx) return;
-  
-  const maxDTI = 50; // Max recommended DTI %
-  const value = Math.min(dtiPercentage, maxDTI);
-  const remaining = maxDTI - value;
-  
-  // Color based on DTI level
-  let color;
-  if (dtiPercentage < 20) color = window.firesideChartColors.success;
-  else if (dtiPercentage < 36) color = window.firesideChartColors.warning;
-  else color = window.firesideChartColors.danger;
-  
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [value, remaining],
-        backgroundColor: [color, 'rgba(255, 255, 255, 0.1)'],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      rotation: -90,        // Start at top
-      circumference: 180,   // Half circle
-      cutout: '75%',        // Thick gauge
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false }
-      }
-    },
-    plugins: [{
-      id: 'gaugeText',
-      afterDraw: (chart) => {
-        const ctx = chart.ctx;
-        const centerX = chart.width / 2;
-        const centerY = chart.height / 2;
-        
-        ctx.save();
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = 'bold 32px Inter';
-        ctx.fillStyle = color;
-        ctx.fillText(`${dtiPercentage.toFixed(1)}%`, centerX, centerY - 10);
-        ctx.font = '14px Inter';
-        ctx.fillStyle = '#999';
-        ctx.fillText('DTI Ratio', centerX, centerY + 20);
-        ctx.restore();
-      }
-    }]
-  });
-}
-```
-
-**Use Case:** Show debt-to-income ratio with visual indicator (green < 20%, yellow < 36%, red >= 36%)
-
----
-
-### 3.3 Sankey Diagram (Money Flow)
-
-Shows flow from income sources → expense categories.
-
-**Note:** Chart.js doesn't natively support Sankey. Use `chartjs-chart-sankey` plugin.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.11.0"></script>
-```
-
-```javascript
-function renderMoneyFlowSankey() {
-  const ctx = document.getElementById('moneyFlowChart');
-  if (!ctx) return;
-  
-  new Chart(ctx, {
-    type: 'sankey',
-    data: {
-      datasets: [{
-        data: [
-          { from: 'Salary', to: 'Housing', flow: 1200 },
-          { from: 'Salary', to: 'Food', flow: 600 },
-          { from: 'Salary', to: 'Savings', flow: 1000 },
-          { from: 'Freelance', to: 'Investments', flow: 800 },
-          { from: 'Freelance', to: 'Savings', flow: 200 }
-        ],
-        colorFrom: (c) => window.firesideChartColors.positive,
-        colorTo: (c) => {
-          if (c.raw.to === 'Savings' || c.raw.to === 'Investments') {
-            return window.firesideChartColors.success;
-          }
-          return window.firesideChartColors.secondary;
-        }
-      }]
-    }
-  });
-}
-```
-
-**Use Case:** Visualize cash flow from income sources to spending/saving categories
-
----
-
-## 4. Chart Export Functionality
-
-**User Request:** "Save net worth chart as PNG for tax prep"
-
-```javascript
-// charts.js - Export helper
-
-function exportChartAsPNG(chartInstance, filename = 'chart.png') {
-  const url = chartInstance.toBase64Image();
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-}
-
-function exportChartAsPDF(chartInstance, filename = 'chart.pdf') {
-  // Use jsPDF library
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('landscape');
-  const imgData = chartInstance.toBase64Image();
-  
-  pdf.addImage(imgData, 'PNG', 10, 10, 280, 150);
-  pdf.save(filename);
-}
-
-// Add export buttons to chart cards
-function addExportButton(chartCard, chartInstance, chartName) {
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2';
-  exportBtn.innerHTML = '<i class="bi bi-download"></i>';
-  exportBtn.title = 'Export chart';
-  
-  exportBtn.addEventListener('click', () => {
-    exportChartAsPNG(chartInstance, `${chartName}_${new Date().toISOString().split('T')[0]}.png`);
-  });
-  
-  chartCard.style.position = 'relative';
-  chartCard.appendChild(exportBtn);
-}
 ```
 
 **Usage:**
 ```javascript
-renderNetWorthChart().then(chart => {
-  const chartCard = document.getElementById('netWorthTimelineChart').closest('.chart-card');
-  addExportButton(chartCard, chart, 'net-worth');
+// In charts.js
+const projectionWorker = new Worker('assets/js/workers/chart-projections.worker.js');
+
+projectionWorker.onmessage = function(e) {
+  if (e.data.type === 'projectionComplete') {
+    updateChartProjection(netWorthChart, e.data.data);
+  }
+};
+
+function calculateProjection(values, months) {
+  projectionWorker.postMessage({
+    type: 'calculateProjection',
+    data: { values, months }
+  });
+}
+```
+
+**Impact:** Non-blocking projection calculations (smoother UI during time range changes).
+
+#### 3. No Chart Instance Caching ⚠️
+**Problem:** Charts are recreated on every page load (unnecessary DOM manipulation).
+
+**Solution:** Cache chart configurations in sessionStorage:
+```javascript
+// Chart config cache
+const CHART_CONFIG_CACHE_KEY = 'fc_chart_configs';
+
+function getCachedChartConfig(chartId) {
+  const cache = sessionStorage.getItem(CHART_CONFIG_CACHE_KEY);
+  if (!cache) return null;
+  
+  try {
+    const configs = JSON.parse(cache);
+    return configs[chartId];
+  } catch {
+    return null;
+  }
+}
+
+function setCachedChartConfig(chartId, config) {
+  const cache = sessionStorage.getItem(CHART_CONFIG_CACHE_KEY);
+  const configs = cache ? JSON.parse(cache) : {};
+  
+  configs[chartId] = config;
+  sessionStorage.setItem(CHART_CONFIG_CACHE_KEY, JSON.stringify(configs));
+}
+
+// Use in chart initialization
+function createNetWorthChart(data, labels) {
+  const cachedConfig = getCachedChartConfig('netWorth');
+  
+  if (cachedConfig) {
+    // Restore from cache (faster)
+    chartInstances.netWorth = new Chart(ctx, cachedConfig);
+  } else {
+    // Build config from scratch
+    const config = buildNetWorthChartConfig(data, labels);
+    chartInstances.netWorth = new Chart(ctx, config);
+    setCachedChartConfig('netWorth', config);
+  }
+}
+```
+
+**Impact:** ~50ms faster chart initialization on repeat page loads.
+
+---
+
+## Advanced Optimization Strategies
+
+### 1. Intersection Observer for Lazy Chart Rendering
+
+**Problem:** All charts render immediately, even if user hasn't scrolled to them yet.
+
+**Solution:**
+```javascript
+// Lazy chart initialization
+const chartObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !entry.target.dataset.initialized) {
+      const chartId = entry.target.id;
+      initializeChart(chartId);
+      entry.target.dataset.initialized = 'true';
+      chartObserver.unobserve(entry.target);
+    }
+  });
+}, {
+  rootMargin: '100px' // Load charts 100px before they enter viewport
+});
+
+// Observe all chart canvases
+document.querySelectorAll('canvas[id*="chart"]').forEach(canvas => {
+  chartObserver.observe(canvas);
 });
 ```
 
+**Impact:** Faster initial page load (dashboard only renders above-the-fold charts).
+
+### 2. Chart.js Tree Shaking
+
+**Problem:** Loading full Chart.js bundle (~270KB) when only using line + doughnut charts.
+
+**Solution:** Use modular imports:
+```javascript
+// Instead of:
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+// Use modular build:
+import {
+  Chart,
+  LineController,
+  DoughnutController,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+Chart.register(
+  LineController,
+  DoughnutController,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend
+);
+```
+
+**Impact:** Reduce Chart.js bundle from 270KB → ~120KB (55% reduction).
+
+**Caveat:** Requires build step (Webpack/Vite). Not compatible with current CDN approach.
+
+### 3. Debounced Resize Handler
+
+**Problem:** Chart resize events fire on every pixel change during window resize.
+
+**Solution:**
+```javascript
+// Optimized resize handler
+let resizeTimeout;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    Object.values(chartInstances).forEach(chart => {
+      if (chart) chart.resize();
+    });
+  }, 150); // Debounce 150ms
+});
+```
+
+**Impact:** Smoother window resizing (prevents layout thrashing).
+
 ---
 
-## 5. Accessibility Enhancements
+## Financial Dashboard Best Practices
 
-### 5.1 ARIA Labels for Charts
+### 1. Use Monospace Fonts for Financial Values ✅
 
+**Current Implementation:**
 ```javascript
-// chart-theme.js - Add accessibility defaults
-
-Chart.defaults.plugins.legend.labels.generateLabels = function(chart) {
-  const datasets = chart.data.datasets;
-  return datasets.map((dataset, i) => ({
-    text: dataset.label,
-    fillStyle: dataset.backgroundColor,
-    hidden: !chart.isDatasetVisible(i),
-    datasetIndex: i,
-    // Add ARIA label
-    ariaLabel: `Dataset ${dataset.label}, ${chart.data.labels.length} data points`
-  }));
+// From chart-theme.js:L88-94
+Chart.defaults.plugins.tooltip.callbacks = {
+  label: function(context) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(context.parsed.y);
+  }
 };
 ```
 
-**Add to HTML:**
-
-```html
-<canvas id="netWorthTimelineChart" 
-        role="img" 
-        aria-label="Net worth over time chart showing financial growth from January to December 2026"></canvas>
+**Enhancement:** Apply monospace font to tooltip values for better number alignment:
+```javascript
+Chart.defaults.plugins.tooltip.bodyFont = {
+  size: 13,
+  weight: '400',
+  family: getToken('--font-mono') // Use monospace for numbers
+};
 ```
 
-### 5.2 Keyboard Navigation
+### 2. Color Encoding for Positive/Negative Values ✅
 
+**Current Implementation:**
 ```javascript
-// charts.js - Add keyboard controls
+// From chart-theme.js:L146-153
+window.firesideChartColors = {
+  positive: getToken('--color-accent'),         // Lime Green
+  negative: getToken('--color-danger'),         // Red
+  neutral: getToken('--color-text-tertiary')
+};
+```
 
-function enableChartKeyboardNav(chartInstance, chartElement) {
-  let currentIndex = 0;
-  
-  chartElement.tabIndex = 0; // Make focusable
-  
-  chartElement.addEventListener('keydown', (e) => {
-    const maxIndex = chartInstance.data.labels.length - 1;
+**Best Practice Validation:**
+- ✅ Green for gains/income
+- ✅ Red for losses/expenses
+- ✅ Neutral gray for zero/static values
+- ✅ Colors match design tokens
+
+### 3. Accessibility: Patterns + Color
+
+**Problem:** Color-blind users can't distinguish positive/negative charts.
+
+**Solution:** Add texture patterns to bar charts:
+```javascript
+// Create pattern plugin
+const patternPlugin = {
+  id: 'pattern',
+  beforeDraw: (chart) => {
+    const ctx = chart.ctx;
+    const chartArea = chart.chartArea;
     
-    switch(e.key) {
-      case 'ArrowRight':
-        currentIndex = Math.min(currentIndex + 1, maxIndex);
-        highlightDataPoint(chartInstance, currentIndex);
-        announceDataPoint(chartInstance, currentIndex);
-        e.preventDefault();
-        break;
-        
-      case 'ArrowLeft':
-        currentIndex = Math.max(currentIndex - 1, 0);
-        highlightDataPoint(chartInstance, currentIndex);
-        announceDataPoint(chartInstance, currentIndex);
-        e.preventDefault();
-        break;
-    }
+    chart.data.datasets.forEach((dataset, i) => {
+      const meta = chart.getDatasetMeta(i);
+      
+      meta.data.forEach((bar, index) => {
+        if (dataset.data[index] < 0) {
+          // Negative values: diagonal stripes
+          ctx.save();
+          ctx.fillStyle = createDiagonalPattern(ctx, dataset.backgroundColor);
+          ctx.fillRect(bar.x - bar.width/2, bar.y, bar.width, bar.height);
+          ctx.restore();
+        }
+      });
+    });
+  }
+};
+
+function createDiagonalPattern(ctx, baseColor) {
+  const patternCanvas = document.createElement('canvas');
+  const patternCtx = patternCanvas.getContext('2d');
+  
+  patternCanvas.width = 10;
+  patternCanvas.height = 10;
+  
+  patternCtx.fillStyle = baseColor;
+  patternCtx.fillRect(0, 0, 10, 10);
+  
+  patternCtx.strokeStyle = 'rgba(0,0,0,0.2)';
+  patternCtx.lineWidth = 2;
+  patternCtx.beginPath();
+  patternCtx.moveTo(0, 10);
+  patternCtx.lineTo(10, 0);
+  patternCtx.stroke();
+  
+  return ctx.createPattern(patternCanvas, 'repeat');
+}
+
+// Register plugin
+Chart.register(patternPlugin);
+```
+
+**Impact:** WCAG 2.1 Level AAA compliance for color contrast alternatives.
+
+### 4. Loading States for Async Data
+
+**Problem:** Blank canvas flashes before chart renders.
+
+**Solution:**
+```javascript
+// In HTML
+<div class="chart-container">
+  <div class="chart-loading" data-chart-id="netWorth">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading chart...</span>
+    </div>
+    <p class="text-muted mt-2">Loading Net Worth chart...</p>
+  </div>
+  <canvas id="netWorthChart" style="display:none;"></canvas>
+</div>
+
+// In charts.js
+function initializeChart(chartId) {
+  const loadingEl = document.querySelector(`[data-chart-id="${chartId}"]`);
+  const canvasEl = document.getElementById(`${chartId}Chart`);
+  
+  // Fetch data
+  fetchChartData(chartId).then(data => {
+    // Hide loading, show chart
+    loadingEl.style.display = 'none';
+    canvasEl.style.display = 'block';
+    
+    // Render chart
+    createChart(chartId, data);
   });
 }
-
-function announceDataPoint(chart, index) {
-  const label = chart.data.labels[index];
-  const value = chart.data.datasets[0].data[index];
-  const announcement = `${label}: ${formatCurrency(value)}`;
-  
-  // Use ARIA live region
-  const announcer = document.getElementById('chartAnnouncer');
-  if (announcer) {
-    announcer.textContent = announcement;
-  }
-}
-
-function highlightDataPoint(chart, index) {
-  // Update tooltip programmatically
-  chart.tooltip.setActiveElements([{ datasetIndex: 0, index }]);
-  chart.update('none');
-}
 ```
 
-**Add to HTML:**
-```html
-<div id="chartAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-```
+**Impact:** Better perceived performance (loading state vs. blank canvas).
 
 ---
 
-## 6. Real-Time Updates with Supabase
+## Implementation Tasks (Ready for Azure DevOps)
 
+### Task 1: Implement Chart Lazy Loading (2 hours)
+**Description:** Dynamically load Chart.js only on pages with charts.
+
+**Acceptance Criteria:**
+- [ ] Chart.js loads only on dashboard (index.html)
+- [ ] No Chart.js on assets, bills, budget, debts, income pages
+- [ ] 270KB saved on 5 out of 8 pages
+- [ ] No visual regressions on dashboard
+
+**Code Example:**
 ```javascript
-// charts.js - Supabase Realtime integration
-
-function enableRealTimeChartUpdates() {
-  const supabaseClient = window.supabaseClient;
-  if (!supabaseClient) return;
+// In lazy-loader.js
+export async function loadChartsModule() {
+  if (window.Chart) return; // Already loaded
   
-  // Subscribe to snapshot changes
-  supabaseClient
-    .channel('snapshots_realtime')
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'snapshots'
-    }, (payload) => {
-      console.log('New snapshot:', payload.new);
-      
-      // Append new data point to net worth chart
-      if (chartInstances.netWorth) {
-        appendDataPoint(
-          chartInstances.netWorth,
-          payload.new.date,
-          payload.new.net_worth
-        );
-      }
-    })
-    .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'snapshots'
-    }, (payload) => {
-      console.log('Snapshot updated:', payload.new);
-      
-      // Update existing data point
-      if (chartInstances.netWorth) {
-        updateDataPoint(
-          chartInstances.netWorth,
-          payload.new.date,
-          payload.new.net_worth
-        );
-      }
-    })
-    .subscribe();
-}
-
-function updateDataPoint(chart, label, newValue) {
-  if (!chart) return;
+  // Load Chart.js from CDN
+  await loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js');
   
-  const index = chart.data.labels.indexOf(label);
-  if (index !== -1) {
-    chart.data.datasets[0].data[index] = newValue;
-    chart.update('none');
-  }
+  // Load theme config
+  await loadScript('assets/js/chart-theme.js');
+  
+  // Load chart implementations
+  await loadScript('assets/js/charts.js');
 }
 
-// Auto-enable on dashboard
-if (window.location.pathname.includes('index.html')) {
-  enableRealTimeChartUpdates();
-}
+// In index.html (dashboard)
+<script type="module">
+  import { loadChartsModule } from './assets/js/lazy-loader.js';
+  loadChartsModule().then(() => {
+    console.log('✅ Charts loaded');
+    initializeDashboard();
+  });
+</script>
 ```
 
 ---
 
-## 7. Implementation Checklist
+### Task 2: Add Intersection Observer for Chart Rendering (1.5 hours)
+**Description:** Render charts only when they enter the viewport.
 
-### Phase 1: Lazy Loading (Priority 1)
-- [ ] Create `assets/js/lazy-loader.js`
-- [ ] Remove Chart.js from global `<head>`
-- [ ] Add route-based detection
-- [ ] Test all pages (dashboard loads Chart.js, bills page doesn't)
-- [ ] Measure: Lighthouse performance score improvement
+**Acceptance Criteria:**
+- [ ] Charts below the fold render only when scrolled into view
+- [ ] First contentful paint improves by ~200ms
+- [ ] No visual "pop-in" effect (use placeholder)
+- [ ] Works on mobile + desktop
 
-### Phase 2: Incremental Updates (Priority 1)
-- [ ] Implement `appendDataPoint()` helper
-- [ ] Integrate Supabase Realtime for snapshots
-- [ ] Test: Add new snapshot, chart updates without full re-render
-- [ ] Measure: Update time (target < 10ms)
-
-### Phase 3: Web Worker Offloading (Priority 2)
-- [ ] Create `assets/js/workers/chart-data-worker.js`
-- [ ] Move data processing to worker
-- [ ] Update charts to use worker results
-- [ ] Test: No UI jank during chart updates
-- [ ] Measure: Main thread blocked time (target < 5ms)
-
-### Phase 4: New Chart Types (Priority 2)
-- [ ] Implement waterfall chart (cash flow)
-- [ ] Implement gauge chart (DTI ratio)
-- [ ] Add to dashboard
-- [ ] Document usage in component library
-
-### Phase 5: Export Functionality (Priority 3)
-- [ ] Add `exportChartAsPNG()` helper
-- [ ] Add `exportChartAsPDF()` helper (jsPDF dependency)
-- [ ] Add export buttons to chart cards
-- [ ] Test: Download net worth chart as PNG
-
-### Phase 6: Accessibility (Priority 1)
-- [ ] Add ARIA labels to all charts
-- [ ] Implement keyboard navigation (arrow keys)
-- [ ] Add ARIA live region for announcements
-- [ ] Test with NVDA/JAWS screen readers
-- [ ] WCAG 2.1 AA compliance audit
-
-### Phase 7: Tree Shaking (Priority 3)
-- [ ] Set up Webpack/Rollup build
-- [ ] Create custom Chart.js bundle
-- [ ] Replace CDN link with custom bundle
-- [ ] Measure: Bundle size reduction (target 50%+)
+**Code Example:** (See Advanced Optimization Strategies #1 above)
 
 ---
 
-## 8. Success Metrics
+### Task 3: Implement Web Worker for Projections (2.5 hours)
+**Description:** Offload projection calculations to Web Worker.
 
-### Performance
-- **Chart.js load time:** 80ms → 0ms (on non-chart pages)
-- **Chart render time (< 100 points):** 50ms → 30ms
-- **Chart render time (100+ points):** 200ms → 80ms
-- **Data update time:** 100ms → 10ms
-- **Main thread blocked:** 200ms → 5ms
+**Acceptance Criteria:**
+- [ ] Net worth projection calculation runs in Web Worker
+- [ ] Main thread remains responsive during calculation
+- [ ] Time range changes feel instant (no lag)
+- [ ] Fallback to main thread if Web Worker unsupported
 
-### User Experience
-- **Export adoption:** 20% of users export charts monthly
-- **Time range switching:** < 50ms (instant feel)
-- **Accessibility:** 100% keyboard navigable
+**Files to Create:**
+```
+assets/js/workers/
+└── chart-projections.worker.js
+```
 
-### Bundle Size
-- **Chart.js size:** 270KB → 120KB (custom build)
-- **Lazy loading savings:** 270KB × 5 pages = 1.35MB saved
-
----
-
-## Next Steps
-
-1. **Builder:** Implement Phase 1 (Lazy Loading)
-2. **Builder:** Implement Phase 2 (Incremental Updates + Supabase Realtime)
-3. **Builder:** Create Web Worker for data processing
-4. **Auditor:** Accessibility audit (ARIA, keyboard nav)
-5. **Capital:** Document chart patterns in component library
+**Code Example:** (See Weaknesses #2 above)
 
 ---
 
-**Research Completed:** February 15, 2026  
-**Estimated Implementation Time:** 12-16 hours (across 7 phases)  
-**Risk Level:** Low (non-breaking, additive improvements)  
-**ROI:** High (50% faster loads, real-time updates, better UX)
+### Task 4: Add Chart Loading States (1 hour)
+**Description:** Show loading spinners while chart data is fetched.
+
+**Acceptance Criteria:**
+- [ ] All charts show loading state before rendering
+- [ ] Loading state includes accessible text ("Loading...")
+- [ ] Smooth transition from loading → rendered chart
+- [ ] Works with Intersection Observer (Task 2)
+
+**Code Example:** (See Financial Dashboard Best Practices #4 above)
+
+---
+
+## Performance Impact Estimation
+
+### Current State
+| Page | Chart.js Load | Chart Render | Total Time |
+|------|---------------|--------------|------------|
+| Dashboard (index.html) | 270KB / ~80ms | ~150ms | ~230ms |
+| Assets | 270KB / ~80ms | 0ms (no charts) | ~80ms wasted |
+| Bills | 270KB / ~80ms | 0ms (no charts) | ~80ms wasted |
+| Budget | 270KB / ~80ms | 0ms (no charts) | ~80ms wasted |
+| **Total Waste** | — | — | **240ms across 3 pages** |
+
+### After Optimizations
+| Page | Chart.js Load | Chart Render | Total Time | Savings |
+|------|---------------|--------------|------------|---------|
+| Dashboard (index.html) | 270KB / ~80ms | ~100ms (lazy) | ~180ms | **50ms** |
+| Assets | 0KB | 0ms | 0ms | **80ms** |
+| Bills | 0KB | 0ms | 0ms | **80ms** |
+| Budget | 0KB | 0ms | 0ms | **80ms** |
+| **Total Savings** | — | — | — | **290ms** |
+
+**Key Metrics:**
+- ✅ 270KB saved on 5 out of 8 pages (62.5% of site)
+- ✅ ~50ms faster dashboard load (lazy rendering below fold)
+- ✅ ~80ms saved per non-chart page (lazy loading)
+- ✅ Main thread stays responsive (Web Worker projections)
+
+---
+
+## Chart.js 4.x Upgrade Considerations
+
+**Current Version:** Chart.js 3.x (assumed based on API usage)
+
+**Chart.js 4.0 Improvements:**
+- **Tree-shakeable ESM build** — Reduce bundle size by ~40%
+- **Improved TypeScript support** — Better IDE autocomplete
+- **Enhanced performance mode** — Built-in decimation strategies
+- **Better accessibility** — ARIA labels auto-generated
+
+**Migration Path:**
+1. Test current charts with Chart.js 4.x (check `chart-theme.js` compatibility)
+2. Update to modular imports (see Tree Shaking example above)
+3. Replace CDN with npm build (requires Webpack/Vite setup)
+
+**Estimated Effort:** 4-6 hours (including testing)
+
+---
+
+## References
+
+- **Chart.js Performance Guide:** https://www.chartjs.org/docs/latest/general/performance.html
+- **Chart.js Accessibility:** https://www.chartjs.org/docs/latest/general/accessibility.html
+- **Web Workers for Heavy Calculations:** https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API
+- **Intersection Observer API:** https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+- **Financial Data Visualization Best Practices:** https://observablehq.com/@observablehq/financial-charts
+
+---
+
+## Recommendation
+
+**Current implementation is solid — optimizations are "nice-to-have" not critical.**
+
+**Priority Sequence:**
+1. ✅ **Task 1 (Lazy Loading)** — Highest impact (270KB saved on 5 pages)
+2. ⚠️ **Task 4 (Loading States)** — Improves perceived performance
+3. ⚠️ **Task 2 (Intersection Observer)** — Minor benefit on dashboard
+4. ⚠️ **Task 3 (Web Workers)** — Only needed if projection calculations cause visible lag
+
+**Estimated ROI:** 7 hours investment → ~290ms performance improvement + better UX.
+
+**Status:** Ready for backlog — recommend **Low priority** (current charts perform well).
