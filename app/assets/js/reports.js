@@ -3,14 +3,10 @@
 // Comprehensive financial reporting with charts and export functionality
 // ===================================================================
 
-console.log('[Reports] Loading reports module...');
-
 // ===================================================================
 // INITIALIZE REPORTS PAGE
 // ===================================================================
 async function initReportsPage() {
-  console.log('[Reports] Initializing reports page...');
-  
   // Verify user authentication
   const user = await sb.auth.getUser();
   if (!user.data.user) {
@@ -19,15 +15,12 @@ async function initReportsPage() {
   }
   
   const userId = user.data.user.id;
-  console.log('[Reports] User authenticated:', userId);
   
   // Load report summary data
   await loadReportSummary(userId);
   
   // Initialize all charts (functions already exist in charts.js)
   await initializeReportCharts();
-  
-  console.log('[Reports] Reports page initialized successfully');
 }
 
 // ===================================================================
@@ -35,8 +28,6 @@ async function initReportsPage() {
 // ===================================================================
 async function loadReportSummary(userId) {
   try {
-    console.log('[Reports] Fetching latest snapshot for summary cards...');
-    
     // Fetch latest snapshot for summary cards
     const { data: snapshots, error } = await sb
       .from('snapshots')
@@ -52,7 +43,6 @@ async function loadReportSummary(userId) {
     
     if (snapshots && snapshots.length > 0) {
       const latest = snapshots[0];
-      console.log('[Reports] Latest snapshot:', latest);
       
       // Update summary cards with real data
       document.getElementById('reportInvestments').textContent = 
@@ -65,8 +55,6 @@ async function loadReportSummary(userId) {
       const netWorthValue = latest.net_worth || 0;
       netWorthElement.textContent = formatCurrency(netWorthValue);
       netWorthElement.className = netWorthValue >= 0 ? 'text-success' : 'text-danger';
-      
-      console.log('[Reports] Summary cards updated successfully');
     } else {
       // No data yet - show 0.00
       console.warn('[Reports] No snapshot data found, showing $0.00');
@@ -105,7 +93,6 @@ function showEmptyState() {
   if (dataContainer && emptyState) {
     dataContainer.style.display = 'none';
     emptyState.style.display = 'block';
-    console.log('[Reports] Empty state displayed');
   }
 }
 
@@ -113,38 +100,31 @@ function showEmptyState() {
 // INITIALIZE ALL REPORT CHARTS
 // ===================================================================
 async function initializeReportCharts() {
-  console.log('[Reports] Initializing charts...');
-  
   try {
     // Chart functions already exist in charts.js
     // We just need to call them if their canvas elements exist
     
     if (document.getElementById('netWorthTimelineChart')) {
-      console.log('[Reports] Rendering Net Worth Timeline chart...');
       if (typeof window.renderNetWorthChart === 'function') {
         await window.renderNetWorthChart();
         // Hide skeleton loader after chart renders
         document.getElementById('netWorthSkeleton')?.classList.add('d-none');
-        console.log('[Reports] Net Worth skeleton hidden');
       } else {
         console.warn('[Reports] renderNetWorthChart function not found');
       }
     }
     
     if (document.getElementById('monthlyCashFlowChart')) {
-      console.log('[Reports] Rendering Monthly Cash Flow chart...');
       if (typeof window.generateMonthlyCashFlowChart === 'function') {
         await window.generateMonthlyCashFlowChart();
         // Hide skeleton loader after chart renders
         document.getElementById('monthlyCashFlowSkeleton')?.classList.add('d-none');
-        console.log('[Reports] Monthly Cash Flow skeleton hidden');
       } else {
         console.warn('[Reports] generateMonthlyCashFlowChart function not found');
       }
     }
     
     if (document.getElementById('spendingCategoriesChart')) {
-      console.log('[Reports] Rendering Spending Categories chart...');
       if (typeof window.renderAdditionalCharts === 'function') {
         // renderAdditionalCharts includes spendingCategories, savingsRate, and investmentGrowth
         await window.renderAdditionalCharts();
@@ -152,13 +132,10 @@ async function initializeReportCharts() {
         document.getElementById('spendingCategoriesSkeleton')?.classList.add('d-none');
         document.getElementById('savingsRateSkeleton')?.classList.add('d-none');
         document.getElementById('investmentGrowthSkeleton')?.classList.add('d-none');
-        console.log('[Reports] Additional chart skeletons hidden');
       } else {
         console.warn('[Reports] renderAdditionalCharts function not found');
       }
     }
-    
-    console.log('[Reports] All charts initialized');
   } catch (error) {
     console.error('[Reports] Error initializing charts:', error);
   }
@@ -168,8 +145,6 @@ async function initializeReportCharts() {
 // EXPORT REPORTS DATA
 // ===================================================================
 function exportReportsData() {
-  console.log('[Reports] Exporting reports data...');
-  
   try {
     // Get values from summary cards
     const investmentsValue = document.getElementById('reportInvestments').textContent;
@@ -202,8 +177,6 @@ function exportReportsData() {
     
     // Clean up
     window.URL.revokeObjectURL(url);
-    
-    console.log('[Reports] CSV export complete:', link.download);
   } catch (error) {
     console.error('[Reports] Error exporting reports data:', error);
     alert('Error exporting report. Please try again.');
@@ -214,30 +187,21 @@ function exportReportsData() {
 // EVENT LISTENERS
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[Reports] DOM loaded, checking if on reports page...');
-  
   // Check if we're on the reports page by looking for report-specific elements
   if (document.getElementById('reportInvestments')) {
-    console.log('[Reports] Reports page detected, initializing...');
-    
     // Initialize the reports page
     initReportsPage();
     
     // Add export button handler
     const exportBtn = document.getElementById('exportReportBtn');
     if (exportBtn) {
-      console.log('[Reports] Export button found, attaching click handler...');
       exportBtn.addEventListener('click', exportReportsData);
     } else {
       console.warn('[Reports] Export button not found');
     }
-  } else {
-    console.log('[Reports] Not on reports page, skipping initialization');
   }
 });
 
 // Export functions for potential external use
 window.initReportsPage = initReportsPage;
 window.exportReportsData = exportReportsData;
-
-console.log('[Reports] Module loaded successfully');

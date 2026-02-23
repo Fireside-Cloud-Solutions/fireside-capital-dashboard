@@ -188,5 +188,4 @@
   Chart.defaults.interaction.mode = 'index';
   Chart.defaults.interaction.intersect = false;
 
-  console.log('✅ Fireside Capital Chart.js theme loaded');
 })();

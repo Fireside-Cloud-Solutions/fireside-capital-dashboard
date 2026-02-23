@@ -10,8 +10,6 @@
     return;
   }
 
-  console.log('[Security] Applying CSRF protection patches...');
-
   // List of functions that require CSRF validation
   const protectedOperations = [
     'saveAsset',
@@ -56,11 +54,8 @@
           throw error;
         }
       };
-      console.log(`[Security] Protected: ${funcName}`);
     }
   });
-
-  console.log(`[Security] CSRF protection applied to ${protectedOperations.length} operations`);
 
   // Add CSRF header to all fetch requests
   const originalFetch = window.fetch;
@@ -86,8 +81,6 @@
     return originalFetch.apply(this, [url, options]);
   };
 
-  console.log('[Security] CSRF headers will be added to all state-changing fetch requests');
-
   // Add cookie security reminder
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', checkCookieSecurity);
@@ -107,5 +100,4 @@
     }
   }
 
-  console.log('[Security] Security patch complete ✓');
 })();

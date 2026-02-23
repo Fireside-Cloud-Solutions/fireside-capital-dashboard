@@ -76,8 +76,6 @@ function finishTour() {
     sb.from('settings').upsert({
       user_id: currentUser.id,
       tour_completed: true
-    }).then(() => {
-      console.log('Tour completed and saved');
     }).catch(err => {
       console.error('Failed to save tour completion:', err);
     });

@@ -473,6 +473,4 @@
     CHART_THEME_PALETTES: THEME_PALETTES,
   });
 
-  console.log('✅ Fireside Capital chart-factory.js loaded (FC-095/094/097/177/178)');
-
 })(window);

@@ -346,7 +346,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Check for transactions page elements after DOM is ready (fixes race condition)
   if (document.getElementById('transactionsTableBody')) {
     try {
-      console.log('[Transactions] Initializing page...');
       await renderTransactionsTable();
 
       // BUG-TRANS-INLINE-001: Event delegation for category select (replaces inline onchange).
@@ -360,7 +359,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         });
       }
-      console.log('[Transactions] Page initialized successfully');
       
       // Set up pagination event listeners
       const prevBtn = document.getElementById('prevPageBtn');

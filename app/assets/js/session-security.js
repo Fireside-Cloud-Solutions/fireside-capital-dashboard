@@ -73,8 +73,6 @@ class SessionSecurityManager {
     
     // Start monitoring
     this.activityMonitor = setInterval(() => this.checkSessionValidity(), SESSION_CONFIG.ACTIVITY_CHECK_INTERVAL);
-    
-    console.log('[Security] Session monitoring started');
   }
 
   stopSessionMonitoring() {
@@ -87,8 +85,6 @@ class SessionSecurityManager {
     
     this.sessionStartTime = null;
     this.hideSessionWarning();
-    
-    console.log('[Security] Session monitoring stopped');
   }
 
   checkSessionValidity() {
@@ -197,8 +193,6 @@ class SessionSecurityManager {
     if (window.emergencyFundChart && typeof window.emergencyFundChart.destroy === 'function') {
       window.emergencyFundChart.destroy();
     }
-    
-    console.log('[Security] All session data cleared');
   }
 
   showLogoutMessage(message) {

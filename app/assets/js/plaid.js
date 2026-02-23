@@ -64,8 +64,8 @@ function disablePlaidButtons() {
 
 // Helper function to show Plaid error
 function showPlaidError(message) {
-  // Optional: show user-friendly error message
-  console.log('[Plaid] Error shown to user:', message);
+  // Show user-friendly error message
+  alert(message);
 }
 
 // Exchange public token for access token

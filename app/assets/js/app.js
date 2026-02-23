@@ -239,7 +239,6 @@ async function safeCreateChart(ctx, config, chartName) {
       // FC-077 Fix: Destroy existing chart instance before creating new one
       const canvasId = canvas.id;
       if (canvasId && window.chartInstances[canvasId]) {
-        console.log(`Destroying existing chart instance for: ${canvasId}`);
         window.chartInstances[canvasId].destroy();
         delete window.chartInstances[canvasId];
       }

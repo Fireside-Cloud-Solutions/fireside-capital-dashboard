@@ -34,12 +34,9 @@ class LazyLoader {
       return Promise.resolve();
     }
 
-    console.log('[LazyLoader] Loading Chart.js...');
-
     this.loadingPromises.charts = this.loadScript(
       'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js'
     ).then(() => {
-      console.log('[LazyLoader] Chart.js loaded successfully');
       delete this.loadingPromises.charts;
     });
 
@@ -61,12 +58,9 @@ class LazyLoader {
       return Promise.resolve();
     }
 
-    console.log('[LazyLoader] Loading Plaid Link...');
-
     this.loadingPromises.plaid = this.loadScript(
       'https://cdn.plaid.com/link/v2/stable/link-initialize.js'
     ).then(() => {
-      console.log('[LazyLoader] Plaid Link loaded successfully');
       delete this.loadingPromises.plaid;
     });
 
