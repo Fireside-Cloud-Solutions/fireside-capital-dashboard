@@ -1,489 +1,395 @@
 # CSS Architecture Research — Fireside Capital Dashboard
-
-**Research Date:** February 21, 2026  
-**Status:** Completed  
-**Priority:** Medium (P2)  
-**Scope:** CSS organization, naming conventions, scalability
-
----
+**Date:** February 23, 2026  
+**Researcher:** Capital  
+**Status:** Complete  
 
 ## Executive Summary
+Modern CSS architecture has evolved toward a hybrid approach combining **CSS Globals + BEM + Utility Classes**. The CUBE CSS methodology (Composition, Utility, Block, Exception) provides a pragmatic framework for scalable financial dashboards.
 
-The Fireside Capital dashboard currently has **no consistent CSS architecture methodology**, leading to:
-- **98KB main.css** (difficult to maintain)
-- **Mixed naming conventions** (utilities, semantic classes, IDs)
-- **No clear component boundaries**
-- **Risk of specificity conflicts** as the app scales
+## Key Findings
 
-**Recommendation:** Implement **ITCSS + BEM** hybrid architecture:
-- **ITCSS** for file organization (settings → tools → generic → elements → components → utilities)
-- **BEM** for component naming (.card, .card__title, .card--featured)
-- Keep existing design tokens (already excellent)
+### 1. Recommended Architecture: Hybrid BEM + Utilities
 
----
+#### Why This Approach?
+- **BEM alone** → Too many class names, bloated CSS for minor variations
+- **Utilities alone** → Unreadable HTML, poor for complex animations
+- **Hybrid** → Best of both: DRY code, fast customization, maintainable
 
-## Current State Analysis
-
-### File Structure (10 CSS files, 225KB total)
+#### Layer Structure
 ```
-assets/css/
-├── design-tokens.css     (22KB)  ✅ Good — CSS custom properties
-├── main.css              (98KB)  ⚠️  Too large — needs splitting
-├── components.css        (40KB)  ⚠️  No clear component boundaries
-├── responsive.css        (30KB)  ✅ Good — separate media queries
-├── accessibility.css     (12KB)  ✅ Good — a11y focused
-├── utilities.css         (9KB)   ✅ Good — utility classes
-├── onboarding.css        (8KB)   ⚠️  Page-specific (should be modular)
-├── logged-out-cta.css    (5KB)   ⚠️  Page-specific
-├── critical.css          (2KB)   ✅ Good — above-the-fold styles
-└── main.css.orig         (184KB) ⚠️  Legacy file — DELETE
+Global Styles (CSS Custom Properties)
+    ↓
+Composition (Layout Skeletons)
+    ↓
+Utilities (Single-purpose classes)
+    ↓
+Blocks (Component-specific BEM)
+    ↓
+Exceptions (Data attribute variants)
 ```
 
-### Naming Convention Issues
+### 2. CSS Globals — Foundation Layer
 
-**Current approach:** Inconsistent mix
+#### What Goes in Globals
+- **Design tokens:** spacing, typography, colors, shadows
+- **Responsive rules:** cascade through custom properties
+- **Behavioral components:** `.text-component`, `.card-base`
+
+#### Implementation for Fireside Capital
 ```css
-/* ID selectors (too specific) */
-#notificationBell { }
-#notificationList { }
+/* app/assets/css/globals/_tokens.css */
+:root {
+  /* Spacing Scale */
+  --space-unit: 1em;
+  --space-xs: calc(0.5 * var(--space-unit));
+  --space-sm: calc(0.75 * var(--space-unit));
+  --space-md: calc(1.25 * var(--space-unit));
+  --space-lg: calc(2 * var(--space-unit));
+  --space-xl: calc(3.25 * var(--space-unit));
 
-/* Generic class names (collision risk) */
-.dropdown-header { }
-.page-header { }
+  /* Typography Scale */
+  --text-base-size: 1em;
+  --text-scale-ratio: 1.2;
+  --text-xs: calc(var(--text-base-size) / var(--text-scale-ratio) / var(--text-scale-ratio));
+  --text-sm: calc(var(--text-xs) * var(--text-scale-ratio));
+  --text-md: calc(var(--text-sm) * var(--text-scale-ratio) * var(--text-scale-ratio));
+  --text-lg: calc(var(--text-md) * var(--text-scale-ratio));
+  --text-xl: calc(var(--text-lg) * var(--text-scale-ratio));
+  --text-xxl: calc(var(--text-xl) * var(--text-scale-ratio));
 
-/* Utility classes (good) */
-.mb-8 { margin-bottom: 8px; }
-.p-16 { padding: 16px; }
+  /* Financial Dashboard Colors */
+  --color-primary: #01a4ef;
+  --color-secondary: #f44e24;
+  --color-success: #81b900;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  
+  /* Contrast levels for text hierarchy */
+  --color-contrast-higher: #1a1a1a;
+  --color-contrast-high: #333;
+  --color-contrast-medium: #666;
+  --color-contrast-low: #999;
+  
+  /* Surface colors */
+  --color-bg: #ffffff;
+  --color-bg-light: #f8f9fa;
+  --color-bg-dark: #2c3e50;
+}
 
-/* No component structure */
-/* Should be: .notification-bell, .notification-bell__badge, etc. */
+/* Responsive scaling at 64rem (1024px) */
+@media (min-width: 64rem) {
+  :root {
+    --space-unit: 1.25em;
+    --text-base-size: 1.125em;
+    --text-scale-ratio: 1.25;
+  }
+}
+
+/* Dark theme tokens */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a1a1a;
+    --color-bg-light: #2c2c2c;
+    --color-contrast-higher: #f8f9fa;
+    --color-contrast-high: #e0e0e0;
+    --color-contrast-medium: #b3b3b3;
+  }
+}
 ```
 
----
+### 3. Utility Classes — Speed Layer
 
-## Recommended Architecture: ITCSS + BEM
-
-### Why ITCSS?
-- **Manages specificity naturally** (least to most specific)
-- **Prevents conflicts** with clear layering
-- **Works with existing design tokens**
-
-### Why BEM?
-- **Clear component boundaries** (.card, .card__title, .card--featured)
-- **Self-documenting** (you know what classes do)
-- **Scales to large teams** without conflicts
-
-### Hybrid Structure
-
-```
-assets/css/
-├── 1-settings/
-│   └── design-tokens.css        (already exists ✅)
-├── 2-tools/
-│   ├── mixins.css               (future: Sass/PostCSS mixins)
-│   └── functions.css
-├── 3-generic/
-│   ├── reset.css                (CSS reset/normalize)
-│   └── box-sizing.css
-├── 4-elements/
-│   ├── typography.css           (h1-h6, p, base styles)
-│   ├── forms.css                (base input/button styles)
-│   └── tables.css
-├── 5-objects/
-│   ├── layout.css               (grid, containers)
-│   └── media.css                (responsive objects)
-├── 6-components/
-│   ├── notification-bell.css    (BEM: .notification-bell)
-│   ├── card.css                 (BEM: .card, .card__header)
-│   ├── nav.css                  (BEM: .nav, .nav__item)
-│   ├── dashboard.css            (BEM: .dashboard, .dashboard__widget)
-│   ├── chart.css                (BEM: .chart, .chart__legend)
-│   └── ...
-├── 7-utilities/
-│   ├── spacing.css              (already exists ✅)
-│   ├── display.css
-│   └── accessibility.css        (already exists ✅)
-└── main.css                     (imports all layers in order)
-```
-
----
-
-## Implementation Plan
-
-### Phase 1: File Reorganization (1 day)
-1. Create ITCSS folder structure
-2. Split `main.css` into component files
-3. Update `main.css` to import files in ITCSS order
-4. Test that nothing breaks
-
-**Example main.css (new):**
+#### Core Utilities Needed
 ```css
-/* Fireside Capital — Main Stylesheet (ITCSS Architecture) */
+/* app/assets/css/globals/_utilities.css */
 
-/* 1. Settings — Variables, design tokens */
-@import '1-settings/design-tokens.css';
+/* Spacing */
+.padding-xs { padding: var(--space-xs); }
+.padding-sm { padding: var(--space-sm); }
+.padding-md { padding: var(--space-md); }
+.padding-lg { padding: var(--space-lg); }
+.padding-xl { padding: var(--space-xl); }
 
-/* 2. Tools — Mixins, functions (future) */
-/* @import '2-tools/mixins.css'; */
+.margin-top-md { margin-top: var(--space-md); }
+.margin-bottom-lg { margin-bottom: var(--space-lg); }
 
-/* 3. Generic — Resets, box-sizing */
-@import '3-generic/reset.css';
+/* Typography */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-md { font-size: var(--text-md); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-xxl { font-size: var(--text-xxl); }
 
-/* 4. Elements — Base element styles */
-@import '4-elements/typography.css';
-@import '4-elements/forms.css';
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-bold { font-weight: 700; }
+.font-normal { font-weight: 400; }
 
-/* 5. Objects — Layout primitives */
-@import '5-objects/layout.css';
+/* Colors */
+.color-primary { color: var(--color-primary); }
+.color-success { color: var(--color-success); }
+.color-danger { color: var(--color-danger); }
+.color-contrast-medium { color: var(--color-contrast-medium); }
 
-/* 6. Components — UI components (BEM naming) */
-@import '6-components/notification-bell.css';
-@import '6-components/card.css';
-@import '6-components/nav.css';
-@import '6-components/dashboard.css';
-@import '6-components/chart.css';
+.bg-primary { background-color: var(--color-primary); }
+.bg-light { background-color: var(--color-bg-light); }
 
-/* 7. Utilities — Utility classes (highest specificity) */
-@import '7-utilities/spacing.css';
-@import '7-utilities/display.css';
-@import '7-utilities/accessibility.css';
+/* Layout */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
 
-/* Responsive — Media queries */
-@import 'responsive.css';
+/* Display */
+.block { display: block; }
+.hidden { display: none; }
+.width-100 { width: 100%; }
+
+/* Financial-specific */
+.currency {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.amount-positive { color: var(--color-success); }
+.amount-negative { color: var(--color-danger); }
 ```
 
-### Phase 2: BEM Conversion (2-3 days)
-Convert existing components to BEM naming.
+### 4. BEM Components — Behavior Layer
 
-**Example: Notification Bell**
+#### When to Use BEM
+- Complex hover/focus effects
+- Animations and transitions
+- Positioning relationships between elements
+- Component-specific behavioral CSS
 
-**Before (current):**
-```css
-#notificationBell { }
-#notificationBadge { }
-.dropdown-header { }
-.notification-item { }
-```
-
-**After (BEM):**
-```css
-.notification-bell { }
-.notification-bell__badge { }
-.notification-bell__dropdown { }
-.notification-bell__dropdown-header { }
-.notification-bell__item { }
-.notification-bell__item--unread { }
-```
-
-**HTML:**
+#### Example: Debt Card Component
 ```html
-<button class="notification-bell" id="notificationBell">
-  <i class="bi bi-bell"></i>
-  <span class="notification-bell__badge">3</span>
-</button>
-
-<div class="notification-bell__dropdown">
-  <div class="notification-bell__dropdown-header">
-    <h6>Notifications</h6>
+<!-- app/debts.html -->
+<article class="debt-card radius-md padding-md bg-light">
+  <div class="debt-card__header flex justify-between align-center margin-bottom-sm">
+    <h3 class="debt-card__title text-lg font-bold">Student Loan</h3>
+    <span class="debt-card__badge" data-variant="active">Active</span>
   </div>
-  <div class="notification-bell__item notification-bell__item--unread">
-    <div class="notification-bell__item-icon">💰</div>
-    <div class="notification-bell__item-content">
-      <p>New transaction detected</p>
-      <span class="notification-bell__item-time">2m ago</span>
+  
+  <div class="debt-card__metrics">
+    <div class="metric">
+      <span class="metric__label text-sm color-contrast-medium">Balance</span>
+      <span class="metric__value text-xl currency amount-negative">$24,350.00</span>
+    </div>
+    <div class="metric">
+      <span class="metric__label text-sm color-contrast-medium">Rate</span>
+      <span class="metric__value text-lg">5.25%</span>
     </div>
   </div>
-</div>
+  
+  <div class="debt-card__progress-wrapper margin-top-md">
+    <div class="debt-card__progress" data-progress="35"></div>
+  </div>
+</article>
 ```
-
-### Phase 3: Component Extraction (3-5 days)
-Extract reusable components from `main.css`:
-
-**Priority components:**
-1. **Dashboard widgets** (.dashboard-widget, .dashboard-widget__header)
-2. **Charts** (.chart, .chart__legend, .chart__tooltip)
-3. **Cards** (.card, .card__header, .card__body, .card__footer)
-4. **Forms** (.form-field, .form-field__label, .form-field__input)
-5. **Navigation** (.nav, .nav__item, .nav__item--active)
-6. **Tables** (.data-table, .data-table__row, .data-table__cell)
-
----
-
-## Code Examples
-
-### Dashboard Widget Component
-
-**File:** `6-components/dashboard-widget.css`
 
 ```css
-/* ========================================
-   Dashboard Widget — BEM Component
-   ======================================== */
-
-.dashboard-widget {
-  background-color: var(--color-bg-2);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-5);
-  border: 1px solid var(--color-border-subtle);
-  transition: border-color 0.2s ease;
-}
-
-.dashboard-widget:hover {
-  border-color: var(--color-border-default);
-}
-
-/* Header */
-.dashboard-widget__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-4);
-  padding-bottom: var(--spacing-3);
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-.dashboard-widget__title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.dashboard-widget__actions {
-  display: flex;
-  gap: var(--spacing-2);
-}
-
-/* Body */
-.dashboard-widget__body {
-  margin-bottom: var(--spacing-4);
-}
-
-/* Footer (optional) */
-.dashboard-widget__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--spacing-3);
-  border-top: 1px solid var(--color-border-subtle);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
-/* Modifiers */
-.dashboard-widget--highlight {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px var(--color-primary-light);
-}
-
-.dashboard-widget--loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.dashboard-widget--error {
-  border-color: var(--color-error);
-  background-color: var(--color-error-bg);
-}
-```
-
-**HTML Usage:**
-```html
-<div class="dashboard-widget">
-  <div class="dashboard-widget__header">
-    <h3 class="dashboard-widget__title">Net Worth</h3>
-    <div class="dashboard-widget__actions">
-      <button class="btn btn-sm btn-tertiary">
-        <i class="bi bi-gear"></i>
-      </button>
-    </div>
-  </div>
-  <div class="dashboard-widget__body">
-    <canvas id="netWorthChart"></canvas>
-  </div>
-  <div class="dashboard-widget__footer">
-    <span>Last updated: 2m ago</span>
-    <a href="/reports" class="link">View details →</a>
-  </div>
-</div>
-```
-
-### Chart Component
-
-**File:** `6-components/chart.css`
-
-```css
-/* ========================================
-   Chart Component — BEM
-   ======================================== */
-
-.chart {
+/* app/assets/css/components/_debt-card.css */
+.debt-card {
   position: relative;
-  width: 100%;
-  height: 300px; /* Default height */
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.chart__canvas {
-  width: 100% !important;
-  height: 100% !important;
+.debt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.chart__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-3);
-  margin-top: var(--spacing-4);
-  padding-top: var(--spacing-3);
-  border-top: 1px solid var(--color-border-subtle);
+.debt-card__badge {
+  padding: 0.25em 0.75em;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: var(--color-contrast-low);
+  color: white;
 }
 
-.chart__legend-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+.debt-card__badge[data-variant="active"] {
+  background-color: var(--color-success);
 }
 
-.chart__legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
+.debt-card__badge[data-variant="paid"] {
+  background-color: var(--color-primary);
 }
 
-.chart__legend-label {
-  white-space: nowrap;
+.debt-card__progress-wrapper {
+  height: 8px;
+  background-color: var(--color-bg-light);
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-/* Modifiers */
-.chart--small {
-  height: 200px;
+.debt-card__progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-success) 0%, var(--color-primary) 100%);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
 }
 
-.chart--large {
-  height: 400px;
-}
-
-.chart--loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chart--loading::before {
-  content: "Loading chart...";
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+.debt-card__progress[data-progress="35"] {
+  width: 35%;
 }
 ```
 
----
+### 5. Exception Pattern — Data Attributes Over Modifiers
 
-## Migration Strategy
+#### Why Data Attributes?
+- **Easier JS integration:** `element.dataset.variant = 'active'`
+- **Accessible:** Don't interfere with ARIA attributes
+- **Cleaner HTML:** `data-variant="ghost"` vs `button--ghost button--large button--disabled`
 
-### Option A: Big Bang (Not Recommended)
-- Convert everything at once
-- ❌ High risk of breaking changes
-- ❌ Difficult to test thoroughly
+#### Example: Button Variants
+```html
+<button class="btn" data-variant="solid">Pay Now</button>
+<button class="btn" data-variant="ghost">Details</button>
+<button class="btn" data-variant="disabled">Paid</button>
+```
 
-### Option B: Gradual Migration (Recommended)
-1. **Week 1:** Set up ITCSS folder structure, move design tokens
-2. **Week 2:** Convert 2-3 high-priority components to BEM
-3. **Week 3:** Extract remaining components
-4. **Week 4:** Refactor utilities, remove duplicates
-5. **Week 5:** Final cleanup, delete legacy files
-
-**Backward Compatibility:**
-- Keep old class names as aliases during migration
-- Use both old and new classes in HTML temporarily
-- Deprecate old classes after 2 weeks
-
-**Example:**
 ```css
-/* Temporary alias during migration */
-#notificationBell,
-.notification-bell {
-  /* shared styles */
+.btn {
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--color-primary);
+  color: white;
 }
 
-/* Remove #notificationBell after 2 weeks */
+.btn[data-variant="ghost"] {
+  background-color: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn[data-variant="disabled"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 ```
 
----
+## Recommendations for Fireside Capital
 
-## Benefits of This Approach
-
-### Developer Experience
-- **Predictable naming** — know exactly what classes do
-- **No more specificity wars** — ITCSS manages it automatically
-- **Easier onboarding** — new devs understand structure quickly
-- **Better IDE autocomplete** — BEM names are self-documenting
-
-### Performance
-- **Smaller file sizes** — remove duplicates, better compression
-- **Faster rendering** — fewer selector collisions
-- **Better caching** — component CSS can be cached independently
-
-### Maintainability
-- **Isolated changes** — edit one component file at a time
-- **Easier debugging** — know which file to look in
-- **Safer refactoring** — clear component boundaries
-- **Less technical debt** — prevent future spaghetti code
-
----
-
-## Next Steps — Create Implementation Tasks
-
-### Task 1: Set Up ITCSS Folder Structure
-**Effort:** 2 hours  
-**Files:** Create 7 folders, move existing files
-
-### Task 2: Convert Notification Component to BEM
+### Phase 1: Establish Globals (Week 1)
+**Priority:** HIGH  
 **Effort:** 4 hours  
-**Files:** `6-components/notification-bell.css`, update HTML
 
-### Task 3: Extract Dashboard Widget Component
+1. Create `app/assets/css/globals/` directory
+2. Build design token files:
+   - `_tokens.css` → spacing, typography, colors
+   - `_utilities.css` → utility classes
+   - `_reset.css` → CSS reset
+   - `_text-component.css` → text wrapper behavioral class
+3. Import globals in `style.css`
+
+### Phase 2: Refactor Existing Components (Week 1-2)
+**Priority:** MEDIUM  
+**Effort:** 8 hours  
+
+Refactor these pages using hybrid approach:
+- ✅ **dashboard.html** → Cards showing account summaries
+- ✅ **debts.html** → Debt cards with progress bars
+- ✅ **bills.html** → Bill cards with due date badges
+- ✅ **investments.html** → Portfolio cards with charts
+
+### Phase 3: Component Library (Week 2)
+**Priority:** MEDIUM  
 **Effort:** 6 hours  
-**Files:** `6-components/dashboard-widget.css`, refactor pages
 
-### Task 4: Extract Chart Component
-**Effort:** 4 hours  
-**Files:** `6-components/chart.css`, standardize Chart.js integration
+Document reusable patterns:
+- Card variants (metric-card, account-card, bill-card)
+- Button variants (solid, ghost, danger, success)
+- Badge variants (status, priority, category)
+- Form components (input, select, checkbox with utility classes)
 
-### Task 5: Document CSS Architecture
+### Phase 4: Dark Mode (Week 3)
+**Priority:** LOW  
 **Effort:** 3 hours  
-**Files:** Create `docs/css-architecture.md` with component library
 
----
+Leverage CSS custom properties for automatic dark mode:
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a1a1a;
+    --color-bg-light: #2c2c2c;
+    /* ... other dark tokens */
+  }
+}
+```
+
+## File Structure Recommendation
+```
+app/assets/css/
+├── globals/
+│   ├── _tokens.css          # Design tokens
+│   ├── _reset.css           # CSS reset
+│   ├── _utilities.css       # Utility classes
+│   ├── _text-component.css  # Text wrapper
+│   └── _grid.css            # Grid layout utilities
+├── components/
+│   ├── _debt-card.css
+│   ├── _bill-card.css
+│   ├── _account-card.css
+│   ├── _metric-card.css
+│   ├── _btn.css
+│   └── _badge.css
+├── pages/
+│   ├── _dashboard.css       # Page-specific styles
+│   ├── _debts.css
+│   └── _bills.css
+└── style.css                # Main import file
+```
+
+## Anti-Patterns to Avoid
+
+### ❌ DON'T: Create BEM classes for everything
+```html
+<!-- Too many meaningless names -->
+<div class="card__content-wrapper">
+  <p class="card__text card__text--small card__text--secondary"></p>
+</div>
+```
+
+### ✅ DO: Use utilities for simple properties
+```html
+<!-- Clear, self-documenting -->
+<div class="padding-md">
+  <p class="text-sm color-contrast-medium"></p>
+</div>
+```
+
+### ❌ DON'T: Use utilities for complex effects
+```html
+<!-- Unreadable utility soup -->
+<div class="position-relative overflow-hidden transition-all duration-300 hover:translate-y-2 hover:shadow-lg"></div>
+```
+
+### ✅ DO: Use BEM for behavioral CSS
+```html
+<div class="debt-card"></div> <!-- .debt-card handles hover/transitions in CSS -->
+```
+
+## Next Steps
+1. **Task:** Create globals directory structure
+2. **Task:** Build design token CSS file with Fireside brand colors
+3. **Task:** Create utility classes file
+4. **Task:** Refactor debt-card component as proof of concept
+5. **Task:** Document component patterns in Storybook or style guide
 
 ## References
-
-### Articles
-- [Efficient CSS Architectures: BEM, SMACSS, and ITCSS](https://codedamn.com/news/css/efficient-css-architectures-bem-smacss-itcss)
-- [CSS Architecture and Organization: BEM, OOCSS, and SMACSS](https://dev.to/sharique_siddiqui_8242dad/css-architecture-and-organization-bem-oocss-and-smacss-1i4e)
-
-### Methodologies
-- **BEM:** http://getbem.com/
-- **ITCSS:** https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/
-- **SMACSS:** http://smacss.com/
-
-### Tools
-- **PostCSS** (for future CSS processing)
-- **Stylelint** (enforce BEM naming)
-- **PurgeCSS** (remove unused CSS)
-
----
-
-## Questions for Product Owner
-
-1. **Timeline:** Can we allocate 2-3 weeks for gradual migration?
-2. **Breaking changes:** OK to temporarily have duplicate class names?
-3. **Sass/PostCSS:** Should we introduce a CSS preprocessor for better DX?
-4. **Component library:** Want a Storybook-style component showcase?
-
----
-
-**Research Completed:** February 21, 2026  
-**Next Action:** Review recommendations, create implementation tasks  
-**Estimated Implementation:** 2-3 weeks (gradual migration)
+- [CUBE CSS Methodology](https://cube.fyi/)
+- [BEM + Utilities (CSS-Tricks)](https://css-tricks.com/building-a-scalable-css-architecture-with-bem-and-utility-classes/)
+- [CodyFrame Architecture](https://codyhouse.co/ds/docs/framework)

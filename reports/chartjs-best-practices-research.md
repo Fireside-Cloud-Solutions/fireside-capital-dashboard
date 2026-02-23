@@ -1,265 +1,141 @@
 # Chart.js Best Practices Research — Fireside Capital
-**Research Date:** February 4, 2026  
-**Topic:** Chart.js 4.x Performance Optimization & Financial Chart Patterns  
-**Library Version:** Chart.js 4.x (latest stable)
+**Date:** February 23, 2026  
+**Researcher:** Capital  
+**Status:** Complete  
 
 ## Executive Summary
+Chart.js remains a strong choice for financial dashboards in 2026 due to its **responsive design**, **lightweight footprint**, and **simplicity**. However, accessibility must be manually implemented, and production-grade charts require structured configuration. This research provides actionable patterns for creating accessible, performant, and clear financial data visualizations.
 
-Chart.js is the chosen charting library for Fireside Capital dashboard. This research covers **performance optimization, accessibility, responsive design, and financial-specific chart patterns** to ensure fast, accessible, and visually clear data visualizations.
+## Key Findings
 
-### Key Findings:
-✅ **Performance:** Disable animations, use normalized data, enable decimation for large datasets  
-✅ **Financial Charts:** Currency formatting, color-coded trends, target lines, tooltips with context  
-✅ **Accessibility:** Canvas fallback text, keyboard navigation, ARIA labels, color contrast  
-✅ **Responsive:** `maintainAspectRatio: false`, container-based sizing, mobile-optimized tooltips  
-✅ **Dark Mode Ready:** CSS custom properties for dynamic theming
+### 1. Chart.js Strengths for Financial Dashboards
 
----
+#### Why Chart.js Over Alternatives?
+| Feature | Chart.js | Highcharts | D3.js |
+|---------|----------|------------|-------|
+| Learning curve | ✅ Low | Medium | High |
+| Bundle size | ✅ 60KB | 90KB+ | 240KB+ |
+| Responsive by default | ✅ Yes | Yes | Manual |
+| Accessibility | ⚠️ Manual | Built-in | Manual |
+| Commercial use | ✅ Free | Paid | Free |
 
-## 1. Performance Optimization
+For Fireside Capital: **Chart.js is ideal** because:
+- Already integrated in the codebase
+- Lightweight (critical for mobile users)
+- Simple configuration (fast iteration)
+- Free for commercial use
 
-### Core Performance Rules
+### 2. Accessibility — The Biggest Gap
 
-#### ✅ Rule 1: Disable Animations (Production Dashboards)
-**Why:** Animations require multiple re-renders. For financial dashboards, data updates are more important than flashy transitions.
+#### The Problem
+**Canvas elements are invisible to screen readers** unless explicitly made accessible. Chart.js renders to `<canvas>`, which has no semantic meaning.
 
-```javascript
-const options = {
-  animation: false, // Disable ALL animations
-  // OR disable specific animations:
-  animations: {
-    colors: false,
-    x: false
-  }
-};
+#### Solution: ARIA + Fallback Content
+```html
+<!-- ❌ WRONG: Inaccessible chart -->
+<canvas id="spending-chart"></canvas>
+
+<!-- ✅ CORRECT: Accessible chart -->
+<canvas
+  id="spending-chart"
+  role="img"
+  aria-label="Pie chart showing spending breakdown for February 2026: Housing 40% ($1,800), Food 20% ($900), Transportation 15% ($675), Other 25% ($1,125)"
+>
+  <!-- Fallback content for screen readers -->
+  <table>
+    <caption>Spending Breakdown — February 2026</caption>
+    <thead>
+      <tr>
+        <th scope="col">Category</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Percentage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Housing</td>
+        <td>$1,800</td>
+        <td>40%</td>
+      </tr>
+      <tr>
+        <td>Food</td>
+        <td>$900</td>
+        <td>20%</td>
+      </tr>
+      <tr>
+        <td>Transportation</td>
+        <td>$675</td>
+        <td>15%</td>
+      </tr>
+      <tr>
+        <td>Other</td>
+        <td>$1,125</td>
+        <td>25%</td>
+      </tr>
+    </tbody>
+  </table>
+</canvas>
 ```
 
-**Performance Impact:** 40-60% faster initial render, especially with multiple charts
+#### Accessibility Checklist
+- [ ] Every `<canvas>` has `role="img"`
+- [ ] Every `<canvas>` has descriptive `aria-label`
+- [ ] Fallback `<table>` inside `<canvas>` tags
+- [ ] Chart colors meet WCAG AA contrast ratios
+- [ ] Patterns used in addition to color (for colorblind users)
 
-#### ✅ Rule 2: Use Normalized Data
-**Why:** Prevents Chart.js from re-sorting and processing data
+### 3. Responsive Design — Mobile-First Configuration
 
+#### The Pattern
+Chart.js automatically resizes charts to fit their parent container. However, **responsive options** (fonts, padding, legend position) must be configured.
+
+#### Mobile-Optimized Chart Configuration
 ```javascript
-const data = {
-  labels: ['Jan', 'Feb', 'Mar'], // Already sorted
-  datasets: [{
-    data: [10000, 12000, 15000], // Unique, sorted indices
-    normalized: true // Tell Chart.js data is pre-processed
-  }]
-};
-```
-
-#### ✅ Rule 3: Disable Parsing (Pre-formatted Data)
-**Why:** Skips internal data transformation step
-
-```javascript
-const options = {
-  parsing: false, // Data is already in internal format
-  // Provide data as {x, y} objects for line/scatter charts
-  datasets: [{
-    data: [
-      { x: 0, y: 10000 },
-      { x: 1, y: 12000 },
-      { x: 2, y: 15000 }
-    ]
-  }]
-};
-```
-
-#### ✅ Rule 4: Specify Min/Max for Scales
-**Why:** Prevents Chart.js from calculating range from data
-
-```javascript
-const options = {
-  scales: {
-    y: {
-      min: 0,
-      max: 500000, // Pre-calculated based on expected data range
-      beginAtZero: true
-    }
-  }
-};
-```
-
-#### ✅ Rule 5: Enable Decimation (Large Datasets)
-**Why:** Reduces data points without losing visual fidelity
-
-```javascript
-const options = {
-  plugins: {
-    decimation: {
-      enabled: true,
-      algorithm: 'lttb', // Largest-Triangle-Three-Buckets (best for line charts)
-      samples: 50 // Target number of points to display
-    }
-  }
-};
-```
-
-**Use Case:** Daily transaction data for 1+ years (365+ points → 50 points)
-
-#### ✅ Rule 6: Use Path2D Caching (Automatic with No Animations)
-**Why:** Browser caches rendered paths for reuse
-
-```javascript
-// Automatic when:
-// 1. animation: false
-// 2. Path2D is supported (all modern browsers)
-// No code needed — just disable animations!
-```
-
----
-
-## 2. Financial Chart Configurations
-
-### Net Worth Trend (Line Chart)
-
-```javascript
-const netWorthChart = new Chart(document.getElementById('netWorthChart'), {
-  type: 'line',
-  data: {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    datasets: [{
-      label: 'Net Worth',
-      data: [452000, 458000, 463000, 470000, 475000, 480000, 483000, 479000, 482000, 485000, 487000, 490000],
-      borderColor: '#01a4ef',
-      backgroundColor: 'rgba(1, 164, 239, 0.1)',
-      fill: true,
-      tension: 0, // Disable Bézier curves for performance (default: 0)
-      pointRadius: 0, // Hide points (faster rendering)
-      pointHoverRadius: 6, // Show on hover
-      borderWidth: 2
-    }],
-    normalized: true // Data is pre-sorted
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false, // Let container control height
-    animation: false, // Disable animations
-    interaction: {
-      mode: 'index',
-      intersect: false
-    },
-    plugins: {
-      legend: {
-        display: false // Hide legend (single dataset)
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
-        titleFont: {
-          size: 14,
-          weight: 'bold'
-        },
-        bodyFont: {
-          size: 13
-        },
-        displayColors: false,
-        callbacks: {
-          title: (context) => {
-            return context[0].label; // "Jan"
-          },
-          label: (context) => {
-            const value = context.parsed.y;
-            return `Net Worth: $${value.toLocaleString()}`;
-          },
-          afterLabel: (context) => {
-            // Show month-over-month change
-            const currentIndex = context.dataIndex;
-            if (currentIndex === 0) return '';
-            
-            const currentValue = context.parsed.y;
-            const previousValue = context.dataset.data[currentIndex - 1];
-            const change = currentValue - previousValue;
-            const changePercent = ((change / previousValue) * 100).toFixed(1);
-            
-            const symbol = change >= 0 ? '▲' : '▼';
-            const color = change >= 0 ? 'rgb(129, 185, 0)' : 'rgb(220, 53, 69)';
-            
-            return `${symbol} $${Math.abs(change).toLocaleString()} (${Math.abs(changePercent)}%)`;
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false
-        },
-        ticks: {
-          font: {
-            size: 12
-          }
-        }
-      },
-      y: {
-        beginAtZero: false, // Net worth doesn't start at zero
-        ticks: {
-          callback: (value) => {
-            return `$${(value / 1000).toFixed(0)}k`; // $450k
-          },
-          font: {
-            size: 12
-          }
-        },
-        grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
-        }
-      }
-    }
-  }
-});
-```
-
-### Asset Allocation (Donut Chart)
-
-```javascript
-const assetAllocationChart = new Chart(document.getElementById('assetAllocationChart'), {
+// app/assets/js/charts/spending-chart.js
+const spendingChartConfig = {
   type: 'doughnut',
   data: {
-    labels: ['Real Estate', 'Investments', 'Cash', 'Vehicles', 'Other'],
+    labels: ['Housing', 'Food', 'Transportation', 'Other'],
     datasets: [{
-      data: [450000, 280000, 52000, 30000, 8000],
+      data: [1800, 900, 675, 1125],
       backgroundColor: [
-        '#01a4ef', // Blue (primary)
-        '#6f42c1', // Purple (investments)
-        '#81b900', // Green (cash)
-        '#ffc107', // Yellow (vehicles)
-        '#6c757d'  // Gray (other)
+        'var(--color-primary)',
+        'var(--color-secondary)',
+        'var(--color-warning)',
+        'var(--color-contrast-medium)'
       ],
-      borderWidth: 0,
-      hoverOffset: 8, // Grow on hover
-      hoverBorderWidth: 2,
-      hoverBorderColor: '#fff'
+      borderWidth: 0
     }]
   },
   options: {
     responsive: true,
-    maintainAspectRatio: false,
-    animation: false,
+    maintainAspectRatio: true,
+    aspectRatio: 1.5, // Wider on mobile
+    
+    // Mobile-first legend positioning
     plugins: {
       legend: {
-        position: 'right',
+        display: true,
+        position: 'bottom', // Below chart on mobile
         labels: {
-          padding: 16,
+          boxWidth: 12,
+          padding: 10,
           font: {
-            size: 14
+            size: 14,
+            family: 'Inter, sans-serif'
           },
-          usePointStyle: true, // Circle instead of square
-          pointStyle: 'circle',
-          generateLabels: (chart) => {
+          // Generate accessible labels
+          generateLabels: function(chart) {
             const data = chart.data;
             if (data.labels.length && data.datasets.length) {
-              const dataset = data.datasets[0];
-              const total = dataset.data.reduce((a, b) => a + b, 0);
-              
               return data.labels.map((label, i) => {
-                const value = dataset.data[i];
-                const percentage = ((value / total) * 100).toFixed(1);
+                const value = data.datasets[0].data[i];
+                const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const percent = Math.round((value / total) * 100);
                 
                 return {
-                  text: `${label} (${percentage}%)`,
-                  fillStyle: dataset.backgroundColor[i],
+                  text: `${label} (${percent}%)`,
+                  fillStyle: data.datasets[0].backgroundColor[i],
                   hidden: false,
                   index: i
                 };
@@ -269,621 +145,569 @@ const assetAllocationChart = new Chart(document.getElementById('assetAllocationC
           }
         }
       },
+      
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
-        displayColors: true,
         callbacks: {
-          label: (context) => {
+          label: function(context) {
             const label = context.label || '';
-            const value = context.parsed;
+            const value = context.parsed || 0;
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
+            const percent = Math.round((value / total) * 100);
             
-            return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+            return `${label}: $${value.toLocaleString()} (${percent}%)`;
           }
-        }
+        },
+        bodyFont: {
+          size: 14
+        },
+        padding: 12
       }
     },
-    // Center text plugin (custom)
-    centerText: {
-      display: true,
-      text: '$812,000', // Total assets
-      subtext: 'Total Assets'
-    }
-  },
-  plugins: [{
-    // Custom plugin: Center text in donut
-    id: 'centerText',
-    beforeDraw: (chart) => {
-      if (chart.config.options.centerText.display) {
-        const { ctx, chartArea: { width, height } } = chart;
-        ctx.save();
-        
-        // Main text
-        ctx.font = 'bold 24px Inter';
-        ctx.fillStyle = '#212529';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(chart.config.options.centerText.text, width / 2, height / 2 - 10);
-        
-        // Subtext
-        ctx.font = '14px Inter';
-        ctx.fillStyle = '#6c757d';
-        ctx.fillText(chart.config.options.centerText.subtext, width / 2, height / 2 + 15);
-        
-        ctx.restore();
+    
+    // Responsive breakpoints
+    responsive: true,
+    maintainAspectRatio: true,
+    onResize: function(chart, size) {
+      // Adjust legend position on larger screens
+      if (size.width > 768) {
+        chart.options.plugins.legend.position = 'right';
+      } else {
+        chart.options.plugins.legend.position = 'bottom';
       }
     }
-  }]
-});
+  }
+};
+
+// Initialize chart
+const ctx = document.getElementById('spending-chart').getContext('2d');
+const spendingChart = new Chart(ctx, spendingChartConfig);
 ```
 
-### Budget vs. Actual (Bar Chart)
+### 4. Financial Chart Types — When to Use What
 
+#### Chart Type Decision Matrix
+| Data Type | Best Chart | Why |
+|-----------|------------|-----|
+| Spending breakdown | Doughnut/Pie | Shows proportions clearly |
+| Net worth over time | Line | Shows trends and momentum |
+| Income vs. Expenses | Bar (grouped) | Compares two metrics side-by-side |
+| Debt payoff progress | Horizontal bar | Shows completion percentage |
+| Budget vs. Actual | Bar (stacked) | Shows variance at a glance |
+
+#### Doughnut Chart — Spending Breakdown
+**When to use:** Category distributions (spending by category, asset allocation)  
+**Configuration:**
 ```javascript
-const budgetChart = new Chart(document.getElementById('budgetChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Housing', 'Food', 'Transport', 'Entertainment', 'Utilities', 'Other'],
-    datasets: [
-      {
-        label: 'Budget',
-        data: [2000, 600, 400, 300, 200, 300],
-        backgroundColor: 'rgba(1, 164, 239, 0.3)',
-        borderColor: '#01a4ef',
-        borderWidth: 2,
-        borderRadius: 4,
-        order: 2 // Draw second (behind actual)
-      },
-      {
-        label: 'Actual',
-        data: [2100, 720, 380, 450, 210, 340],
-        backgroundColor: (context) => {
-          const index = context.dataIndex;
-          const actual = context.dataset.data[index];
-          const budget = context.chart.data.datasets[0].data[index];
-          return actual > budget 
-            ? 'rgba(220, 53, 69, 0.6)' // Over budget (red)
-            : 'rgba(129, 185, 0, 0.6)'; // Under budget (green)
-        },
-        borderColor: (context) => {
-          const index = context.dataIndex;
-          const actual = context.dataset.data[index];
-          const budget = context.chart.data.datasets[0].data[index];
-          return actual > budget ? '#dc3545' : '#81b900';
-        },
-        borderWidth: 2,
-        borderRadius: 4,
-        order: 1 // Draw first (on top)
-      }
-    ],
-    normalized: true
-  },
+{
+  type: 'doughnut',
+  data: { /* categories and values */ },
   options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false,
-    interaction: {
-      mode: 'index',
-      intersect: false
-    },
+    cutout: '70%', // Larger center hole = cleaner look
     plugins: {
       legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true,
-          padding: 16,
-          font: {
-            size: 13
-          }
-        }
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
-        displayColors: true,
-        callbacks: {
-          title: (context) => {
-            return context[0].label; // Category name
-          },
-          label: (context) => {
-            const label = context.dataset.label;
-            const value = context.parsed.y;
-            return `${label}: $${value.toLocaleString()}`;
-          },
-          afterBody: (context) => {
-            // Show variance
-            const actual = context[1].parsed.y;
-            const budget = context[0].parsed.y;
-            const variance = actual - budget;
-            const variancePercent = ((variance / budget) * 100).toFixed(1);
-            
-            if (variance === 0) return '';
-            
-            const symbol = variance > 0 ? '▲' : '▼';
-            const status = variance > 0 ? 'over budget' : 'under budget';
-            
-            return `\n${symbol} $${Math.abs(variance).toLocaleString()} (${Math.abs(variancePercent)}%) ${status}`;
+        position: 'right' // Desktop: legend on side
+      }
+    }
+  }
+}
+```
+
+#### Line Chart — Net Worth Trend
+**When to use:** Trends over time (net worth, savings balance, investment growth)  
+**Configuration:**
+```javascript
+{
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Net Worth',
+      data: [120000, 122000, 125000, 123000, 127000, 127482],
+      borderColor: 'var(--color-success)',
+      backgroundColor: 'rgba(129, 185, 0, 0.1)', // Subtle fill
+      tension: 0.4, // Smooth curves
+      fill: true,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: false, // Financial data rarely starts at 0
+        ticks: {
+          callback: function(value) {
+            return '$' + value.toLocaleString();
           }
         }
       }
     },
-    scales: {
-      x: {
-        grid: {
-          display: false
-        },
-        ticks: {
-          font: {
-            size: 12
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return 'Net Worth: $' + context.parsed.y.toLocaleString();
           }
-        }
-      },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: (value) => {
-            return `$${value.toLocaleString()}`;
-          },
-          font: {
-            size: 12
-          }
-        },
-        grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
         }
       }
     }
   }
-});
+}
 ```
 
-### Debt Payoff Progress (Bullet Chart / Progress Bar)
-
+#### Horizontal Bar Chart — Debt Payoff Progress
+**When to use:** Progress toward goals (debt payoff, savings targets)  
+**Configuration:**
 ```javascript
-// Custom bullet chart using bar chart
-const debtPayoffChart = new Chart(document.getElementById('debtPayoffChart'), {
+{
   type: 'bar',
   data: {
-    labels: ['Mortgage', 'Car Loan', 'Student Loan'],
-    datasets: [
-      {
-        label: 'Paid',
-        data: [150000, 12000, 28000],
-        backgroundColor: '#81b900',
-        borderRadius: 4,
-        barThickness: 30
-      },
-      {
-        label: 'Remaining',
-        data: [250000, 8000, 17000],
-        backgroundColor: 'rgba(220, 53, 69, 0.3)',
-        borderRadius: 4,
-        barThickness: 30
-      }
-    ]
+    labels: ['Student Loan', 'Car Loan', 'Credit Card'],
+    datasets: [{
+      label: 'Paid Off',
+      data: [35, 60, 80], // Percentages
+      backgroundColor: 'var(--color-success)',
+      barThickness: 20
+    }, {
+      label: 'Remaining',
+      data: [65, 40, 20],
+      backgroundColor: 'var(--color-contrast-low)',
+      barThickness: 20
+    }]
   },
   options: {
     indexAxis: 'y', // Horizontal bars
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false,
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true,
-          padding: 16
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const label = context.dataset.label;
-            const value = context.parsed.x;
-            const total = context.chart.data.datasets[0].data[context.dataIndex] + 
-                          context.chart.data.datasets[1].data[context.dataIndex];
-            const percentage = ((value / total) * 100).toFixed(1);
-            
-            return `${label}: $${value.toLocaleString()} (${percentage}%)`;
-          }
-        }
-      }
-    },
     scales: {
       x: {
         stacked: true,
-        beginAtZero: true,
+        max: 100,
         ticks: {
-          callback: (value) => `$${(value / 1000).toFixed(0)}k`
+          callback: function(value) {
+            return value + '%';
+          }
         }
       },
       y: {
-        stacked: true,
-        grid: {
-          display: false
-        }
+        stacked: true
+      }
+    },
+    plugins: {
+      legend: {
+        display: false // Legend not needed for binary progress
       }
     }
+  }
+}
+```
+
+### 5. Color Accessibility — Patterns Over Color
+
+#### The Problem
+**4.25% of users are colorblind** (1 in 12 men, 1 in 200 women). Relying solely on color to differentiate data is inaccessible.
+
+#### Solution: Combine Color + Patterns
+```javascript
+// Define patterns for accessibility
+const createPattern = (color, type) => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 10;
+  canvas.height = 10;
+  
+  ctx.fillStyle = color;
+  
+  switch(type) {
+    case 'dots':
+      ctx.fillRect(0, 0, 2, 2);
+      ctx.fillRect(5, 5, 2, 2);
+      break;
+    case 'stripes':
+      ctx.fillRect(0, 0, 5, 10);
+      break;
+    case 'cross':
+      ctx.fillRect(0, 4, 10, 2);
+      ctx.fillRect(4, 0, 2, 10);
+      break;
+    default:
+      ctx.fillRect(0, 0, 10, 10);
+  }
+  
+  return ctx.createPattern(canvas, 'repeat');
+};
+
+// Use patterns in chart
+const spendingChart = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: [1800, 900, 675, 1125],
+      backgroundColor: [
+        createPattern('#01a4ef', 'solid'),
+        createPattern('#f44e24', 'stripes'),
+        createPattern('#ffc107', 'dots'),
+        createPattern('#6c757d', 'cross')
+      ]
+    }]
   }
 });
 ```
 
----
+**Simpler approach:** Use shades of the same color
+```javascript
+backgroundColor: [
+  'rgba(1, 164, 239, 1.0)',   // Primary (full opacity)
+  'rgba(1, 164, 239, 0.75)',  // 75% opacity
+  'rgba(1, 164, 239, 0.5)',   // 50% opacity
+  'rgba(1, 164, 239, 0.25)'   // 25% opacity
+]
+```
 
-## 3. Responsive Design Patterns
+### 6. Performance Optimization — Prevent Chart Lag
 
-### Container-Based Sizing (Recommended)
+#### The Problem
+Financial dashboards often update in real-time (balance refreshes, transaction imports). Recreating charts on every update causes lag.
+
+#### Solution: Update Data, Don't Recreate Chart
+```javascript
+// ❌ WRONG: Recreates chart on every update (slow)
+function updateSpendingChart(newData) {
+  const ctx = document.getElementById('spending-chart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'doughnut',
+    data: newData
+  });
+}
+
+// ✅ CORRECT: Updates existing chart (fast)
+let spendingChart = null;
+
+function initSpendingChart(initialData) {
+  const ctx = document.getElementById('spending-chart').getContext('2d');
+  spendingChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: initialData
+  });
+}
+
+function updateSpendingChart(newData) {
+  if (spendingChart) {
+    // Update data
+    spendingChart.data.datasets[0].data = newData.values;
+    spendingChart.data.labels = newData.labels;
+    
+    // Animate update
+    spendingChart.update('active'); // 'active' for smooth transition
+  }
+}
+```
+
+#### Animation Configuration
+```javascript
+options: {
+  animation: {
+    duration: 750, // Smooth but not slow
+    easing: 'easeInOutQuart'
+  },
+  // Disable animations on data updates for performance
+  transitions: {
+    active: {
+      animation: {
+        duration: 400
+      }
+    }
+  }
+}
+```
+
+### 7. Text Descriptions — Critical for Accessibility
+
+#### The Pattern
+**Every chart should have a text summary** that:
+1. Describes what the chart shows
+2. Highlights key insights
+3. Provides context for decisions
+
+#### Example: Spending Chart Description
 ```html
-<div class="c-chart c-chart--md">
-  <canvas id="netWorthChart"></canvas>
+<div class="chart-wrapper">
+  <canvas id="spending-chart" role="img" aria-labelledby="spending-chart-desc">
+    <!-- Fallback table here -->
+  </canvas>
+  
+  <!-- Text description (visible to all users) -->
+  <p id="spending-chart-desc" class="chart-description text-sm color-contrast-medium margin-top-sm">
+    Your spending for February 2026 totals $4,500. Housing ($1,800, 40%) and Food ($900, 20%) are your largest expenses.
+    Food spending is 15% over your budget—consider reducing dining out this month.
+  </p>
 </div>
 ```
 
-```css
-.c-chart {
-  position: relative;
-  width: 100%;
-}
+### 8. Tooltip Customization — Financial Context
 
-.c-chart--sm { min-height: 200px; }
-.c-chart--md { min-height: 300px; }
-.c-chart--lg { min-height: 400px; }
-.c-chart--xl { min-height: 500px; }
-
-.c-chart canvas {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
+#### Default Tooltips (Not Great)
+```
+Housing
+1800
 ```
 
-```javascript
-const options = {
-  responsive: true,
-  maintainAspectRatio: false, // Let CSS control height
-  // Chart fills container
-};
+#### Customized Tooltips (Much Better)
+```
+Housing: $1,800 (40% of budget)
+⚠️ 5% over budget
 ```
 
-### Mobile Optimizations
-
-#### Touch-Friendly Tooltips
+#### Implementation
 ```javascript
-const options = {
-  interaction: {
-    mode: 'nearest', // Easier to tap
-    intersect: false
-  },
-  plugins: {
-    tooltip: {
-      enabled: true,
-      mode: 'index',
-      position: 'nearest', // Auto-position to avoid edges
-      // Larger touch target on mobile
-      padding: window.innerWidth < 768 ? 16 : 12
+plugins: {
+  tooltip: {
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    titleFont: {
+      size: 14,
+      weight: 'bold'
+    },
+    bodyFont: {
+      size: 13
+    },
+    padding: 12,
+    callbacks: {
+      title: function(context) {
+        return context[0].label;
+      },
+      label: function(context) {
+        const value = context.parsed;
+        const dataset = context.dataset;
+        const total = dataset.data.reduce((a, b) => a + b, 0);
+        const percent = Math.round((value / total) * 100);
+        
+        // Add budget comparison
+        const budgets = {
+          'Housing': 1800,
+          'Food': 780,
+          'Transportation': 650,
+          'Other': 1000
+        };
+        
+        const category = context.label;
+        const budget = budgets[category];
+        const variance = budget ? value - budget : null;
+        
+        let label = `$${value.toLocaleString()} (${percent}%)`;
+        
+        if (variance !== null) {
+          if (variance > 0) {
+            label += `\n⚠️ $${variance.toLocaleString()} over budget`;
+          } else if (variance < 0) {
+            label += `\n✓ $${Math.abs(variance).toLocaleString()} under budget`;
+          }
+        }
+        
+        return label;
+      }
     }
   }
-};
+}
 ```
 
-#### Simplified Mobile Charts
-```javascript
-// Detect mobile and simplify chart
-const isMobile = window.innerWidth < 768;
+### 9. Chart.js Plugin Architecture
 
-const options = {
-  plugins: {
-    legend: {
-      display: !isMobile, // Hide legend on mobile
-      position: isMobile ? 'bottom' : 'right'
-    }
-  },
-  scales: {
-    x: {
-      ticks: {
-        maxRotation: isMobile ? 45 : 0, // Angle labels on mobile
+#### Useful Plugins for Financial Dashboards
+| Plugin | Purpose | Use Case |
+|--------|---------|----------|
+| chartjs-plugin-datalabels | Show values on chart | Display percentages on pie slices |
+| chartjs-plugin-annotation | Add reference lines | Mark budget thresholds |
+| chartjs-plugin-zoom | Pan and zoom | Explore long time-series data |
+
+#### Example: Data Labels on Doughnut Chart
+```html
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+```
+
+```javascript
+{
+  type: 'doughnut',
+  data: { /* ... */ },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
         font: {
-          size: isMobile ? 10 : 12
+          weight: 'bold',
+          size: 14
+        },
+        formatter: function(value, context) {
+          const total = context.dataset.data.reduce((a, b) => a + b, 0);
+          const percent = Math.round((value / total) * 100);
+          return percent + '%';
         }
       }
     }
-  }
-};
-```
-
----
-
-## 4. Accessibility (WCAG 2.1 AA)
-
-### Canvas Fallback Text
-```html
-<canvas id="netWorthChart" 
-        role="img" 
-        aria-label="Line chart showing net worth trend over 12 months, increasing from $452,000 in January to $490,000 in December">
-  <!-- Fallback for screen readers -->
-  <p>Net worth has increased from $452,000 to $490,000 over the past 12 months.</p>
-</canvas>
-```
-
-### Keyboard Navigation (Chartjs-plugin-a11y)
-```bash
-npm install chartjs-plugin-a11y
-```
-
-```javascript
-import ChartjsPluginA11y from 'chartjs-plugin-a11y';
-Chart.register(ChartjsPluginA11y);
-
-const options = {
-  plugins: {
-    a11y: {
-      enabled: true,
-      description: {
-        chart: 'This chart shows net worth trend over 12 months.',
-        dataset: 'Net worth values from January to December.'
-      }
-    }
-  }
-};
-```
-
-### Color Contrast (WCAG AA: 4.5:1)
-```javascript
-// Good contrast colors for accessibility
-const accessibleColors = {
-  blue: '#0056b3',   // Darker blue (4.6:1 on white)
-  green: '#006400',  // Dark green (6.1:1 on white)
-  red: '#c82333',    // Dark red (4.6:1 on white)
-  purple: '#5a32a3', // Dark purple (5.2:1 on white)
-  orange: '#d63384'  // Dark magenta (4.8:1 on white)
-};
-```
-
----
-
-## 5. Dark Mode Support
-
-### CSS Custom Properties Integration
-```javascript
-// Read colors from CSS custom properties
-const styles = getComputedStyle(document.documentElement);
-const primaryColor = styles.getPropertyValue('--color-primary').trim();
-const successColor = styles.getPropertyValue('--color-success').trim();
-const dangerColor = styles.getPropertyValue('--color-danger').trim();
-const textColor = styles.getPropertyValue('--color-text-primary').trim();
-const gridColor = styles.getPropertyValue('--color-border').trim();
-
-const options = {
-  plugins: {
-    legend: {
-      labels: {
-        color: textColor // Adapts to light/dark mode
-      }
-    },
-    tooltip: {
-      backgroundColor: textColor === '#212529' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-      titleColor: textColor === '#212529' ? '#fff' : '#000',
-      bodyColor: textColor === '#212529' ? '#fff' : '#000'
-    }
   },
-  scales: {
-    x: {
-      ticks: {
-        color: textColor
+  plugins: [ChartDataLabels]
+}
+```
+
+### 10. Chart Configuration Structure
+
+#### Maintainable Chart Factory Pattern
+```javascript
+// app/assets/js/charts/chart-factory.js
+class FinancialChartFactory {
+  static defaultOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        labels: {
+          font: {
+            family: 'Inter, sans-serif'
+          }
+        }
       },
-      grid: {
-        color: gridColor
-      }
-    },
-    y: {
-      ticks: {
-        color: textColor
-      },
-      grid: {
-        color: gridColor
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 12,
+        titleFont: { size: 14 },
+        bodyFont: { size: 13 }
       }
     }
+  };
+  
+  static currencyFormatter(value) {
+    return '$' + value.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   }
-};
-```
-
-### Dark Mode Detection
-```javascript
-// Detect dark mode preference
-const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-// Update chart when theme changes
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  const isDark = e.matches;
-  updateChartTheme(myChart, isDark);
-});
-
-function updateChartTheme(chart, isDark) {
-  chart.options.plugins.legend.labels.color = isDark ? '#f8f9fa' : '#212529';
-  chart.options.scales.x.ticks.color = isDark ? '#f8f9fa' : '#212529';
-  chart.options.scales.y.ticks.color = isDark ? '#f8f9fa' : '#212529';
-  chart.update();
-}
-```
-
----
-
-## 6. Common Patterns & Utilities
-
-### Currency Formatter (Reusable)
-```javascript
-// Utility function for consistent currency formatting
-function formatCurrency(value, decimals = 0) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(value);
-}
-
-// Usage in chart:
-ticks: {
-  callback: (value) => formatCurrency(value)
-}
-```
-
-### Target Line Plugin (Savings Goal, Budget Target)
-```javascript
-const targetLinePlugin = {
-  id: 'targetLine',
-  afterDraw: (chart) => {
-    if (chart.config.options.plugins.targetLine) {
-      const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
-      const targetValue = chart.config.options.plugins.targetLine.value;
-      const targetY = y.getPixelForValue(targetValue);
-      
-      ctx.save();
-      ctx.strokeStyle = chart.config.options.plugins.targetLine.color || '#ffc107';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.moveTo(left, targetY);
-      ctx.lineTo(right, targetY);
-      ctx.stroke();
-      
-      // Label
-      ctx.fillStyle = chart.config.options.plugins.targetLine.color || '#ffc107';
-      ctx.font = 'bold 12px Inter';
-      ctx.fillText(chart.config.options.plugins.targetLine.label || 'Target', right + 5, targetY - 5);
-      
-      ctx.restore();
-    }
+  
+  static createSpendingChart(canvasId, data) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    return new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: {
+        ...this.defaultOptions,
+        cutout: '70%',
+        plugins: {
+          ...this.defaultOptions.plugins,
+          tooltip: {
+            ...this.defaultOptions.plugins.tooltip,
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percent = Math.round((value / total) * 100);
+                return `${context.label}: ${FinancialChartFactory.currencyFormatter(value)} (${percent}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
   }
-};
-
-Chart.register(targetLinePlugin);
-
-// Usage:
-const options = {
-  plugins: {
-    targetLine: {
-      value: 5000, // Target value
-      label: 'Emergency Fund Goal',
-      color: '#ffc107'
-    }
+  
+  static createNetWorthChart(canvasId, data) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    return new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+        ...this.defaultOptions,
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              callback: function(value) {
+                return FinancialChartFactory.currencyFormatter(value);
+              }
+            }
+          }
+        },
+        plugins: {
+          ...this.defaultOptions.plugins,
+          tooltip: {
+            ...this.defaultOptions.plugins.tooltip,
+            callbacks: {
+              label: function(context) {
+                return 'Net Worth: ' + FinancialChartFactory.currencyFormatter(context.parsed.y);
+              }
+            }
+          }
+        }
+      }
+    });
   }
-};
-```
-
-### Chart Update Helper (Real-time Data)
-```javascript
-// Update chart data without re-creating chart
-function updateChartData(chart, newLabels, newData) {
-  chart.data.labels = newLabels;
-  chart.data.datasets[0].data = newData;
-  chart.update('none'); // Update without animation
 }
 
-// Example: Update net worth chart with new month
-updateChartData(netWorthChart, 
-  [...existingLabels, 'Jan 2026'], 
-  [...existingData, 495000]
-);
+// Usage
+const spendingChart = FinancialChartFactory.createSpendingChart('spending-chart', spendingData);
+const netWorthChart = FinancialChartFactory.createNetWorthChart('net-worth-chart', netWorthData);
 ```
 
-### Lazy Load Charts (Performance)
-```javascript
-// Only render charts when visible (Intersection Observer)
-const chartObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting && !entry.target.dataset.chartRendered) {
-      const chartId = entry.target.id;
-      renderChart(chartId);
-      entry.target.dataset.chartRendered = 'true';
-      chartObserver.unobserve(entry.target);
-    }
-  });
-}, {
-  rootMargin: '100px' // Load 100px before visible
-});
+## Recommendations for Fireside Capital
 
-// Observe all chart canvases
-document.querySelectorAll('.c-chart canvas').forEach(canvas => {
-  chartObserver.observe(canvas);
-});
-```
+### Phase 1: Accessibility Audit & Fix (4 hours)
+**Priority:** HIGH  
+**Files:** All pages with charts (dashboard.html, reports.html, investments.html)
 
----
+1. Add `role="img"` and `aria-label` to all `<canvas>` elements
+2. Add fallback `<table>` inside canvas tags
+3. Add text descriptions below charts
+4. Verify color contrast ratios (WCAG AA minimum)
 
-## 7. Testing & Debugging
+### Phase 2: Chart Factory Pattern (6 hours)
+**Priority:** MEDIUM  
 
-### Chart.js DevTools
-```javascript
-// Log chart configuration for debugging
-console.log('Chart Config:', myChart.config);
-console.log('Chart Data:', myChart.data);
-console.log('Chart Options:', myChart.options);
+1. Create `app/assets/js/charts/chart-factory.js`
+2. Extract all chart configurations into factory methods
+3. Centralize currency formatting, tooltip callbacks
+4. Update all pages to use factory pattern
 
-// Manually trigger update
-myChart.update();
+### Phase 3: Mobile Optimization (3 hours)
+**Priority:** MEDIUM  
 
-// Destroy and re-create chart
-myChart.destroy();
-myChart = new Chart(ctx, config);
-```
+1. Test all charts on mobile viewports
+2. Adjust legend positions (bottom on mobile, right on desktop)
+3. Reduce font sizes on mobile
+4. Test touch interactions (tooltips, legends)
 
-### Performance Monitoring
-```javascript
-// Measure chart render time
-console.time('Chart Render');
-const myChart = new Chart(ctx, config);
-console.timeEnd('Chart Render'); // e.g., "Chart Render: 45ms"
+### Phase 4: Enhanced Tooltips (2 hours)
+**Priority:** LOW  
 
-// Monitor update performance
-console.time('Chart Update');
-myChart.update();
-console.timeEnd('Chart Update');
-```
+1. Add budget variance to spending chart tooltips
+2. Add trend indicators to net worth chart tooltips
+3. Add percentage changes to all charts
 
----
+### Phase 5: Performance Optimization (2 hours)
+**Priority:** LOW  
 
-## Implementation Checklist
+1. Replace chart recreation with `.update()` method
+2. Add debouncing to real-time data updates
+3. Measure and optimize animation durations
 
-### Phase 1: Setup (Week 1)
-- ✅ Install Chart.js 4.x via CDN or npm
-- ✅ Create chart wrapper components (`.c-chart`)
-- ✅ Set up CSS sizing (container-based, responsive)
-- ✅ Configure global defaults (fonts, colors from CSS tokens)
+## Code Examples Provided
+✅ Accessible canvas with ARIA and fallback table  
+✅ Mobile-optimized chart configuration  
+✅ Financial chart type decision matrix  
+✅ Doughnut, line, and horizontal bar chart configs  
+✅ Pattern-based backgrounds for colorblind accessibility  
+✅ Performance-optimized update pattern  
+✅ Customized financial tooltips  
+✅ Chart factory pattern for maintainability  
 
-### Phase 2: Core Charts (Week 2)
-- ✅ Net Worth Trend (line chart)
-- ✅ Asset Allocation (donut chart with center text)
-- ✅ Budget vs. Actual (bar chart with variance)
-- ✅ Debt Payoff Progress (horizontal bar/bullet chart)
+## Success Metrics
+- **Accessibility:** 100% of charts pass WCAG AA
+- **Performance:** Chart updates under 200ms
+- **Mobile usability:** 95%+ of users can read charts on mobile
+- **Clarity:** Text descriptions provided for all charts
 
-### Phase 3: Enhancements (Week 3)
-- ✅ Custom tooltips (show MoM change, variance)
-- ✅ Target line plugin (emergency fund, budget goals)
-- ✅ Lazy loading (Intersection Observer)
-- ✅ Dark mode support (CSS custom properties)
-
-### Phase 4: Accessibility (Week 4)
-- ✅ Canvas fallback text (aria-label)
-- ✅ Keyboard navigation (chartjs-plugin-a11y)
-- ✅ Color contrast audit (WCAG AA)
-- ✅ Screen reader testing
-
----
+## Related Documents
+- CSS Architecture: `reports/css-architecture-research.md`
+- UI Patterns: `reports/financial-dashboard-ui-patterns-research.md`
 
 ## References
-
-- **Chart.js Official Docs:** https://www.chartjs.org/docs/latest/
-- **Chart.js Performance Guide:** https://www.chartjs.org/docs/latest/general/performance.html
-- **Chart.js Accessibility Plugin:** https://github.com/julianna-langston/chartjs-plugin-a11y-legend
-- **Chart.js Examples:** https://www.chartjs.org/docs/latest/samples/
-- **Canvas API (MDN):** https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
-
----
-
-**Status:** ✅ Research complete — Ready for implementation  
-**Estimated Effort:** 3-4 weeks for full chart library  
-**Priority:** High (core dashboard functionality)  
-**Next Research Topic:** Bootstrap 5 Dark Theme Customization
+- [Chart.js Official Docs](https://www.chartjs.org/docs/latest/)
+- [Chart.js Accessibility Guide](https://www.chartjs.org/docs/latest/general/accessibility.html)
+- [Chart Accessibility Best Practices (Highcharts)](https://www.highcharts.com/blog/best-practices/best-chart-accessibility-practices/)
+- [WCAG 2.2 Guidelines](https://www.w3.org/WAI/WCAG22/quickref/)

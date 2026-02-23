@@ -305,23 +305,6 @@
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --focus-ring: var(--focus-ring-width) solid var(--focus-ring-color);
-
-  /* -----------------------------------------------------------------
-     COLORS — Financial Semantic
-     Positive/negative/neutral value display throughout the dashboard.
-     Text variants are tuned for dark-on-dark readability.
-     ----------------------------------------------------------------- */
-  --color-financial-positive:       #81b900;               /* Gains, income, positive deltas */
-  --color-financial-positive-bg:    rgba(129, 185, 0, 0.12);
-  --color-financial-positive-text:  #a3d400;               /* Lighter green for dark bg text */
-  --color-financial-negative:       #e53e3e;               /* Losses, expenses, negative deltas */
-  --color-financial-negative-bg:    rgba(229, 62, 62, 0.12);
-  --color-financial-negative-text:  #fc8181;               /* Lighter red for dark bg text */
-  --color-financial-neutral:        #01a4ef;               /* Neutral / informational values */
-  --color-financial-neutral-bg:     rgba(1, 164, 239, 0.12);
-  --color-financial-neutral-text:   #63b3ed;               /* Lighter blue for dark bg text */
-  --color-financial-warning:        #f6ad55;               /* Approaching limit warnings */
-  --color-financial-warning-bg:     rgba(246, 173, 85, 0.12);
 }
 
 /* ===================================================================

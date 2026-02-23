@@ -3703,3 +3703,23 @@ html {
 [data-bs-theme="dark"] .sidebar-logo {
   filter: drop-shadow(0 0 2px rgba(244, 78, 36, 0.3));
 }
+
+/* =================================================================
+   BILLS PAGE ENHANCEMENTS — UX Polish
+   ================================================================= */
+
+/* Issue #12: Smooth transition for financing fields toggle */
+#financingFields {
+  transition: max-height 200ms cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  max-height: 1000px; /* Enough for all financing fields */
+  opacity: 1;
+}
+
+#financingFields.d-none {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
