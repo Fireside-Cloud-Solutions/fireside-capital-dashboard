@@ -156,19 +156,17 @@ async function loadSubscriptionWidget() {
     const listEl = document.getElementById('subscriptionsList');
     if (!listEl) return;
     
-    // Empty state
+    // Empty state - follows design system pattern
     if (subs.length === 0) {
-      if (typeof generateEmptyStateHTML === 'function') {
-        listEl.innerHTML = generateEmptyStateHTML('subscriptions');
-      } else {
-        // Fallback if empty-states.js not loaded
-        listEl.innerHTML = `
-          <p class="text-muted text-center py-3">
-            <i class="bi bi-info-circle me-2"></i>
-            No subscriptions detected yet. Add monthly bills to track them here.
-          </p>
-        `;
-      }
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <i class="bi bi-credit-card-2-front empty-state-icon"></i>
+          <p class="empty-state-message">No subscriptions tracked yet.</p>
+          <a href="bills.html?filter=subscriptions" class="btn btn-sm btn-outline-secondary">
+            Add Subscription
+          </a>
+        </div>
+      `;
       return;
     }
     
