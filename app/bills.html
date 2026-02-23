@@ -90,7 +90,7 @@
           <div id="pageActions">
             <div class="d-flex gap-2">
               <button class="btn btn-outline-secondary btn-lg" id="scanEmailBillsBtn" aria-label="Scan email for bills">
-                <i class="bi bi-envelope-check"></i> Scan Email for Bills
+                <i class="bi bi-envelope-check"></i> <span class="d-none d-sm-inline">Scan Email for Bills</span>
               </button>
               <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addBillModal" aria-label="Add new bill">
                 <i class="bi bi-plus-circle"></i> Add Bill
@@ -161,28 +161,28 @@
         <div class="row g-3 g-xl-4 mb-4">
           <div class="col-xl-3 col-md-6 col-12">
             <div class="summary-card loading">
-              <h6>Monthly Bills Total</h6>
+              <h6><i class="bi bi-cash-stack me-2"></i>Monthly Bills Total</h6>
               <div class="skeleton-loader skeleton-value" style="width: 120px; height: 32px;"></div>
               <h4 id="billsTotal" class="d-none">$0.00</h4>
             </div>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
             <div class="summary-card loading">
-              <h6>Recurring</h6>
+              <h6><i class="bi bi-arrow-repeat me-2"></i>Recurring</h6>
               <div class="skeleton-loader skeleton-value" style="width: 80px; height: 32px;"></div>
               <h4 id="billsRecurringCount" class="d-none">0</h4>
             </div>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
             <div class="summary-card loading">
-              <h6>Shared With Me</h6>
+              <h6><i class="bi bi-people me-2"></i>Shared With Me</h6>
               <div class="skeleton-loader skeleton-value" style="width: 80px; height: 32px;"></div>
               <h4 id="billsSharedCount" class="d-none">0</h4>
             </div>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
             <div class="summary-card loading">
-              <h6>Next Due</h6>
+              <h6><i class="bi bi-calendar-event me-2"></i>Next Due</h6>
               <div class="skeleton-loader skeleton-value" style="width: 140px; height: 32px;"></div>
               <h4 id="billsNextDueAmount" class="d-none">�</h4>
               <small id="billsNextDueName" class="text-muted d-none"></small>
