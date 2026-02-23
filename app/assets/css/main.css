@@ -2686,6 +2686,18 @@ main {
   }
 }
 
+/* Extra small mobile devices - prevent stat card overflow */
+@media (max-width: 374px) {
+  .stat-card .stat-value {
+    font-size: 1.75rem; /* Down from 2rem */
+    word-break: break-word; /* Allow long numbers to wrap */
+  }
+  
+  .stat-card {
+    padding: var(--space-3); /* Further reduce padding for narrow screens */
+  }
+}
+
 /* =================================================================
    CRITICAL FIX: Welcome dropdown alignment (Consolidated 2026-02-03)
    All welcome button CSS lives here. No duplicates in other files.
