@@ -282,11 +282,11 @@
               </div>
               <div class="modal-body">
                 <div class="mb-3">
-                  <label for="budgetItemName" class="form-label mb-1">Item Name (e.g., Groceries)</label>
+                  <label for="budgetItemName" class="form-label mb-1">Item Name (e.g., Groceries) <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="budgetItemName" required>
                 </div>
                 <div class="mb-3">
-                  <label for="budgetItemCategory" class="form-label mb-1">Category</label>
+                  <label for="budgetItemCategory" class="form-label mb-1">Category <span class="text-danger">*</span></label>
                   <select class="form-select" id="budgetItemCategory" required>
                     <option value="" disabled selected>Select a category...</option>
                     <option value="dining">Dining</option>
@@ -301,7 +301,7 @@
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="budgetItemNeeded" class="form-label mb-1">Amount Needed ($)</label>
+                  <label for="budgetItemNeeded" class="form-label mb-1">Amount Needed ($) <span class="text-danger">*</span></label>
                   <input type="number" class="form-control" id="budgetItemNeeded" required min="0" step="0.01">
                 </div>
               </div>
