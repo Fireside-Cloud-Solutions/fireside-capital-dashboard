@@ -1755,3 +1755,33 @@ tbody.loading {
     display: none;
   }
 }
+
+/* =================================================================
+   CSS SIZING FIXES — 2026-02-23 (User-reported visual bugs)
+   ================================================================= */
+
+/* Fix #6: Asset Card Action Buttons Crowding */
+.card-actions .btn-icon,
+.table .btn-icon {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.card-actions .btn-icon:first-child,
+.table .btn-icon:first-child {
+  margin-left: 0;
+}
+
+.card-actions .btn-icon:last-child,
+.table .btn-icon:last-child {
+  margin-right: 0;
+}
+
+/* Fix #7: Currency Input Prefix Alignment */
+.input-group-text {
+  display: flex !important;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 1;
+}

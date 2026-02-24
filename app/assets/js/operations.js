@@ -248,8 +248,11 @@ function renderSafeToSpend(data) {
             <span>Est. Monthly Income</span>
             <span class="${state !== 'danger' ? 'text-success' : ''}">+${opsFormatCurrency(balance)}</span>
           </div>
-          <div class="d-flex justify-content-between mb-1">
-            <span>Bills ≤7 days <span class="badge bg-${state === 'danger' ? 'light text-danger' : 'danger'} ms-1">${billsDue7d.length}</span></span>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="d-flex align-items-center gap-2">
+              Bills ≤7 days
+              <span class="badge bg-${state === 'danger' ? 'light text-danger' : 'danger'} rounded-pill d-flex align-items-center justify-content-center" style="min-width: 20px; height: 20px; font-size: 11px;">${billsDue7d.length}</span>
+            </span>
             <span>−${opsFormatCurrency(billsDue7dTotal)}</span>
           </div>
           <div class="d-flex justify-content-between">
@@ -588,9 +591,9 @@ function renderBillsAging() {
            aria-label="${label} — ${bucketBills.length} bills totalling ${opsFormatCurrency(total)}">
         <div class="card-body py-2 px-3">
           <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge bg-${variant} rounded-pill">${bucketBills.length}</span>
-              <span class="fw-medium small">${emoji} ${label}</span>
+            <div class="d-flex align-items-center gap-2 flex-nowrap">
+              <span class="badge bg-${variant} rounded-pill d-flex align-items-center justify-content-center" style="min-width: 24px; height: 24px;">${bucketBills.length}</span>
+              <span class="fw-medium small text-nowrap">${emoji} ${label}</span>
             </div>
             <div class="d-flex align-items-center gap-2">
               <span class="fw-bold text-${variant}">${opsFormatCurrency(total)}</span>
