@@ -307,11 +307,11 @@
     line-height: 1.3;
   }
   
-  /* FIX: Empty state icons - reduce size on mobile */
+  /* P1-003: Empty state icons - optimized size for mobile visual impact */
   .empty-state .empty-icon,
   .empty-state svg {
-    width: 48px !important;
-    height: 48px !important;
+    width: 64px !important; /* Increased from 48px for better visibility (industry standard 64-80px) */
+    height: 64px !important;
   }
   
   .empty-state h3 {
