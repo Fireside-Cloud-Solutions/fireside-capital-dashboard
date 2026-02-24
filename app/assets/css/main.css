@@ -471,7 +471,7 @@ strong {
 
 .dashboard-card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-4px); /* P1-002: Standardized hover lift from -2px → -4px for consistency with .card */
   border-color: var(--color-border-default);
 }
 
@@ -546,7 +546,7 @@ strong {
 .chart-card:hover {
   border-color: var(--color-border-default);
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-4px); /* P1-002: Standardized hover lift from -2px → -4px for consistency with .card */
 }
 
 /* Mobile chart card padding */
