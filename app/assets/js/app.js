@@ -1808,6 +1808,9 @@ function renderFinancingCards() {
   const financingContainer = document.getElementById('financingCards');
   if (!financingContainer) return; // Not on the debts page
 
+  // Remove skeleton loaders (P1-002 fix - Debts page financing section loading state)
+  financingContainer.querySelectorAll('.skeleton-financing-card').forEach(el => el.remove());
+
   const allBills = window.bills || [];
   const isFinancingType = (b) => {
     const type = (b.type || '').toLowerCase();
