@@ -1333,6 +1333,54 @@ function renderDebts() {
               <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDebt('${escapeAttribute(d.id)}', '${escapeAttribute(d.name)}')" aria-label="Delete ${escapeAttribute(d.name)}"><i class="bi bi-trash"></i></button>
           </td>
       </tr>`).join('');
+
+  // P1-001: Update Debt KPI cards
+  updateDebtKPIs();
+}
+
+// P1-001: Calculate and display Debt KPI summary cards (UI/UX Audit 0547)
+function updateDebtKPIs() {
+  const debts = window.debts || [];
+  
+  // Calculate totals
+  const totalDebt = debts.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+  const totalMonthlyPayments = debts.reduce((sum, d) => sum + (parseFloat(d.monthlyPayment) || 0), 0);
+  
+  // Calculate weighted average interest rate
+  let weightedInterestSum = 0;
+  let totalForWeighting = 0;
+  debts.forEach(d => {
+    const amount = parseFloat(d.amount) || 0;
+    const rate = parseFloat(d.interestRate) || 0;
+    if (amount > 0 && rate > 0) {
+      weightedInterestSum += amount * rate;
+      totalForWeighting += amount;
+    }
+  });
+  const avgInterestRate = totalForWeighting > 0 ? weightedInterestSum / totalForWeighting : 0;
+  
+  // Update DOM elements
+  const totalDebtEl = document.getElementById('debtTotalAmount');
+  const avgRateEl = document.getElementById('debtAvgInterestRate');
+  const monthlyPaymentsEl = document.getElementById('debtMonthlyPayments');
+  
+  if (totalDebtEl) {
+    totalDebtEl.textContent = formatCurrency(totalDebt);
+    totalDebtEl.classList.remove('d-none');
+    totalDebtEl.parentElement.classList.remove('loading');
+  }
+  
+  if (avgRateEl) {
+    avgRateEl.textContent = avgInterestRate > 0 ? `${avgInterestRate.toFixed(2)}%` : '-';
+    avgRateEl.classList.remove('d-none');
+    avgRateEl.parentElement.classList.remove('loading');
+  }
+  
+  if (monthlyPaymentsEl) {
+    monthlyPaymentsEl.textContent = formatCurrency(totalMonthlyPayments);
+    monthlyPaymentsEl.classList.remove('d-none');
+    monthlyPaymentsEl.parentElement.classList.remove('loading');
+  }
 }
 function openDebtModal(id = null) {
   editDebtId = id;

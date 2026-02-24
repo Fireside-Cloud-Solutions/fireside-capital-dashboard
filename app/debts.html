@@ -134,6 +134,31 @@
       </div>
 
       <div id="dataContainer" class="data-hidden">
+        
+        <!-- Debt KPI Summary Cards (P1-001 from UI/UX Audit 0547) -->
+        <div class="row g-3 g-xl-4 mb-4">
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="summary-card loading" role="status" aria-live="polite">
+              <h6>Total Debt</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 140px; height: 32px;"></div>
+              <h4 id="debtTotalAmount" class="d-none">$0.00</h4>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-6 col-12">
+            <div class="summary-card loading" role="status" aria-live="polite">
+              <h6>Weighted Avg Interest Rate</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 100px; height: 32px;"></div>
+              <h4 id="debtAvgInterestRate" class="d-none">-</h4>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-12 col-12">
+            <div class="summary-card loading" role="status" aria-live="polite">
+              <h6>Total Monthly Payments</h6>
+              <div class="skeleton-loader skeleton-value" style="width: 120px; height: 32px;"></div>
+              <h4 id="debtMonthlyPayments" class="d-none">$0.00</h4>
+            </div>
+          </div>
+        </div>
 
         <!-- Static empty state (shown by JS when no debts exist) -->
         <div id="debtEmptyState" class="empty-state" style="display:none">
