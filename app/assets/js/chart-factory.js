@@ -83,10 +83,10 @@
    * All can be overridden per call via the `options` parameter.
    */
   const FACTORY_DEFAULTS = {
-    // Decimation (FC-096): reduce data points for line charts > 100pts
+    // Decimation (FC-096): reduce data points for line charts with 365+ points
     decimation: false,
     decimationAlgorithm: 'lttb',
-    samples: 365,                 // target sample count after decimation
+    samples: 500,                 // FC-096: target 500 samples (was 365)
 
     // Tick rotation (FC-178): skip auto-calculation, always 0°
     fixedRotation: true,

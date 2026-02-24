@@ -68,9 +68,10 @@ Chart.defaults.datasets.line.spanGaps = true; // Skip line segmentation on gaps
 // CHART.JS PERFORMANCE OPTIMIZATIONS (SPRINT-DEV 0615)
 // ===================================================================
 
-// Check if data decimation should be enabled (100+ data points)
+// Check if data decimation should be enabled (365+ data points)
+// FC-096: Only decimate large datasets (1+ year of daily data)
 function shouldEnableDecimation(dataLength) {
-  return dataLength > 100;
+  return dataLength >= 365;
 }
 
 // Get responsive legend position based on viewport
@@ -270,8 +271,8 @@ async function renderNetWorthChart() {
         decimation: {
           enabled: shouldEnableDecimation(filtered.data.length),
           algorithm: 'lttb', // Largest-Triangle-Three-Buckets (best for time series)
-          samples: 50, // Max data points to render
-          threshold: 100 // Only enable if dataset has 100+ points
+          samples: 500, // FC-096: Target 500 samples for accuracy + performance (was 50)
+          threshold: 365 // FC-096: Only enable for 1+ year daily data (was 100)
         },
         legend: {
           labels: { color: theme.text }
