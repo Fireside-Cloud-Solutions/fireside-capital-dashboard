@@ -34,7 +34,30 @@
 /* -----------------------------------------------------------------
    FOCUS INDICATORS — WCAG 2.4.7 (Focus Visible)
    Enhanced for better visibility across all interactive elements
+   P2-002: Added 150ms transitions for smooth focus ring animations
    ----------------------------------------------------------------- */
+
+/* P2-002: Smooth transitions for all interactive elements */
+button,
+.btn,
+input,
+select,
+textarea,
+.form-control,
+.form-select,
+a,
+.sidebar a,
+.dropdown-item,
+.form-check-input,
+.btn-icon,
+.btn-close,
+.table .btn {
+  transition: outline 150ms ease-out,
+              outline-offset 150ms ease-out,
+              box-shadow 150ms ease-out,
+              background-color 150ms ease-out,
+              border-color 150ms ease-out;
+}
 
 /* Base focus ring for all focusable elements */
 :focus-visible {
